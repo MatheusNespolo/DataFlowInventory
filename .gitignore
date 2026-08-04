@@ -1,0 +1,34 @@
+# ============================================================
+# DATA FLOW INVENTORY — .gitignore
+# ============================================================
+
+# Node.js
+server/node_modules/
+server/package-lock.json
+npm-debug.log*
+
+# Variáveis de ambiente (senhas!)
+server/.env
+
+# Arduino / PlatformIO
+.vscode/
+*.ino.elf
+*.ino.hex
+.build/
+.cache/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDEs
+.idea/
+.vscode/
+
+# Logs
+*.log
+logs/

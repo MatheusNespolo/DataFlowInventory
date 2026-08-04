@@ -1,0 +1,19 @@
+{
+  "name": "dataflow-inventory-server",
+  "version": "1.0.0",
+  "description": "Servidor Node.js para o sistema Data Flow Inventory — ponte entre MQTT e WebSocket",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["iot", "mqtt", "websocket", "intralogistica", "arduino"],
+  "author": "Henrique Moni, Matheus Nespolo, Murilo Tolardo, Vitor Marcolongo",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mqtt": "^5.9.1",
+    "socket.io": "^4.7.5"
+  }
+}
