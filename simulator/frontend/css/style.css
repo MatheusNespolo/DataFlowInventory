@@ -1,0 +1,642 @@
+/* ============================================================
+   DATA FLOW INVENTORY — Estilos do Simulador
+   ============================================================ */
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-primary: #0f1117;
+  --bg-secondary: #1a1d27;
+  --bg-card: #1e2130;
+  --bg-card-hover: #252840;
+  --border-color: #2a2d3e;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0b4;
+  --text-muted: #6b7189;
+  --accent-blue: #4a9eff;
+  --accent-green: #34d399;
+  --accent-red: #f87171;
+  --accent-yellow: #fbbf24;
+  --accent-purple: #a78bfa;
+  --color-a: #e74c3c;
+  --color-b: #2ecc71;
+  --color-c: #3498db;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: all 0.3s ease;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  font-size: 1.5rem;
+}
+
+.header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ============================================================
+   SIMULADOR BADGE
+   ============================================================ */
+.simulator-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  background: rgba(252, 211, 77, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(252, 211, 77, 0.3);
+  border-radius: 1rem;
+  vertical-align: text-bottom;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-online {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.status-online .status-dot {
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+  animation: pulse 2s infinite;
+}
+
+.status-offline {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--accent-red);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.status-offline .status-dot {
+  background: var(--accent-red);
+}
+
+.status-sim {
+  background: rgba(203, 213, 225, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(203, 213, 225, 0.3);
+}
+
+.status-sim .status-dot {
+  background: #cbd5e1;
+}
+
+.server-time {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ============================================================
+   DASHBOARD LAYOUT
+   ============================================================ */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  flex: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.col-left,
+.col-center,
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: rgba(74, 158, 255, 0.2);
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-desc {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+/* ============================================================
+   CARD: ESTADO
+   ============================================================ */
+.estado-display {
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.estado-texto {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  letter-spacing: 0.02em;
+}
+
+.estado-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   CARD: ESTOQUE
+   ============================================================ */
+.estoque-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.estoque-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  transition: var(--transition);
+}
+
+.estoque-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.estoque-cor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.estoque-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+.estoque-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.estoque-numero {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   CARD: ESTEIRAS
+   ============================================================ */
+.esteiras-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.esteira-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 1rem;
+}
+
+.esteira-nome {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.esteira-status {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+}
+
+.esteira-on {
+  color: var(--accent-green);
+  background: rgba(52, 211, 153, 0.15);
+}
+
+.esteira-off {
+  color: var(--text-muted);
+  background: rgba(107, 113, 137, 0.15);
+}
+
+.esteira-erro {
+  color: var(--accent-red);
+  background: rgba(248, 113, 113, 0.15);
+}
+
+/* ============================================================
+   CARD: DIAGRAMA
+   ============================================================ */
+.diagrama-container {
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.diagrama-svg {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+}
+
+/* ============================================================
+   CARD: SENSORES
+   ============================================================ */
+.sensores-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sensor-group h3 {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.sensor-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1rem;
+}
+
+.sensor-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sensor-valor {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.sensor-valor.ativo {
+  color: var(--accent-green);
+}
+
+/* ============================================================
+   CARD: CONTROLE REMOTO
+   ============================================================ */
+.botoes-controle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+.btn-a {
+  background: rgba(231, 76, 60, 0.15);
+  color: var(--color-a);
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+.btn-a:hover {
+  background: rgba(231, 76, 60, 0.25);
+  border-color: var(--color-a);
+}
+
+.btn-b {
+  background: rgba(46, 204, 113, 0.15);
+  color: var(--color-b);
+  border-color: rgba(46, 204, 113, 0.3);
+}
+
+.btn-b:hover {
+  background: rgba(46, 204, 113, 0.25);
+  border-color: var(--color-b);
+}
+
+.btn-c {
+  background: rgba(52, 152, 219, 0.15);
+  color: var(--color-c);
+  border-color: rgba(52, 152, 219, 0.3);
+}
+
+.btn-c:hover {
+  background: rgba(52, 152, 219, 0.25);
+  border-color: var(--color-c);
+}
+
+.btn-reset {
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--accent-yellow);
+  border-color: rgba(251, 191, 36, 0.3);
+  margin-top: 0.5rem;
+}
+
+.btn-reset:hover {
+  background: rgba(251, 191, 36, 0.25);
+  border-color: var(--accent-yellow);
+}
+
+/* ============================================================
+   CARD: HISTÓRICO
+   ============================================================ */
+.historico-lista {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-right: 0.3rem;
+}
+
+.historico-lista::-webkit-scrollbar {
+  width: 4px;
+}
+
+.historico-lista::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 2px;
+}
+
+.historico-lista::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.historico-item {
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  border-left: 3px solid var(--border-color);
+  animation: slideIn 0.3s ease;
+}
+
+.historico-item.evento-pedido {
+  border-left-color: var(--accent-blue);
+}
+
+.historico-item.evento-entrega {
+  border-left-color: var(--accent-green);
+}
+
+.historico-item.evento-erro {
+  border-left-color: var(--accent-red);
+}
+
+.historico-item.evento-inicio {
+  border-left-color: var(--accent-purple);
+}
+
+.historico-vazio {
+  color: var(--text-muted);
+  text-align: center;
+  border-left: none;
+}
+
+.historico-hora {
+  color: var(--text-muted);
+  font-family: 'Courier New', monospace;
+  margin-right: 0.5rem;
+}
+
+.historico-msg {
+  color: var(--text-primary);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width: 1200px) {
+  .dashboard {
+    grid-template-columns: 1fr 1fr;
+  }
+  .col-right {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    padding: 0.75rem;
+  }
+  .header {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .botoes-controle {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    min-width: 120px;
+  }
+  .footer {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+  }
+}
