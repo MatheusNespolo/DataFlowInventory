@@ -124,7 +124,7 @@ function atualizarSensores(data) {
 }
 
 function atualizarSensor(element, valor) {
-  element.textContent = valor ? '1' : '0';
+  element.textContent = valor ? '● Ativo' : '○ Inativo';
   if (valor) {
     element.classList.add('ativo');
   } else {

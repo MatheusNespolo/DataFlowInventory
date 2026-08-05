@@ -56,6 +56,7 @@ const ESTADOS = {
   VERIFICANDO: 'VERIFICANDO_ESTOQUE',
   ACIONANDO: 'ACIONANDO_ESTEIRA',
   ENTREGANDO: 'ENTREGANDO_PECA',
+  PROCESSANDO: 'PROCESSANDO_MOTOR',
   ERRO: 'ERRO',
 };
 
@@ -135,19 +136,21 @@ function processarPeca(peca) {
       publicarStatus();
       publicarSensores();
 
-      // 4. Entrega concluída (1s)
+      // 4. Entrega concluída e ativação do motor separador (1s)
       setTimeout(() => {
         sim.estoque[estoqueKey]--;
         sim.esteiras[`sec${peca}`] = false;
         sim.sensores.juncao[jKey] = false;
-        sim.fsm = ESTADOS.AGUARDANDO;
-        sim.pecaSolicitada = 0;
-
-        publicarEvento('entrega', peca);
-        publicarEstoque();
-        publicarEsteiras();
-        publicarSensores();
+        sim.fsm = ESTADOS.PROCESSANDO;
+        publicarEvento('processando', peca, 'motor_separador');
         publicarStatus();
+
+        // 5. Retorno ao estado inicial (1s)
+        setTimeout(() => {
+          sim.fsm = ESTADOS.AGUARDANDO;
+          sim.pecaSolicitada = 0;
+          publicarStatus();
+        }, 1000);
       }, 1000);
     }, 1500);
   }, 500);
