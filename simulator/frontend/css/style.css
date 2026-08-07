@@ -1,0 +1,496 @@
+/* ============================================================
+   DATA FLOW INVENTORY — Estilos do Simulador
+   ============================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0f1923;
+  color: #e0e0e0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- HEADER ---- */
+header {
+  background-color: #1a2632;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #2ecc71;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+header h1 span {
+  color: #2ecc71;
+}
+
+header .status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #e74c3c;
+  display: inline-block;
+}
+
+.status-dot.online {
+  background-color: #2ecc71;
+  box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
+}
+
+/* ---- MAIN ---- */
+main {
+  flex: 1;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---- CARDS ---- */
+.card {
+  background-color: #1a2632;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #2a3a4a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2ecc71;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a3a4a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ---- CARD: CONTROLO (solicitar peça) ---- */
+.card-controle {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-controle h2 {
+  width: 100%;
+}
+
+.botoes-peca {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-peca {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #ffffff;
+  min-width: 140px;
+}
+
+.btn-peca:active {
+  transform: scale(0.96);
+}
+
+.btn-peca:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-peca.peca-a {
+  background-color: #e74c3c;
+}
+
+.btn-peca.peca-a:hover:not(:disabled) {
+  background-color: #c0392b;
+  box-shadow: 0 0 12px rgba(231, 76, 60, 0.4);
+}
+
+.btn-peca.peca-b {
+  background-color: #27ae60;
+}
+
+.btn-peca.peca-b:hover:not(:disabled) {
+  background-color: #1e8449;
+  box-shadow: 0 0 12px rgba(39, 174, 96, 0.4);
+}
+
+.btn-peca.peca-c {
+  background-color: #2980b9;
+}
+
+.btn-peca.peca-c:hover:not(:disabled) {
+  background-color: #1a5276;
+  box-shadow: 0 0 12px rgba(41, 128, 185, 0.4);
+}
+
+.btn-reset {
+  padding: 14px 28px;
+  border: 2px solid #e74c3c;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: transparent;
+  color: #e74c3c;
+  transition: all 0.2s ease;
+}
+
+.btn-reset:hover:not(:disabled) {
+  background-color: #e74c3c;
+  color: #ffffff;
+}
+
+.btn-reset:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- CARD: STATUS ---- */
+.card-status {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #2a3a4a;
+}
+
+.info-linha:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #8899aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-valor {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.info-valor.estado-ativo {
+  color: #2ecc71;
+}
+
+.info-valor.estado-erro {
+  color: #e74c3c;
+}
+
+.info-valor.estado-aguardando {
+  color: #f39c12;
+}
+
+/* ---- CARD: ESTOQUE ---- */
+.card-estoque {
+  display: flex;
+  flex-direction: column;
+}
+
+.estoque-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.estoque-item {
+  text-align: center;
+  padding: 16px 8px;
+  border-radius: 8px;
+  background-color: #0f1923;
+  border: 1px solid #2a3a4a;
+}
+
+.estoque-item .peca-nome {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.estoque-item .peca-qtd {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.estoque-item.qtd-a {
+  border-color: #e74c3c;
+}
+
+.estoque-item.qtd-a .peca-nome { color: #e74c3c; }
+.estoque-item.qtd-a .peca-qtd { color: #e74c3c; }
+
+.estoque-item.qtd-b {
+  border-color: #27ae60;
+}
+
+.estoque-item.qtd-b .peca-nome { color: #27ae60; }
+.estoque-item.qtd-b .peca-qtd { color: #27ae60; }
+
+.estoque-item.qtd-c {
+  border-color: #2980b9;
+}
+
+.estoque-item.qtd-c .peca-nome { color: #2980b9; }
+.estoque-item.qtd-c .peca-qtd { color: #2980b9; }
+
+/* ---- CARD: ESTEIRAS ---- */
+.card-esteiras {
+  grid-column: 1 / -1;
+}
+
+.esteiras-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.esteira-item {
+  text-align: center;
+  padding: 16px 8px;
+  border-radius: 8px;
+  background-color: #0f1923;
+  border: 2px solid #2a3a4a;
+  transition: all 0.3s ease;
+}
+
+.esteira-item .esteira-nome {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8899aa;
+  margin-bottom: 8px;
+}
+
+.esteira-item .esteira-status {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.esteira-item.ligada {
+  border-color: #2ecc71;
+}
+
+.esteira-item.ligada .esteira-nome {
+  color: #2ecc71;
+}
+
+.esteira-item.ligada .esteira-status {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+
+.esteira-item.desligada .esteira-status {
+  background-color: rgba(136, 153, 170, 0.15);
+  color: #8899aa;
+}
+
+/* ---- CARD: HISTÓRICO ---- */
+.card-historico {
+  grid-column: 1 / -1;
+}
+
+.lista-historico {
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #2a3a4a #1a2632;
+}
+
+.lista-historico::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lista-historico::-webkit-scrollbar-track {
+  background: #1a2632;
+}
+
+.lista-historico::-webkit-scrollbar-thumb {
+  background-color: #2a3a4a;
+  border-radius: 3px;
+}
+
+.lista-historico li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #2a3a4a;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lista-historico li:last-child {
+  border-bottom: none;
+}
+
+.lista-historico li .evento-tempo {
+  color: #8899aa;
+  font-family: monospace;
+  font-size: 0.8rem;
+  min-width: 60px;
+}
+
+.lista-historico li .evento-tipo {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 80px;
+  text-align: center;
+}
+
+.lista-historico li .evento-tipo.entrega {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+
+.lista-historico li .evento-tipo.erro {
+  background-color: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+}
+
+.lista-historico li .evento-tipo.pedido {
+  background-color: rgba(243, 156, 18, 0.15);
+  color: #f39c12;
+}
+
+.lista-historico li .evento-desc {
+  flex: 1;
+  margin: 0 12px;
+}
+
+.historico-vazio {
+  text-align: center;
+  color: #8899aa;
+  font-size: 0.85rem;
+  padding: 24px;
+  font-style: italic;
+}
+
+/* ---- SENSORES ---- */
+.sensores-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.sensor-item {
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: 6px;
+  background-color: #0f1923;
+  border: 1px solid #2a3a4a;
+}
+
+.sensor-item .sensor-nome {
+  font-size: 0.7rem;
+  color: #8899aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.sensor-item .sensor-valor {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.sensor-item .sensor-valor.detectado {
+  color: #2ecc71;
+}
+
+/* ---- RESPONSIVO ---- */
+@media (max-width: 768px) {
+  main {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .card-controle {
+    grid-column: 1;
+  }
+
+  .card-historico {
+    grid-column: 1;
+  }
+
+  .card-esteiras {
+    grid-column: 1;
+  }
+
+  .esteiras-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .botoes-peca {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-peca {
+    width: 100%;
+  }
+
+  .estoque-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -2,7 +2,9 @@
 
 ## Visão Geral
 
-O sistema de comunicação conecta o protótipo físico (Arduino Mega + sensores + motores) a um dashboard web em tempo real, utilizando MQTT como protocolo de transporte entre o dispositivo IoT e o servidor na nuvem.
+O sistema de comunicação conecta o protótipo físico (Arduino Mega + sensores + motores) a um dashboard web em tempo real, utilizando MQTT como protocolo de transporte entre o dispositivo IoT e o servidor local.
+
+**Nota sobre hospedagem:** Esta arquitetura utiliza um broker MQTT local (Mosquitto) para fins de demonstração e desenvolvimento. A implantação é totalmente viável em ambiente de nuvem (HiveMQ Cloud, AWS IoT Core, Azure IoT Hub, etc.), bastando alterar o endpoint do broker e as credenciais de acesso.
 
 ---
 
@@ -24,22 +26,25 @@ O sistema de comunicação conecta o protótipo físico (Arduino Mega + sensores
 │  └──────────────┘                           │ Wi-Fi                 │
 └─────────────────────────────────────────────┼───────────────────────┘
                                               │
-                                              │ MQTT (TLS, port 8883)
+                                              │ MQTT (porta 1883)
                                               ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        NUVEM (Cloud)                                │
+│                    LOCAL (Máquina / Servidor)                       │
 │                                                                     │
 │  ┌──────────────────────────────────────┐                          │
-│  │         HiveMQ Cloud (Broker)        │                          │
+│  │         Mosquitto (Broker)           │                          │
+│  │                                      │                          │
+│  │  • Roda localmente (localhost)       │                          │
+│  │  • Porta padrão: 1883                │                          │
+│  │  • Sem TLS (rede local)              │                          │
 │  │                                      │                          │
 │  │  Tópicos:                            │                          │
-│  │  ├── dataflow/status                 │                          │
-│  │  ├── dataflow/estoque                │                          │
-│  │  ├── dataflow/eventos                │                          │
-│  │  ├── dataflow/sensores               │                          │
-│  │  ├── dataflow/esteiras               │                          │
-│  │  ├── dataflow/comandos/sub ←─────   │ ← (ESP32 se inscreve)   │
-│  │  └── dataflow/comandos/pub ──────→ │ → (ESP32 publica)       │
+│  │  ├── dfi/status                      │                          │
+│  │  ├── dfi/estoque                     │                          │
+│  │  ├── dfi/eventos                     │                          │
+│  │  ├── dfi/sensores                    │                          │
+│  │  ├── dfi/esteiras                    │                          │
+│  │  └── dfi/comando ←─────────────     │ ← (ESP32 se inscreve)   │
 │  └──────────────┬───────────────────────┘                          │
 │                  │                                                   │
 │                  │ MQTT                                              │
@@ -51,6 +56,8 @@ O sistema de comunicação conecta o protótipo físico (Arduino Mega + sensores
 │  │  • Socket.IO (WebSocket)             │                          │
 │  │  • mqtt.js (Subscriber)              │                          │
 │  │  • Relay MQTT → WebSocket            │                          │
+│  │                                      │                          │
+│  │  Roda em: localhost:3001             │                          │
 │  └──────────────┬───────────────────────┘                          │
 │                  │                                                   │
 │                  │ WebSocket (Socket.IO)                            │
@@ -62,8 +69,30 @@ O sistema de comunicação conecta o protótipo físico (Arduino Mega + sensores
 │  │  • Diagrama SVG interativo           │                          │
 │  │  • Botões de controle remoto         │                          │
 │  │  • Histórico de eventos              │                          │
+│  │                                      │                          │
+│  │  Roda em: localhost:3000             │                          │
 │  └──────────────────────────────────────┘                          │
 └─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Modos de Operação
+
+### Modo Simulador (offline, sem hardware)
+
+O simulador (`simulator/`) reproduz inteiramente a FSM do Arduino Mega em JavaScript, sem necessidade de dispositivos físicos nem de broker MQTT. É ideal para testes do frontend e para demonstração do fluxo de dados.
+
+```
+Frontend (localhost:3000) ──WebSocket──> server.js (simulador, porta 3000)
+```
+
+### Modo Real (com hardware físico)
+
+Com os dispositivos conectados, o fluxo completo envolve MQTT:
+
+```
+Arduino Mega ──Serial──> ESP32 ──MQTT:1883──> Mosquitto ──> Node.js Server ──WebSocket──> Frontend
 ```
 
 ---
@@ -79,7 +108,7 @@ Arduino Mega detecta evento (entrega, erro, mudança de estado)
 ESP32 recebe JSON pela Serial
     │
     ▼ mqtt.publish(tópico, JSON)
-HiveMQ Cloud recebe e distribui
+Mosquitto recebe e distribui (localhost:1883)
     │
     ▼ mqtt.on('message')
 Node.js Server recebe mensagem MQTT
@@ -108,8 +137,8 @@ Usuário clica "Solicitar Peça A" no dashboard
     ▼ socket.emit('solicitar_peca', {peca: 'A'})
 Node.js Server recebe evento Socket.IO
     │
-    ▼ mqtt.publish('dataflow/comandos/sub', JSON)
-HiveMQ Cloud recebe e distribui
+    ▼ mqtt.publish('dfi/comando', JSON)
+Mosquitto recebe e distribui
     │
     ▼ mqtt.on('message')
 ESP32 recebe comando MQTT
@@ -136,13 +165,12 @@ Arduino Mega recebe comando pela Serial
 
 | Tópico | Direção | Descrição |
 |--------|---------|-----------|
-| `dataflow/status` | Arduino → Cloud | Estado atual da FSM e uptime |
-| `dataflow/estoque` | Arduino → Cloud | Quantidade de peças A, B, C |
-| `dataflow/eventos` | Arduino → Cloud | Pedidos, entregas, erros, inicialização |
-| `dataflow/sensores` | Arduino → Cloud | Leituras dos 6 sensores IR |
-| `dataflow/esteiras` | Arduino → Cloud | Status de ligada/desligada de cada esteira |
-| `dataflow/comandos/sub` | Cloud → ESP32 | Comandos recebidos do front-end (inscrito) |
-| `dataflow/comandos/pub` | ESP32 → Cloud | Confirmação de comandos encaminhados |
+| `dfi/status` | ESP32 → Server | Estado atual da FSM e uptime |
+| `dfi/estoque` | ESP32 → Server | Quantidade de peças A, B, C |
+| `dfi/eventos` | ESP32 → Server | Pedidos, entregas, erros, inicialização |
+| `dfi/sensores` | ESP32 → Server | Leituras dos 6 sensores IR |
+| `dfi/esteiras` | ESP32 → Server | Status de ligada/desligada de cada esteira |
+| `dfi/comando` | Server → ESP32 | Comandos recebidos do front-end |
 
 ---
 
@@ -201,28 +229,67 @@ socket.emit('reset_sistema');
 
 ---
 
-## Configuração do HiveMQ Cloud
+## Configuração do Mosquitto (Local)
 
-1. Criar conta gratuita em [cloud.hivemq.com](https://cloud.hivemq.com)
-2. Criar um cluster (gratuito para testes)
-3. Criar credenciais de acesso (username/password)
-4. Anotar a URL do broker (ex: `mqtt://xxx.s1.eu.hivemq.com`)
-5. Configurar no `.env` do server e no código do ESP32
+### Instalação
 
-**Credenciais necessárias:**
-- Broker URL
-- Porta: 8883 (TLS)
-- Username
-- Password
+- **Windows:** [mosquitto.org/download](https://mosquitto.org/download/)
+- **Linux:** `sudo apt install mosquitto mosquitto-clients`
+- **macOS:** `brew install mosquitto`
+
+### Iniciar o broker
+
+```bash
+# Iniciar em background
+mosquitto -d
+
+# Ou com verbose para debug
+mosquitto -v
+```
+
+O broker escuta na porta **1883** (MQTT sem TLS) por padrão.
+
+### Testar com clientes CLI
+
+```bash
+# Terminal 1 — inscrever nos tópicos
+mosquitto_sub -h localhost -t "dfi/#"
+
+# Terminal 2 — publicar mensagem de teste
+mosquitto_pub -h localhost -t "dfi/status" -m '{"estado":"Teste"}'
+```
+
+### Alternativa: HiveMQ Cloud (nuvem)
+
+Para implantação em nuvem, o broker pode ser substituído por:
+- **HiveMQ Cloud** (gratuito para testes): [cloud.hivemq.com](https://cloud.hivemq.com)
+- **AWS IoT Core** (requer conta AWS)
+- **Azure IoT Hub** (requer conta Azure)
+
+Basta alterar as variáveis de ambiente no `server/.env`:
+```
+MQTT_BROKER=hivemq-endpoint.s1.eu.hivemq.com
+MQTT_PORT=8883
+MQTT_USER=seu_usuario
+MQTT_PASS=sua_senha
+```
 
 ---
 
 ## Segurança
 
+### Modo Local (desenvolvimento/demo)
+
+- **Sem autenticação** (rede local confiável)
+- **Sem TLS** (porta 1883)
+- Adequado para bancada de testes e demonstração presencial
+
+### Modo Nuvem (produção)
+
 - **TLS/SSL**: Conexão criptografada na porta 8883
 - **Autenticação**: Username/password para o broker
 - **Client ID único**: Cada dispositivo tem seu ID
-- **Tópicos dedicados**: Separação por função (status, comandos, etc.)
+- **Tópicos dedicados**: Separação por função
 
 ---
 
@@ -253,7 +320,7 @@ socket.emit('reset_sistema');
 ## Estrutura de Diretórios
 
 ```
-Code/
+DataFlowInventory/
 ├── arduino/
 │   └── data_flow_inventory/
 │       └── data_flow_inventory.ino    # Código Arduino (FSM + MQTT Serial)
@@ -265,7 +332,15 @@ Code/
 ├── server/
 │   ├── package.json                   # Dependências Node.js
 │   ├── server.js                      # Express + Socket.IO + MQTT
-│   └── .env                           # Configurações (HiveMQ, porta, etc.)
+│   └── .env                           # Configurações (Mosquitto local, porta, etc.)
+│
+├── simulator/
+│   ├── package.json                   # Dependências Node.js
+│   ├── server.js                      # Simulador offline (FSM em JS)
+│   └── frontend/                      # Interface do simulador
+│       ├── index.html
+│       ├── css/style.css
+│       └── js/app.js
 │
 ├── frontend/
 │   ├── index.html                     # Dashboard principal
@@ -282,24 +357,46 @@ Code/
 
 ## Como Rodar
 
-### 1. Configurar o Arduino
+### Simulador (offline, sem hardware)
+
+```bash
+cd simulator
+npm install
+npm start
+# Acessar http://localhost:3000
+```
+
+### Sistema Completo (com hardware)
+
+#### 1. Instalar e iniciar o Mosquitto
+
+```bash
+# Instalar (conforme SO)
+mosquitto -d
+```
+
+#### 2. Configurar o Arduino
+
 1. Abrir `arduino/data_flow_inventory/data_flow_inventory.ino` na Arduino IDE
 2. Selecionar placa: Arduino Mega 2560
 3. Fazer upload
 
-### 2. Configurar o ESP32
+#### 3. Configurar o ESP32
+
 1. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino` na Arduino IDE
-2. Alterar SSID, senha Wi-Fi e credenciais MQTT
+2. Alterar SSID, senha Wi-Fi e IP do broker MQTT (seu IP local)
 3. Selecionar placa: ESP32 Dev Module
 4. Fazer upload
 
-### 3. Instalar e rodar o Server
+#### 4. Instalar e rodar o Server
+
 ```bash
 cd server
 npm install
-# Editar .env com credenciais do HiveMQ Cloud
+# Editar .env com IP do Mosquitto e porta
 npm start
 ```
 
-### 4. Acessar o Dashboard
+#### 5. Acessar o Dashboard
+
 Abrir no navegador: `http://localhost:3000`

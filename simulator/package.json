@@ -1,4 +1,13 @@
 {
+  "name": "data-flow-inventory-simulator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simulador offline do Data Flow Inventory",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
   "dependencies": {
     "express": "^5.2.1",
     "socket.io": "^4.8.3"
