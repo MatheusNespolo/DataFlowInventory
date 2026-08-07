@@ -78,7 +78,7 @@ const MAX_HISTORICO = 30;
 
 // Conectado ao servidor
 socket.on('connect', () => {
-  console.log('[WS] Conectado ao servidor');
+  console.log('[WS] Conectado ao servidor — ID:', socket.id);
   atualizarStatusConexao(true);
 });
 
@@ -86,6 +86,13 @@ socket.on('connect', () => {
 socket.on('disconnect', () => {
   console.log('[WS] Desconectado do servidor');
   atualizarStatusConexao(false);
+});
+
+// Erro de conexão (servidor offline, porta errada, etc.)
+socket.on('connect_error', (err) => {
+  console.error('[WS] Erro de conexão:', err.message);
+  atualizarStatusConexao(false);
+  adicionarHistorico('erro', '', `Conexão perdida: ${err.message}`);
 });
 
 // Estado inicial (quando o cliente se conecta)

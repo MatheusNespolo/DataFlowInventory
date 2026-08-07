@@ -4,8 +4,11 @@
 // ============================================================
 // Descrição:
 // Server Express que serve o front-end estático, conecta ao broker
-// MQTT (HiveMQ Cloud) e retransmite dados via WebSocket (Socket.IO)
-// para o dashboard em tempo real.
+// MQTT (Mosquitto local ou nuvem) e retransmite dados via
+// WebSocket (Socket.IO) para o dashboard em tempo real.
+//
+// Para configurar a autenticação MQTT, edite o arquivo .env
+// na pasta server/ com os dados do broker desejado.
 // ============================================================
 
 require('dotenv').config();
@@ -21,10 +24,21 @@ const path = require('path');
 const PORT = process.env.PORT || 3000;
 
 const MQTT_CONFIG = {
+  // TODO: Altere MQTT_BROKER_URL no .env para o endpoint do seu broker
+  // Exemplos: mqtt://localhost (local) | mqtt://xxx.s1.eu.hivemq.com (nuvem)
   brokerUrl:  process.env.MQTT_BROKER_URL || 'mqtt://localhost',
+
+  // TODO: Altere MQTT_PORT no .env conforme o broker:
+  //   1883 = MQTT sem TLS (local) | 8883 = MQTT com TLS (nuvem)
   port:       parseInt(process.env.MQTT_PORT) || 1883,
+
+  // TODO: Altere MQTT_USERNAME e MQTT_PASSWORD no .env
+  // Para Mosquitto local sem auth, deixe vazio.
+  // Para nuvem (HiveMQ, AWS), preencha com as credenciais.
   username:   process.env.MQTT_USERNAME || '',
   password:   process.env.MQTT_PASSWORD || '',
+
+  // TODO: MQTT_CLIENT_ID deve ser único por instância do servidor
   clientId:   process.env.MQTT_CLIENT_ID || 'dataflow-node-server',
 };
 
@@ -75,15 +89,22 @@ const mqttOptions = {
   port: MQTT_CONFIG.port,
   clientId: MQTT_CONFIG.clientId,
   clean: true,
-  reconnectPeriod: 5000,
-  connectTimeout: 10000,
+  reconnectPeriod: 5000,    // Tenta reconectar a cada 5s
+  connectTimeout: 10000,    // Timeout de 10s para conexão
+  // TODO: Para brokers com TLS (HiveMQ Cloud, AWS IoT), descomente:
+  // rejectUnauthorized: false,  // Aceita certificados autoassinados
 };
 
+// Autenticação: só adiciona se username estiver definido no .env
 if (MQTT_CONFIG.username) {
   mqttOptions.username = MQTT_CONFIG.username;
   mqttOptions.password = MQTT_CONFIG.password;
+  console.log(`[MQTT] Autenticação habilitada — usuário: ${MQTT_CONFIG.username}`);
 }
 
+// TODO: Para TLS (porta 8883), altere a URL:
+//   mqtt://  →  mqtts://
+// Exemplo: mqtts://xxx.s1.eu.hivemq.com
 const mqttClient = mqtt.connect(MQTT_CONFIG.brokerUrl, mqttOptions);
 
 // Estado atual do sistema (cache para novos clientes)
