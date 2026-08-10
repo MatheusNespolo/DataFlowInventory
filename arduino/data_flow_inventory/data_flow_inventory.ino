@@ -186,6 +186,8 @@ int lerBotao() {
 
 // ============================================================
 // PUBLICAÇÃO DE DADOS VIA SERIAL (para ESP32 → MQTT)
+// IMPORTANTE: Baud rate deve ser IDÊNTICO ao do ESP32 (9600).
+//   O ESP32 usa Serial2.begin(9600) para receber estes dados.
 // ============================================================
 
 // Publica o estado atual do sistema
@@ -197,6 +199,7 @@ void publicarEstado() {
   doc["uptime"] = millis() / 1000;
   serializeJson(doc, Serial);
   Serial.println();
+  Serial.flush(); // Aguarda transmissão completa
 }
 
 // Publica o estoque atual
@@ -208,6 +211,7 @@ void publicarEstoque() {
   doc["pecaC"] = estoque[3];
   serializeJson(doc, Serial);
   Serial.println();
+  Serial.flush();
 }
 
 // Publica leitura dos sensores
