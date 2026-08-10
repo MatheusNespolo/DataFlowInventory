@@ -243,9 +243,9 @@ setInterval(() => {
 server.listen(PORT, () => {
   console.log("");
   console.log("  ╔══════════════════════════════════════════════════╗");
-  console.log("  ║  Data Flow Inventory — Simulador                ║");
-  console.log(`  ║  Rodando em: http://localhost:${PORT}             ║`);
-  console.log("  ║  Modo: SIMULADO (sem hardware)                  ║");
+  console.log("  ║  Data Flow Inventory — Simulador                 ║");
+  console.log(`  ║  Rodando em: http://localhost:${PORT}               ║`);
+  console.log("  ║  Modo: SIMULADO (sem hardware)                   ║");
   console.log("  ╚══════════════════════════════════════════════════╝");
   console.log("");
   console.log("[SIM] Sistema iniciado. Aguardando pedido...");
