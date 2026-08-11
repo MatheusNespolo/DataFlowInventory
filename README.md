@@ -1,30 +1,69 @@
+<div align="center">
+
 # Data Flow Inventory
 
-<p align="center">
-  <strong>Centro de Distribuição Automatizado — Protótipo IoT em Escala Reduzida</strong>
-</p>
+**Centro de Distribuição Automatizado — Protótipo IoT em Escala Reduzida**
 
-<p align="center">
-  SENAI São Caetano do Sul — Boa Vista<br>
-  Engenharia de Controle e Automação<br>
-  2026
-</p>
+![Arduino](https://img.shields.io/badge/Arduino-Uno-00979D?logo=arduino&logoColor=white)
+![ESP32](https://img.shields.io/badge/ESP32-DevModule-000000?logo=espressif&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=node.js&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-HiveMQ-660066?logo=mosquitto&logoColor=white)
+![School](https://img.shields.io/badge/SENAI-São%20Caetano%20do%20Sul-blue)
+![Year](https://img.shields.io/badge/Ano-2026-orange)
+![IoT](https://img.shields.io/badge/IoT-Arduino%20+%20ESP32-teal)
+![Industria4](https://img.shields.io/badge/Indústria-4.0-red)
+
+<br>
+
+SENAI São Caetano do Sul — Boa Vista<br>
+Engenharia de Controle e Automação
 
 ---
 
-## Visão Geral
+⭐ **Se este projeto te ajudou, deixe uma estrela no GitHub!** Sua avaliação nos motiva bastante! 🙏
+
+</div>
+
+## Sumário
+
+- [Sobre](#sobre)
+- [Visão Geral](#visão-geral)
+- [Arquitetura](#arquitetura)
+- [Estrutura do Repositório](#estrutura-do-repositório)
+- [Funcionamento](#funcionamento)
+- [Materiais](#materiais)
+- [Como Rodar](#como-rodar)
+- [Equipe](#equipe)
+- [Licença](#licença)
+- [Referências](#referências)
+
+---
+
+## Sobre
 
 O **Data Flow Inventory** é um protótipo funcional que simula um centro de distribuição automatizado em escala reduzida, controlado por microcontroladores e monitorado remotamente via dashboard web em tempo real.
 
+O projeto se insere no setor de **Automação Industrial da Logística**, com foco em:
+- 📦 Intralogística e centros de distribuição
+- 🛒 E-commerce e gestão de estoque
+- 🔄 Sistemas de recebimento automático
+
+> 📄 Para o projeto completo, consulte `Projeto de pesquisa - Final.docx` na pasta `docs/`.
+
+## Visão Geral
+
 O sistema é composto por:
-- **4 esteiras transportadoras** (1 principal + 3 secundárias) com motores DC
-- **6 sensores infravermelhos** TCRT5000 (3 no topo + 3 nas junções)
-- **Roda giratória** de separação com 3 compartimentos
-- **Arduino Uno** como controlador principal (FSM de 5 estados)
-- **ESP32** como gateway MQTT (bridge Serial ↔ Wi-Fi)
-- **Dashboard web** em tempo real (HTML/CSS/JS + Socket.IO)
-- **Servidor Node.js** como ponte entre MQTT e WebSocket
-- **HiveMQ Cloud** como broker MQTT
+
+| Componente | Função |
+|------------|--------|
+| 🏗️ **4 esteiras transportadoras** | 1 principal + 3 secundárias, motores DC 3–6V |
+| 🔍 **6 sensores infravermelhos** | TCRT5000 — 3 no topo + 3 nas junções |
+| 🎡 **Roda giratória** | 3 compartimentos para separação de peças |
+| 🎛️ **Arduino Uno** | Controlador principal (FSM de 5 estados) |
+| 📡 **ESP32** | Gateway MQTT (bridge Serial ↔ Wi-Fi) |
+| 🖥️ **Dashboard web** | HTML/CSS/JS + Socket.IO em tempo real |
+| ⚙️ **Servidor Node.js** | Ponte entre MQTT e WebSocket |
+| ☁️ **HiveMQ Cloud** | Broker MQTT |
 
 ## Arquitetura
 
@@ -33,13 +72,20 @@ O sistema é composto por:
 │ Arduino Uno  │ ────────── │  ESP32   │ ────────  │  HiveMQ Cloud  │ ──────────── │  Dashboard  │
 │  (FSM + I/O) │ ←────────  │(Gateway) │           │    (Broker)    │              │  (Frontend) │
 └──────────────┘            └──────────┘           └───────┬────────┘              └─────────────┘
-                                                           │ MQTT                      ↑
-                                                           │                           │
-                                                   ┌───────┴────────┐                  │
-                                                   │ Node.js Server │ ─────────────────┘
+                                                           │ MQTT                       ↑
+                                                           │                            │
+                                                   ┌───────┴────────┐                   │
+                                                   │ Node.js Server │ ──────────────────┘
                                                    │ (Express+WS)   │
                                                    └────────────────┘
 ```
+
+**Fluxo de dados:**
+
+- **Publicação** (Arduino → Dashboard):
+  `Arduino detecta evento → Serial.print(JSON) → ESP32 → MQTT Broker → Node.js → Socket.IO → Dashboard`
+- **Controle Remoto** (Dashboard → Arduino):
+  `Botão clicado → Socket.IO → Node.js → MQTT Broker → ESP32 → Serial → Arduino executa comando`
 
 ## Estrutura do Repositório
 
@@ -47,26 +93,30 @@ O sistema é composto por:
 DataFlowInventory/
 ├── arduino/
 │   └── data_flow_inventory/
-│       └── data_flow_inventory.ino    # Código Arduino (FSM + Serial JSON)
+│       └── data_flow_inventory.ino        # Código Arduino (FSM + Serial JSON)
 │
 ├── esp32/
 │   └── gateway_mqtt/
-│       └── gateway_mqtt.ino           # Código ESP32 (Serial ↔ MQTT)
+│       └── gateway_mqtt.ino               # Código ESP32 (Serial ↔ MQTT)
 │
 ├── server/
-│   ├── package.json                   # Dependências Node.js
-│   ├── server.js                      # Express + Socket.IO + MQTT
-│   └── .env                           # Configurações (não versionado)
+│   ├── package.json                       # Dependências Node.js
+│   ├── server.js                          # Express + Socket.IO + MQTT
+│   └── .env                               # Configurações (não versionado)
 │
 ├── frontend/
-│   ├── index.html                     # Dashboard principal
+│   ├── index.html                         # Dashboard principal
 │   ├── css/
-│   │   └── style.css                  # Estilos (dark theme)
+│   │   └── style.css                      # Estilos (dark theme)
 │   └── js/
-│       └── app.js                     # Lógica WebSocket + UI
+│       └── app.js                         # Lógica WebSocket + UI
+│
+├── test/
+│   └── esteira_peca_a/                    # Códigos de teste incrementais
 │
 ├── docs/
-│   └── arquitetura_mqtt.md            # Documentação da arquitetura MQTT
+│   ├── arquitetura_mqtt.md                # Documentação da arquitetura MQTT
+│   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
 │
 ├── .gitignore
 └── README.md
@@ -76,25 +126,15 @@ DataFlowInventory/
 
 ### Máquina de Estados (Arduino)
 
-O Arduino opera com 5 estados:
+O Arduino opera com **5 estados**:
 
-1. **AGUARDANDO_PEDIDO** — Sistema em repouso, monitora botões e comandos remotos
-2. **VERIFICANDO_ESTOQUE** — Verifica sensor do topo + contador interno
-3. **ACIONANDO_ESTEIRA** — Liga motor da esteira secundária correspondente
-4. **ENTREGANDO_PECA** — Monitora sensor da junção com timeout de 3s
-5. **ERRO** — Sinaliza falha no LCD, aguarda reset manual
-
-### Fluxo de Dados
-
-**Publicação (Arduino → Dashboard):**
-```
-Arduino detecta evento → Serial.print(JSON) → ESP32 → MQTT Broker → Node.js → Socket.IO → Dashboard
-```
-
-**Controle Remoto (Dashboard → Arduino):**
-```
-Botão clicado → Socket.IO → Node.js → MQTT Broker → ESP32 → Serial → Arduino executa comando
-```
+| # | Estado | Descrição |
+|---|--------|-----------|
+| 1 | **AGUARDANDO_PEDIDO** | Sistema em repouso, monitora botões e comandos remotos |
+| 2 | **VERIFICANDO_ESTOQUE** | Verifica sensor do topo + contador interno |
+| 3 | **ACIONANDO_ESTEIRA** | Liga motor da esteira secundária correspondente |
+| 4 | **ENTREGANDO_PECA** | Monitora sensor da junção com timeout de 3s |
+| 5 | **ERRO** | Sinaliza falha no LCD, aguarda reset manual |
 
 ### Tópicos MQTT
 
@@ -107,41 +147,6 @@ Botão clicado → Socket.IO → Node.js → MQTT Broker → ESP32 → Serial �
 | `dataflow/esteiras` | Arduino → Cloud | Status das esteiras |
 | `dataflow/comandos/sub` | Cloud → ESP32 | Comandos do front-end |
 | `dataflow/comandos/pub` | ESP32 → Cloud | Confirmação de comandos |
-
-## Como Rodar
-
-### Pré-requisitos
-
-- Arduino IDE (com suporte a Arduino Uno e ESP32)
-- Node.js v18+
-- Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com)
-- Conexão Wi-Fi para o ESP32
-
-### 1. Configurar o Arduino
-
-1. Abrir `arduino/data_flow_inventory/data_flow_inventory.ino`
-2. Selecionar placa: **Arduino Uno R3**
-3. Fazer upload
-
-### 2. Configurar o ESP32
-
-1. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino`
-2. Alterar as credenciais Wi-Fi e MQTT no início do arquivo
-3. Selecionar placa: **ESP32 Dev Module**
-4. Fazer upload
-
-### 3. Rodar o Servidor
-
-```bash
-cd server
-npm install
-# Editar .env com suas credenciais do HiveMQ Cloud
-npm start
-```
-
-### 4. Acessar o Dashboard
-
-Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## Materiais
 
@@ -212,18 +217,55 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 > A **Alternativa A** (Uno + 4× IRF520) é a opção de menor custo viável para este projeto, desde que se aceite o controle exclusivamente via dashboard web (sem botões físicos).
 
+## Como Rodar
+
+### Pré-requisitos
+
+- [Arduino IDE](https://www.arduino.cc/en/software) (com suporte a Arduino Uno e ESP32)
+- [Node.js](https://nodejs.org/) v18+
+- Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com)
+- Conexão Wi-Fi para o ESP32
+
+### 1. Configurar o Arduino
+
+1. Abrir `arduino/data_flow_inventory/data_flow_inventory.ino`
+2. Selecionar placa: **Arduino Uno R3**
+3. Fazer upload
+
+### 2. Configurar o ESP32
+
+1. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino`
+2. Alterar as credenciais Wi-Fi e MQTT no início do arquivo
+3. Selecionar placa: **ESP32 Dev Module**
+4. Fazer upload
+
+### 3. Rodar o Servidor
+
+```bash
+cd server
+npm install
+# Editar .env com suas credenciais do HiveMQ Cloud
+npm start
+```
+
+### 4. Acessar o Dashboard
+
+Abrir [http://localhost:3000](http://localhost:3000) no navegador.
+
 ## Equipe
 
-- **Henrique Moni de Souza**
-- **Matheus Nespolo Silva**
-- **Murilo Tolardo da Silva**
-- **Vitor Marcolongo Silva**
+| Nome | |
+|------|--|
+| **Henrique Moni de Souza** | |
+| **Matheus Nespolo Silva** | |
+| **Murilo Tolardo da Silva** | |
+| **Vitor Marcolongo Silva** | |
 
-Orientação: Prof. Dr.
+**Orientação:** Prof. Dr.
 
 ## Licença
 
-MIT License
+MIT License — Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## Referências
 
@@ -232,3 +274,9 @@ MIT License
 - TUBIS; ROHMAN (2023) — Intelligent Warehouse in Industry 4.0
 - HUSSEIN; MUHUDIN (2024) — IoT Based Warehouse Management System
 - Ver `Projeto de pesquisa - Final.docx` para referências completas
+
+---
+
+<div align="center">
+Feito com ❤️ no SENAI São Caetano do Sul
+</div>
