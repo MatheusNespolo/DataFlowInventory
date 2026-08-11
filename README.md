@@ -20,7 +20,7 @@ O sistema é composto por:
 - **4 esteiras transportadoras** (1 principal + 3 secundárias) com motores DC
 - **6 sensores infravermelhos** TCRT5000 (3 no topo + 3 nas junções)
 - **Roda giratória** de separação com 3 compartimentos
-- **Arduino Mega** como controlador principal (FSM de 5 estados)
+- **Arduino Uno** como controlador principal (FSM de 5 estados)
 - **ESP32** como gateway MQTT (bridge Serial ↔ Wi-Fi)
 - **Dashboard web** em tempo real (HTML/CSS/JS + Socket.IO)
 - **Servidor Node.js** como ponte entre MQTT e WebSocket
@@ -29,16 +29,16 @@ O sistema é composto por:
 ## Arquitetura
 
 ```
-┌──────────────┐   Serial   ┌──────────┐   MQTT    ┌────────────────┐   WebSocket   ┌─────────────┐
-│ Arduino Mega │ ────────── │   ESP32   │ ──────── │  HiveMQ Cloud  │ ──────────── │  Dashboard  │
-│  (FSM + I/O) │ ←──────── │ (Gateway) │          │    (Broker)    │              │  (Frontend) │
-└──────────────┘            └──────────┘          └───────┬────────┘              └─────────────┘
-                                                          │ MQTT                        ↑
-                                                          │                            │
-                                                  ┌───────┴────────┐                   │
-                                                  │  Node.js Server │ ─────────────────┘
-                                                  │  (Express+WS)   │
-                                                  └────────────────┘
+┌──────────────┐   Serial   ┌──────────┐   MQTT    ┌────────────────┐   WebSocket  ┌─────────────┐
+│ Arduino Uno  │ ────────── │  ESP32   │ ────────  │  HiveMQ Cloud  │ ──────────── │  Dashboard  │
+│  (FSM + I/O) │ ←────────  │(Gateway) │           │    (Broker)    │              │  (Frontend) │
+└──────────────┘            └──────────┘           └───────┬────────┘              └─────────────┘
+                                                           │ MQTT                      ↑
+                                                           │                           │
+                                                   ┌───────┴────────┐                  │
+                                                   │ Node.js Server │ ─────────────────┘
+                                                   │ (Express+WS)   │
+                                                   └────────────────┘
 ```
 
 ## Estrutura do Repositório
@@ -112,7 +112,7 @@ Botão clicado → Socket.IO → Node.js → MQTT Broker → ESP32 → Serial �
 
 ### Pré-requisitos
 
-- Arduino IDE (com suporte a Arduino Mega e ESP32)
+- Arduino IDE (com suporte a Arduino Uno e ESP32)
 - Node.js v18+
 - Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com)
 - Conexão Wi-Fi para o ESP32
@@ -120,7 +120,7 @@ Botão clicado → Socket.IO → Node.js → MQTT Broker → ESP32 → Serial �
 ### 1. Configurar o Arduino
 
 1. Abrir `arduino/data_flow_inventory/data_flow_inventory.ino`
-2. Selecionar placa: **Arduino Mega 2560**
+2. Selecionar placa: **Arduino Uno R3**
 3. Fazer upload
 
 ### 2. Configurar o ESP32
@@ -150,9 +150,9 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 | Componente | Quantidade | Especificação |
 |-----------|-----------|---------------|
 | Esteira transportadora | 4 | BR Eletrônica 35cm, motor DC 3–6V |
-| Arduino Mega 2560 | 1 | Controlador principal |
+| Arduino Uno | 1 | Controlador principal |
 | ESP32 Dev Module | 1 | Gateway MQTT |
-| Driver L298N | 2 | Controle de 2 motores cada |
+| Driver IRF520 | 4 | Controle de 1 motor cada |
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
 | Display LCD 16x2 | 1 | Com módulo I2C (endereço 0x27) |
 | Botões | 4 | 3 solicitação + 1 reset |
