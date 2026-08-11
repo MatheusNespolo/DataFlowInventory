@@ -145,6 +145,8 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## Materiais
 
+### Configuração Principal (Recomendada)
+
 | Componente | Quantidade | Especificação |
 |-----------|-----------|---------------|
 | Esteira transportadora | 4 | BR Eletrônica 35cm, motor DC 3–6V |
@@ -155,6 +157,60 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 | Display LCD 16x2 | 1 | Com módulo I2C (endereço 0x27) |
 | Botões | 4 | 3 solicitação + 1 reset |
 | Fonte 12V DC | 1 | Alimentação geral |
+
+### Alternativas Técnicas (Viáveis)
+
+> **Nota**: As configurações abaixo foram validadas tecnicamente e podem substituir a configuração principal conforme necessidade de custo ou disponibilidade de componentes.
+
+#### Opção A — Módulos IRF520 ao invés de L298N
+
+| Aspecto | L298N | IRF520 |
+|---------|-------|--------|
+| **Controle de direção** | Frente e ré (H-bridge) | Apenas um sentido (MOSFET) |
+| **Motores por módulo** | 2 | 1 |
+| **Quantidade necessária** | 2 | 4 |
+| **PWM (velocidade)** | ✅ Sim | ✅ Sim |
+| **Corrente máxima** | ~2A por canal | ~5A (com dissipador) |
+| **Tensão** | 5–35V | Até 24V |
+| **Custo** | Mais alto | Mais baixo |
+
+**⚠️ Atenção**: Os motores das esteiras neste projeto operam em apenas um sentido, portanto a perda de reversão do IRF520 não impacta o funcionamento. É necessário 1 módulo IRF520 por motor (total de 4).
+
+#### Opção B — Arduino Uno ao invés de Mega (sem botões físicos)
+
+| Aspecto | Arduino Mega | Arduino Uno |
+|---------|-------------|-------------|
+| **Pinos digitais** | 54 | 20 (0–13 + A0–A5) |
+| **Pinos PWM** | 15 | 6 (3, 5, 6, 9, 10, 11) |
+| **Memória Flash** | 256 KB | 32 KB |
+| **Memória RAM** | 8 KB | 2 KB |
+| **Serial hardware** | 4 portas | 1 porta (pins 0/1) |
+
+**Pinos necessários com Uno (sem botões físicos)**:
+
+| Componente | Pinos | Alocação no Uno |
+|-----------|-------|-----------------|
+| 4 motores (IRF520) | 4 PWM | 3, 5, 6, 9 |
+| 6 sensores TCRT5000 | 6 digitais | 2, 4, 7, 8, 12, A0 |
+| LCD I2C | 2 (SDA/SCL) | A4 (SDA), A5 (SCL) |
+| Serial ESP32 | 2 (RX/TX) | 0 (RX), 1 (TX) |
+| **Total** | **14** | **Uno tem 20 disponíveis ✅** |
+
+**⚠️ Atenções com Arduino Uno**:
+- Pins 0 e 1 são compartilhados com a porta USB de programação. **Desconecte o ESP32 durante upload de código**.
+- Memória RAM de 2KB é suficiente para o código atual (usa `StaticJsonDocument` de tamanho fixo), mas deixa menos margem para expansões futuras.
+- O uso de botões físicos requer 4 pinos adicionais, o que tornaria o Uno inadequado. Nesta configuração, todo o controle de peças deve ser feito via dashboard web.
+
+#### Resumo das Combinações Possíveis
+
+| Configuração | Controlador | Driver | Pinos Usados | Custo |
+|-------------|-------------|--------|--------------|-------|
+| **Principal** (recomendada) | Mega 2560 | 2× L298N | 17 + 4 botões | Médio |
+| **Alternativa A** (econômica) | Uno | 4× IRF520 | 14 (sem botões) | Baixo |
+| **Alternativa B** (misturada) | Mega 2560 | 4× IRF520 | 17 + 4 botões | Médio-Baixo |
+| **Alternativa C** (limitada) | Uno | 2× L298N | 10 + 4 botões | *Botões não cabem ❌* |
+
+> A **Alternativa A** (Uno + 4× IRF520) é a opção de menor custo viável para este projeto, desde que se aceite o controle exclusivamente via dashboard web (sem botões físicos).
 
 ## Equipe
 
