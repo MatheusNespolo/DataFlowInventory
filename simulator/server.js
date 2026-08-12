@@ -3,16 +3,20 @@
 // ============================================================
 // Descrição:
 // Servidor Express + Socket.IO que SIMULA a máquina de estados
-// do Arduino Mega para testes offline, sem necessidade de
-// dispositivos ou MQTT real.
+// do Arduino para testes offline, sem hardware nem broker MQTT.
+//
+// IMPORTANTE: este simulador emite os MESMOS eventos Socket.IO
+// que o servidor real (../server/server.js), permitindo usar o
+// front-end unificado (../frontend) sem nenhuma modificação.
 //
 // Modo de operação: SIMULADO
-// Para modo REAL (com hardware), usar ../server/server.js
+// Para modo REAL (com hardware + MQTT), usar ../server/server.js
 // ============================================================
 
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -23,230 +27,228 @@ const PORT = process.env.PORT || 3000;
 // ============================================================
 // CONFIGURAÇÃO DA SIMULAÇÃO
 // ============================================================
-const TIMEOUT_ENTREGA = 3000;  // ms — timeout para entrega
-const DELAY_ENTREGA   = 1500;  // ms — delay simulado da entrega
-const ESTOQUE_INICIAL = 5;     // peças de cada tipo
+const DELAY_VERIFICACAO = 300;   // ms — delay simulado da verificação
+const DELAY_ACIONAMENTO = 200;   // ms — delay simulado do acionamento
+const DELAY_ENTREGA     = 1500;  // ms — delay simulado da entrega
+const ESTOQUE_INICIAL   = 5;     // peças de cada tipo
 
 // ============================================================
-// ESTADO SIMULADO (espelha a FSM do Arduino Mega)
+// ESTADO SIMULADO (espelha a FSM do Arduino)
+// Os nomes de estado são idênticos aos publicados via MQTT
+// pelo firmware real, para compatibilidade com o dashboard.
 // ============================================================
-const ESTADOS = {
-  AGUARDANDO:     "Aguardando",
-  VERIFICANDO:    "Verificando Estoque",
-  ACIONANDO:      "Acionando Esteira",
-  ENTREGANDO:     "Entregando Peça",
-  ERRO:           "Erro"
-};
-
-let estado = {
-  fsm:             ESTADOS.AGUARDANDO,
-  pecaSolicitada:  null,      // "A", "B", "C" ou null
+let sim = {
+  estado:          'AGUARDANDO_PEDIDO',
+  pecaSolicitada:  0,   // 0 = nenhuma, 1 = A, 2 = B, 3 = C
   uptime:          0,
-  mqttCount:       0,
-  estoque:         { A: ESTOQUE_INICIAL, B: ESTOQUE_INICIAL, C: ESTOQUE_INICIAL },
-  esteiras:        { principal: true, A: false, B: false, C: false },
-  sensores:        { topoA: 1, topoB: 1, topoC: 1, j1: 0, j2: 0, j3: 0 },
-  historico:       [],
+  estoque:         { pecaA: ESTOQUE_INICIAL, pecaB: ESTOQUE_INICIAL, pecaC: ESTOQUE_INICIAL },
+  esteiras:        { principal: true, secA: false, secB: false, secC: false },
+  sensores:        { topo: { A: 1, B: 1, C: 1 }, juncao: { J1: 0, J2: 0, J3: 0 } },
+  eventos:         [],
   timerEntrega:    null,
-  timerVerificacao: null,
 };
 
-// ============================================================
-// SERVE ARQUIVOS ESTÁTICOS (frontend)
-// ============================================================
-app.use(express.static('frontend'));
+const PECAS = ['A', 'B', 'C'];
 
 // ============================================================
-// SOCKET.IO — COMUNICAÇÃO COM FRONTEND
+// SERVE O FRONT-END UNIFICADO (../frontend)
 // ============================================================
-io.on("connection", (socket) => {
-  console.log(`[SIM] Cliente conectado: ${socket.id}`);
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
-  // Envia estado inicial ao conectar
-  emitirEstado(socket);
-
-  // ---- Solicitação de peça ----
-  socket.on("solicitarPeca", (data) => {
-    const peca = data.peca; // "A", "B" ou "C"
-
-    if (estado.fsm !== ESTADOS.AGUARDANDO) {
-      console.log(`[SIM] Ignorado — sistema não está aguardando (estado: ${estado.fsm})`);
-      return;
-    }
-
-    console.log(`[SIM] Pedido recebido: Peça ${peca}`);
-
-    // Registra evento de pedido
-    adicionarHistorico("pedido", `Peça ${peca} solicitada`);
-
-    // Transição: AGUARDANDO → VERIFICANDO
-    estado.fsm = ESTADOS.VERIFICANDO;
-    estado.pecaSolicitada = peca;
-    emitirEstado(io);
-
-    // Simula verificação de estoque (imediato)
-    setTimeout(() => {
-      verificarEstoque(peca);
-    }, 300);
-  });
-
-  // ---- Reset do sistema ----
-  socket.on("resetSistema", () => {
-    if (estado.fsm !== ESTADOS.ERRO) {
-      console.log(`[SIM] Ignorado reset — sistema não está em erro`);
-      return;
-    }
-
-    console.log(`[SIM] Sistema resetado`);
-
-    // Limpa timers pendentes
-    if (estado.timerEntrega) {
-      clearTimeout(estado.timerEntrega);
-      estado.timerEntrega = null;
-    }
-
-    estado.fsm = ESTADOS.AGUARDANDO;
-    estado.pecaSolicitada = null;
-    emitirEstado(io);
-    console.log(`[SIM] Sistema resetado. Aguardando pedido...`);
-  });
-
-  // ---- Desconexão ----
-  socket.on("disconnect", () => {
-    console.log(`[SIM] Cliente desconectado: ${socket.id}`);
-  });
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
+
+// ============================================================
+// FUNÇÕES DE EMISSÃO (mesmo formato do servidor real)
+// ============================================================
+
+function emitirStatus() {
+  io.emit('status', {
+    estado: sim.estado,
+    pecaSolicitada: sim.pecaSolicitada,
+    uptime: sim.uptime,
+  });
+}
+
+function emitirEstoque() {
+  io.emit('estoque', { ...sim.estoque });
+}
+
+function emitirEsteiras() {
+  io.emit('esteiras', { ...sim.esteiras });
+}
+
+function emitirSensores() {
+  io.emit('sensores', {
+    topo: { ...sim.sensores.topo },
+    juncao: { ...sim.sensores.juncao },
+  });
+}
+
+function emitirEvento(evento, peca, extra = {}) {
+  const evt = { evento, peca, ...extra };
+  sim.eventos.unshift(evt);
+  if (sim.eventos.length > 50) sim.eventos = sim.eventos.slice(0, 50);
+  io.emit('evento', evt);
+}
+
+function estadoInicial() {
+  return {
+    status:   { estado: sim.estado, pecaSolicitada: sim.pecaSolicitada, uptime: sim.uptime },
+    estoque:  { ...sim.estoque },
+    sensores: { topo: { ...sim.sensores.topo }, juncao: { ...sim.sensores.juncao } },
+    esteiras: { ...sim.esteiras },
+    eventos:  sim.eventos.slice(0, 10),
+    gateway:  { status: 'online', type: 'gateway' }, // simulado sempre online
+  };
+}
 
 // ============================================================
 // LÓGICA DA MÁQUINA DE ESTADOS SIMULADA
 // ============================================================
 
+function solicitarPeca(peca) {
+  if (sim.estado !== 'AGUARDANDO_PEDIDO') {
+    console.log(`[SIM] Ignorado — sistema não está aguardando (estado: ${sim.estado})`);
+    return;
+  }
+
+  const idx = PECAS.indexOf(peca);
+  if (idx === -1) return;
+
+  console.log(`[SIM] Pedido recebido: Peça ${peca}`);
+  sim.pecaSolicitada = idx + 1;
+  sim.estado = 'VERIFICANDO_ESTOQUE';
+  emitirStatus();
+  emitirEvento('pedido', peca);
+
+  setTimeout(() => verificarEstoque(peca), DELAY_VERIFICACAO);
+}
+
 function verificarEstoque(peca) {
-  const temSensor = estado.sensores["topo" + peca] === 1;
-  const temEstoque = estado.estoque[peca] > 0;
+  const temSensor = sim.sensores.topo[peca] === 1;
+  const temEstoque = sim.estoque['peca' + peca] > 0;
 
   if (temSensor && temEstoque) {
     console.log(`[SIM] Estoque OK — Peça ${peca} detectada`);
-
-    // Transição: VERIFICANDO → ACIONANDO
-    estado.fsm = ESTADOS.ACIONANDO;
-    emitirEstado(io);
-
-    // Simula acionamento da esteira (imediato)
-    setTimeout(() => {
-      acionarEsteira(peca);
-    }, 200);
+    sim.estado = 'ACIONANDO_ESTEIRA';
+    emitirStatus();
+    setTimeout(() => acionarEsteira(peca), DELAY_ACIONAMENTO);
   } else {
     console.log(`[SIM] ERRO — Sem estoque ou peça não detectada (${peca})`);
-    estado.fsm = ESTADOS.ERRO;
-    adicionarHistorico("erro", `Sem estoque ou peça não detectada: ${peca}`);
-    emitirEstado(io);
+    sim.estado = 'ERRO';
+    emitirStatus();
+    emitirEvento('erro', peca, { tipo: 'sem_estoque' });
   }
 }
 
 function acionarEsteira(peca) {
   console.log(`[SIM] Acionando esteira secundária ${peca}`);
+  sim.esteiras['sec' + peca] = true;
+  sim.estado = 'ENTREGANDO_PECA';
+  emitirStatus();
+  emitirEsteiras();
 
-  // Liga a esteira correspondente
-  estado.esteiras[peca] = true;
-
-  // Transição: ACIONANDO → ENTREGANDO
-  estado.fsm = ESTADOS.ENTREGANDO;
-  emitirEstado(io);
-
-  // Simula a entrega (peça percorre a esteira)
-  estado.timerEntrega = setTimeout(() => {
-    confirmarEntrega(peca);
-  }, DELAY_ENTREGA);
+  sim.timerEntrega = setTimeout(() => confirmarEntrega(peca), DELAY_ENTREGA);
 }
 
 function confirmarEntrega(peca) {
   console.log(`[SIM] Peça ${peca} entregue com sucesso`);
 
-  // Desliga a esteira
-  estado.esteiras[peca] = false;
+  // Desliga a esteira e decrementa estoque
+  sim.esteiras['sec' + peca] = false;
+  sim.estoque['peca' + peca]--;
 
-  // Atualiza estoque
-  estado.estoque[peca]--;
+  // Pulso no sensor de junção (simula detecção da peça)
+  const juncao = 'J' + (PECAS.indexOf(peca) + 1);
+  sim.sensores.juncao[juncao] = 1;
+  emitirSensores();
+  setTimeout(() => {
+    sim.sensores.juncao[juncao] = 0;
+    emitirSensores();
+  }, 500);
 
-  // Atualiza sensor de junção (simula detecção)
-  const sensorJuncao = "j" + ["A", "B", "C"].indexOf(peca) + 1;
-  estado.sensores[sensorJuncao] = 1;
-  setTimeout(() => { estado.sensores[sensorJuncao] = 0; }, 500);
-
-  // Incrementa contador MQTT simulado
-  estado.mqttCount++;
-
-  // Registra evento
-  adicionarHistorico("entrega", `Peça ${peca} entregue — Estoque: ${estado.estoque[peca]}`);
-
-  // Transição: ENTREGANDO → AGUARDANDO
-  estado.fsm = ESTADOS.AGUARDANDO;
-  estado.pecaSolicitada = null;
-  estado.timerEntrega = null;
-
-  console.log(`[SIM] Publica MQTT: estoque A=${estado.estoque.A} B=${estado.estoque.B} C=${estado.estoque.C}`);
-  emitirEstado(io);
-}
-
-// ============================================================
-// FUNÇÕES AUXILIARES
-// ============================================================
-
-function emitirEstado(target) {
-  const dados = {
-    estado:          estado.fsm,
-    pecaSolicitada:  estado.pecaSolicitada || "—",
-    uptime:          estado.uptime,
-    mqttCount:       estado.mqttCount,
-    estoque:         { ...estado.estoque },
-    esteiras:        { ...estado.esteiras },
-    sensores:        { ...estado.sensores },
-  };
-  target.emit("estadoAtualizado", dados);
-}
-
-function adicionarHistorico(tipo, descricao) {
-  const evento = {
-    tempo:     formatarUptime(estado.uptime),
-    tipo:      tipo,       // "pedido", "entrega", "erro"
-    descricao: descricao,
-  };
-  estado.historico.push(evento);
-
-  // Mantém apenas os últimos 50 eventos
-  if (estado.historico.length > 50) {
-    estado.historico.shift();
+  // Se o estoque zerou, o sensor de topo deixa de detectar peça
+  if (sim.estoque['peca' + peca] === 0) {
+    sim.sensores.topo[peca] = 0;
   }
 
-  io.emit("historicoAtualizado", estado.historico);
+  sim.estado = 'AGUARDANDO_PEDIDO';
+  sim.pecaSolicitada = 0;
+  sim.timerEntrega = null;
+
+  emitirStatus();
+  emitirEstoque();
+  emitirEsteiras();
+  emitirEvento('entrega', peca);
+
+  console.log(`[SIM] Estoque: A=${sim.estoque.pecaA} B=${sim.estoque.pecaB} C=${sim.estoque.pecaC}`);
 }
 
-function formatarUptime(segundos) {
-  if (segundos < 60) return segundos + "s";
-  const min = Math.floor(segundos / 60);
-  const seg = segundos % 60;
-  return min + "m " + seg + "s";
+function resetSistema() {
+  console.log('[SIM] Sistema resetado');
+
+  if (sim.timerEntrega) {
+    clearTimeout(sim.timerEntrega);
+    sim.timerEntrega = null;
+  }
+
+  sim.esteiras.secA = false;
+  sim.esteiras.secB = false;
+  sim.esteiras.secC = false;
+  sim.estado = 'AGUARDANDO_PEDIDO';
+  sim.pecaSolicitada = 0;
+
+  emitirStatus();
+  emitirEsteiras();
+  console.log('[SIM] Aguardando pedido...');
 }
 
 // ============================================================
-// TIMER DE UPTIME (1s)
+// SOCKET.IO — mesmos eventos do servidor real
+// ============================================================
+io.on('connection', (socket) => {
+  console.log(`[SIM] Cliente conectado: ${socket.id}`);
+
+  // Envia estado inicial (mesmo formato do servidor real)
+  socket.emit('estado_inicial', estadoInicial());
+  socket.emit('gateway', { status: 'online', type: 'gateway' });
+
+  socket.on('solicitar_peca', (data) => {
+    io.emit('comando', { acao: 'solicitar_peca', peca: data.peca });
+    solicitarPeca(data.peca);
+  });
+
+  socket.on('reset_sistema', () => {
+    io.emit('comando', { acao: 'reset' });
+    resetSistema();
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`[SIM] Cliente desconectado: ${socket.id}`);
+  });
+});
+
+// ============================================================
+// TIMER DE UPTIME (emite status a cada 5s, como o firmware real)
 // ============================================================
 setInterval(() => {
-  estado.uptime++;
-  emitirEstado(io);
+  sim.uptime++;
+  if (sim.uptime % 5 === 0) emitirStatus();
 }, 1000);
 
 // ============================================================
 // INICIAR SERVIDOR
 // ============================================================
 server.listen(PORT, () => {
-  console.log("");
-  console.log("  ╔══════════════════════════════════════════════════╗");
-  console.log("  ║  Data Flow Inventory — Simulador                 ║");
+  console.log('');
+  console.log('  ╔══════════════════════════════════════════════════╗');
+  console.log('  ║  Data Flow Inventory — Simulador                 ║');
   console.log(`  ║  Rodando em: http://localhost:${PORT}               ║`);
-  console.log("  ║  Modo: SIMULADO (sem hardware)                   ║");
-  console.log("  ╚══════════════════════════════════════════════════╝");
-  console.log("");
-  console.log("[SIM] Sistema iniciado. Aguardando pedido...");
+  console.log('  ║  Modo: SIMULADO (sem hardware, sem MQTT)         ║');
+  console.log('  ║  Front-end: ../frontend (unificado)              ║');
+  console.log('  ╚══════════════════════════════════════════════════╝');
+  console.log('');
+  console.log('[SIM] Sistema iniciado. Aguardando pedido...');
 });

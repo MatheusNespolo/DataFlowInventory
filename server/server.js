@@ -114,6 +114,7 @@ let estadoAtual = {
   eventos: [],
   sensores: {},
   esteiras: {},
+  gateway: {},   // online/offline do ESP32 (via LWT do broker MQTT)
 };
 
 // ============================================================
@@ -174,9 +175,19 @@ mqttClient.on('message', (topic, message) => {
   // Roteamento por tópico
   switch (topic) {
     case TOPICS.status:
-      estadoAtual.status = msgJson;
-      io.emit('status', msgJson);
-      console.log(`[WS →] Status: ${msgJson.estado || msgJson.status || ''}`);
+      // Mensagens do tipo "gateway" (online/offline) vêm do LWT
+      // (Last Will Testament) configurado no ESP32: o broker publica
+      // "offline" automaticamente se o ESP32 cair. Isso permite ao
+      // dashboard sinalizar "hardware offline" em tempo real.
+      if (msgJson.type === 'gateway') {
+        estadoAtual.gateway = msgJson;
+        io.emit('gateway', msgJson);
+        console.log(`[WS →] Gateway ESP32: ${msgJson.status}`);
+      } else {
+        estadoAtual.status = msgJson;
+        io.emit('status', msgJson);
+        console.log(`[WS →] Status: ${msgJson.estado || msgJson.status || ''}`);
+      }
       break;
 
     case TOPICS.estoque:

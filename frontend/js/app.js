@@ -19,6 +19,7 @@ const socket = io();
 const els = {
   // Header
   mqttStatus: document.getElementById('mqtt-status'),
+  gatewayStatus: document.getElementById('gateway-status'),
   serverTime: document.getElementById('server-time'),
 
   // Estado
@@ -119,6 +120,20 @@ socket.on('estado_inicial', (data) => {
       adicionarHistorico(evt.evento, evt.peca, evt.tipo, false);
     });
   }
+  if (data.gateway && data.gateway.status) {
+    atualizarGateway(data.gateway);
+  }
+});
+
+// Status do gateway ESP32 (online/offline via MQTT LWT)
+// O broker publica "offline" automaticamente se o ESP32 cair.
+socket.on('gateway', (data) => {
+  atualizarGateway(data);
+  adicionarHistorico(
+    data.status === 'online' ? 'gateway_online' : 'gateway_offline',
+    '',
+    ''
+  );
 });
 
 // Status do sistema
@@ -180,6 +195,17 @@ function atualizarStatusConexao(conectado) {
   } else {
     els.mqttStatus.className = 'status-badge status-offline';
     els.mqttStatus.innerHTML = '<span class="status-dot"></span> Desconectado';
+  }
+}
+
+function atualizarGateway(data) {
+  if (!els.gatewayStatus) return;
+  if (data.status === 'online') {
+    els.gatewayStatus.className = 'status-badge status-online';
+    els.gatewayStatus.innerHTML = '<span class="status-dot"></span> ESP32 Online';
+  } else {
+    els.gatewayStatus.className = 'status-badge status-offline';
+    els.gatewayStatus.innerHTML = '<span class="status-dot"></span> ESP32 Offline';
   }
 }
 
@@ -351,6 +377,14 @@ function adicionarHistorico(evento, peca, tipo, scroll = true) {
     case 'comando_enviado':
       msg = `Comando enviado: ${tipo}${peca ? ' — Peça ' + peca : ''}`;
       classe = 'evento-pedido';
+      break;
+    case 'gateway_online':
+      msg = 'Gateway ESP32 online';
+      classe = 'evento-inicio';
+      break;
+    case 'gateway_offline':
+      msg = 'Gateway ESP32 OFFLINE (hardware desconectado)';
+      classe = 'evento-erro';
       break;
     default:
       msg = `${evento}${peca ? ' — ' + peca : ''}`;

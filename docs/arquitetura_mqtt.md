@@ -361,18 +361,30 @@ DataFlowInventory/
 ├── server/
 │   ├── package.json                   # Dependências Node.js
 │   ├── server.js                      # Express + Socket.IO + MQTT
-│   └── .env                           # Configurações (broker, tópicos, porta)
+│   ├── .env.example                   # Modelo de configuração (copiar para .env)
+│   └── .env                           # Configurações locais (não versionado)
 │
 ├── simulator/
 │   ├── package.json                   # Dependências Node.js
 │   └── server.js                      # Simulador offline (FSM em JS)
+│                                      # Serve o mesmo frontend/ unificado
 │
-├── frontend/
+├── frontend/                          # Dashboard único (usado pelo server E pelo simulador)
 │   ├── index.html                     # Dashboard principal
 │   ├── css/
 │   │   └── style.css                  # Estilos (dark theme)
 │   └── js/
 │       └── app.js                     # Lógica WebSocket + atualização UI
+│
+├── test/
+│   └── esteira_peca_a/                # Sketches de teste incremental (1 por pasta)
+│       ├── arduino_teste_setup/       # 0.1 — Blink + Serial
+│       ├── arduino_teste_serial/      # Teste de comunicação Serial
+│       ├── arduino_teste_sensor/      # 2.1 — Sensor IR TCRT5000
+│       ├── arduino_teste_motor/       # Teste do motor via driver
+│       ├── arduino_teste_integracao/  # Integração sensor + motor
+│       ├── esp32_teste_serial/        # ESP32: teste Serial2
+│       └── esp32_peca_a/              # ESP32: gateway reduzido (só Peça A)
 │
 └── docs/
     └── arquitetura_mqtt.md            # Este documento

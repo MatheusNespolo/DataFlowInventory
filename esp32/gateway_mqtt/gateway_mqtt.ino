@@ -65,6 +65,22 @@ const char* MQTT_CLIENT = "dataflow-esp32-gateway";
 #define TOPICO_CMD_PUB    "dataflow/comandos/pub"   // ESP32 publica (confirmações)
 
 // ============================================================
+// LWT — LAST WILL AND TESTAMENT (testamento MQTT)
+// ============================================================
+// O LWT é uma mensagem que o BROKER publica automaticamente
+// quando o ESP32 cai (queda de energia, Wi-Fi, travamento),
+// sem depender de qualquer código rodando no ESP32.
+// Com isso, o dashboard consegue detectar "hardware offline"
+// em tempo real — valor agregado de confiabilidade do sistema.
+// As mensagens são RETAINED: um cliente que conectar depois
+// recebe imediatamente o último estado conhecido do gateway.
+// ============================================================
+#define LWT_PAYLOAD_OFFLINE "{\"type\":\"gateway\",\"status\":\"offline\"}"
+#define LWT_PAYLOAD_ONLINE  "{\"type\":\"gateway\",\"status\":\"online\"}"
+#define LWT_QOS     1     // Garante entrega ao broker pelo menos 1 vez
+#define LWT_RETAIN  true  // Broker guarda a última mensagem do tópico
+
+// ============================================================
 // OBJETOS GLOBAIS
 // ============================================================
 WiFiClientSecure espClient;   // Cliente TLS (obrigatório para porta 8883)
@@ -168,7 +184,12 @@ bool conectarMQTT() {
   Serial.print("[MQTT] Conectando ao broker: ");
   Serial.println(MQTT_SERVER);
 
-  if (mqtt.connect(MQTT_CLIENT, MQTT_USER, MQTT_PASS)) {
+  // Conecta registrando o LWT no broker:
+  //   se o ESP32 cair, o broker publica LWT_PAYLOAD_OFFLINE
+  //   (retained) em TOPICO_STATUS automaticamente.
+  // Assinatura: connect(clientID, user, pass, willTopic, willQoS, willRetain, willMessage)
+  if (mqtt.connect(MQTT_CLIENT, MQTT_USER, MQTT_PASS,
+                   TOPICO_STATUS, LWT_QOS, LWT_RETAIN, LWT_PAYLOAD_OFFLINE)) {
     Serial.println("[MQTT] Conectado!");
 
     // Inscreve nos tópicos de comando
@@ -176,8 +197,9 @@ bool conectarMQTT() {
     Serial.print("[MQTT] Inscrito no topico: ");
     Serial.println(TOPICO_CMD_SUB);
 
-    // Publica mensagem de online
-    mqtt.publish(TOPICO_STATUS, "{\"type\":\"gateway\",\"status\":\"online\"}");
+    // Publica "online" (retained) — sobrescreve o eventual
+    // "offline" deixado pelo LWT em uma queda anterior.
+    mqtt.publish(TOPICO_STATUS, LWT_PAYLOAD_ONLINE, LWT_RETAIN);
 
     return true;
   } else {
