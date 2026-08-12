@@ -4,7 +4,11 @@
 
 O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores + motores) a um dashboard web em tempo real, utilizando MQTT como protocolo de transporte entre o dispositivo IoT e o servidor.
 
-**Nota sobre hospedagem:** Esta arquitetura suporta tanto um broker MQTT local (Mosquitto) para desenvolvimento/demonstração quanto brokers em nuvem (HiveMQ Cloud, AWS IoT Core, Azure IoT Hub). A escolha é feita pela configuração no `server/.env` e nas constantes do ESP32.
+**Nota sobre hospedagem:** Esta arquitetura suporta tanto um broker MQTT local (Mosquitto) para desenvolvimento/demonstração quanto brokers em nuvem (HiveMQ Cloud, AWS IoT Core, Azure IoT Hub). A escolha é feita pela configuração no `server/.env` e pela flag `USE_TLS` no `esp32/gateway_mqtt/gateway_mqtt.ino`.
+
+**Documentos relacionados:**
+- 📊 [`fluxograma_funcionamento.md`](fluxograma_funcionamento.md) — Diagramas da máquina de estados, fluxo operacional e sequência de comunicação
+- 🧪 [`broker_local_mosquitto.md`](broker_local_mosquitto.md) — Passo a passo do teste local com Mosquitto (sem nuvem)
 
 ---
 

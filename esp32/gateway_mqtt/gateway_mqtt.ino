@@ -44,13 +44,31 @@ const char* SSID  = "SUA_REDE_WIFI";       // ← Alterar
 const char* SENHA = "SUA_SENHA_WIFI";      // ← Alterar
 
 // ============================================================
-// CONFIGURAÇÃO MQTT (HiveMQ Cloud)
-// Porta 8883 = TLS → requer WiFiClientSecure
+// CONFIGURAÇÃO MQTT
 // ============================================================
+// USE_TLS seleciona o modo de conexão com o broker:
+//   false → broker LOCAL (Mosquitto), porta 1883, sem criptografia
+//   true  → broker NUVEM (HiveMQ Cloud), porta 8883, TLS
+//
+// Broker local (teste): MQTT_SERVER = IP do PC rodando o Mosquitto
+//   (obter com `ipconfig`; ESP32 e PC na MESMA rede Wi-Fi).
+//   Deixe MQTT_USER/MQTT_PASS vazios se allow_anonymous true.
+// Broker nuvem: MQTT_SERVER = URL do cluster HiveMQ Cloud.
+// ============================================================
+#define USE_TLS false   // ← false = Mosquitto local | true = HiveMQ Cloud
+
+#if USE_TLS
 const char* MQTT_SERVER = "xxx.s1.eu.hivemq.com";  // ← Alterar (URL do cluster HiveMQ Cloud)
 const int   MQTT_PORT   = 8883;                     // Porta TLS
 const char* MQTT_USER   = "seu_usuario";            // ← Alterar
 const char* MQTT_PASS   = "sua_senha";              // ← Alterar
+#else
+const char* MQTT_SERVER = "192.168.0.10";           // ← Alterar (IP do PC com Mosquitto — ipconfig)
+const int   MQTT_PORT   = 1883;                     // Porta padrão sem TLS
+const char* MQTT_USER   = "";                       // vazio = sem autenticação
+const char* MQTT_PASS   = "";
+#endif
+
 const char* MQTT_CLIENT = "dataflow-esp32-gateway";
 
 // ============================================================
@@ -83,7 +101,11 @@ const char* MQTT_CLIENT = "dataflow-esp32-gateway";
 // ============================================================
 // OBJETOS GLOBAIS
 // ============================================================
-WiFiClientSecure espClient;   // Cliente TLS (obrigatório para porta 8883)
+#if USE_TLS
+WiFiClientSecure espClient;   // Cliente TLS (obrigatório para porta 8883 / HiveMQ Cloud)
+#else
+WiFiClient espClient;         // Cliente simples (broker local, porta 1883)
+#endif
 PubSubClient mqtt(espClient);
 
 unsigned long ultimoReconnect = 0;
@@ -289,10 +311,12 @@ void setup() {
   // Configura Wi-Fi
   conectarWiFi();
 
+#if USE_TLS
   // TLS: aceita o certificado do broker sem validação de CA
   // (adequado para protótipo; em produção, use setCACert() com o
   //  certificado raiz ISRG Root X1 do HiveMQ Cloud)
   espClient.setInsecure();
+#endif
 
   // Configura MQTT
   mqtt.setServer(MQTT_SERVER, MQTT_PORT);

@@ -116,6 +116,8 @@ DataFlowInventory/
 │
 ├── docs/
 │   ├── arquitetura_mqtt.md                # Documentação da arquitetura MQTT
+│   ├── fluxograma_funcionamento.md        # Fluxogramas (FSM, operação, sequência)
+│   ├── broker_local_mosquitto.md          # Teste local com Mosquitto (sem nuvem)
 │   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
 │
 ├── .gitignore
@@ -135,6 +137,8 @@ O Arduino opera com **5 estados**:
 | 3 | **ACIONANDO_ESTEIRA** | Liga motor da esteira secundária correspondente |
 | 4 | **ENTREGANDO_PECA** | Monitora sensor da junção com timeout de 3s |
 | 5 | **ERRO** | Sinaliza falha no LCD, aguarda reset manual |
+
+> 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/fluxograma_funcionamento.md`](docs/fluxograma_funcionamento.md).
 
 ### Tópicos MQTT
 
@@ -235,9 +239,12 @@ O Arduino opera com **5 estados**:
 ### 2. Configurar o ESP32
 
 1. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino`
-2. Alterar as credenciais Wi-Fi e MQTT no início do arquivo
-3. Selecionar placa: **ESP32 Dev Module**
-4. Fazer upload
+2. Definir o modo de conexão pela flag `USE_TLS`:
+   - `false` → broker **local** Mosquitto (porta 1883) — ideal para testes sem nuvem. Veja [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md)
+   - `true` → broker **nuvem** HiveMQ Cloud (porta 8883, TLS)
+3. Alterar as credenciais Wi-Fi e MQTT no início do arquivo
+4. Selecionar placa: **ESP32 Dev Module**
+5. Fazer upload
 
 ### 3. Rodar o Servidor
 
