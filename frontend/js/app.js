@@ -57,6 +57,9 @@ const els = {
   svgSensorJ2: document.getElementById('svg-sensor-j2'),
   svgSensorJ3: document.getElementById('svg-sensor-j3'),
 
+  // Driver/versão (header)
+  driverInfo: document.getElementById('driver-info'),
+
   // Botões
   btnSolicitarA: document.getElementById('btn-solicitar-a'),
   btnSolicitarB: document.getElementById('btn-solicitar-b'),
@@ -130,13 +133,17 @@ socket.on('estoque', (data) => {
 
 // Eventos (pedido, entrega, erro, inicio)
 socket.on('evento', (data) => {
-  adicionarHistorico(data.evento, data.peca, data.tipo);
+  adicionarHistorico(data.evento, data.peca, data.tipo || data.msg);
 
   // Efeitos visuais por tipo de evento
   if (data.evento === 'entrega') {
     flashCard('card-estoque', 'var(--accent-green)');
   } else if (data.evento === 'erro') {
     flashCard('card-estado', 'var(--accent-red)');
+  } else if (data.evento === 'inicio') {
+    // Arduino v2.1 envia versao e driver no evento de início
+    atualizarDriver(data.versao, data.driver);
+    flashCard('card-estado', 'var(--accent-purple)');
   }
 });
 
@@ -283,6 +290,17 @@ function atualizarSensores(data) {
   }
 }
 
+function atualizarDriver(versao, driver) {
+  if (!els.driverInfo) return;
+  const partes = [];
+  if (versao) partes.push('v' + versao);
+  if (driver) partes.push(driver);
+  if (partes.length > 0) {
+    els.driverInfo.textContent = partes.join(' · ');
+    els.driverInfo.classList.add('driver-online');
+  }
+}
+
 function atualizarSensor(elementText, elementSvg, valor) {
   elementText.textContent = valor;
   if (valor) {
@@ -383,6 +401,9 @@ function formatarUptime(segundos) {
 
 function animarNumero(element, de, para) {
   if (de === para) return;
+
+  // Define a transição ANTES de alterar o valor (necessário para animar)
+  element.style.transition = 'all 0.3s ease';
   element.textContent = para;
 
   // Animação de destaque
@@ -392,7 +413,6 @@ function animarNumero(element, de, para) {
     element.style.transform = 'scale(1)';
     element.style.color = 'var(--text-primary)';
   }, 400);
-  element.style.transition = 'all 0.3s ease';
 }
 
 function flashCard(cardId, cor) {

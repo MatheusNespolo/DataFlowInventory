@@ -19,7 +19,7 @@
 // ============================================================
 
 #define MOTOR_A_PWM 3
-#define SENSOR_TOPO_A 2
+#define SENSOR_TOPO_A 4
 
 unsigned long ultimaPublicacao = 0;
 const unsigned long INTERVALO = 2000;

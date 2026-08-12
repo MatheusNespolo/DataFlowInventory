@@ -86,6 +86,25 @@ body {
   background-clip: text;
 }
 
+.driver-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(107, 113, 137, 0.15);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.15rem 0.55rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.driver-badge.driver-online {
+  color: var(--accent-purple);
+  background: rgba(167, 139, 250, 0.12);
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
 .header-right {
   display: flex;
   align-items: center;
