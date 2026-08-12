@@ -18,11 +18,13 @@
 //   - Serial deve alternar entre PEC e VAZIO corretamente
 // ============================================================
 
-#define SENSOR_TOPO_A 2
+#define SENSOR_TOPO_A 4
+#define SENSOR_JUNCAO_A 2
 
 void setup() {
   Serial.begin(9600);
   pinMode(SENSOR_TOPO_A, INPUT_PULLUP);
+  pinMode(SENSOR_JUNCAO_A, INPUT_PULLUP);
   delay(1000);
   Serial.println("=== TESTE 2.1: SENSOR TCRT5000 ===");
   Serial.println("Posicione uma peca sobre o sensor...");
@@ -30,11 +32,17 @@ void setup() {
 }
 
 void loop() {
-  int leitura = digitalRead(SENSOR_TOPO_A);
-  if (leitura == LOW) {
-    Serial.println("[SENSOR] PEC detectada! (LOW)");
+  int leituraT = digitalRead(SENSOR_TOPO_A);
+  if (leituraT == LOW) {
+    Serial.println("[SENSOR TOPO] PEC detectada! (LOW)");
   } else {
-    Serial.println("[SENSOR] VAZIO (HIGH)");
+    Serial.println("[SENSOR TOPO] VAZIO (HIGH)");
+  }
+  int leituraJ = digitalRead(SENSOR_JUNCAO_A);
+  if (leituraJ == LOW) {
+    Serial.println("[SENSOR JUNCAO] PEC detectada! (LOW)");
+  } else {
+    Serial.println("[SENSOR JUNCAO] VAZIO (HIGH)");
   }
   delay(500);
 }

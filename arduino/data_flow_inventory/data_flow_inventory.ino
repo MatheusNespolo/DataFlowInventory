@@ -14,6 +14,10 @@
 // Comunicação bidirecional com ESP32 via Serial (JSON):
 //   - Publica eventos, estado, sensores e estoque
 //   - Recebe comandos do front-end via ESP32 (CMD:PECA:A, CMD:RESET)
+//
+// Driver: IRF520 (MOSFET) — 1 pino PWM por motor
+// Botões físicos: DESABILITADOS (controle via dashboard web)
+// Separador (roda giratória): CÓDIGO COMENTADO (verificar implementação futura)
 // ============================================================
 
 #include <Wire.h>
@@ -26,24 +30,13 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // ============================================================
-// PINOS — MOTORES DC (via driver L298N)
-// Cada motor tem: ENA (PWM velocidade), IN1, IN2 (direção)
+// PINOS — MOTORES DC (via driver IRF520)
+// Cada motor usa 1 pino PWM (SIG do módulo IRF520)
 // ============================================================
-#define MOTOR_PRINCIPAL_ENA  2
-#define MOTOR_PRINCIPAL_IN1  3
-#define MOTOR_PRINCIPAL_IN2  4
-
-#define MOTOR_A_ENA  5
-#define MOTOR_A_IN1  6
-#define MOTOR_A_IN2  7
-
-#define MOTOR_B_ENA  8
-#define MOTOR_B_IN1  9
-#define MOTOR_B_IN2  10
-
-#define MOTOR_C_ENA  11
-#define MOTOR_C_IN1  12
-#define MOTOR_C_IN2  13
+#define MOTOR_PRINCIPAL  3    // PWM — Esteira Principal
+#define MOTOR_A          5    // PWM — Esteira A (secundária)
+#define MOTOR_B          6    // PWM — Esteira B (secundária)
+#define MOTOR_C          9    // PWM — Esteira C (secundária)
 
 // ============================================================
 // PINOS — SENSORES IR (TCRT5000)
@@ -56,12 +49,24 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define SENSOR_JUNCAO_J3  A5
 
 // ============================================================
-// PINOS — BOTÕES FÍSICOS
+// BOTÕES FÍSICOS — DESABILITADOS
+// Controle exclusivo via dashboard web (Serial/ESP32)
+// Para reativar, descomente as linhas marcadas com "// [HABILITAR]"
 // ============================================================
-#define BTN_PECA_A  22
-#define BTN_PECA_B  23
-#define BTN_PECA_C  24
-#define BTN_RESET   25
+// #define BTN_PECA_A  22    // [HABILITAR]
+// #define BTN_PECA_B  23    // [HABILITAR]
+// #define BTN_PECA_C  24    // [HABILITAR]
+// #define BTN_RESET   25    // [HABILITAR]
+
+// ============================================================
+// PINO — SEPARADOR (RODA GIRATÓRIA)
+// MANTIDO COMO COMENTÁRIO — verificar implementação futura
+// ============================================================
+// #define MOTOR_SEPARADOR  10  // [HABILITAR] PWM para servo/motor do separador
+// #define SEPARADOR_POSICAO_INICIAL 0
+// #define SEPARADOR_POSICAO_A       90
+// #define SEPARADOR_POSICAO_B       135
+// #define SEPARADOR_POSICAO_C       180
 
 // ============================================================
 // PARÂMETROS DO SISTEMA
@@ -104,40 +109,39 @@ bool   erroTimeout = false;
 bool   erroSemEstoque = false;
 
 // ============================================================
-// FUNÇÕES AUXILIARES — MOTORES
+// FUNÇÕES AUXILIARES — MOTORES (IRF520)
+// Com IRF520, basta controlar o PWM em 1 pino por motor.
+// analogWrite(pin, velocidade) → liga motor
+// analogWrite(pin, 0)          → para motor
 // ============================================================
 
-void ligarMotor(int ena, int in1, int in2, int velocidade) {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  analogWrite(ena, velocidade);
+void ligarMotor(int pin, int velocidade) {
+  analogWrite(pin, velocidade);
 }
 
-void pararMotor(int ena, int in1, int in2) {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  analogWrite(ena, 0);
+void pararMotor(int pin) {
+  analogWrite(pin, 0);
 }
 
 void ligarEsteiraPrincipal() {
-  ligarMotor(MOTOR_PRINCIPAL_ENA, MOTOR_PRINCIPAL_IN1, MOTOR_PRINCIPAL_IN2, VELOCIDADE_PRINCIPAL);
+  ligarMotor(MOTOR_PRINCIPAL, VELOCIDADE_PRINCIPAL);
 }
 
 void ligarEsteiraA() {
-  ligarMotor(MOTOR_A_ENA, MOTOR_A_IN1, MOTOR_A_IN2, VELOCIDADE_SECUNDARIA);
+  ligarMotor(MOTOR_A, VELOCIDADE_SECUNDARIA);
 }
 
 void ligarEsteiraB() {
-  ligarMotor(MOTOR_B_ENA, MOTOR_B_IN1, MOTOR_B_IN2, VELOCIDADE_SECUNDARIA);
+  ligarMotor(MOTOR_B, VELOCIDADE_SECUNDARIA);
 }
 
 void ligarEsteiraC() {
-  ligarMotor(MOTOR_C_ENA, MOTOR_C_IN1, MOTOR_C_IN2, VELOCIDADE_SECUNDARIA);
+  ligarMotor(MOTOR_C, VELOCIDADE_SECUNDARIA);
 }
 
-void pararEsteiraA() { pararMotor(MOTOR_A_ENA, MOTOR_A_IN1, MOTOR_A_IN2); }
-void pararEsteiraB() { pararMotor(MOTOR_B_ENA, MOTOR_B_IN1, MOTOR_B_IN2); }
-void pararEsteiraC() { pararMotor(MOTOR_C_ENA, MOTOR_C_IN1, MOTOR_C_IN2); }
+void pararEsteiraA() { pararMotor(MOTOR_A); }
+void pararEsteiraB() { pararMotor(MOTOR_B); }
+void pararEsteiraC() { pararMotor(MOTOR_C); }
 
 void pararTodasSecundarias() {
   pararEsteiraA();
@@ -172,17 +176,44 @@ void exibirEstoque() {
 }
 
 // ============================================================
-// LEITURA DE BOTÕES COM DEBOUNCE
+// FUNÇÕES AUXILIARES — SEPARADOR (COMENTADO)
+// Implementação futura: controlar servo/motor do separador
+// para direcionar a peça para o compartimento correto.
 // ============================================================
+/*
+void moverSeparador(char peca) {
+  int posicao = SEPARADOR_POSICAO_INICIAL;
+  if (peca == 'A') posicao = SEPARADOR_POSICAO_A;
+  if (peca == 'B') posicao = SEPARADOR_POSICAO_B;
+  if (peca == 'C') posicao = SEPARADOR_POSICAO_C;
+
+  analogWrite(MOTOR_SEPARADOR, map(posicao, 0, 180, 0, 255));
+  delay(500); // Aguarda movimento do servo
+  pararMotor(MOTOR_SEPARADOR);
+}
+
+void resetarSeparador() {
+  analogWrite(MOTOR_SEPARADOR, map(SEPARADOR_POSICAO_INICIAL, 0, 180, 0, 255));
+  delay(500);
+  pararMotor(MOTOR_SEPARADOR);
+}
+*/
+
+// ============================================================
+// LEITURA DE BOTÕES — DESABILITADA
+// Controle exclusivo via dashboard web (Serial/ESP32)
+// Para reativar botões físicos, descomente abaixo:
+// ============================================================
+/*
 int lerBotao() {
   if (millis() - ultimoDebounce < DEBOUNCE_BTN) return 0;
-
   if (digitalRead(BTN_PECA_A) == LOW) { ultimoDebounce = millis(); return 1; }
   if (digitalRead(BTN_PECA_B) == LOW) { ultimoDebounce = millis(); return 2; }
   if (digitalRead(BTN_PECA_C) == LOW) { ultimoDebounce = millis(); return 3; }
   if (digitalRead(BTN_RESET)  == LOW) { ultimoDebounce = millis(); return -1; }
   return 0;
 }
+*/
 
 // ============================================================
 // PUBLICAÇÃO DE DADOS VIA SERIAL (para ESP32 → MQTT)
@@ -190,7 +221,6 @@ int lerBotao() {
 //   O ESP32 usa Serial2.begin(9600) para receber estes dados.
 // ============================================================
 
-// Publica o estado atual do sistema
 void publicarEstado() {
   StaticJsonDocument<200> doc;
   doc["type"] = "status";
@@ -199,10 +229,9 @@ void publicarEstado() {
   doc["uptime"] = millis() / 1000;
   serializeJson(doc, Serial);
   Serial.println();
-  Serial.flush(); // Aguarda transmissão completa
+  Serial.flush();
 }
 
-// Publica o estoque atual
 void publicarEstoque() {
   StaticJsonDocument<200> doc;
   doc["type"] = "estoque";
@@ -214,7 +243,6 @@ void publicarEstoque() {
   Serial.flush();
 }
 
-// Publica leitura dos sensores
 void publicarSensores() {
   StaticJsonDocument<300> doc;
   doc["type"] = "sensores";
@@ -230,7 +258,6 @@ void publicarSensores() {
   Serial.println();
 }
 
-// Publica evento de entrega
 void publicarEntrega(char peca) {
   StaticJsonDocument<250> doc;
   doc["type"] = "evento";
@@ -243,7 +270,6 @@ void publicarEntrega(char peca) {
   Serial.println();
 }
 
-// Publica evento de erro
 void publicarErro(const char* tipo) {
   StaticJsonDocument<200> doc;
   doc["type"] = "evento";
@@ -256,7 +282,6 @@ void publicarErro(const char* tipo) {
   Serial.println();
 }
 
-// Publica pedido recebido
 void publicarPedido(char peca) {
   StaticJsonDocument<150> doc;
   doc["type"] = "evento";
@@ -266,7 +291,6 @@ void publicarPedido(char peca) {
   Serial.println();
 }
 
-// Publica status das esteiras
 void publicarStatusEsteiras() {
   StaticJsonDocument<200> doc;
   doc["type"] = "esteiras";
@@ -325,17 +349,15 @@ void setup() {
   // Inicializa LCD
   lcd.init();
   lcd.backlight();
-  atualizarLCD("Data Flow", "Inventory v2.0");
+  atualizarLCD("Data Flow", "Inventory v2.1");
   delay(2000);
 
-  // Configura pinos dos motores
-  int motores[] = {
-    MOTOR_PRINCIPAL_ENA, MOTOR_PRINCIPAL_IN1, MOTOR_PRINCIPAL_IN2,
-    MOTOR_A_ENA, MOTOR_A_IN1, MOTOR_A_IN2,
-    MOTOR_B_ENA, MOTOR_B_IN1, MOTOR_B_IN2,
-    MOTOR_C_ENA, MOTOR_C_IN1, MOTOR_C_IN2
-  };
-  for (int i = 0; i < 12; i++) pinMode(motores[i], OUTPUT);
+  // Configura pinos dos motores (IRF520 — apenas 1 PWM por motor)
+  int motores[] = { MOTOR_PRINCIPAL, MOTOR_A, MOTOR_B, MOTOR_C };
+  for (int i = 0; i < 4; i++) {
+    pinMode(motores[i], OUTPUT);
+    analogWrite(motores[i], 0); // Inicia desligado
+  }
 
   // Configura pinos dos sensores
   int sensores[] = {
@@ -344,9 +366,10 @@ void setup() {
   };
   for (int i = 0; i < 6; i++) pinMode(sensores[i], INPUT_PULLUP);
 
-  // Configura pinos dos botões
-  int botoes[] = { BTN_PECA_A, BTN_PECA_B, BTN_PECA_C, BTN_RESET };
-  for (int i = 0; i < 4; i++) pinMode(botoes[i], INPUT_PULLUP);
+  // Botões físicos: DESABILITADOS (controle via dashboard)
+  // Para reativar, descomente:
+  // int botoes[] = { BTN_PECA_A, BTN_PECA_B, BTN_PECA_C, BTN_RESET };
+  // for (int i = 0; i < 4; i++) pinMode(botoes[i], INPUT_PULLUP);
 
   // Esteira principal fica ligada continuamente
   ligarEsteiraPrincipal();
@@ -358,6 +381,8 @@ void setup() {
   doc["type"] = "evento";
   doc["evento"] = "inicio";
   doc["msg"] = "Sistema iniciado";
+  doc["versao"] = "2.1";
+  doc["driver"] = "IRF520";
   serializeJson(doc, Serial);
   Serial.println();
 }
@@ -370,7 +395,7 @@ void loop() {
   // Processa comandos recebidos do ESP32
   processarComando();
 
-  // Publicação periódica de status (a cada INTERVALO_PUBLICACAO ms)
+  // Publicação periódica de status
   if (millis() - ultimaPublicacao >= INTERVALO_PUBLICACAO) {
     ultimaPublicacao = millis();
     publicarEstado();
@@ -382,14 +407,20 @@ void loop() {
 
     // ----------------------------------------------------------
     // ESTADO 1: AGUARDANDO PEDIDO
+    // Comandos recebidos via Serial (ESP32/dashboard web)
+    // Botões físicos desabilitados (verificar reativação futura)
     // ----------------------------------------------------------
     case AGUARDANDO_PEDIDO: {
-      int btn = lerBotao();
-      if (btn > 0) {
-        pecaSolicitada = btn;
-        publicarPedido((char)('A' + btn - 1));
-        estadoAtual = VERIFICANDO_ESTOQUE;
-      }
+      // Botões físicos: DESABILITADOS
+      // Para reativar, descomente o bloco abaixo:
+      // int btn = lerBotao();
+      // if (btn > 0) {
+      //   pecaSolicitada = btn;
+      //   publicarPedido((char)('A' + btn - 1));
+      //   estadoAtual = VERIFICANDO_ESTOQUE;
+      // } else if (btn == -1) {
+      //   // Reset via botão físico — já processado em processarComando()
+      // }
       break;
     }
 
@@ -447,6 +478,9 @@ void loop() {
         if (pecaSolicitada == 2) pararEsteiraB();
         if (pecaSolicitada == 3) pararEsteiraC();
 
+        // Separador: CÓDIGO COMENTADO — verificar implementação futura
+        // moverSeparador((char)('A' + pecaSolicitada - 1));
+
         // Atualiza estoque
         estoque[pecaSolicitada]--;
 
@@ -482,22 +516,24 @@ void loop() {
     // ----------------------------------------------------------
     case ERRO: {
       if (erroTimeout) {
-        atualizarLCD("ERRO: Timeout", "Pressione RESET");
+        atualizarLCD("ERRO: Timeout", "Aguarde comando");
       } else if (erroSemEstoque) {
         // Mantém mensagem de sem estoque
       }
 
-      int btn = lerBotao();
-      if (btn == -1) {
-        erroTimeout = false;
-        erroSemEstoque = false;
-        pecaSolicitada = 0;
-        pararTodasSecundarias();
-        exibirEstoque();
-        publicarEstado();
-        publicarStatusEsteiras();
-        estadoAtual = AGUARDANDO_PEDIDO;
-      }
+      // Reset via botão físico: DESABILITADO
+      // Para reativar, descomente:
+      // int btn = lerBotao();
+      // if (btn == -1) {
+      //   erroTimeout = false;
+      //   erroSemEstoque = false;
+      //   pecaSolicitada = 0;
+      //   pararTodasSecundarias();
+      //   exibirEstoque();
+      //   publicarEstado();
+      //   publicarStatusEsteiras();
+      //   estadoAtual = AGUARDANDO_PEDIDO;
+      // }
       break;
     }
   }

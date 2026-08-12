@@ -21,10 +21,10 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-const char* SSID = "SUA_REDE";
-const char* SENHA = "SUA_SENHA";
-const char* MQTT_SERVER = "broker.hivemq.com";
-const int MQTT_PORT = 1883;
+const char* SSID = "Iphone de Matheus";
+const char* SENHA = "matheus22";
+const char* MQTT_SERVER = "282b6bee608949f68d1717e96b4be31e.s1.eu.hivemq.cloud";
+const int MQTT_PORT = 8883;
 const char* MQTT_CLIENT = "esp32_dataflow_teste";
 
 #define TOPICO_STATUS "dataflow/status"
