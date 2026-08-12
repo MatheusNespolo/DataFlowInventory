@@ -12,27 +12,19 @@ Os 5 estados do firmware e suas transições:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> AGUARDANDO_PEDIDO : setup() concluído
-    esteira principal ligada
+    [*] --> AGUARDANDO_PEDIDO : setup() concluído<br/>esteira principal ligada
 
-    AGUARDANDO_PEDIDO --> VERIFICANDO_ESTOQUE : comando recebido
-    (CMD PECA A/B/C via ESP32)
+    AGUARDANDO_PEDIDO --> VERIFICANDO_ESTOQUE : comando recebido<br/>(CMD PECA A/B/C via ESP32)
 
-    VERIFICANDO_ESTOQUE --> ACIONANDO_ESTEIRA : sensor topo detecta peça
-    E estoque > 0
-    VERIFICANDO_ESTOQUE --> ERRO : sem peça no topo
-    OU estoque = 0
+    VERIFICANDO_ESTOQUE --> ACIONANDO_ESTEIRA : sensor topo detecta peça<br/>E estoque > 0
+    VERIFICANDO_ESTOQUE --> ERRO : sem peça no topo<br/>OU estoque = 0
 
-    ACIONANDO_ESTEIRA --> ENTREGANDO_PECA : motor da esteira
-    secundária ligado
+    ACIONANDO_ESTEIRA --> ENTREGANDO_PECA : motor da esteira<br/>secundária ligado
 
-    ENTREGANDO_PECA --> AGUARDANDO_PEDIDO : sensor da junção detecta peça
-    (estoque--, evento de entrega publicado)
-    ENTREGANDO_PECA --> ERRO : timeout 3s
-    (peça não chegou na junção)
+    ENTREGANDO_PECA --> AGUARDANDO_PEDIDO : sensor da junção detecta peça<br/>(estoque--, evento de entrega publicado)
+    ENTREGANDO_PECA --> ERRO : timeout 3s<br/>(peça não chegou na junção)
 
-    ERRO --> AGUARDANDO_PEDIDO : comando RESET
-    (via dashboard)
+    ERRO --> AGUARDANDO_PEDIDO : comando RESET<br/>(via dashboard)
 
     note right of AGUARDANDO_PEDIDO
         Esteira principal sempre ligada.
@@ -54,45 +46,28 @@ Visão de processo: da solicitação do usuário no dashboard até a entrega da 
 
 ```mermaid
 flowchart TD
-    A([Usuário clica 'Solicitar Peça X'
-    no dashboard]) --> B[Frontend emite
-    solicitar_peca via Socket.IO]
-    B --> C[Server Node publica comando
-    em dataflow/comandos/sub]
-    C --> D[ESP32 recebe MQTT e enviaCMD:PECA:X pela Serial2]
-    D --> E[Arduino: estado
-    VERIFICANDO_ESTOQUE]
+    A([Usuário clica 'Solicitar Peça X'<br/>no dashboard]) --> B[Frontend emite<br/>solicitar_peca via Socket.IO]
+    B --> C[Server Node publica comando<br/>em dataflow/comandos/sub]
+    C --> D[ESP32 recebe MQTT e envia<br/>CMD:PECA:X pela Serial2]
+    D --> E[Arduino: estado<br/>VERIFICANDO_ESTOQUE]
 
-    E --> F{Sensor do topo
-    detecta peça E
-    estoque > 0?}
-    F -- Não --> G[Estado ERRO:
-    'Sem estoque']
-    G --> H[Publica evento de erro
-    → dashboard exibe alerta]
-    H --> I([Aguarda RESET
-    via dashboard])
+    E --> F{Sensor do topo<br/>detecta peça E<br/>estoque > 0?}
+    F -- Não --> G[Estado ERRO:<br/>'Sem estoque']
+    G --> H[Publica evento de erro<br/>→ dashboard exibe alerta]
+    H --> I([Aguarda RESET<br/>via dashboard])
     I --> Z
 
-    F -- Sim --> J[Estado ACIONANDO_ESTEIRA:
-    liga motor da esteira X]
-    J --> K[Estado ENTREGANDO_PECA:
-    monitora sensor da junção]
+    F -- Sim --> J[Estado ACIONANDO_ESTEIRA:<br/>liga motor da esteira X]
+    J --> K[Estado ENTREGANDO_PECA:<br/>monitora sensor da junção]
 
-    K --> L{Peça chegou na
-    junção em até 3s?}
-    L -- Não --> M[Timeout: para esteira,
-    estado ERRO]
+    K --> L{Peça chegou na<br/>junção em até 3s?}
+    L -- Não --> M[Timeout: para esteira,<br/>estado ERRO]
     M --> H
 
-    L -- Sim --> N[Para esteira secundária
-    estoque X = estoque X - 1]
-    N --> O[Peça segue pela esteira principal
-    até a roda de estoque]
-    O --> P[Publica evento de entrega +
-    estoque atualizado via MQTT]
-    P --> Q[Dashboard atualiza:
-    estoque, histórico, diagrama]
+    L -- Sim --> N[Para esteira secundária<br/>estoque X = estoque X - 1]
+    N --> O[Peça segue pela esteira principal<br/>até a roda de estoque]
+    O --> P[Publica evento de entrega +<br/>estoque atualizado via MQTT]
+    P --> Q[Dashboard atualiza:<br/>estoque, histórico, diagrama]
     Q --> Z([Estado AGUARDANDO_PEDIDO])
 ```
 
@@ -106,31 +81,23 @@ Caminho completo de um pedido bem-sucedido através de todas as camadas:
 sequenceDiagram
     autonumber
     actor U as Usuário
-    participant F as Frontend
-    (Dashboard)
-    participant S as Server Node
-    (Express+Socket.IO)
-    participant B as Broker MQTT
-    (Mosquitto/HiveMQ)
-    participant E as ESP32
-    (Gateway)
-    participant A as Arduino Uno
-    (FSM)
+    participant F as Frontend<br/>(Dashboard)
+    participant S as Server Node<br/>(Express+Socket.IO)
+    participant B as Broker MQTT<br/>(Mosquitto/HiveMQ)
+    participant E as ESP32<br/>(Gateway)
+    participant A as Arduino Uno<br/>(FSM)
 
     U->>F: Clica "Solicitar Peça A"
     F->>S: socket.emit('solicitar_peca', {peca:'A'})
-    S->>B: publish dataflow/comandos/sub
-    {"acao":"solicitar_peca","peca":"A"}
+    S->>B: publish dataflow/comandos/sub<br/>{"acao":"solicitar_peca","peca":"A"}
     B->>E: message (comandos/sub)
     E->>A: Serial2: "CMD:PECA:A"
-    E->>B: publish dataflow/comandos/pub
-    (confirmação)
+    E->>B: publish dataflow/comandos/pub<br/>(confirmação)
     B->>S: message (comandos/pub)
     S->>F: socket.emit('comando', ...)
     F->>U: Histórico: "Comando enviado"
 
-    Note over A: FSM: VERIFICANDO_ESTOQUE →
-    ACIONANDO_ESTEIRA → ENTREGANDO_PECA
+    Note over A: FSM: VERIFICANDO_ESTOQUE →<br/>ACIONANDO_ESTEIRA → ENTREGANDO_PECA
 
     A->>E: Serial: {"type":"esteiras","secA":1,...}
     E->>B: publish dataflow/esteiras
@@ -138,8 +105,7 @@ sequenceDiagram
     S->>F: socket.emit('esteiras', ...)
     F->>U: Diagrama: esteira A ligada
 
-    Note over A: Sensor J1 detecta peça
-    estoqueA--
+    Note over A: Sensor J1 detecta peça<br/>estoqueA--
 
     A->>E: Serial: {"type":"evento","evento":"entrega","peca":"A",...}
     E->>B: publish dataflow/eventos
