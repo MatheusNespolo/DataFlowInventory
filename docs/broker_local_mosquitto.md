@@ -44,7 +44,8 @@ Em dois terminais separados:
 
 ```powershell
 # Terminal 2 — publicar mensagem de teste
-& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/status" -m "{\"type\":\"status\",\"estado\":\"Teste\"}"
+# (no PowerShell, use aspas simples para o JSON — aspas duplas com \" causam erro de parsing)
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/status" -m '{"type":"status","estado":"Teste"}'
 ```
 
 ✅ **Critério de sucesso:** a mensagem aparece no Terminal 1.
@@ -84,16 +85,16 @@ npm start
 
 ```powershell
 # Simular atualização de estoque
-mosquitto_pub -h localhost -t "dataflow/estoque" -m "{\"type\":\"estoque\",\"pecaA\":4,\"pecaB\":5,\"pecaC\":5}"
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/estoque" -m '{"type":"estoque","pecaA":4,"pecaB":5,"pecaC":5}'
 
 # Simular evento de entrega
-mosquitto_pub -h localhost -t "dataflow/eventos" -m "{\"type\":\"evento\",\"evento\":\"entrega\",\"peca\":\"A\",\"estoqueA\":4,\"estoqueB\":5,\"estoqueC\":5}"
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/eventos" -m '{"type":"evento","evento":"entrega","peca":"A","estoqueA":4,"estoqueB":5,"estoqueC":5}'
 
 # Simular esteira ligada
-mosquitto_pub -h localhost -t "dataflow/esteiras" -m "{\"type\":\"esteiras\",\"principal\":1,\"secA\":1,\"secB\":0,\"secC\":0}"
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/esteiras" -m '{"type":"esteiras","principal":1,"secA":1,"secB":0,"secC":0}'
 
 # Simular gateway online (LWT)
-mosquitto_pub -h localhost -t "dataflow/gateway" -m "{\"status\":\"online\"}"
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/gateway" -m '{"status":"online"}'
 ```
 
 ✅ **Critério de sucesso:** o dashboard atualiza em tempo real (estoque, histórico, diagrama, badge "ESP32 Online").
