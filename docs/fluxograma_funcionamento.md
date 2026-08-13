@@ -10,7 +10,7 @@
 
 Os 5 estados do firmware e suas transições:
 
-![alt text](<Máquina de estados (FSM) - Arduino Uno-1.png>)
+![alt text](<Máquina de estados (FSM) - Arduino Uno.png>)
 
 ---
 
