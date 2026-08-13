@@ -10,33 +10,7 @@
 
 Os 5 estados do firmware e suas transições:
 
-```mermaid
-stateDiagram-v2
-    [*] --> AGUARDANDO_PEDIDO : setup() concluído<br/>esteira principal ligada
-
-    AGUARDANDO_PEDIDO --> VERIFICANDO_ESTOQUE : comando recebido<br/>(CMD PECA A/B/C via ESP32)
-
-    VERIFICANDO_ESTOQUE --> ACIONANDO_ESTEIRA : sensor topo detecta peça<br/>E estoque > 0
-    VERIFICANDO_ESTOQUE --> ERRO : sem peça no topo<br/>OU estoque = 0
-
-    ACIONANDO_ESTEIRA --> ENTREGANDO_PECA : motor da esteira<br/>secundária ligado
-
-    ENTREGANDO_PECA --> AGUARDANDO_PEDIDO : sensor da junção detecta peça<br/>(estoque--, evento de entrega publicado)
-    ENTREGANDO_PECA --> ERRO : timeout 3s<br/>(peça não chegou na junção)
-
-    ERRO --> AGUARDANDO_PEDIDO : comando RESET<br/>(via dashboard)
-
-    note right of AGUARDANDO_PEDIDO
-        Esteira principal sempre ligada.
-        Esteiras secundárias paradas.
-    end note
-
-    note right of ERRO
-        Motores secundários parados.
-        Mensagem no LCD.
-        Evento de erro publicado via MQTT.
-    end note
-```
+![alt text](<Máquina de estados (FSM) - Arduino Uno-1.png>)
 
 ---
 

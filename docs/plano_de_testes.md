@@ -17,6 +17,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | 2 | ESP32 → Broker → Node.js | Item 1 + PC com Mosquitto + server Node | ESP32 publica no broker → Node.js recebe | Mensagem aparece nos logs do servidor |
 | 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / LCD) |
 | 4 | End-to-End (Dashboard) | Item 2 + navegador | Clicar no dashboard → Arduino executa → dashboard atualiza | Ciclo completo pedido → entrega refletido na UI |
+| 5 | Duas esteiras (A + B) | Itens 1–3 + 2ª esteira secundária + 2 sensores | Validar FSM completa com 2 esteiras e cenários de rejeição | Entregas A/B, rejeição de C, `ocupado`, timeout + reset |
 
 ---
 
@@ -194,6 +195,36 @@ MQTT_PORT=1883
 
 ---
 
+## Teste 5 — Duas Esteiras (A + B)
+
+> Objetivo: validar a máquina de estados completa (5 estados) e o protocolo Serial JSON final com duas esteiras secundárias, incluindo cenários de rejeição, antes de escalar para as três esteiras.
+
+### Materiais
+- Sketches em `test/esteira_peca_b/`:
+  - `arduino_esteiras_ab/` no Arduino Uno
+  - `esp32_esteiras_ab/` no ESP32
+- 3× IRF520 (principal + A + B), 4× TCRT5000 (topo A/B, junções J1/J2)
+- Broker Mosquitto local + `test/mqtt_probe/` (ou MQTT Box)
+
+### Procedimento
+1. **Fase 1 (sem ESP32):** upload no Uno e testes pelo monitor serial (9600):
+   - `CMD:PECA:A` e `CMD:PECA:B` → ciclo completo de entrega
+   - `CMD:PECA:C` → rejeição `peca_indisponivel`
+   - Pedido durante entrega → rejeição `ocupado`
+   - Timeout (peça não chega em J1/J2) → `ERRO` → `CMD:RESET`
+2. **Fase 2 (com ESP32 + broker):** repetir os comandos publicando em `dataflow/comandos/sub` e observar os tópicos `dataflow/#` com o `mqtt_probe`.
+
+Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/README.md`](../test/esteira_peca_b/README.md)
+
+### Critérios de validação
+- [ ] Entregas consecutivas de A e B decrementam o estoque corretamente
+- [ ] Peça C rejeitada com `{"evento":"erro","tipo":"peca_indisponivel"}` sem travar a FSM
+- [ ] Pedido com FSM ocupada gera evento `ocupado`
+- [ ] Timeout de 3 s → `ERRO`; `CMD:RESET` recupera o sistema
+- [ ] Status periódico (`status`, `sensores`, `esteiras`) publicado a cada ~1 s nos tópicos MQTT
+
+---
+
 ## Registro de Resultados
 
 | # | Teste | Data | Resultado | Observações |
@@ -202,3 +233,4 @@ MQTT_PORT=1883
 | 2 | ESP32 → Broker → Node.js | | ⬜ Pendente | |
 | 3 | Comando via MQTT Box | | ⬜ Pendente | |
 | 4 | End-to-End (Dashboard) | | ⬜ Pendente | |
+| 5 | Duas esteiras (A + B) | | ⬜ Pendente | |

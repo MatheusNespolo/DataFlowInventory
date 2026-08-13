@@ -112,7 +112,8 @@ DataFlowInventory/
 │       └── app.js                         # Lógica WebSocket + UI
 │
 ├── test/
-│   ├── esteira_peca_a/                    # Códigos de teste incrementais
+│   ├── esteira_peca_a/                    # Códigos de teste incrementais (1 esteira)
+│   ├── esteira_peca_b/                    # Teste 5: duas esteiras (A+B) com FSM completa
 │   └── mqtt_probe/                        # Sonda MQTT (escuta dataflow/# com timestamp)
 │
 ├── docs/
