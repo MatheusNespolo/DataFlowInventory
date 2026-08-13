@@ -112,12 +112,14 @@ DataFlowInventory/
 │       └── app.js                         # Lógica WebSocket + UI
 │
 ├── test/
-│   └── esteira_peca_a/                    # Códigos de teste incrementais
+│   ├── esteira_peca_a/                    # Códigos de teste incrementais
+│   └── mqtt_probe/                        # Sonda MQTT (escuta dataflow/# com timestamp)
 │
 ├── docs/
 │   ├── arquitetura_mqtt.md                # Documentação da arquitetura MQTT
 │   ├── fluxograma_funcionamento.md        # Fluxogramas (FSM, operação, sequência)
 │   ├── broker_local_mosquitto.md          # Teste local com Mosquitto (sem nuvem)
+│   ├── plano_de_testes.md                 # Plano de testes de integração (Serial → E2E)
 │   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
 │
 ├── .gitignore
@@ -139,6 +141,8 @@ O Arduino opera com **5 estados**:
 | 5 | **ERRO** | Sinaliza falha no LCD, aguarda reset manual |
 
 > 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/fluxograma_funcionamento.md`](docs/fluxograma_funcionamento.md).
+>
+> 🧪 Testes de integração da cadeia de comunicação (Serial → Broker → Dashboard) em [`docs/plano_de_testes.md`](docs/plano_de_testes.md).
 
 ### Tópicos MQTT
 
@@ -285,5 +289,5 @@ MIT License — Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 ---
 
 <div align="center">
-Feito com ❤️ no SENAI São Caetano do Sul
+"A forma mais fácil de estagnar é considerar que não há nada a aprender."
 </div>

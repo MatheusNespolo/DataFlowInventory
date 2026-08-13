@@ -1,0 +1,12 @@
+{
+  "name": "dataflow-mqtt-probe",
+  "version": "1.0.0",
+  "description": "Sonda MQTT para testes do Data Flow Inventory — escuta todos os tópicos dataflow/# e imprime as mensagens com timestamp",
+  "main": "probe.js",
+  "scripts": {
+    "start": "node probe.js"
+  },
+  "dependencies": {
+    "mqtt": "^5.0.0"
+  }
+}
