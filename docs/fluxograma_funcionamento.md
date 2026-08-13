@@ -18,75 +18,9 @@ Os 5 estados do firmware e suas transições:
 
 Visão de processo: da solicitação do usuário no dashboard até a entrega da peça.
 
-```mermaid
-flowchart TD
-    A([Usuário clica 'Solicitar Peça X'<br/>no dashboard]) --> B[Frontend emite<br/>solicitar_peca via Socket.IO]
-    B --> C[Server Node publica comando<br/>em dataflow/comandos/sub]
-    C --> D[ESP32 recebe MQTT e envia<br/>CMD:PECA:X pela Serial2]
-    D --> E[Arduino: estado<br/>VERIFICANDO_ESTOQUE]
-
-    E --> F{Sensor do topo<br/>detecta peça E<br/>estoque > 0?}
-    F -- Não --> G[Estado ERRO:<br/>'Sem estoque']
-    G --> H[Publica evento de erro<br/>→ dashboard exibe alerta]
-    H --> I([Aguarda RESET<br/>via dashboard])
-    I --> Z
-
-    F -- Sim --> J[Estado ACIONANDO_ESTEIRA:<br/>liga motor da esteira X]
-    J --> K[Estado ENTREGANDO_PECA:<br/>monitora sensor da junção]
-
-    K --> L{Peça chegou na<br/>junção em até 3s?}
-    L -- Não --> M[Timeout: para esteira,<br/>estado ERRO]
-    M --> H
-
-    L -- Sim --> N[Para esteira secundária<br/>estoque X = estoque X - 1]
-    N --> O[Peça segue pela esteira principal<br/>até a roda de estoque]
-    O --> P[Publica evento de entrega +<br/>estoque atualizado via MQTT]
-    P --> Q[Dashboard atualiza:<br/>estoque, histórico, diagrama]
-    Q --> Z([Estado AGUARDANDO_PEDIDO])
-```
+![alt text](<Fluxograma Operacional — Ciclo de um Pedido.png>)
 
 ---
-
-## 3. Diagrama de Sequência — Comunicação Fim a Fim
-
-Caminho completo de um pedido bem-sucedido através de todas as camadas:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as Usuário
-    participant F as Frontend<br/>(Dashboard)
-    participant S as Server Node<br/>(Express+Socket.IO)
-    participant B as Broker MQTT<br/>(Mosquitto/HiveMQ)
-    participant E as ESP32<br/>(Gateway)
-    participant A as Arduino Uno<br/>(FSM)
-
-    U->>F: Clica "Solicitar Peça A"
-    F->>S: socket.emit('solicitar_peca', {peca:'A'})
-    S->>B: publish dataflow/comandos/sub<br/>{"acao":"solicitar_peca","peca":"A"}
-    B->>E: message (comandos/sub)
-    E->>A: Serial2: "CMD:PECA:A"
-    E->>B: publish dataflow/comandos/pub<br/>(confirmação)
-    B->>S: message (comandos/pub)
-    S->>F: socket.emit('comando', ...)
-    F->>U: Histórico: "Comando enviado"
-
-    Note over A: FSM: VERIFICANDO_ESTOQUE →<br/>ACIONANDO_ESTEIRA → ENTREGANDO_PECA
-
-    A->>E: Serial: {"type":"esteiras","secA":1,...}
-    E->>B: publish dataflow/esteiras
-    B->>S: message
-    S->>F: socket.emit('esteiras', ...)
-    F->>U: Diagrama: esteira A ligada
-
-    Note over A: Sensor J1 detecta peça<br/>estoqueA--
-
-    A->>E: Serial: {"type":"evento","evento":"entrega","peca":"A",...}
-    E->>B: publish dataflow/eventos
-    B->>S: message
-    S->>F: socket.emit('evento', ...)
-    F->>U: "Peça A entregue" + estoque atualizado
-```
 
 ---
 
