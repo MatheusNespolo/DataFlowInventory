@@ -13,6 +13,9 @@ Este documento define os testes de integração da cadeia de comunicação do si
 
 | # | Teste | Materiais | Objetivo | Validação |
 |---|-------|-----------|----------|-----------|
+| B0.1 | Setup da placa (Blink + Serial) | Arduino Uno | Validar upload, GPIO e comunicação Serial básica | LED pisca + mensagens no monitor serial |
+| B0.2 | Sensor IR isolado | Arduino Uno + 1 TCRT5000 | Validar leitura digital e calibração do trimpot | Detecção estável da peça (LOW/HIGH sem oscilação) |
+| B0.3 | Motor isolado | Arduino Uno + IRF520 + 1 motor DC | Validar acionamento PWM via driver | Motor liga/desliga e varia velocidade por comando |
 | **1** | **Serial Arduino ↔ ESP32** | Arduino Uno + ESP32 + divisor de tensão | Arduino publica status via Serial → ESP32 recebe | ESP32 imprime JSON recebido no monitor serial ✅ **(CONCLUÍDO)** |
 | **B1** | **Bancada 3.1 — Ciclo completo** | Arduino Uno + IRF520 + 1 esteira + 1 TCRT5000 | Solicitar peça A → acionar motor → sensor detecta saída → parar motor | Ciclo completo funcionando |
 | **B2** | **Bancada 3.2 — Sem estoque** | Mesma montagem do B1 | Solicitar peça B/C (inexistente) → retorna "peca_indisponivel" | Resposta de erro correta + recuperação via reset |
@@ -24,9 +27,46 @@ Este documento define os testes de integração da cadeia de comunicação do si
 
 ---
 
+## Testes de Bancada B0 (Componentes isolados)
+
+> Objetivo: validar cada componente individualmente antes de qualquer integração. São pré-requisitos dos testes B1–B3.
+
+### B0.1 — Setup da placa (Blink + Serial)
+
+**Sketch:** `test/esteira_peca_a/arduino_teste_setup/`
+
+1. Upload do sketch e abrir o monitor serial em **9600 baud**
+2. Conferir o LED onboard piscando e as mensagens periódicas na serial
+
+- [ ] LED pisca no intervalo esperado
+- [ ] Mensagens legíveis no monitor serial (baud correto)
+
+### B0.2 — Sensor IR TCRT5000 isolado
+
+**Sketch:** `test/esteira_peca_a/arduino_teste_sensor/`
+
+1. Ligar o TCRT5000 (VCC/GND/D0 → pino 2) e fazer upload
+2. Aproximar/afastar uma peça e observar a leitura na serial
+3. Ajustar o trimpot do módulo com a peça na distância real da esteira
+
+- [ ] Saída D0 vai a LOW com a peça presente e HIGH sem peça
+- [ ] Leitura estável (sem oscilação) na distância de operação
+
+### B0.3 — Motor DC isolado (driver IRF520)
+
+**Sketch:** `test/esteira_peca_a/arduino_teste_motor/`
+
+1. Ligar o IRF520 (SIG → pino 3, fonte externa do motor, **GND comum**) e fazer upload
+2. Testar comandos de liga/desliga e variação de PWM pela serial
+
+- [ ] Motor responde ao PWM (liga, desliga, varia velocidade)
+- [ ] **Registrar** o menor PWM que move a esteira (calibra `VELOCIDADE_MOTOR`)
+
+---
+
 ## Testes de Bancada B1–B3 (Hardware: motor, sensor e LCD)
 
-> Objetivo: validar os componentes físicos individualmente antes de integrá-los à cadeia MQTT. Correspondem aos itens 3.1, 3.2 e 3.3 do plano do artigo.
+> Objetivo: validar os componentes físicos integrados antes de conectá-los à cadeia MQTT. Correspondem aos itens 3.1, 3.2 e 3.3 do plano do artigo.
 
 ### B1 (3.1) — Ciclo completo: solicitar → acionar → detectar → parar
 
@@ -175,6 +215,9 @@ mosquitto_pub -h localhost -t "dataflow/status" -m "{\"type\":\"status\",\"estad
 ✔ A mensagem deve aparecer no terminal do `mosquitto_sub`. Isso confirma que o broker funciona **antes** de envolver o hardware.
 
 **2.2 — Configurar o ESP32 (`esp32/gateway_mqtt/gateway_mqtt.ino`):**
+
+> 💡 Alternativa reduzida: para validar a cadeia com **uma única esteira (Peça A)**, use o sketch `test/esteira_peca_a/esp32_peca_a/` no lugar do gateway completo. Ele implementa o mesmo fluxo Serial2 ↔ MQTT, porém limitado à Peça A — útil como etapa intermediária antes do gateway completo.
+
 - `USE_TLS` = `false`
 - `SSID` / `SENHA` = credenciais do Wi-Fi (mesma rede do PC)
 - `MQTT_SERVER` = IP do PC (obter com `ipconfig` → "Endereço IPv4")
@@ -324,6 +367,9 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 
 | # | Teste | Data | Resultado | Observações |
 |---|-------|------|-----------|-------------|
+| B0.1 | Setup da placa (Blink + Serial) | | ⬜ Pendente | |
+| B0.2 | Sensor IR isolado | | ⬜ Pendente | Anotar distância/trimpot calibrados |
+| B0.3 | Motor isolado (IRF520) | | ⬜ Pendente | Registrar PWM mínimo |
 | 1 | Serial Arduino ↔ ESP32 | 12/08/2026 | ✅ Aprovado | JSON recebido corretamente no ESP32 |
 | B1 | Bancada 3.1 — Ciclo completo | | ⬜ Pendente | Registrar tempo_ms e PWM mínimo |
 | B2 | Bancada 3.2 — Sem estoque | | ⬜ Pendente | |

@@ -381,17 +381,34 @@ DataFlowInventory/
 │       └── app.js                     # Lógica WebSocket + atualização UI
 │
 ├── test/
-│   └── esteira_peca_a/                # Sketches de teste incremental (1 por pasta)
-│       ├── arduino_teste_setup/       # 0.1 — Blink + Serial
-│       ├── arduino_teste_serial/      # Teste de comunicação Serial
-│       ├── arduino_teste_sensor/      # 2.1 — Sensor IR TCRT5000
-│       ├── arduino_teste_motor/       # Teste do motor via driver
-│       ├── arduino_teste_integracao/  # Integração sensor + motor
-│       ├── esp32_teste_serial/        # ESP32: teste Serial2
-│       └── esp32_peca_a/              # ESP32: gateway reduzido (só Peça A)
+│   ├── esteira_peca_a/                # Sketches de teste incremental (1 por pasta)
+│   │   ├── arduino_teste_setup/       # B0.1 — Blink + Serial (validação da placa)
+│   │   ├── arduino_teste_serial/      # Teste de comunicação Serial (JSON periódico)
+│   │   ├── arduino_teste_sensor/      # B0.2 — Sensor IR TCRT5000 isolado
+│   │   ├── arduino_teste_motor/       # B0.3 — Motor DC via driver IRF520 isolado
+│   │   ├── arduino_teste_integracao/  # B1/B2 — Integração sensor + motor (ciclo completo)
+│   │   ├── arduino_teste_lcd/         # B3 — LCD 16x2 I2C (scanner + telas)
+│   │   ├── esp32_teste_serial/        # ESP32: teste Serial2 (Teste 1)
+│   │   └── esp32_peca_a/              # ESP32: gateway reduzido (só Peça A)
+│   │
+│   ├── esteira_peca_b/                # Teste 5 — FSM completa com 2 esteiras (A + B)
+│   │   ├── README.md                  # Pinagem, ligações e checklists do Teste 5
+│   │   ├── arduino_esteiras_ab/       # Arduino Uno: FSM 2 esteiras + protocolo JSON final
+│   │   └── esp32_esteiras_ab/         # ESP32: gateway para o cenário A + B
+│   │
+│   └── mqtt_probe/                    # Sonda MQTT em Node.js (observa dataflow/# com timestamp)
+│       ├── package.json
+│       └── probe.js
 │
 └── docs/
-    └── arquitetura_mqtt.md            # Este documento
+    ├── arquitetura_mqtt.md            # Este documento
+    ├── broker_local_mosquitto.md      # Passo a passo do broker Mosquitto local
+    ├── fluxograma_funcionamento.md    # FSM, fluxo operacional e sequência de comunicação
+    ├── plano_de_testes.md             # Plano de testes (B0–B3 e Testes 1–5)
+    ├── github_setup.sh                # Script de configuração do repositório
+    ├── Projeto de pesquisa - Final.docx               # Projeto de pesquisa (artigo)
+    ├── Fluxograma Operacional — Ciclo de um Pedido.png
+    └── Máquina de estados (FSM) - Arduino Uno.png
 ```
 
 ---
