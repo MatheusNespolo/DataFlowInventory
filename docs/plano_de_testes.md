@@ -14,10 +14,105 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | # | Teste | Materiais | Objetivo | Validação |
 |---|-------|-----------|----------|-----------|
 | **1** | **Serial Arduino ↔ ESP32** | Arduino Uno + ESP32 + divisor de tensão | Arduino publica status via Serial → ESP32 recebe | ESP32 imprime JSON recebido no monitor serial ✅ **(CONCLUÍDO)** |
+| **B1** | **Bancada 3.1 — Ciclo completo** | Arduino Uno + IRF520 + 1 esteira + 1 TCRT5000 | Solicitar peça A → acionar motor → sensor detecta saída → parar motor | Ciclo completo funcionando |
+| **B2** | **Bancada 3.2 — Sem estoque** | Mesma montagem do B1 | Solicitar peça B/C (inexistente) → retorna "peca_indisponivel" | Resposta de erro correta + recuperação via reset |
+| **B3** | **Bancada 3.3 — LCD I2C** | Arduino Uno + LCD 16x2 I2C | Exibir estoque e status no display | LCD mostra informações legíveis |
 | 2 | ESP32 → Broker → Node.js | Item 1 + PC com Mosquitto + server Node | ESP32 publica no broker → Node.js recebe | Mensagem aparece nos logs do servidor |
 | 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / LCD) |
 | 4 | End-to-End (Dashboard) | Item 2 + navegador | Clicar no dashboard → Arduino executa → dashboard atualiza | Ciclo completo pedido → entrega refletido na UI |
 | 5 | Duas esteiras (A + B) | Itens 1–3 + 2ª esteira secundária + 2 sensores | Validar FSM completa com 2 esteiras e cenários de rejeição | Entregas A/B, rejeição de C, `ocupado`, timeout + reset |
+
+---
+
+## Testes de Bancada B1–B3 (Hardware: motor, sensor e LCD)
+
+> Objetivo: validar os componentes físicos individualmente antes de integrá-los à cadeia MQTT. Correspondem aos itens 3.1, 3.2 e 3.3 do plano do artigo.
+
+### B1 (3.1) — Ciclo completo: solicitar → acionar → detectar → parar
+
+**Sketch:** `test/esteira_peca_a/arduino_teste_integracao/`
+
+#### Materiais e ligações
+| Componente | Ligação | Observação |
+|------------|---------|------------|
+| IRF520 SIG | Pino 3 (PWM) | Sinal de controle do motor |
+| IRF520 V+ / V- | Fonte externa do motor | **Nunca alimentar o motor pelo USB do Uno** |
+| IRF520 GND | GND do Uno | **GND comum obrigatório** (sem ele o PWM não funciona) |
+| Diodo 1N4007 | Antiparalelo nos terminais do motor | Flyback — o módulo IRF520 comum **não tem** proteção |
+| TCRT5000 VCC/GND | 5V / GND do Uno | Usar módulo com comparador (saída D0) |
+| TCRT5000 D0 | Pino 2 | Ajustar trimpot com a peça na distância real |
+
+⚠️ **Cuidados:** manter os fios do motor afastados do sensor IR; se houver ruído/reset ao ligar o motor, adicionar capacitores 100 nF + 470 µF na alimentação.
+
+#### Procedimento
+1. Montar o circuito e posicionar uma peça sobre o sensor do topo (D0 deve ir a LOW — conferir LED do módulo)
+2. Upload do sketch e abrir o monitor serial em **9600 baud**
+3. Enviar `CMD:PECA:A`
+4. Observar a sequência: `acionando` → motor liga com soft-start (rampa ~300 ms) → peça sai do sensor → motor para → evento `entregue` com `tempo_ms`
+5. Repetir **sem peça** no sensor → evento `erro` tipo `sem_estoque` → enviar `CMD:RESET`
+6. Repetir **segurando a peça** sobre o sensor → após 5 s, `erro` tipo `timeout` → `CMD:RESET`
+
+#### Critérios de validação
+- [ ] Ciclo completo: comando → motor liga → peça sai do sensor → motor para → `{"evento":"entregue","tempo_ms":...}`
+- [ ] Sem peça: `{"evento":"erro","tipo":"sem_estoque"}` sem acionar o motor
+- [ ] Timeout de 5 s funciona e para o motor
+- [ ] `CMD:RESET` recupera o sistema do estado ERRO
+- [ ] **Registrar** o `tempo_ms` medido (calibra o `TIMEOUT_ENTREGA` da versão final)
+- [ ] **Registrar** o menor PWM que move a esteira com peça (calibra `VELOCIDADE_MOTOR`)
+
+### B2 (3.2) — Peça inexistente
+
+**Sketch:** o mesmo do B1 (cenário incluído).
+
+#### Procedimento
+1. Com a montagem do B1 funcionando, enviar `CMD:PECA:B` e depois `CMD:PECA:C`
+2. Observar: motor **não** liga e o Arduino responde `{"evento":"erro","tipo":"peca_indisponivel","peca":"B"}`
+3. Enviar `CMD:RESET` e confirmar retorno a AGUARDANDO
+4. Enviar comando malformado (ex.: `CMD:XYZ`) → deve ser reportado como desconhecido, sem travar a FSM
+
+#### Critérios de validação
+- [ ] Peça B/C rejeitada com resposta explícita `peca_indisponivel` (não silenciosa)
+- [ ] Motor permanece desligado durante a rejeição
+- [ ] `CMD:RESET` recupera o sistema
+- [ ] Comando inválido não trava a FSM
+
+### B3 (3.3) — LCD I2C 16x2
+
+**Sketch:** `test/esteira_peca_a/arduino_teste_lcd/`
+
+#### Materiais e ligações
+| LCD I2C | Arduino Uno |
+|---------|-------------|
+| SDA | A4 |
+| SCL | A5 |
+| VCC | 5V |
+| GND | GND |
+
+#### Procedimento
+1. Upload do sketch e abrir o monitor serial (9600)
+2. O sketch roda um **scanner I2C** no boot e informa o endereço encontrado (0x27 ou 0x3F, conforme o módulo)
+3. Conferir a tela de boot ("Data Flow / Inventory v2.1") e a alternância automática Estoque ↔ Estado a cada 3 s
+4. Testar comandos pela serial:
+   - `LCD:ESTOQUE:4,5,5` → linha de estoque atualiza
+   - `LCD:ESTADO:SEPARANDO A` → tela de estado fixa
+   - `LCD:ERRO:TIMEOUT J1` → tela de erro fixa
+5. Se o texto sair corrompido ou o display em branco: ajustar o trimpot de contraste no verso do módulo
+
+#### Critérios de validação
+- [ ] Scanner encontra o endereço do módulo (anotar o valor)
+- [ ] Estoque e status exibidos corretamente, sem caracteres corrompidos
+- [ ] Comandos via serial refletem no display
+
+#### Troubleshooting (B1–B3)
+| Sintoma | Causa provável | Solução |
+|---------|----------------|---------|
+| Motor não gira | GND não comum / PWM baixo | Conferir GND Uno↔IRF520; aumentar `VELOCIDADE_MOTOR` |
+| Motor gira fraco | IRF520 não satura a 5 V | Aceitável para motor 3–6 V; se insuficiente, usar PWM 255 ou driver logic-level |
+| Sensor sempre LOW/HIGH | Trimpot desajustado | Calibrar com a peça na distância real da esteira |
+| Entrega "confirmada" sem a peça sair | Ruído no sensor | Aumentar `DEBOUNCE_SENSOR` (50 → 100 ms) |
+| Arduino reseta ao ligar motor | Pico de corrente / ruído | Fonte externa + capacitores 100 nF/470 µF; afastar fiação |
+| LCD em branco | Contraste ou endereço errado | Trimpot do módulo; usar endereço do scanner |
+| Nenhum dispositivo I2C | Fiação SDA/SCL invertida | SDA→A4, SCL→A5 |
 
 ---
 
@@ -230,6 +325,9 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | # | Teste | Data | Resultado | Observações |
 |---|-------|------|-----------|-------------|
 | 1 | Serial Arduino ↔ ESP32 | 12/08/2026 | ✅ Aprovado | JSON recebido corretamente no ESP32 |
+| B1 | Bancada 3.1 — Ciclo completo | | ⬜ Pendente | Registrar tempo_ms e PWM mínimo |
+| B2 | Bancada 3.2 — Sem estoque | | ⬜ Pendente | |
+| B3 | Bancada 3.3 — LCD I2C | | ⬜ Pendente | Anotar endereço I2C encontrado |
 | 2 | ESP32 → Broker → Node.js | | ⬜ Pendente | |
 | 3 | Comando via MQTT Box | | ⬜ Pendente | |
 | 4 | End-to-End (Dashboard) | | ⬜ Pendente | |
