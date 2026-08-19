@@ -371,9 +371,9 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | B0.2 | Sensor IR isolado | | ⬜ Pendente | Anotar distância/trimpot calibrados |
 | B0.3 | Motor isolado (IRF520) | | ⬜ Pendente | Registrar PWM mínimo |
 | 1 | Serial Arduino ↔ ESP32 | 12/08/2026 | ✅ Aprovado | JSON recebido corretamente no ESP32 |
-| B1 | Bancada 3.1 — Ciclo completo | | ⬜ Pendente | Registrar tempo_ms e PWM mínimo |
-| B2 | Bancada 3.2 — Sem estoque | | ⬜ Pendente | |
-| B3 | Bancada 3.3 — LCD I2C | | ⬜ Pendente | Anotar endereço I2C encontrado |
+| B1 | Bancada 3.1 — Ciclo completo | 18/08/2026 | ✅ Aprovado | tempo_ms: 5000 · PWM mínimo: 150 (calibrações aplicadas ao sketch principal) |
+| B2 | Bancada 3.2 — Sem estoque | 18/08/2026 | ✅ Aprovado | Rejeição `peca_indisponivel` + recuperação via reset OK |
+| B3 | Bancada 3.3 — LCD I2C | 18/08/2026 | ✅ Aprovado | Endereço I2C: 0x27 |
 | 2 | ESP32 → Broker → Node.js | | ⬜ Pendente | |
 | 3 | Comando via MQTT Box | | ⬜ Pendente | |
 | 4 | End-to-End (Dashboard) | | ⬜ Pendente | |

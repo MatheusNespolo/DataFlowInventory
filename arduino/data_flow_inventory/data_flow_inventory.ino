@@ -33,18 +33,17 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // PINOS — MOTORES DC (via driver IRF520)
 // Cada motor usa 1 pino PWM (SIG do módulo IRF520)
 // ============================================================
-#define MOTOR_PRINCIPAL  5    // PWM — Esteira Principal
-#define MOTOR_A          3    // PWM — Esteira A (secundária)
-#define MOTOR_B          6    // PWM — Esteira B (secundária)
-#define MOTOR_C          9    // PWM — Esteira C (secundária)
+#define MOTOR_A          9    // PWM — Esteira A (secundária)
+#define MOTOR_B          10    // PWM — Esteira B (secundária)
+#define MOTOR_C          11    // PWM — Esteira C (secundária)
 
 // ============================================================
 // PINOS — SENSORES IR (TCRT5000)
 // ============================================================
-#define SENSOR_TOPO_A     2
+#define SENSOR_TOPO_A     A0
 #define SENSOR_TOPO_B     A1
 #define SENSOR_TOPO_C     A2
-#define SENSOR_JUNCAO_J1  4
+#define SENSOR_JUNCAO_J1  A3
 #define SENSOR_JUNCAO_J2  A4
 #define SENSOR_JUNCAO_J3  A5
 
@@ -71,9 +70,9 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // ============================================================
 // PARÂMETROS DO SISTEMA
 // ============================================================
-#define VELOCIDADE_PRINCIPAL   200   // PWM 0-255
-#define VELOCIDADE_SECUNDARIA  255   // PWM 0-255
-#define TIMEOUT_ENTREGA        5000  // ms
+#define VELOCIDADE_PRINCIPAL   180   // PWM 0-255
+#define VELOCIDADE_SECUNDARIA  200   // PWM 0-255
+#define TIMEOUT_ENTREGA        8000  // ms
 #define DEBOUNCE_BTN           200   // ms
 #define INTERVALO_PUBLICACAO   1000  // ms — intervalo para publicar status periódico
 
