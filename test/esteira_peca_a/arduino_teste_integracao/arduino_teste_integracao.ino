@@ -10,15 +10,19 @@
 //    diodo flyback 1N4007 antiparalelo no motor)
 //
 // Maquina de estados simplificada:
-//   AGUARDANDO  - Aguarda comando via Serial
-//   ACIONANDO   - Liga motor (soft-start), aguarda peca SAIR do sensor
-//   ENTREGUE    - Peca saiu do sensor (entrega confirmada), para motor
-//   ERRO        - Timeout ou sem estoque; aguarda CMD:RESET
+//   AGUARDANDO    - Aguarda comando via Serial
+//   ACIONANDO     - Liga motor (soft-start), aguarda peca SAIR do sensor
+//   TRANSPORTANDO - Motor segue ligado por TEMPO_TRANSPORTE_MS para a
+//                   peca percorrer a esteira ate o final
+//   ENTREGUE      - Transporte concluido, motor parado
+//   ERRO          - Timeout ou sem estoque; aguarda CMD:RESET
 //
 // Semantica do sensor unico (topo):
 //   - Peca presente  = D0 em LOW
-//   - Entrega        = transicao LOW -> HIGH estavel (debounce 50 ms),
-//                      ou seja, a peca deixou o topo da esteira.
+//   - Saida do topo  = transicao LOW -> HIGH estavel (debounce 50 ms).
+//     Como o sensor fica no INICIO da esteira, apos a saida o motor
+//     continua ligado por TEMPO_TRANSPORTE_MS (calibravel) para
+//     garantir que a peca chegue ao final da esteira.
 //
 // Comandos via Serial (9600 baud, terminados em \n):
 //   CMD:PECA:A  -> Solicita peca A (teste 3.1)
@@ -33,17 +37,19 @@
 #define MOTOR_A_PWM      3
 #define SENSOR_TOPO_A    2
 
-#define VELOCIDADE_MOTOR 200   // PWM alvo (calibrar o minimo que move a esteira)
+#define VELOCIDADE_MOTOR 100   // PWM alvo (calibrar o minimo que move a esteira)
 #define SOFT_START_MS    300   // rampa 0 -> VELOCIDADE_MOTOR
-#define TIMEOUT_ENTREGA  5000  // ms aguardando a peca sair do sensor
+#define TIMEOUT_ENTREGA  10000  // ms aguardando a peca sair do sensor
 #define DEBOUNCE_SENSOR  50    // ms de estabilidade da transicao LOW -> HIGH
 #define TEMPO_ENTREGUE   1500  // ms exibindo "entregue" antes de voltar a AGUARDANDO
+#define TEMPO_TRANSPORTE_MS 5000  // ms com motor ligado apos a peca sair do sensor
 
-enum Estado { AGUARDANDO, ACIONANDO, ENTREGUE, ERRO };
+enum Estado { AGUARDANDO, ACIONANDO, TRANSPORTANDO, ENTREGUE, ERRO };
 Estado estadoAtual = AGUARDANDO;
 
 unsigned long tempoInicio      = 0;  // inicio do acionamento (timeout)
 unsigned long tempoTransicao   = 0;  // inicio da transicao LOW -> HIGH (debounce)
+unsigned long tempoTransporte  = 0;  // entrada no estado TRANSPORTANDO
 unsigned long tempoEntregue    = 0;  // entrada no estado ENTREGUE
 unsigned long tempoSoftStart   = 0;  // inicio da rampa PWM
 bool pecaEstavaPresente        = false;
@@ -157,8 +163,10 @@ void loop() {
     }
 
     // --------------------------------------------------------
-    // ACIONANDO: motor ligado; entrega = peca SAIR do sensor
-    // (transicao LOW -> HIGH estavel por DEBOUNCE_SENSOR ms)
+    // ACIONANDO: motor ligado; aguarda a peca SAIR do sensor
+    // (transicao LOW -> HIGH estavel por DEBOUNCE_SENSOR ms).
+    // Ao confirmar a saida, o motor CONTINUA ligado e a FSM
+    // avanca para TRANSPORTANDO.
     // --------------------------------------------------------
     case ACIONANDO: {
       atualizarSoftStart();
@@ -169,17 +177,11 @@ void loop() {
         // Possivel inicio da saida da peca - inicia debounce
         if (tempoTransicao == 0) tempoTransicao = millis();
         if (millis() - tempoTransicao >= DEBOUNCE_SENSOR) {
-          // Transicao confirmada: entrega concluida
-          pararMotor();
-          unsigned long duracao = millis() - tempoInicio;
-          Serial.print("[INT] Peca A entregue! Tempo de entrega: ");
-          Serial.print(duracao);
-          Serial.println(" ms");
-          char extra[48];
-          snprintf(extra, sizeof(extra), "\"peca\":\"A\",\"tempo_ms\":%lu", duracao);
-          publicarEvento("entregue", extra);
-          tempoEntregue = millis();
-          estadoAtual = ENTREGUE;
+          // Saida confirmada: peca deixou o topo, segue em transporte
+          Serial.println("[INT] Peca saiu do topo. Transportando ate o final da esteira...");
+          publicarEvento("transportando", "\"peca\":\"A\"");
+          tempoTransporte = millis();
+          estadoAtual = TRANSPORTANDO;
           break;
         }
       } else if (presente) {
@@ -192,6 +194,29 @@ void loop() {
         Serial.println("[INT] ERRO: Timeout na entrega!");
         publicarEvento("erro", "\"tipo\":\"timeout\",\"peca\":\"A\"");
         estadoAtual = ERRO;
+      }
+      break;
+    }
+
+    // --------------------------------------------------------
+    // TRANSPORTANDO: motor em velocidade plena por
+    // TEMPO_TRANSPORTE_MS para a peca chegar ao final da
+    // esteira. Depois, para o motor e confirma a entrega.
+    // --------------------------------------------------------
+    case TRANSPORTANDO: {
+      analogWrite(MOTOR_A_PWM, VELOCIDADE_MOTOR);
+
+      if (millis() - tempoTransporte >= TEMPO_TRANSPORTE_MS) {
+        pararMotor();
+        unsigned long duracao = millis() - tempoInicio;
+        Serial.print("[INT] Peca A entregue! Tempo total (acionamento + transporte): ");
+        Serial.print(duracao);
+        Serial.println(" ms");
+        char extra[48];
+        snprintf(extra, sizeof(extra), "\"peca\":\"A\",\"tempo_ms\":%lu", duracao);
+        publicarEvento("entregue", extra);
+        tempoEntregue = millis();
+        estadoAtual = ENTREGUE;
       }
       break;
     }

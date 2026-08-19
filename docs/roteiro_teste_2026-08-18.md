@@ -102,9 +102,9 @@ Com a esteira A validada End-to-End, a expansão é **incremental e já preparad
 
 | Teste | Resultado | Medições / Observações |
 |-------|-----------|------------------------|
-| B1 — Ciclo completo | ⬜ | tempo_ms: ____ · PWM mínimo: ____ |
-| B2 — Peça inexistente | ⬜ | |
-| B3 — LCD I2C | ⬜ | Endereço I2C: ____ |
+| B1 — Ciclo completo | ✅ | tempo_ms: 5000 · PWM mínimo: 150 |
+| B2 — Peça inexistente | ✅ | |
+| B3 — LCD I2C | ✅ | Endereço I2C: 0x27 |
 | 2 — ESP32 → Broker → Node | ⬜ | IP do PC: ____ |
 | 3 — Comando MQTT Box | ⬜ | |
 | 4 — End-to-End Dashboard | ⬜ | |
