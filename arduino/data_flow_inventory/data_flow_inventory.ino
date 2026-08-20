@@ -44,8 +44,8 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define SENSOR_TOPO_B     A1
 #define SENSOR_TOPO_C     A2
 #define SENSOR_JUNCAO_J1  A3
-#define SENSOR_JUNCAO_J2  A4
-#define SENSOR_JUNCAO_J3  A5
+#define SENSOR_JUNCAO_J2  2
+#define SENSOR_JUNCAO_J3  4
 
 // ============================================================
 // BOTÕES FÍSICOS — DESABILITADOS
@@ -120,10 +120,6 @@ void ligarMotor(int pin, int velocidade) {
 
 void pararMotor(int pin) {
   analogWrite(pin, 0);
-}
-
-void ligarEsteiraPrincipal() {
-  ligarMotor(MOTOR_PRINCIPAL, VELOCIDADE_PRINCIPAL);
 }
 
 void ligarEsteiraA() {
@@ -352,7 +348,7 @@ void setup() {
   delay(2000);
 
   // Configura pinos dos motores (IRF520 — apenas 1 PWM por motor)
-  int motores[] = { MOTOR_PRINCIPAL, MOTOR_A, MOTOR_B, MOTOR_C };
+  int motores[] = { MOTOR_A, MOTOR_B, MOTOR_C };
   for (int i = 0; i < 4; i++) {
     pinMode(motores[i], OUTPUT);
     analogWrite(motores[i], 0); // Inicia desligado
