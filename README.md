@@ -166,10 +166,10 @@ O Arduino opera com **5 estados**:
 | Esteira transportadora | 4 | BR Eletrônica 35cm, motor DC 3–6V |
 | Arduino Uno | 1 | Controlador principal |
 | ESP32 Dev Module | 1 | Gateway MQTT |
-| Driver IRF520 | 4 | Controle de 1 motor cada |
+| Driver IRF520 | 3 | Controle de 1 motor cada |
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
 | Display LCD 16x2 | 1 | Com módulo I2C (endereço 0x27) |
-| Botões | 4 | 3 solicitação + 1 reset |
+| Botões | 4 | 3 solicitação + 1 reset | (opcionais)
 | Fonte 12V DC | 1 | Alimentação geral |
 
 ### Alternativas Técnicas (Viáveis)
