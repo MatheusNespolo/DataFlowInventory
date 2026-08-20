@@ -166,10 +166,10 @@ O Arduino opera com **5 estados**:
 | Esteira transportadora | 4 | BR Eletrônica 35cm, motor DC 3–6V |
 | Arduino Uno | 1 | Controlador principal |
 | ESP32 Dev Module | 1 | Gateway MQTT |
-| Driver IRF520 | 4 | Controle de 1 motor cada |
+| Driver IRF520 | 3 | Controle de 1 motor cada |
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
 | Display LCD 16x2 | 1 | Com módulo I2C (endereço 0x27) |
-| Botões | 4 | 3 solicitação + 1 reset |
+| Botões | 4 | 3 solicitação + 1 reset | (opcionais)
 | Fonte 12V DC | 1 | Alimentação geral |
 
 ### Alternativas Técnicas (Viáveis)
@@ -190,7 +190,7 @@ O Arduino opera com **5 estados**:
 
 **⚠️ Atenção**: Os motores das esteiras neste projeto operam em apenas um sentido, portanto a perda de reversão do IRF520 não impacta o funcionamento. É necessário 1 módulo IRF520 por motor (total de 4).
 
-#### Opção B — Arduino Uno ao invés de Mega (sem botões físicos)
+#### Opção B — Arduino Mega ao invés de Uno (com botões físicos)
 
 | Aspecto | Arduino Mega | Arduino Uno |
 |---------|-------------|-------------|
@@ -204,8 +204,8 @@ O Arduino opera com **5 estados**:
 
 | Componente | Pinos | Alocação no Uno |
 |-----------|-------|-----------------|
-| 4 motores (IRF520) | 4 PWM | 3, 5, 6, 9 |
-| 6 sensores TCRT5000 | 6 digitais | 2, 4, 7, 8, 12, A0 |
+| 3 motores (IRF520) | 3 PWM | 9, 10, 11 |
+| 6 sensores TCRT5000 | 6 digitais | A0, A1, A2, A3, 2, 4 |
 | LCD I2C | 2 (SDA/SCL) | A4 (SDA), A5 (SCL) |
 | Serial ESP32 | 2 (RX/TX) | 0 (RX), 1 (TX) |
 | **Total** | **14** | **Uno tem 20 disponíveis ✅** |
@@ -219,8 +219,7 @@ O Arduino opera com **5 estados**:
 
 | Configuração | Controlador | Driver | Pinos Usados | Custo |
 |-------------|-------------|--------|--------------|-------|
-| **Principal** (recomendada) | Mega 2560 | 2× L298N | 17 + 4 botões | Médio |
-| **Alternativa A** (econômica) | Uno | 4× IRF520 | 14 (sem botões) | Baixo |
+| **Principal** (econômica) | Uno | 4× IRF520 | 14 (sem botões) | Baixo |
 | **Alternativa B** (misturada) | Mega 2560 | 4× IRF520 | 17 + 4 botões | Médio-Baixo |
 | **Alternativa C** (limitada) | Uno | 2× L298N | 10 + 4 botões | *Botões não cabem ❌* |
 
