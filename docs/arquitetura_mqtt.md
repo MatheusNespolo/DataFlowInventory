@@ -15,9 +15,9 @@ O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores 
 ## Diagrama de Arquitetura
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        FÍSICO (Protótipo)                           │
-│                                                                     │
+┌────────────────────────────────────────────────────────────────────┐
+│                        FÍSICO (Protótipo)                          │
+│                                                                    │
 │  ┌──────────────┐   Serial (9600)   ┌──────────────┐               │
 │  │ Arduino Uno  │ ────────────────→ │     ESP32    │               │
 │  │              │  TX(1) → RX2(16)* │   (Gateway)  │               │
@@ -36,44 +36,44 @@ O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores 
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    BROKER (Local ou Nuvem)                          │
 │                                                                     │
-│  ┌──────────────────────────────────────┐                          │
-│  │   Mosquitto (local) ou HiveMQ Cloud  │                          │
-│  │                                      │                          │
-│  │  Tópicos:                            │                          │
-│  │  ├── dataflow/status                 │                          │
-│  │  ├── dataflow/estoque                │                          │
-│  │  ├── dataflow/eventos                │                          │
-│  │  ├── dataflow/sensores               │                          │
-│  │  ├── dataflow/esteiras               │                          │
-│  │  ├── dataflow/comandos/sub  ←────── │ ← (ESP32 se inscreve)    │
-│  │  └── dataflow/comandos/pub          │ ← (confirmações)         │
-│  └──────────────┬───────────────────────┘                          │
+│  ┌──────────────────────────────────────┐                           │
+│  │   Mosquitto (local) ou HiveMQ Cloud  │                           │
+│  │                                      │                           │
+│  │  Tópicos:                            │                           │
+│  │  ├── dataflow/status                 │                           │
+│  │  ├── dataflow/estoque                │                           │
+│  │  ├── dataflow/eventos                │                           │
+│  │  ├── dataflow/sensores               │                           │
+│  │  ├── dataflow/esteiras               │                           │
+│  │  ├── dataflow/comandos/sub  ←──────  │ ← (ESP32 se inscreve)     │
+│  │  └── dataflow/comandos/pub           │ ← (confirmações)          │
+│  └──────────────┬───────────────────────┘                           │
 │                 │                                                   │
 │                 │ MQTT                                              │
 │                 ▼                                                   │
-│  ┌──────────────────────────────────────┐                          │
-│  │     Node.js Server                   │                          │
-│  │                                      │                          │
-│  │  • Express (HTTP + arquivos estáticos)│                         │
-│  │  • Socket.IO (WebSocket)             │                          │
-│  │  • mqtt.js (Pub/Sub)                 │                          │
-│  │  • Relay MQTT ↔ WebSocket            │                          │
-│  │                                      │                          │
-│  │  Roda em: localhost:3000             │                          │
-│  └──────────────┬───────────────────────┘                          │
+│  ┌──────────────────────────────────────┐                           │
+│  │     Node.js Server                   │                           │
+│  │                                      │                           │
+│  │  • Express (HTTP+ arquivos estáticos)│                           │
+│  │  • Socket.IO (WebSocket)             │                           │
+│  │  • mqtt.js (Pub/Sub)                 │                           │
+│  │  • Relay MQTT ↔ WebSocket            │                           │
+│  │                                      │                           │
+│  │  Roda em: localhost:3000             │                           │
+│  └──────────────┬───────────────────────┘                           │
 │                 │                                                   │
 │                 │ WebSocket (Socket.IO)                             │
 │                 ▼                                                   │
-│  ┌──────────────────────────────────────┐                          │
-│  │     Front-end (HTML/CSS/JS)          │                          │
-│  │                                      │                          │
-│  │  • Dashboard em tempo real           │                          │
-│  │  • Diagrama SVG interativo           │                          │
-│  │  • Botões de controle remoto         │                          │
-│  │  • Histórico de eventos              │                          │
-│  │                                      │                          │
-│  │  Servido pelo Node em localhost:3000 │                          │
-│  └──────────────────────────────────────┘                          │
+│  ┌──────────────────────────────────────┐                           │
+│  │     Front-end (HTML/CSS/JS)          │                           │
+│  │                                      │                           │
+│  │  • Dashboard em tempo real           │                           │
+│  │  • Diagrama SVG interativo           │                           │
+│  │  • Botões de controle remoto         │                           │
+│  │  • Histórico de eventos              │                           │
+│  │                                      │                           │
+│  │  Servido pelo Node em localhost:3000 │                           │
+│  └──────────────────────────────────────┘                           │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
