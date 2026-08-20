@@ -170,7 +170,7 @@ O Arduino opera com **5 estados**:
 | Driver IRF520 | 3 | Controle de 1 motor cada |
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
 | Display LCD 16x2 | 1 | Com módulo I2C (endereço 0x27) |
-| Botões | 4 | 3 solicitação + 1 reset | (opcionais)
+| Botões | 4 | 3 solicitação + 1 reset (opcionais) |
 | Fonte 12V DC | 1 | Alimentação geral |
 
 ### Alternativas Técnicas (Viáveis)
