@@ -69,6 +69,15 @@ O sistema é composto por:
 
 ## Arquitetura
 
+### Modo Simulador (sem hardware)
+
+Para testar o dashboard sem nenhum componente físico conectado, o projeto inclui um simulador (`simulator/`) que reproduz o ciclo da máquina de estados em JavaScript — pedido → verificação de estoque → acionamento da esteira → entrega — emitindo os **mesmos eventos Socket.IO** que o servidor real (`server/`), servindo o `frontend/` sem nenhuma alteração.
+
+
+Diferente do modo real, os tempos de verificação/acionamento/entrega são temporizadores fixos (não dependem de sensores físicos) e não há MQTT nem broker envolvidos. Cobre o fluxo de sucesso e a rejeição por falta de estoque; cenários de timeout e `ocupado` do firmware real ainda não são simulados.
+
+> 🖥️ Detalhes de implementação em [`docs/arquitetura_mqtt.md`](docs/arquitetura_mqtt.md#modos-de-operação).
+
 ```
 ┌──────────────┐   Serial   ┌──────────┐   MQTT    ┌────────────────┐   WebSocket  ┌─────────────┐
 │ Arduino Uno  │ ────────── │  ESP32   │ ────────  │  HiveMQ Cloud  │ ──────────── │  Dashboard  │
@@ -105,6 +114,10 @@ DataFlowInventory/
 │   ├── package.json                       # Dependências Node.js
 │   ├── server.js                          # Express + Socket.IO + MQTT
 │   └── .env                               # Configurações (não versionado)
+│
+├── simulator/
+│   ├── package.json                       # Dependências Node.js
+│   └── server.js                          # Simulador offline (FSM em JS, mesmo frontend/)
 │
 ├── frontend/
 │   ├── index.html                         # Dashboard principal
