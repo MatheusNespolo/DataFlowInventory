@@ -243,20 +243,34 @@ O Arduino opera com **5 estados**:
 
 ## Como Rodar
 
-### Pré-requisitos
+### Caminho rápido — Simulador (sem hardware)
+
+Para ver o dashboard funcionando sem montar nenhum componente físico:
+
+```bash
+cd simulator
+npm install
+npm start
+```
+Acessar http://localhost:3000 no navegador.
+⚠️ O simulador sobe na mesma porta 3000 usada pelo servidor real (server/) — não rode os dois ao mesmo tempo sem alterar a variável PORT de um deles.
+
+### Sistema Completo (com hardware)
+
+#### Pré-requisitos
 
 - [Arduino IDE](https://www.arduino.cc/en/software) (com suporte a Arduino Uno e ESP32)
 - [Node.js](https://nodejs.org/) v18+
 - Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com)
 - Conexão Wi-Fi para o ESP32
 
-### 1. Configurar o Arduino
+#### 1. Configurar o Arduino
 
 1. Abrir `arduino/data_flow_inventory/data_flow_inventory.ino`
 2. Selecionar placa: **Arduino Uno R3**
 3. Fazer upload
 
-### 2. Configurar o ESP32
+#### 2. Configurar o ESP32
 
 1. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino`
 2. Definir o modo de conexão pela flag `USE_TLS`:
@@ -266,7 +280,7 @@ O Arduino opera com **5 estados**:
 4. Selecionar placa: **ESP32 Dev Module**
 5. Fazer upload
 
-### 3. Rodar o Servidor
+#### 3. Rodar o Servidor
 
 ```bash
 cd server
@@ -275,7 +289,7 @@ npm install
 npm start
 ```
 
-### 4. Acessar o Dashboard
+#### 4. Acessar o Dashboard
 
 Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
