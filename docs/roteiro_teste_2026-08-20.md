@@ -58,20 +58,21 @@ netstat -ano | findstr :1883
 ::    Esperado: TCP 0.0.0.0:1883 ... LISTENING  (se aparecer só 127.0.0.1, o conf não foi carregado!)
 
 :: 2) Publicar mensagem de teste
-mosquitto_pub -h localhost -t "dataflow/status" -m "{\"type\":\"status\",\"estado\":\"smoke-test\"}"
+mosquitto_pub -h localhost -t "dataflow/status" -m '{"type":"status","estado":"smoke-test"}'
+::    Esperado: [WS →] [dataflow/status] {"type":"status","estado":"smoke-test"}
 ```
 
 **Critérios para liberar o hardware:**
-- [ ] `netstat` mostra `0.0.0.0:1883 LISTENING`
-- [ ] Mensagem do `mosquitto_pub` aparece no **mqtt_probe** E nos logs do **server** (`[WS →] ...` ou similar)
-- [ ] Janela do Mosquitto (`-v`) loga as conexões dos clientes
+- [X] `netstat` mostra `0.0.0.0:1883 LISTENING`
+- [X] Mensagem do `mosquitto_pub` aparece no **mqtt_probe** E nos logs do **server** (`[WS →] ...` ou similar)
+- [X] Janela do Mosquitto (`-v`) loga as conexões dos clientes
 
 ### 2.4 ESP32 — upload e conexão
 
 1. Editar `esp32/gateway_mqtt/gateway_mqtt.ino`: `USE_TLS=false`, SSID/senha do **hotspot do Windows**, `MQTT_SERVER = "192.168.137.1"` (nunca `localhost`)
 2. Fechar o Serial Monitor → upload (Upload Speed 921600; botão BOOT se travar em `Connecting...`)
 3. Abrir monitor serial (115200) e aguardar:
-   - [ ] `[WiFi] Conectado!` (com IP na faixa `192.168.137.x`)
+   - [X] `[WiFi] Conectado!` (com IP na faixa `192.168.137.x`)
    - [ ] `[MQTT] Conectado!`
    - [ ] `mqtt_probe` mostra o retained `{"type":"gateway","status":"online"}` em `dataflow/status`
 
