@@ -65,6 +65,8 @@ O sistema é composto por:
 | ⚙️ **Servidor Node.js** | Ponte entre MQTT e WebSocket |
 | ☁️ **HiveMQ Cloud** | Broker MQTT |
 
+> A roda giratória é um aprimoramento futuro do projeto, uma sugestão de melhoria. Atualmente existem menções ao controle no motor de passo no código, mas ele está comentado para ajustes durante o desenvolvimento até a integração final.
+
 ## Arquitetura
 
 ```
