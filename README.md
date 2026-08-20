@@ -204,8 +204,8 @@ O Arduino opera com **5 estados**:
 
 | Componente | Pinos | Alocação no Uno |
 |-----------|-------|-----------------|
-| 4 motores (IRF520) | 4 PWM | 3, 5, 6, 9 |
-| 6 sensores TCRT5000 | 6 digitais | 2, 4, 7, 8, 12, A0 |
+| 3 motores (IRF520) | 3 PWM | 9, 10, 11 |
+| 6 sensores TCRT5000 | 6 digitais | A0, A1, A2, A3, 2, 4 |
 | LCD I2C | 2 (SDA/SCL) | A4 (SDA), A5 (SCL) |
 | Serial ESP32 | 2 (RX/TX) | 0 (RX), 1 (TX) |
 | **Total** | **14** | **Uno tem 20 disponíveis ✅** |
