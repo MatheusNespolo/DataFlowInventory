@@ -90,12 +90,12 @@ Este documento define os testes de integração da cadeia de comunicação do si
 3. Enviar `CMD:PECA:A`
 4. Observar a sequência: `acionando` → motor liga com soft-start (rampa ~300 ms) → peça sai do sensor → motor para → evento `entregue` com `tempo_ms`
 5. Repetir **sem peça** no sensor → evento `erro` tipo `sem_estoque` → enviar `CMD:RESET`
-6. Repetir **segurando a peça** sobre o sensor → após 5 s, `erro` tipo `timeout` → `CMD:RESET`
+6. Repetir **segurando a peça** sobre o sensor → após 8 s, `erro` tipo `timeout` → `CMD:RESET`
 
 #### Critérios de validação
 - [ ] Ciclo completo: comando → motor liga → peça sai do sensor → motor para → `{"evento":"entregue","tempo_ms":...}`
 - [ ] Sem peça: `{"evento":"erro","tipo":"sem_estoque"}` sem acionar o motor
-- [ ] Timeout de 5 s funciona e para o motor
+- [ ] Timeout de 8 s funciona e para o motor
 - [ ] `CMD:RESET` recupera o sistema do estado ERRO
 - [ ] **Registrar** o `tempo_ms` medido (calibra o `TIMEOUT_ENTREGA` da versão final)
 - [ ] **Registrar** o menor PWM que move a esteira com peça (calibra `VELOCIDADE_MOTOR`)
@@ -358,7 +358,7 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - [ ] Entregas consecutivas de A e B decrementam o estoque corretamente
 - [ ] Peça C rejeitada com `{"evento":"erro","tipo":"peca_indisponivel"}` sem travar a FSM
 - [ ] Pedido com FSM ocupada gera evento `ocupado`
-- [ ] Timeout de 3 s → `ERRO`; `CMD:RESET` recupera o sistema
+- [ ] Timeout de 8 s → `ERRO`; `CMD:RESET` recupera o sistema
 - [ ] Status periódico (`status`, `sensores`, `esteiras`) publicado a cada ~1 s nos tópicos MQTT
 
 ---
