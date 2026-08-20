@@ -349,7 +349,7 @@ void setup() {
 
   // Configura pinos dos motores (IRF520 — apenas 1 PWM por motor)
   int motores[] = { MOTOR_A, MOTOR_B, MOTOR_C };
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     pinMode(motores[i], OUTPUT);
     analogWrite(motores[i], 0); // Inicia desligado
   }
@@ -365,9 +365,6 @@ void setup() {
   // Para reativar, descomente:
   // int botoes[] = { BTN_PECA_A, BTN_PECA_B, BTN_PECA_C, BTN_RESET };
   // for (int i = 0; i < 4; i++) pinMode(botoes[i], INPUT_PULLUP);
-
-  // Esteira principal fica ligada continuamente
-  ligarEsteiraPrincipal();
 
   exibirEstoque();
 
