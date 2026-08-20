@@ -58,7 +58,7 @@ O sistema é composto por:
 |------------|--------|
 | 🏗️ **4 esteiras transportadoras** | 1 principal + 3 secundárias, motores DC 3–6V |
 | 🔍 **6 sensores infravermelhos** | TCRT5000 — 3 no topo + 3 nas junções |
-| 🎡 **Roda giratória** | 3 compartimentos para separação de peças |
+| 🎡 **Roda giratória** (melhoria) | 3 compartimentos para separação de peças |
 | 🎛️ **Arduino Uno** | Controlador principal (FSM de 5 estados) |
 | 📡 **ESP32** | Gateway MQTT (bridge Serial ↔ Wi-Fi) |
 | 🖥️ **Dashboard web** | HTML/CSS/JS + Socket.IO em tempo real |
