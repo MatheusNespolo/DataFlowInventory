@@ -190,7 +190,7 @@ O Arduino opera com **5 estados**:
 
 **⚠️ Atenção**: Os motores das esteiras neste projeto operam em apenas um sentido, portanto a perda de reversão do IRF520 não impacta o funcionamento. É necessário 1 módulo IRF520 por motor (total de 4).
 
-#### Opção B — Arduino Uno ao invés de Mega (sem botões físicos)
+#### Opção B — Arduino Mega ao invés de Uno (com botões físicos)
 
 | Aspecto | Arduino Mega | Arduino Uno |
 |---------|-------------|-------------|
@@ -219,8 +219,7 @@ O Arduino opera com **5 estados**:
 
 | Configuração | Controlador | Driver | Pinos Usados | Custo |
 |-------------|-------------|--------|--------------|-------|
-| **Principal** (recomendada) | Mega 2560 | 2× L298N | 17 + 4 botões | Médio |
-| **Alternativa A** (econômica) | Uno | 4× IRF520 | 14 (sem botões) | Baixo |
+| **Principal** (econômica) | Uno | 4× IRF520 | 14 (sem botões) | Baixo |
 | **Alternativa B** (misturada) | Mega 2560 | 4× IRF520 | 17 + 4 botões | Médio-Baixo |
 | **Alternativa C** (limitada) | Uno | 2× L298N | 10 + 4 botões | *Botões não cabem ❌* |
 
