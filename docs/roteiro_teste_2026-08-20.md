@@ -134,12 +134,14 @@ Validar toda a cadeia de **software** sem hardware, usando o simulador:
 
 | Etapa | Resultado | Medições / Observações |
 |-------|-----------|------------------------|
-| Rede escolhida (Opção 1/2/3) | ⬜ | SSID: ____ · IP do PC: ____ |
-| Smoke test do broker (2.3) | ⬜ | `netstat` mostrou 0.0.0.0:1883? |
-| ESP32: WiFi + MQTT conectados (2.4) | ⬜ | IP do ESP32: ____ · rc de erro (se houver): ____ |
-| 2 — ESP32 → Broker → Node | ⬜ | |
-| 3 — Comando MQTT Box | ⬜ | |
-| 4 — End-to-End Dashboard | ⬜ | |
-| Plano B (simulador), se usado | ⬜ | |
+| Rede escolhida (Opção 1/2/3) | ✅ | Rede Wi-Fi externa (não hotspot do celular) — resolveu o problema de conexão do ESP32 |
+| Smoke test do broker (2.3) | ✅ | Critérios 2.3 aprovados (netstat 0.0.0.0:1883 + probe + server logando) |
+| ESP32: WiFi + MQTT conectados (2.4) | ⚠️ Parcial | `[WiFi] Conectado!` ✅ · `[MQTT] Conectado!` ✖ — anotar `rc=` na próxima sessão |
+| 2 — ESP32 → Broker → Node | ❌ | Serial Arduino ↔ ESP32 sem troca de mensagens (uploads OK). Suspeita principal: **divisor de tensão + GND comum ausentes** na montagem UART |
+| 3 — Comando MQTT Box | ⬜ | Não executado (bloqueado pelo Teste 2) |
+| 4 — End-to-End Dashboard | ⬜ | Não executado (bloqueado pelo Teste 2) |
+| Plano B (simulador), se usado | ⬜ | Não executado — replanejado para 25/08 |
+
+> **Continuação:** ver [`roteiro_teste_2026-08-25.md`](roteiro_teste_2026-08-25.md) — Bloco 0.A (bancada Serial com divisor de tensão) + Bloco 0.B (destravar MQTT) + Testes 2–4.
 
 > Ao final: transferir resultados dos Testes 2–4 para o [`plano_de_testes.md`](plano_de_testes.md) e atualizar os cards (#4, #6, #9).
