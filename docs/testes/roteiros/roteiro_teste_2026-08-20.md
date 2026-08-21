@@ -1,6 +1,6 @@
 # Roteiro de Testes — 20/08/2026
 
-Continuação do [`roteiro_teste_2026-08-19.md`](roteiro_teste_2026-08-19.md). Referências: [`plano_de_testes.md`](plano_de_testes.md), [`broker_local_mosquitto.md`](broker_local_mosquitto.md), gateway `esp32/gateway_mqtt/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
+Continuação do [`roteiro_teste_2026-08-19.md`](roteiro_teste_2026-08-19.md). Referências: [`plano_de_testes.md`](../plano_de_testes.md), [`broker_local_mosquitto.md`](../../broker_local_mosquitto.md), gateway `esp32/gateway_mqtt/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
 
 **Meta do dia:** estabelecer uma **infraestrutura de rede/broker estável e reproduzível** (ordem fixa de inicialização dos serviços) e concluir os **Testes 2, 3 e 4** — fechando a integração End-to-End da esteira A.
 
@@ -144,4 +144,4 @@ Validar toda a cadeia de **software** sem hardware, usando o simulador:
 
 > **Continuação:** ver [`roteiro_teste_2026-08-25.md`](roteiro_teste_2026-08-25.md) — Bloco 0.A (bancada Serial com divisor de tensão) + Bloco 0.B (destravar MQTT) + Testes 2–4.
 
-> Ao final: transferir resultados dos Testes 2–4 para o [`plano_de_testes.md`](plano_de_testes.md) e atualizar os cards (#4, #6, #9).
+> Ao final: transferir resultados dos Testes 2–4 para o [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards (#4, #6, #9).

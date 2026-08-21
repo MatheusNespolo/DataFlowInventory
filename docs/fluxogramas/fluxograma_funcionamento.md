@@ -10,7 +10,7 @@
 
 Os 5 estados do firmware e suas transições:
 
-![alt text](<Máquina de estados (FSM) - Arduino Uno.png>)
+![Máquina de estados (FSM) - Arduino Uno](maquina_de_estados_fsm_arduino_uno.png)
 
 ---
 
@@ -18,7 +18,7 @@ Os 5 estados do firmware e suas transições:
 
 Visão de processo: da solicitação do usuário no dashboard até a entrega da peça.
 
-![alt text](<Fluxograma Operacional — Ciclo de um Pedido.png>)
+![Fluxograma Operacional — Ciclo de um Pedido](fluxograma_operacional_ciclo_pedido.png)
 
 ---
 

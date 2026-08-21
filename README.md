@@ -48,7 +48,7 @@ O projeto se insere no setor de **Automação Industrial da Logística**, com fo
 - 🛒 E-commerce e gestão de estoque
 - 🔄 Sistemas de recebimento automático
 
-> 📄 Para o projeto completo, consulte `Projeto de pesquisa - Final.docx` na pasta `docs/`.
+> 📄 Para o projeto completo, consulte `Projeto de pesquisa - Final.docx` na pasta `docs/artigo/`.
 
 ## Visão Geral
 
@@ -133,10 +133,14 @@ DataFlowInventory/
 │
 ├── docs/
 │   ├── arquitetura_mqtt.md                # Documentação da arquitetura MQTT
-│   ├── fluxograma_funcionamento.md        # Fluxogramas (FSM, operação, sequência)
 │   ├── broker_local_mosquitto.md          # Teste local com Mosquitto (sem nuvem)
-│   ├── plano_de_testes.md                 # Plano de testes de integração (Serial → E2E)
-│   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
+│   ├── artigo/
+│   │   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
+│   ├── fluxogramas/
+│   │   └── fluxograma_funcionamento.md    # Fluxogramas (FSM, operação, sequência)
+│   └── testes/
+│       ├── plano_de_testes.md             # Plano de testes de integração (Serial → E2E)
+│       └── roteiros/                      # Roteiros diários de execução dos testes
 │
 ├── .gitignore
 └── README.md
@@ -156,9 +160,9 @@ O Arduino opera com **5 estados**:
 | 4 | **ENTREGANDO_PECA** | Monitora sensor da junção com timeout de 8s |
 | 5 | **ERRO** | Sinaliza falha no LCD, aguarda reset manual |
 
-> 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/fluxograma_funcionamento.md`](docs/fluxograma_funcionamento.md).
+> 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/fluxogramas/fluxograma_funcionamento.md`](docs/fluxogramas/fluxograma_funcionamento.md).
 >
-> 🧪 Testes de integração da cadeia de comunicação (Serial → Broker → Dashboard) em [`docs/plano_de_testes.md`](docs/plano_de_testes.md).
+> 🧪 Testes de integração da cadeia de comunicação (Serial → Broker → Dashboard) em [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md).
 
 ### Tópicos MQTT
 
@@ -314,7 +318,7 @@ MIT License — Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 - ALKHATEEB et al. (2022) — Smart Warehouse Management System
 - TUBIS; ROHMAN (2023) — Intelligent Warehouse in Industry 4.0
 - HUSSEIN; MUHUDIN (2024) — IoT Based Warehouse Management System
-- Ver `Projeto de pesquisa - Final.docx` para referências completas
+- Ver `docs/artigo/Projeto de pesquisa - Final.docx` para referências completas
 
 ---
 

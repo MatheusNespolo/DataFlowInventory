@@ -1,6 +1,6 @@
 # Roteiro de Testes — 19/08/2026
 
-Continuação do [`roteiro_teste_2026-08-18.md`](roteiro_teste_2026-08-18.md), com base em: [`plano_de_testes.md`](plano_de_testes.md), [`README.md`](../README.md), sketch principal `arduino/data_flow_inventory/`, gateway `esp32/gateway_mqtt/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
+Continuação do [`roteiro_teste_2026-08-18.md`](roteiro_teste_2026-08-18.md), com base em: [`plano_de_testes.md`](../plano_de_testes.md), [`README.md`](../../../README.md), sketch principal `arduino/data_flow_inventory/`, gateway `esp32/gateway_mqtt/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
 
 **Meta do dia:** destravar o ambiente do **ESP32** (compilação/upload lentos que bloquearam o dia 18) e concluir a cadeia de rede — **Testes 2, 3 e 4** — fechando a integração End-to-End da esteira A (sensor → Arduino → ESP32 → Broker → Server → Dashboard).
 
@@ -105,7 +105,7 @@ Com a esteira A validada End-to-End, a expansão é **incremental e já preparad
 
 ## 5. Documentação e board — fazer hoje
 
-- [x] **Transferir os resultados de B1–B3 para a tabela oficial do [`plano_de_testes.md`](plano_de_testes.md)** (data 18/08, tempo_ms 5000, PWM 150, LCD 0x27).
+- [x] **Transferir os resultados de B1–B3 para a tabela oficial do [`plano_de_testes.md`](../plano_de_testes.md)** (data 18/08, tempo_ms 5000, PWM 150, LCD 0x27).
 - [ ] **Atualizar os cards do GitHub Projects:**
   - **#3** Máquina de estados no Arduino → **Done** (implementada, calibrada e validada em bancada B1–B2)
   - **#4** Gateway ESP32 → **In Progress** (código pronto + Teste 1 aprovado; mover para Done após o Teste 2)
@@ -126,4 +126,4 @@ Com a esteira A validada End-to-End, a expansão é **incremental e já preparad
 | 3 — Comando MQTT Box | ⬜ | |
 | 4 — End-to-End Dashboard | ⬜ | |
 
-> Ao final, transferir os resultados para a tabela oficial em [`plano_de_testes.md`](plano_de_testes.md) e atualizar os cards do GitHub Projects (#2, #3, #4, #6 e #9).
+> Ao final, transferir os resultados para a tabela oficial em [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards do GitHub Projects (#2, #3, #4, #6 e #9).

@@ -3,9 +3,9 @@
 Este documento define os testes de integração da cadeia de comunicação do sistema, do link Serial (Arduino ↔ ESP32) até o teste End-to-End (Dashboard ↔ Arduino).
 
 **Documentos relacionados:**
-- 🧪 [`broker_local_mosquitto.md`](broker_local_mosquitto.md) — Instalação e configuração do broker local
-- 📊 [`fluxograma_funcionamento.md`](fluxograma_funcionamento.md) — Máquina de estados e sequência de comunicação
-- 🏗 [`arquitetura_mqtt.md`](arquitetura_mqtt.md) — Arquitetura geral, tópicos e formatos de mensagem
+- 🧪 [`broker_local_mosquitto.md`](../broker_local_mosquitto.md) — Instalação e configuração do broker local
+- 📊 [`fluxograma_funcionamento.md`](../fluxogramas/fluxograma_funcionamento.md) — Máquina de estados e sequência de comunicação
+- 🏗 [`arquitetura_mqtt.md`](../arquitetura_mqtt.md) — Arquitetura geral, tópicos e formatos de mensagem
 
 ---
 
@@ -195,7 +195,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 
 ### Materiais
 - Montagem do Teste 1 funcionando
-- PC com **Mosquitto** instalado e rodando (ver [`broker_local_mosquitto.md`](broker_local_mosquitto.md))
+- PC com **Mosquitto** instalado e rodando (ver [`broker_local_mosquitto.md`](../broker_local_mosquitto.md))
 - PC e ESP32 na **mesma rede Wi-Fi**
 - Pasta `server/` com dependências instaladas (`npm install`)
 
@@ -352,7 +352,7 @@ MQTT_PORT=1883
    - Timeout (peça não chega em J1/J2) → `ERRO` → `CMD:RESET`
 2. **Fase 2 (com ESP32 + broker):** repetir os comandos publicando em `dataflow/comandos/sub` e observar os tópicos `dataflow/#` com o `mqtt_probe`.
 
-Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/README.md`](../test/esteira_peca_b/README.md)
+Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/README.md`](../../test/esteira_peca_b/README.md)
 
 ### Critérios de validação
 - [ ] Entregas consecutivas de A e B decrementam o estoque corretamente

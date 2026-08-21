@@ -1,6 +1,6 @@
 # Roteiro de Testes — 18/08/2026
 
-Preparação do dia de testes com base em: [`plano_de_testes.md`](plano_de_testes.md), [`README.md`](../README.md), sketch principal `arduino/data_flow_inventory/`, sketches auxiliares de `test/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
+Preparação do dia de testes com base em: [`plano_de_testes.md`](../plano_de_testes.md), [`README.md`](../../../README.md), sketch principal `arduino/data_flow_inventory/`, sketches auxiliares de `test/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
 
 **Meta do dia:** integrar completamente a **esteira A** com toda a cadeia (sensor → Arduino → ESP32 → Broker → Server → Dashboard), abrindo caminho para replicar rapidamente nas esteiras B e C.
 
@@ -109,4 +109,4 @@ Com a esteira A validada End-to-End, a expansão é **incremental e já preparad
 | 3 — Comando MQTT Box | ⬜ | |
 | 4 — End-to-End Dashboard | ⬜ | |
 
-> Ao final, transferir os resultados para a tabela oficial em [`plano_de_testes.md`](plano_de_testes.md) e atualizar os cards do GitHub Projects (#3, #4, #6 e #9).
+> Ao final, transferir os resultados para a tabela oficial em [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards do GitHub Projects (#3, #4, #6 e #9).

@@ -7,8 +7,9 @@ O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores 
 **Nota sobre hospedagem:** Esta arquitetura suporta tanto um broker MQTT local (Mosquitto) para desenvolvimento/demonstração quanto brokers em nuvem (HiveMQ Cloud, AWS IoT Core, Azure IoT Hub). A escolha é feita pela configuração no `server/.env` e pela flag `USE_TLS` no `esp32/gateway_mqtt/gateway_mqtt.ino`.
 
 **Documentos relacionados:**
-- 📊 [`fluxograma_funcionamento.md`](fluxograma_funcionamento.md) — Diagramas da máquina de estados, fluxo operacional e sequência de comunicação
+- 📊 [`fluxograma_funcionamento.md`](fluxogramas/fluxograma_funcionamento.md) — Diagramas da máquina de estados, fluxo operacional e sequência de comunicação
 - 🧪 [`broker_local_mosquitto.md`](broker_local_mosquitto.md) — Passo a passo do teste local com Mosquitto (sem nuvem)
+- 🧪 [`plano_de_testes.md`](testes/plano_de_testes.md) — Plano de testes de integração
 
 ---
 
@@ -403,12 +404,16 @@ DataFlowInventory/
 └── docs/
     ├── arquitetura_mqtt.md            # Este documento
     ├── broker_local_mosquitto.md      # Passo a passo do broker Mosquitto local
-    ├── fluxograma_funcionamento.md    # FSM, fluxo operacional e sequência de comunicação
-    ├── plano_de_testes.md             # Plano de testes (B0–B3 e Testes 1–5)
     ├── github_setup.sh                # Script de configuração do repositório
-    ├── Projeto de pesquisa - Final.docx               # Projeto de pesquisa (artigo)
-    ├── Fluxograma Operacional — Ciclo de um Pedido.png
-    └── Máquina de estados (FSM) - Arduino Uno.png
+    ├── artigo/
+    │   └── Projeto de pesquisa - Final.docx           # Projeto de pesquisa (artigo)
+    ├── fluxogramas/
+    │   ├── fluxograma_funcionamento.md                # FSM, fluxo operacional e sequência
+    │   ├── fluxograma_operacional_ciclo_pedido.png
+    │   └── maquina_de_estados_fsm_arduino_uno.png
+    └── testes/
+        ├── plano_de_testes.md         # Plano de testes (B0–B3 e Testes 1–5)
+        └── roteiros/                  # Roteiros diários de execução dos testes
 ```
 
 ---

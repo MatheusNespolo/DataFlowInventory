@@ -1,6 +1,6 @@
 # Roteiro de Testes — 25/08/2026
 
-Continuação do [`roteiro_teste_2026-08-20.md`](roteiro_teste_2026-08-20.md). Referências: [`plano_de_testes.md`](plano_de_testes.md), [`broker_local_mosquitto.md`](broker_local_mosquitto.md), gateway `esp32/gateway_mqtt/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
+Continuação do [`roteiro_teste_2026-08-20.md`](roteiro_teste_2026-08-20.md). Referências: [`plano_de_testes.md`](../plano_de_testes.md), [`broker_local_mosquitto.md`](../../broker_local_mosquitto.md), gateway `esp32/gateway_mqtt/` e o board do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
 
 **Meta do dia:** destravar os **dois bloqueios independentes** do dia 20 — (a) comunicação Serial Arduino ↔ ESP32 e (b) conexão MQTT do ESP32 ao broker — e concluir os **Testes 2, 3 e 4** (End-to-End da esteira A).
 
@@ -149,4 +149,4 @@ Progresso: com rede Wi-Fi externa (não o hotspot do celular), o ESP32 conectou 
 | 4 — End-to-End Dashboard | ⬜ | |
 | Plano B (simulador) | ⬜ | |
 
-> Ao final: transferir resultados dos Testes 2–4 para o [`plano_de_testes.md`](plano_de_testes.md) e atualizar os cards (#4, #7, #9).
+> Ao final: transferir resultados dos Testes 2–4 para o [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards (#4, #7, #9).
