@@ -1,90 +1,65 @@
 // ============================================================
-// TESTE 4.1 - ESP32 GATEWAY (Arduino Uno + ESP32)
+// TESTE 1 (Bloco 0.A) - COMUNICACAO SERIAL Arduino <-> ESP32
 // ============================================================
-// Materiais: ESP32 + Arduino Uno (conectados via Serial)
+// Materiais: Arduino Uno + ESP32 (conectados via Serial2)
+//
+// Este sketch e SO SERIAL, SEM Wi-Fi/MQTT: isola a variavel da
+// comunicacao fisica UART antes de habilitar a rede (Bloco 0.B,
+// que usa o esp32/gateway_mqtt/gateway_mqtt.ino completo).
 //
 // Pinagem:
-//   ESP32 TX (17) -> Arduino RX (0)
-//   ESP32 RX (16) -> Arduino TX (1)
-//   GND comum
+//   Arduino TX (pino 1) -> divisor de tensao (1k/2k) -> ESP32 RX2 (GPIO16)
+//   ESP32 TX2 (GPIO17)  -> Arduino RX (pino 0)                 [direto]
+//   GND comum obrigatorio
+//   Baud: 9600 na Serial2 (igual ao Arduino) / 115200 no monitor USB
 //
-// Este ESP32:
-//   1. Conecta ao Wi-Fi e ao broker MQTT (HiveMQ)
-//   2. Recebe JSON do Arduino pela Serial2
-//   3. Publica no broker MQTT (topico dataflow/status)
-//   4. Escuta comandos MQTT e retransmite ao Arduino
-//
-// NOTA: Substitua SSID, SENHA, MQTT_SERVER pelas suas credenciais
+// Uso:
+//   1. Upload no Uno (ESP32 desconectado dos pinos 0/1) -> upload neste ESP32
+//   2. Conectar a fiacao (ver docs/testes/roteiros/roteiro_teste_2026-08-25.md)
+//   3. Abrir o Monitor Serial do ESP32 em 115200
+//   4. JSONs do Arduino aparecem prefixados com "[Serial2]"
+//   5. Digite qualquer texto no monitor e pressione Enter para enviar
+//      "CMD:PECA:A" ao Arduino e validar o caminho ESP32 -> Uno
 // ============================================================
 
-#include <WiFi.h>
-#include <PubSubClient.h>
-#include <ArduinoJson.h>
+#define BAUD_ARDUINO 9600
+#define PIN_RX2 16
+#define PIN_TX2 17
 
-const char* SSID = "Iphone de Matheus";
-const char* SENHA = "matheus22";
-const char* MQTT_SERVER = "282b6bee608949f68d1717e96b4be31e.s1.eu.hivemq.cloud";
-const int MQTT_PORT = 8883;
-const char* MQTT_CLIENT = "esp32_dataflow_teste";
-
-#define TOPICO_STATUS "dataflow/status"
-#define TOPICO_CMD_SUB "dataflow/comandos/sub"
-#define TOPICO_CMD_PUB "dataflow/comandos/pub"
-
-WiFiClient espClient;
-PubSubClient mqtt(espClient);
-
-void conectarWiFi() {
-  Serial.println("Conectando ao Wi-Fi...");
-  WiFi.begin(SSID, SENHA);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWi-Fi conectado!");
-}
-
-void conectarMQTT() {
-  while (!mqtt.connected()) {
-    if (mqtt.connect(MQTT_CLIENT)) {
-      Serial.println("MQTT conectado.");
-      mqtt.subscribe(TOPICO_CMD_SUB);
-    } else {
-      Serial.print("Falha MQTT. Retry...");
-      delay(2000);
-    }
-  }
-}
-
-void callbackMQTT(char* topic, byte* payload, unsigned int length) {
-  String msg = "";
-  for (unsigned int i = 0; i < length; i++) {
-    msg += (char)payload[i];
-  }
-  Serial.printf("[MQTT -> Serial] %s\n", msg.c_str());
-  Serial.println(msg);
-}
+String bufferSerial2 = "";
 
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(9600, SERIAL_8N1, 16, 17);
-  conectarWiFi();
-  mqtt.setServer(MQTT_SERVER, MQTT_PORT);
-  mqtt.setCallback(callbackMQTT);
+  Serial2.begin(BAUD_ARDUINO, SERIAL_8N1, PIN_RX2, PIN_TX2);
+  delay(500);
+  Serial.println();
+  Serial.println("=== Teste 1 (Bloco 0.A): Serial Arduino <-> ESP32 (sem Wi-Fi) ===");
+  Serial.println("Digite qualquer texto + Enter para enviar CMD:PECA:A ao Arduino.");
 }
 
 void loop() {
-  if (!mqtt.connected()) {
-    conectarMQTT();
+  // Arduino -> ESP32
+  while (Serial2.available()) {
+    char c = (char)Serial2.read();
+    if (c == '\n') {
+      bufferSerial2.trim();
+      if (bufferSerial2.length() > 0) {
+        Serial.print("[Serial2] ");
+        Serial.println(bufferSerial2);
+      }
+      bufferSerial2 = "";
+    } else if (c != '\r') {
+      bufferSerial2 += c;
+    }
   }
-  mqtt.loop();
 
-  if (Serial2.available()) {
-    String dados = Serial2.readStringUntil('\n');
-    dados.trim();
-    if (dados.length() > 0) {
-      mqtt.publish(TOPICO_STATUS, dados.c_str());
-      Serial.printf("[Serial -> MQTT] %s\n", dados.c_str());
+  // Monitor USB do ESP32 -> Arduino: dispara comando de teste
+  if (Serial.available()) {
+    String linha = Serial.readStringUntil('\n');
+    linha.trim();
+    if (linha.length() > 0) {
+      Serial2.println("CMD:PECA:A");
+      Serial.println("[Serial2 ->] CMD:PECA:A");
     }
   }
 }
