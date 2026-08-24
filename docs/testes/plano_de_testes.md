@@ -341,7 +341,7 @@ MQTT_PORT=1883
 - Sketches em `test/esteira_peca_b/`:
   - `arduino_esteiras_ab/` no Arduino Uno
   - `esp32_esteiras_ab/` no ESP32
-- 3× IRF520 (principal + A + B), 4× TCRT5000 (topo A/B, junções J1/J2)
+- 2× IRF520 (esteiras A + B — a principal liga direto na fonte, sem driver), 4× TCRT5000 (topo A/B, junções J1/J2)
 - Broker Mosquitto local + `test/mqtt_probe/` (ou MQTT Box)
 
 ### Procedimento

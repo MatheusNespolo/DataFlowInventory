@@ -15,8 +15,8 @@ Este teste já utiliza a **máquina de estados de 5 etapas** e o **protocolo Ser
 
 - Arduino Uno
 - ESP32 DevKit
-- 3× módulo IRF520 (esteira principal + A + B)
-- 3× esteiras com motor DC
+- 2× módulo IRF520 (esteiras A + B — a principal liga direto na fonte, sem driver)
+- 3× esteiras com motor DC (principal + A + B)
 - 4× sensores TCRT5000 (topo A, topo B, junção J1, junção J2)
 - Divisor de tensão (1kΩ + 2kΩ) para o TX do Uno → RX2 do ESP32
 - Fonte 12V DC
@@ -25,13 +25,12 @@ Este teste já utiliza a **máquina de estados de 5 etapas** e o **protocolo Ser
 
 | Função | Pino |
 |---|---|
-| Motor principal (IRF520 SIG) | 3 (PWM) |
 | Motor A (IRF520 SIG) | 5 (PWM) |
 | Motor B (IRF520 SIG) | 6 (PWM) |
 | Sensor topo A | A0 |
 | Sensor topo B | A1 |
 | Sensor junção J1 | A3 |
-| Sensor junção J2 | A4 |
+| Sensor junção J2 | 4 |
 
 Sensores em `INPUT_PULLUP` — **LOW = peça presente**.
 
@@ -69,7 +68,7 @@ Sensores em `INPUT_PULLUP` — **LOW = peça presente**.
 - [ ] Pedidos consecutivos de A e B entregam corretamente e decrementam o estoque
 - [ ] Pedido durante entrega em andamento é rejeitado com evento `ocupado`
 - [ ] Pedido de peça C retorna `peca_indisponivel` sem travar a FSM
-- [ ] Timeout de 3 s leva a `ERRO` e `CMD:RESET` recupera o sistema
+- [ ] Timeout de 8 s leva a `ERRO` e `CMD:RESET` recupera o sistema
 - [ ] Status periódico (`status`, `sensores`, `esteiras`) chega a cada ~1 s nos tópicos MQTT
 - [ ] LWT: desligar o ESP32 gera `{"type":"gateway","status":"offline"}` em `dataflow/status`
 

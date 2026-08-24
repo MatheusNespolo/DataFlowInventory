@@ -86,8 +86,8 @@ O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores 
 |------------|---------------|
 | Microcontrolador | Arduino Uno |
 | Gateway IoT | ESP32 (Wi-Fi + MQTT) |
-| Drivers de motor | 4x módulo MOSFET IRF520 (1 pino PWM por motor) |
-| Motores | 4x DC 3–6V (esteira principal + A, B, C) |
+| Drivers de motor | 3x módulo MOSFET IRF520 (1 pino PWM por esteira secundária) |
+| Motores | 4x DC 3–6V (principal liga direto na fonte, sem driver; A, B e C via IRF520) |
 | Sensores | 6x IR TCRT5000 (3 topo + 3 junções J1/J2/J3) |
 | Display | LCD 16x2 I2C (0x27) |
 | Botões físicos | Desabilitados — controle exclusivo via dashboard |

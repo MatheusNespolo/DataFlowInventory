@@ -56,7 +56,7 @@ O sistema é composto por:
 
 | Componente | Função |
 |------------|--------|
-| 🏗️ **4 esteiras transportadoras** | 1 principal + 3 secundárias, motores DC 3–6V |
+| 🏗️ **4 esteiras transportadoras** | 1 principal (liga direto na fonte) + 3 secundárias com driver IRF520 |
 | 🔍 **6 sensores infravermelhos** | TCRT5000 — 3 no topo + 3 nas junções |
 | 🎡 **Roda giratória** (melhoria) | 3 compartimentos para separação de peças |
 | 🎛️ **Arduino Uno** | Controlador principal (FSM de 5 estados) |
@@ -202,13 +202,13 @@ O Arduino opera com **5 estados**:
 |---------|-------|--------|
 | **Controle de direção** | Frente e ré (H-bridge) | Apenas um sentido (MOSFET) |
 | **Motores por módulo** | 2 | 1 |
-| **Quantidade necessária** | 2 | 4 |
+| **Quantidade necessária** | 2 | 3 *(1 esteira principal liga direto na fonte, sem driver)* |
 | **PWM (velocidade)** | ✅ Sim | ✅ Sim |
 | **Corrente máxima** | ~2A por canal | ~5A (com dissipador) |
 | **Tensão** | 5–35V | Até 24V |
 | **Custo** | Mais alto | Mais baixo |
 
-**⚠️ Atenção**: Os motores das esteiras neste projeto operam em apenas um sentido, portanto a perda de reversão do IRF520 não impacta o funcionamento. É necessário 1 módulo IRF520 por motor (total de 4).
+**⚠️ Atenção**: Os motores das esteiras neste projeto operam em apenas um sentido, portanto a perda de reversão do IRF520 não impacta o funcionamento. É necessário 1 módulo IRF520 por esteira secundária (total de 3). A esteira principal é ligada diretamente na fonte 12 V e não utiliza driver.
 
 #### Opção B — Arduino Mega ao invés de Uno (com botões físicos)
 
@@ -239,11 +239,11 @@ O Arduino opera com **5 estados**:
 
 | Configuração | Controlador | Driver | Pinos Usados | Custo |
 |-------------|-------------|--------|--------------|-------|
-| **Principal** (econômica) | Uno | 4× IRF520 | 14 (sem botões) | Baixo |
-| **Alternativa B** (misturada) | Mega 2560 | 4× IRF520 | 17 + 4 botões | Médio-Baixo |
+| **Principal** (econômica) | Uno | 3× IRF520 | 14 (sem botões) | Baixo |
+| **Alternativa B** (misturada) | Mega 2560 | 3× IRF520 | 17 + 4 botões | Médio-Baixo |
 | **Alternativa C** (limitada) | Uno | 2× L298N | 10 + 4 botões | *Botões não cabem ❌* |
 
-> A **Alternativa A** (Uno + 4× IRF520) é a opção de menor custo viável para este projeto, desde que se aceite o controle exclusivamente via dashboard web (sem botões físicos).
+> A **Alternativa A** (Uno + 3× IRF520) é a opção de menor custo viável para este projeto, desde que se aceite o controle exclusivamente via dashboard web (sem botões físicos).
 
 ## Como Rodar
 
