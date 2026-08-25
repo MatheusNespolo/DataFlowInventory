@@ -24,7 +24,7 @@ O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores 
 │  │              │  TX(1) → RX2(16)* │   (Gateway)  │               │
 │  │ • FSM (5     │ ←──────────────── │              │               │
 │  │   estados)   │  RX(0) ← TX2(17)  │ • WiFi       │               │
-│  │ • 4 motores  │                   │ • MQTT Pub/Sub│              │
+│  │ • 3 motores  │                   │ • MQTT Pub/Sub│              │
 │  │   (IRF520)   │  *divisor de      │ • Bridge     │               │
 │  │ • 6 sensores │   tensão 5V→3,3V  └──────┬───────┘               │
 │  │ • LCD 16x2   │                          │                       │
