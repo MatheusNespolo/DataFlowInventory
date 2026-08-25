@@ -322,7 +322,7 @@ void processarComando() {
       publicarPedido(pecaChar);
       estadoAtual = VERIFICANDO_ESTOQUE;
     }
-  } else if (linha == "CMD:RESET") {
+  } else if (linha.startsWith("CMD:RESET")) {
     if (estadoAtual == ERRO) {
       erroTimeout = false;
       erroSemEstoque = false;
