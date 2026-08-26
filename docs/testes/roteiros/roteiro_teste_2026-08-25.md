@@ -66,13 +66,13 @@ Progresso: com rede Wi-Fi externa (não o hotspot do celular), o ESP32 conectou 
    ::  Esperado: TCP 0.0.0.0:1883 ... LISTENING (se só 127.0.0.1, o conf não foi carregado!)
    mosquitto_pub -h localhost -t "dataflow/status" -m '{"type":"status","estado":"smoke-test"}'
    ```
-   - [ ] `netstat` mostra `0.0.0.0:1883 LISTENING`
-   - [ ] Mensagem aparece no mqtt_probe E nos logs do server
+   - [X] `netstat` mostra `0.0.0.0:1883 LISTENING`
+   - [X] Mensagem aparece no mqtt_probe E nos logs do server
 4. **ESP32 (agora com o gateway completo `esp32/gateway_mqtt/`):**
    - Editar SSID/senha da rede escolhida e `MQTT_SERVER` = IP do PC (nunca `localhost`), `USE_TLS=false`
    - Upload (Speed 921600, Serial Monitor fechado) → monitor 115200:
-   - [ ] `[WiFi] Conectado!`
-   - [ ] `[MQTT] Conectado!` — **se falhar, anotar o `rc=`:**
+   - [X] `[WiFi] Conectado!`
+   - [X] `[MQTT] Conectado!` — **se falhar, anotar o `rc=`:**
 
 | rc | Significado | Ação |
 |----|-------------|------|
@@ -80,7 +80,7 @@ Progresso: com rede Wi-Fi externa (não o hotspot do celular), o ESP32 conectou 
 | -4 | Timeout de conexão | Conferir IP do PC e se broker está de pé |
 | 4/5 | Autenticação/não autorizado | Conferir `allow_anonymous true` no conf |
 
-   - [ ] mqtt_probe mostra o retained `{"type":"gateway","status":"online"}` em `dataflow/status`
+   - [X] mqtt_probe mostra o retained `{"type":"gateway","status":"online"}` em `dataflow/status`
 
 ---
 
@@ -90,22 +90,22 @@ Progresso: com rede Wi-Fi externa (não o hotspot do celular), o ESP32 conectou 
 
 1. **Teste 2** (Blocos 0.A e 0.B completos):
    - Conectar o Arduino ao ESP32 (fiação já validada no Bloco 0.A)
-   - [ ] JSONs do Arduino aparecem no `mqtt_probe` nos tópicos `dataflow/...`
-   - [ ] Server Node loga as mensagens (`[WS →] ...`)
-   - [ ] Desligar o ESP32 → LWT `{"type":"gateway","status":"offline"}` no probe
+   - [X] JSONs do Arduino aparecem no `mqtt_probe` nos tópicos `dataflow/...`
+   - [X] Server Node loga as mensagens (`[WS →] ...`)
+   - [ ] Desligar o ESP32 → LWT `{"type":"gateway","status":"offline"}` no probe (não feito)
 2. **Teste 3** — MQTT Box/Explorer (host `localhost:1883`):
    - Publicar em `dataflow/comandos/sub`: `{"acao":"solicitar_peca","peca":"A"}`
-   - [ ] ESP32 loga `[MQTT ←]` + `[Serial2 →] CMD:PECA:A`
-   - [ ] **Esteira física aciona** e completa a entrega; confirmação em `dataflow/comandos/pub`
-   - [ ] `{"acao":"reset"}` retorna a FSM a `AGUARDANDO_PEDIDO`
+   - [X] ESP32 loga `[MQTT ←]` + `[Serial2 →] CMD:PECA:A`
+   - [X] **Esteira física aciona** e completa a entrega; confirmação em `dataflow/comandos/pub`
+   - [X] `{"acao":"reset"}` retorna a FSM a `AGUARDANDO_PEDIDO`
 
 ### Bloco 2 — Teste 4 (End-to-End no dashboard)
 
 3. Navegador em `http://localhost:3000`:
-   - [ ] Indicadores de conexão OK (WebSocket + gateway online)
-   - [ ] **Solicitar Peça A** → esteira executa → estado/estoque/histórico atualizam em tempo real
-   - [ ] Cenários de erro: sem estoque e timeout (segurar a peça) → `ERRO` no dashboard → **Reset** pelo dashboard
-   - [ ] Desligar o ESP32 → dashboard indica gateway offline
+   - [X] Indicadores de conexão OK (WebSocket + gateway online)
+   - [X] **Solicitar Peça A** → esteira executa → estado/estoque/histórico atualizam em tempo real
+   - [X] Cenários de erro: sem estoque e timeout (segurar a peça) → `ERRO` no dashboard → **Reset** pelo dashboard
+   - [ ] Desligar o ESP32 → dashboard indica gateway offline (não feito)
 
 **✅ Marco do dia:** esteira A 100% integrada, do sensor ao dashboard.
 
@@ -128,8 +128,8 @@ Progresso: com rede Wi-Fi externa (não o hotspot do celular), o ESP32 conectou 
 
 ## 6. Documentação e board
 
-- [ ] Registrar os resultados na tabela abaixo (transferir para o `plano_de_testes.md` oficial apenas os testes aprovados/reprovados)
-- [ ] **Atualizar os cards do GitHub Projects** ao final:
+- [X] Registrar os resultados na tabela abaixo (transferir para o `plano_de_testes.md` oficial apenas os testes aprovados/reprovados)
+- [X] **Atualizar os cards do GitHub Projects** ao final:
   - **#4** Gateway ESP32 → Done após Teste 2
   - **#7** Dashboard web → Done após Teste 4 (real ou via Plano B)
   - **#9** Testes e validação → registrar 2–4
@@ -140,13 +140,13 @@ Progresso: com rede Wi-Fi externa (não o hotspot do celular), o ESP32 conectou 
 
 | Etapa | Resultado | Medições / Observações |
 |-------|-----------|------------------------|
-| 0.A — Serial Uno ↔ ESP32 (com divisor) | ⬜ | Divisor: ____Ω/____Ω · GND comum conferido? |
-| 0.B — Rede escolhida | ⬜ | SSID: ____ · IP do PC: ____ |
-| 0.B — Smoke test do broker | ⬜ | `netstat` mostrou 0.0.0.0:1883? |
-| 0.B — ESP32: WiFi + MQTT | ⬜ | IP do ESP32: ____ · rc de erro (se houver): ____ |
-| 2 — ESP32 → Broker → Node | ⬜ | |
+| 0.A — Serial Uno ↔ ESP32 (com divisor) | ✅ | Divisor: 1kΩ/2kΩ · GND comum conferido? ✅ |
+| 0.B — Rede escolhida | ✅ | SSID: MATHEUSN-NB01 7089 · IP do PC: 10.84.23.136 |
+| 0.B — Smoke test do broker | ✅ | `netstat` mostrou 0.0.0.0:1883? ✅ |
+| 0.B — ESP32: WiFi + MQTT | ✅ | IP do ESP32: ____ · rc de erro (se houver): corrigido |
+| 2 — ESP32 → Broker → Node | ✅ | |
 | 3 — Comando MQTT Box | ⬜ | |
-| 4 — End-to-End Dashboard | ⬜ | |
-| Plano B (simulador) | ⬜ | |
+| 4 — End-to-End Dashboard | ✅ | |
+| Plano B (simulador) | ✅ | |
 
 > Ao final: transferir resultados dos Testes 2–4 para o [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards (#4, #7, #9).
