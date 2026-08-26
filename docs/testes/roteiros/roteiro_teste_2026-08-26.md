@@ -105,6 +105,26 @@ Aproveitar que a esteira A está integrada para cobrir cenários de borda antes 
 
 ---
 
+## 5.1. Bloco 4 — Stretch goal (opcional): broker remoto HiveMQ Cloud
+
+⚠️ **Não bloqueia o dia.** Só executar se os Blocos 0–3 fecharem com folga de tempo, pois a esteira B ainda não está montada.
+
+**Pré-condição:** Blocos 1 e 2 ✅ (sistema estável no broker local).
+
+1. Criar cluster gratuito em [cloud.hivemq.com](https://cloud.hivemq.com) + credenciais (username/password)
+2. **ESP32:** `USE_TLS=true`, `MQTT_SERVER=<cluster>.s1.eu.hivemq.com`, `MQTT_PORT=8883`, preencher `MQTT_USER`/`MQTT_PASS` → reupload
+3. **`server/.env`:** `MQTT_BROKER_URL=mqtts://<cluster>.s1.eu.hivemq.com`, `MQTT_PORT=8883` + credenciais → `npm start`
+4. Validar:
+   - [ ] ESP32 conecta ao broker remoto via TLS (`[MQTT] Conectado!`)
+   - [ ] Servidor Node conecta ao broker remoto
+   - [ ] Dashboard reflete pedido de peça A end-to-end pela nuvem
+   - [ ] LWT continua funcionando (desligar ESP32 → gateway offline)
+5. Ao final, reverter para `USE_TLS=false` (broker local) se a bancada continuar em uso hoje
+
+📝 **Se NÃO executado hoje:** manter registrado como Teste 6 pendente em [`plano_de_testes.md`](../plano_de_testes.md).
+
+---
+
 ## 6. Plano B — progresso garantido em software (se o hardware travar)
 
 1. `start_services.bat` (broker + probe + server)
@@ -113,6 +133,7 @@ Aproveitar que a esteira A está integrada para cobrir cenários de borda antes 
 
 > Mesmo com hardware OK, rodar ao menos uma vez como evidência formal do card #7.
 
+> ⚠️ Nota: Migração para broker remoto (HiveMQ Cloud) está formalmente prevista como Teste 6 (`plano_de_testes.md`) e rodada futura (Bloco 4 opcional neste roteiro).
 ---
 
 ## 7. Próximos passos após o marco (rumo à continuidade do projeto)
@@ -123,6 +144,7 @@ Pontos **cruciais** para prosseguir depois de estabilizar a esteira A:
 2. **Incorporar B ao sketch principal:** o protocolo já suporta as 3 peças — a mudança é essencialmente pinagem + replicação das funções da esteira A. O sketch principal **já tem** MOTOR_B (pino 10) e J2 (pino 2) mapeados.
 3. **Esteira C + separador:** o código do separador (roda giratória) está comentado no sketch principal — decidir implementação futura.
 4. **Fechar o Teste 3 puro** (MQTT Box isolado) para evidência formal, hoje só validado via Dashboard.
+5. **Broker remoto (HiveMQ Cloud — Teste 6):** hoje o sistema opera com Mosquitto local. Se não executado como stretch goal (Bloco 4), formalizar como rodada dedicada assim que a esteira A estiver 100% estável — isola a variável rede/TLS da lógica de FSM.
 
 ---
 
@@ -152,6 +174,7 @@ Pontos **cruciais** para prosseguir depois de estabilizar a esteira A:
 | 3 — FSM ocupada / peça indisponível | ⬜ | |
 | 3 — LWT gateway offline/online | ⬜ | |
 | 3 — Reconexão do broker | ⬜ | |
+| 4 — Broker remoto HiveMQ (opcional) | ⬜ | Executado ou adiado para Teste 6 futuro? ____ |
 | Plano B (simulador) | ⬜ | |
 
 > Ao final: transferir resultados para o [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards do board.

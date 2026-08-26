@@ -46,3 +46,14 @@
 ## 6. Automação
 
 - [ ] `validar_infra.ps1` executado como Admin — todos os testes PASS
+
+## 7. Broker Remoto (opcional — HiveMQ Cloud)
+
+> Só aplicável quando executando o Teste 6 (`plano_de_testes.md`) ou o Bloco 4 (stretch goal) dos roteiros diários. Não é pré-requisito da bancada local.
+
+- [ ] Cluster gratuito criado em [cloud.hivemq.com](https://cloud.hivemq.com) e credenciais (username/password) gerados
+- [ ] ESP32: `USE_TLS = true`, `MQTT_SERVER = <cluster>.s1.eu.hivemq.com`, `MQTT_PORT = 8883`, `MQTT_USER`/`MQTT_PASS` preenchidos
+- [ ] `server/.env`: `MQTT_BROKER_URL=mqtts://<cluster>.s1.eu.hivemq.com`, `MQTT_PORT=8883` + credenciais
+- [ ] **Não é necessário** liberar firewall/porta 1883 local nem garantir bind `0.0.0.0` — a conexão sai pela internet (TLS/8883)
+- [ ] Certificado: protótipo usa `setInsecure()`; produção exigiria `setCACert()` com o certificado raiz do broker (ISRG Root X1 no HiveMQ Cloud)
+- [ ] Monitor serial (115200) do ESP32 mostra `[MQTT] Conectado!` apontando para o host remoto

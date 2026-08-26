@@ -7,7 +7,8 @@
 ![Arduino](https://img.shields.io/badge/Arduino-Uno-00979D?logo=arduino&logoColor=white)
 ![ESP32](https://img.shields.io/badge/ESP32-DevModule-000000?logo=espressif&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=node.js&logoColor=white)
-![MQTT](https://img.shields.io/badge/MQTT-HiveMQ-660066?logo=mosquitto&logoColor=white)
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-5391FE?logo=powershell&logoColor=white)
+![MQTT](https://img.shields.io/badge/MQTT-Mosquitto%20%7C%20HiveMQ-660066?logo=mosquitto&logoColor=white)
 ![School](https://img.shields.io/badge/SENAI-São%20Caetano%20do%20Sul-blue)
 ![Year](https://img.shields.io/badge/Ano-2026-orange)
 ![IoT](https://img.shields.io/badge/IoT-Arduino%20+%20ESP32-teal)
@@ -33,6 +34,7 @@ Engenharia de Controle e Automação
 - [Funcionamento](#funcionamento)
 - [Materiais](#materiais)
 - [Como Rodar](#como-rodar)
+- [Próximos Passos](#próximos-passos)
 - [Equipe](#equipe)
 - [Licença](#licença)
 - [Referências](#referências)
@@ -63,7 +65,7 @@ O sistema é composto por:
 | 📡 **ESP32** | Gateway MQTT (bridge Serial ↔ Wi-Fi) |
 | 🖥️ **Dashboard web** | HTML/CSS/JS + Socket.IO em tempo real |
 | ⚙️ **Servidor Node.js** | Ponte entre MQTT e WebSocket |
-| ☁️ **HiveMQ Cloud** | Broker MQTT |
+| ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (planejado — ver [Próximos Passos](#próximos-passos)) |
 
 > A roda giratória é um aprimoramento futuro do projeto, uma sugestão de melhoria. Atualmente existem menções ao controle no motor de passo no código, mas ele está comentado para ajustes durante o desenvolvimento até a integração final.
 
@@ -80,8 +82,9 @@ Diferente do modo real, os tempos de verificação/acionamento/entrega são temp
 
 ```
 ┌──────────────┐   Serial   ┌──────────┐   MQTT    ┌────────────────┐   WebSocket  ┌─────────────┐
-│ Arduino Uno  │ ────────── │  ESP32   │ ────────  │  HiveMQ Cloud  │ ──────────── │  Dashboard  │
-│  (FSM + I/O) │ ←────────  │(Gateway) │           │    (Broker)    │              │  (Frontend) │
+│ Arduino Uno  │ ────────── │  ESP32   │ ────────  │ Broker MQTT    │ ──────────── │  Dashboard  │
+│  (FSM + I/O) │ ←────────  │(Gateway) │           │ Mosquitto/     │              │  (Frontend) │
+│              │            │          │           │ HiveMQ Cloud   │              │             │
 └──────────────┘            └──────────┘           └───────┬────────┘              └─────────────┘
                                                            │ MQTT                       ↑
                                                            │                            │
@@ -140,8 +143,13 @@ DataFlowInventory/
 │   │   └── fluxograma_funcionamento.md    # Fluxogramas (FSM, operação, sequência)
 │   └── testes/
 │       ├── plano_de_testes.md             # Plano de testes de integração (Serial → E2E)
-│       └── roteiros/                      # Roteiros diários de execução dos testes
+│       ├── roteiros/                      # Roteiros diários de execução dos testes
+│       └── validações/                    # Checklists e automação de validação de infra
+│           ├── checklist_pre_teste_rede_infra.md
+│           ├── validar_infra.ps1          # Script PowerShell de validação (broker/firewall/portas)
+│           └── tabela_mudancas_artigo_final.md
 │
+├── start_services.bat                     # Sobe broker + probe + server em sequência
 ├── .gitignore
 └── README.md
 ```
@@ -265,8 +273,9 @@ Acessar http://localhost:3000 no navegador.
 
 - [Arduino IDE](https://www.arduino.cc/en/software) (com suporte a Arduino Uno e ESP32)
 - [Node.js](https://nodejs.org/) v18+
-- Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com)
-- Conexão Wi-Fi para o ESP32
+- [Mosquitto](https://mosquitto.org/) rodando localmente (porta 1883) — **caminho padrão validado em bancada**. Veja [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md)
+- Conexão Wi-Fi 2.4 GHz para o ESP32
+- *(Opcional, futuro)* Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com) — apenas para o Teste 6 de migração para broker remoto (TLS/8883)
 
 #### 1. Configurar o Arduino
 
@@ -289,13 +298,21 @@ Acessar http://localhost:3000 no navegador.
 ```bash
 cd server
 npm install
-# Editar .env com suas credenciais do HiveMQ Cloud
+# Editar .env conforme o broker escolhido:
+#   Local (padrão):  MQTT_BROKER_URL=mqtt://localhost  | MQTT_PORT=1883
+#   Nuvem (HiveMQ):  MQTT_BROKER_URL=mqtts://<cluster>.s1.eu.hivemq.com | MQTT_PORT=8883 + credenciais
 npm start
 ```
 
 #### 4. Acessar o Dashboard
 
 Abrir [http://localhost:3000](http://localhost:3000) no navegador.
+
+## Próximos Passos
+
+- 🚧 **Esteira B/C:** montagem do hardware adicional (motores + sensores) e réplica das funções da esteira A no sketch principal.
+- ☁️ **Broker Remoto (HiveMQ Cloud):** o sistema hoje está validado com **Mosquitto local**. A próxima rodada de testes cobre a migração para o **HiveMQ Cloud** (MQTT sobre TLS, porta 8883), validando autenticação, certificados (`setCACert`) e a mesma cadeia end-to-end (Arduino → ESP32 → Broker → Dashboard) via internet. Ver [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) (Teste 6) e [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md#etapa-e--migração-para-hivemq-cloud-futuro).
+- 🧪 **Validação de infraestrutura:** script [`docs/testes/validações/validar_infra.ps1`](docs/testes/validações/validar_infra.ps1) automatiza a checagem de broker, firewall e serviços antes de cada bancada — inclui checklist manual complementar em [`checklist_pre_teste_rede_infra.md`](docs/testes/validações/checklist_pre_teste_rede_infra.md).
 
 ## Equipe
 

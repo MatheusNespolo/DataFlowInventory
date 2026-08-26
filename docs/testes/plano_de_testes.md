@@ -24,6 +24,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / LCD) |
 | 4 | End-to-End (Dashboard) | Item 2 + navegador | Clicar no dashboard → Arduino executa → dashboard atualiza | Ciclo completo pedido → entrega refletido na UI |
 | 5 | Duas esteiras (A + B) | Itens 1–3 + 2ª esteira secundária + 2 sensores | Validar FSM completa com 2 esteiras e cenários de rejeição | Entregas A/B, rejeição de C, `ocupado`, timeout + reset |
+| 6 | Migração para broker remoto (HiveMQ Cloud) | Item 2 aprovado + conta HiveMQ Cloud + `USE_TLS=true` no ESP32 | Repetir a cadeia de comunicação (Serial → MQTT → Dashboard) usando um broker em nuvem via TLS, sem alterar lógica de FSM | Mesmo ciclo end-to-end do Teste 4, porém via internet/TLS (porta 8883) |
 
 ---
 
@@ -363,6 +364,34 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 
 ---
 
+## Teste 6 — Migração para Broker Remoto (HiveMQ Cloud)
+
+> Objetivo: validar a mesma cadeia de comunicação (Serial → MQTT → Dashboard) usando um broker em **nuvem via TLS**, isolando a variável "rede/TLS" da lógica de FSM já validada localmente (Teste 2 e Teste 4). Executar apenas com o sistema estável no broker local.
+
+### Materiais
+- Sistema local já validado (Testes 1, 2 e 4 aprovados)
+- Conta gratuita em [cloud.hivemq.com](https://cloud.hivemq.com) + cluster criado
+- Credenciais (username/password) do cluster
+
+### Procedimento
+1. Criar cluster gratuito no HiveMQ Cloud e gerar credenciais de acesso.
+2. **ESP32** (`esp32/gateway_mqtt/gateway_mqtt.ino`): alterar `USE_TLS` para `true`, `MQTT_SERVER` para `<cluster>.s1.eu.hivemq.com`, `MQTT_PORT` para `8883`, preencher `MQTT_USER`/`MQTT_PASS` → reupload.
+3. **Servidor** (`server/.env`): `MQTT_BROKER_URL=mqtts://<cluster>.s1.eu.hivemq.com`, `MQTT_PORT=8883` + credenciais → reiniciar `npm start`.
+4. Repetir o fluxo do Teste 4 (pedido de peça A via Dashboard → entrega completa) usando o broker remoto.
+5. Validar a persistência do LWT (`gateway offline/online`) também no broker remoto.
+6. Ao final, reverter para `USE_TLS=false` (broker local) caso a bancada continue em uso no mesmo dia.
+
+### Critérios de validação
+- [ ] ESP32 conecta ao broker remoto via TLS (monitor serial: `[MQTT] Conectado!`)
+- [ ] Servidor Node conecta ao broker remoto (`mqtts://`, porta 8883)
+- [ ] Ciclo completo pedido → entrega refletido no Dashboard via nuvem
+- [ ] LWT (`gateway offline/online`) funciona igual ao broker local
+- [ ] Nenhuma alteração de lógica de FSM foi necessária (apenas configuração de conexão)
+
+> 💡 Ver detalhes de configuração em [`docs/broker_local_mosquitto.md`](../broker_local_mosquitto.md#etapa-e--migração-para-hivemq-cloud-futuro) e [`docs/arquitetura_mqtt.md`](../arquitetura_mqtt.md#opção-2-hivemq-cloud-nuvem-tls).
+
+---
+
 ## Registro de Resultados
 
 | # | Teste | Data | Resultado | Observações |
@@ -378,9 +407,14 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | 3 | Comando via MQTT Box | 25/08/2026 | ⚠️ Parcial | Comando chega ao Uno, mas não testado isoladamente via MQTT Box (testado via Dashboard) |
 | 4 | End-to-End (Dashboard) | 25/08/2026 | ✅ Aprovado | Pedido de peça A via Dashboard → esteira parte → entrega completa |
 | 5 | Duas esteiras (A + B) | | ⬜ Pendente | Aguarda montagem da esteira B |
+| 6 | Migração para broker remoto (HiveMQ Cloud) | | ⬜ Pendente | Planejado para rodada futura, após consolidação da esteira A |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
 **Observações 25/08:**
 - `TIMEOUT_ENTREGA` ajustado de 8 s → **12 s** (peça chegava no sensor mas não saía da esteira secundária)
 - Adicionado `publicarEstoque()` em `setup()` e `CMD:RESET` para sincronizar LCD ↔ Dashboard
-- Divisor 1k/2kΩ + GND comum confirmados como criticos para UART Uno↔ESP32
+- Divisor 1k/2kΩ + GND comum confirmados como críticos para UART Uno↔ESP32
+
+**Observações 26/08:**
+- Introduzida automação de validação de infraestrutura (`docs/testes/validações/validar_infra.ps1`) e checklist de rede/infra correspondente
+- Sistema ainda opera com **broker local (Mosquitto)**; conexão com **broker remoto (HiveMQ Cloud)** planejada para rodada futura (Teste 6), condicionada à consolidação da esteira A
