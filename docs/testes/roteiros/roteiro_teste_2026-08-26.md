@@ -30,7 +30,7 @@ Antes de executar, relembrar o que já está **fechado** para não retrabalhar:
 
 > Regra herdada: **não ligar Wi-Fi/MQTT antes de a Serial Arduino ↔ ESP32 estar comprovadamente viva.**
 
-- [ ] Executar [`validar_infra.ps1`](../validações/validar_infra.ps1) como Admin → todos PASS
+- [ ] Executar [`validar_infra.ps1`](../validações/validar_infra.ps1) como Admin (pré-voo, antes dos serviços) → PASS nos checks de config/firewall
 - [ ] Rodar o [checklist de rede/infra](../validações/checklist_pre_teste_rede_infra.md) (seções 1 a 5)
 - [ ] Confirmar `MQTT_SERVER` no ESP32 = IP do PC de hoje (`ipconfig`) — se a rede mudou desde 25/08, **atualizar e regravar o ESP32**
 - [ ] Fiação UART reconferida (TX→divisor→GPIO16 / GPIO17→RX / GND comum)
@@ -38,6 +38,7 @@ Antes de executar, relembrar o que já está **fechado** para não retrabalhar:
   - [ ] `arduino/data_flow_inventory/` no Uno (ESP32 fora dos pinos 0/1 durante upload)
   - [ ] `esp32/gateway_mqtt/` no ESP32
 - [ ] Subir serviços: `start_services.bat` (broker + probe + server) + Dashboard em `http://localhost:3000`
+- [ ] Executar `validar_infra.ps1 -PosSubida` como Admin (depois dos serviços de pé) → PASS em todos os checks de rede
 
 Critério de liberação do Bloco 0:
 - [ ] `mqtt_probe` mostra JSONs periódicos do Uno em `dataflow/status`, `dataflow/sensores`, `dataflow/esteiras`
