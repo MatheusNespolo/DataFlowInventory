@@ -191,7 +191,7 @@ O Arduino opera com **5 estados**:
 | Componente | Quantidade | Especificação |
 |-----------|-----------|---------------|
 | Esteira transportadora | 3 | BR Eletrônica 35cm, motor DC 3–6V |
-| Esteira transportadora (já com fonte e motor integrados) | 1 | BR Eletrônica 35cm, motor DC 3–6V | # não necessita driver
+| Esteira transportadora (já com fonte e motor integrados) | 1 | BR Eletrônica 35cm, motor DC 3–6V # não necessita driver |
 | Arduino Uno | 1 | Controlador principal |
 | ESP32 Dev Module | 1 | Gateway MQTT |
 | Driver IRF520 | 3 | Controle de 1 motor cada |
