@@ -17,7 +17,8 @@
 //
 // Driver: IRF520 (MOSFET) — 1 pino PWM por motor
 // Botões físicos: DESABILITADOS (controle via dashboard web)
-// Separador (roda giratória): CÓDIGO COMENTADO (verificar implementação futura)
+// Separador (roda giratória): motor de passo 28BYJ-48 + driver ULN2003
+//   CÓDIGO COMENTADO — habilitar quando o hardware for montado
 // ============================================================
 
 #include <Wire.h>
@@ -58,14 +59,24 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // #define BTN_RESET   25    // [HABILITAR]
 
 // ============================================================
-// PINO — SEPARADOR (RODA GIRATÓRIA)
-// MANTIDO COMO COMENTÁRIO — verificar implementação futura
+// PINO — SEPARADOR (RODA GIRATÓRIA) — MOTOR DE PASSO
+// MANTIDO COMO COMENTÁRIO — habilitar quando o hardware for montado
+// Motor de passo 28BYJ-48 + driver ULN2003 (4 fios IN1-IN4).
+// Pinos escolhidos: 5, 6, 7, 8 — sequenciais, únicos digitais livres no Uno.
 // ============================================================
-// #define MOTOR_SEPARADOR  10  // [HABILITAR] PWM para servo/motor do separador
-// #define SEPARADOR_POSICAO_INICIAL 0
-// #define SEPARADOR_POSICAO_A       90
-// #define SEPARADOR_POSICAO_B       135
-// #define SEPARADOR_POSICAO_C       180
+// #include <Stepper.h>                             // [HABILITAR] biblioteca padrão da Arduino IDE
+// #define STEPPER_IN1        5                      // [HABILITAR]
+// #define STEPPER_IN2        6                      // [HABILITAR]
+// #define STEPPER_IN3        7                      // [HABILITAR]
+// #define STEPPER_IN4        8                      // [HABILITAR]
+// #define STEPS_PER_REV      2048                   // 28BYJ-48 em passo completo — conferir no datasheet do driver usado
+// #define SEPARADOR_RPM      10                     // velocidade do giro — ajustar conforme torque necessário
+// Stepper motorSeparador(STEPS_PER_REV, STEPPER_IN1, STEPPER_IN3, STEPPER_IN2, STEPPER_IN4); // [HABILITAR]
+// long SEPARADOR_POSICAO_INICIAL = 0;                        // 0°   — compartimento neutro
+// long SEPARADOR_POSICAO_A       = STEPS_PER_REV / 3;        // 120° — compartimento A
+// long SEPARADOR_POSICAO_B       = (STEPS_PER_REV * 2) / 3;  // 240° — compartimento B
+// long SEPARADOR_POSICAO_C       = 0;                        // 0°   — compartimento C (mesmo ponto que o neutro, ajustar layout físico se preciso)
+// long posicaoAtualSeparador     = 0;                        // posição atual em passos (0..STEPS_PER_REV-1)
 
 // ============================================================
 // PARÂMETROS DO SISTEMA
@@ -173,25 +184,35 @@ void exibirEstoque() {
 
 // ============================================================
 // FUNÇÕES AUXILIARES — SEPARADOR (COMENTADO)
-// Implementação futura: controlar servo/motor do separador
+// Implementação futura: motor de passo (28BYJ-48 + ULN2003)
 // para direcionar a peça para o compartimento correto.
+//
+// Stepper.step() é RELATIVO (nº de passos a girar a partir de onde
+// está), diferente de servo.write() que é absoluto — por isso o
+// controle guarda posicaoAtualSeparador e calcula o delta a cada
+// movimento, sempre pelo caminho mais curto.
 // ============================================================
 /*
-void moverSeparador(char peca) {
-  int posicao = SEPARADOR_POSICAO_INICIAL;
-  if (peca == 'A') posicao = SEPARADOR_POSICAO_A;
-  if (peca == 'B') posicao = SEPARADOR_POSICAO_B;
-  if (peca == 'C') posicao = SEPARADOR_POSICAO_C;
+void moverSeparadorPara(long posicaoAlvo) {
+  long delta = (posicaoAlvo - posicaoAtualSeparador) % STEPS_PER_REV;
+  if (delta < 0) delta += STEPS_PER_REV;
+  if (delta > STEPS_PER_REV / 2) delta -= STEPS_PER_REV; // caminho mais curto (sentido horário ou anti-horário)
 
-  analogWrite(MOTOR_SEPARADOR, map(posicao, 0, 180, 0, 255));
-  delay(500); // Aguarda movimento do servo
-  pararMotor(MOTOR_SEPARADOR);
+  motorSeparador.step(delta);
+  posicaoAtualSeparador = posicaoAlvo;
+}
+
+void moverSeparador(char peca) {
+  long alvo = SEPARADOR_POSICAO_INICIAL;
+  if (peca == 'A') alvo = SEPARADOR_POSICAO_A;
+  if (peca == 'B') alvo = SEPARADOR_POSICAO_B;
+  if (peca == 'C') alvo = SEPARADOR_POSICAO_C;
+
+  moverSeparadorPara(alvo);
 }
 
 void resetarSeparador() {
-  analogWrite(MOTOR_SEPARADOR, map(SEPARADOR_POSICAO_INICIAL, 0, 180, 0, 255));
-  delay(500);
-  pararMotor(MOTOR_SEPARADOR);
+  moverSeparadorPara(SEPARADOR_POSICAO_INICIAL);
 }
 */
 
@@ -365,6 +386,11 @@ void setup() {
     SENSOR_JUNCAO_J1, SENSOR_JUNCAO_J2, SENSOR_JUNCAO_J3
   };
   for (int i = 0; i < 6; i++) pinMode(sensores[i], INPUT_PULLUP);
+
+  // Separador (roda giratória): DESABILITADO — motor de passo ainda não montado
+  // Para reativar, descomente (junto com o bloco de definições e funções auxiliares):
+  // motorSeparador.setSpeed(SEPARADOR_RPM);
+  // moverSeparadorPara(SEPARADOR_POSICAO_INICIAL);
 
   // Botões físicos: DESABILITADOS (controle via dashboard)
   // Para reativar, descomente:

@@ -93,8 +93,8 @@ npm start
 # Simular esteira ligada
 & "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/esteiras" -m '{"type":"esteiras","principal":1,"secA":1,"secB":0,"secC":0}'
 
-# Simular gateway online (LWT)
-& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/gateway" -m '{"status":"online"}'
+# Simular gateway online (LWT) — o LWT real do ESP32 é publicado em dataflow/status, não em um tópico "gateway" separado
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/status" -m '{"type":"gateway","status":"online"}'
 ```
 
 ✅ **Critério de sucesso:** o dashboard atualiza em tempo real (estoque, histórico, diagrama, badge "ESP32 Online").
@@ -129,7 +129,7 @@ const char* MQTT_PASS   = "";
 ✅ **Critérios de sucesso:**
    - `WiFi conectado` com IP na mesma faixa do PC;
    - `MQTT conectado`;
-   - Badge **"ESP32 Online"** acende no dashboard (LWT publicado em `dataflow/gateway`).
+   - Badge **"ESP32 Online"** acende no dashboard (LWT publicado em `dataflow/status`).
 
 4. Testar comando remoto: clicar em "Solicitar A" no dashboard → o ESP32 deve exibir no monitor serial o envio de `CMD:PECA:A` pela Serial2 (validável **mesmo sem o Arduino conectado**).
 

@@ -45,7 +45,8 @@
 
 ## 6. Automação
 
-- [ ] `validar_infra.ps1` executado como Admin — todos os testes PASS
+- [ ] `validar_infra.ps1` executado como Admin (pré-voo, antes de subir os serviços) — PASS nos checks de config/firewall
+- [ ] `validar_infra.ps1 -PosSubida` executado como Admin (depois do `start_services.bat`) — PASS em todos os checks de rede
 
 ## 7. Broker Remoto (opcional — HiveMQ Cloud)
 
