@@ -39,7 +39,7 @@
 
 #define VELOCIDADE_MOTOR 100   // PWM alvo (calibrar o minimo que move a esteira)
 #define SOFT_START_MS    300   // rampa 0 -> VELOCIDADE_MOTOR
-#define TIMEOUT_ENTREGA  10000  // ms aguardando a peca sair do sensor
+#define TIMEOUT_ENTREGA  12000  // ms (consistente com sketch principal: margem para peça sair da esteira)
 #define DEBOUNCE_SENSOR  50    // ms de estabilidade da transicao LOW -> HIGH
 #define TEMPO_ENTREGUE   1500  // ms exibindo "entregue" antes de voltar a AGUARDANDO
 #define TEMPO_TRANSPORTE_MS 5000  // ms com motor ligado apos a peca sair do sensor

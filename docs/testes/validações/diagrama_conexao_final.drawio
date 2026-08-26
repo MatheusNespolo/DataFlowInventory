@@ -1,0 +1,48 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="DataFlowInventory" id="dfi-conn">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- FONTE -->
+        <mxCell id="fonte" value="FONTE 12V DC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ARDUINO -->
+        <mxCell id="uno" value="ARDUINO UNO&#10;PWM: 9,10,11 (A/B/C)&#10;A0-A3: Topo A/B/C + J1&#10;D2: J2 | D4: J3&#10;A4/A5: LCD I2C&#10;D0/D1: UART 9600" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="220" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- ESP32 -->
+        <mxCell id="esp32" value="ESP32 DEVKIT (Gateway)&#10;RX2(GPIO16) ← Uno TX via divisor&#10;TX2(GPIO17) → Uno RX&#10;Wi-Fi 2.4GHz&#10;MQTT → Broker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="40" y="340" width="220" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- DIVISOR -->
+        <mxCell id="divisor" value="DIVISOR 1kΩ + 2kΩ&#10;(5V → 3.3V)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="290" y="250" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- BROKER -->
+        <mxCell id="broker" value="PC WINDOWS&#10;├─ Mosquitto :1883 (0.0.0.0)&#10;├─ mqtt_probe (dataflow/#)&#10;└─ Server Node :3000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="470" y="160" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- FRONTEND -->
+        <mxCell id="fe" value="NAVEGADOR&#10;Dashboard :3000&#10;WebSocket (Socket.IO)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="470" y="340" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- CONEXÕES -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="fonte" target="uno"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="uno" target="divisor"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="divisor" target="esp32"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="esp32" target="broker"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="broker" target="fe"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="GND comum" style="edgeStyle=orthogonalEdgeStyle;dashed=1;" edge="1" parent="1" source="uno" target="esp32"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

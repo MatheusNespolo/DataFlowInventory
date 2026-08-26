@@ -40,8 +40,8 @@
 // ============================================================
 // CONFIGURAÇÃO WI-FI
 // ============================================================
-const char* SSID  = "SUA_REDE_WIFI";       // ← Alterar
-const char* SENHA = "SUA_SENHA_WIFI";      // ← Alterar
+const char* SSID  = "MATHEUSN-NB01 7089";       // ← Alterar
+const char* SENHA = "v3(448T1";      // ← Alterar
 
 // ============================================================
 // CONFIGURAÇÃO MQTT
@@ -63,7 +63,7 @@ const int   MQTT_PORT   = 8883;                     // Porta TLS
 const char* MQTT_USER   = "seu_usuario";            // ← Alterar
 const char* MQTT_PASS   = "sua_senha";              // ← Alterar
 #else
-const char* MQTT_SERVER = "192.168.0.10";           // ← Alterar (IP do PC com Mosquitto — ipconfig)
+const char* MQTT_SERVER = "10.84.23.136";           // ← Alterar (IP do PC com Mosquitto — ipconfig)
 const int   MQTT_PORT   = 1883;                     // Porta padrão sem TLS
 const char* MQTT_USER   = "";                       // vazio = sem autenticação
 const char* MQTT_PASS   = "";

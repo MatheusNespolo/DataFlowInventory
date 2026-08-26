@@ -68,7 +68,7 @@ Sensores em `INPUT_PULLUP` — **LOW = peça presente**.
 - [ ] Pedidos consecutivos de A e B entregam corretamente e decrementam o estoque
 - [ ] Pedido durante entrega em andamento é rejeitado com evento `ocupado`
 - [ ] Pedido de peça C retorna `peca_indisponivel` sem travar a FSM
-- [ ] Timeout de 8 s leva a `ERRO` e `CMD:RESET` recupera o sistema
+- [ ] **Timeout de 12 s** leva a `ERRO` e `CMD:RESET` recupera o sistema
 - [ ] Status periódico (`status`, `sensores`, `esteiras`) chega a cada ~1 s nos tópicos MQTT
 - [ ] LWT: desligar o ESP32 gera `{"type":"gateway","status":"offline"}` em `dataflow/status`
 

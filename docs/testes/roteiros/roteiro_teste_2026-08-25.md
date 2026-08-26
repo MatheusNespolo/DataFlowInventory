@@ -143,7 +143,7 @@ Progresso: com rede Wi-Fi externa (não o hotspot do celular), o ESP32 conectou 
 | 0.A — Serial Uno ↔ ESP32 (com divisor) | ✅ | Divisor: 1kΩ/2kΩ · GND comum conferido? ✅ |
 | 0.B — Rede escolhida | ✅ | SSID: MATHEUSN-NB01 7089 · IP do PC: 10.84.23.136 |
 | 0.B — Smoke test do broker | ✅ | `netstat` mostrou 0.0.0.0:1883? ✅ |
-| 0.B — ESP32: WiFi + MQTT | ✅ | IP do ESP32: ____ · rc de erro (se houver): corrigido |
+| 0.B — ESP32: WiFi + MQTT | ✅ | IP do ESP32: ____ · rc de erro (se houver): -2 corrigido |
 | 2 — ESP32 → Broker → Node | ✅ | |
 | 3 — Comando MQTT Box | ⬜ | |
 | 4 — End-to-End Dashboard | ✅ | |

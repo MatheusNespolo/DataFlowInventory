@@ -90,12 +90,12 @@ Este documento define os testes de integração da cadeia de comunicação do si
 3. Enviar `CMD:PECA:A`
 4. Observar a sequência: `acionando` → motor liga com soft-start (rampa ~300 ms) → peça sai do sensor → motor para → evento `entregue` com `tempo_ms`
 5. Repetir **sem peça** no sensor → evento `erro` tipo `sem_estoque` → enviar `CMD:RESET`
-6. Repetir **segurando a peça** sobre o sensor → após 8 s, `erro` tipo `timeout` → `CMD:RESET`
+6. Repetir **segurando a peça** sobre o sensor → após **12 s**, `erro` tipo `timeout` → `CMD:RESET`
 
 #### Critérios de validação
 - [ ] Ciclo completo: comando → motor liga → peça sai do sensor → motor para → `{"evento":"entregue","tempo_ms":...}`
 - [ ] Sem peça: `{"evento":"erro","tipo":"sem_estoque"}` sem acionar o motor
-- [ ] Timeout de 8 s funciona e para o motor
+- [ ] **Timeout de 12 s** funciona e para o motor
 - [ ] `CMD:RESET` recupera o sistema do estado ERRO
 - [ ] **Registrar** o `tempo_ms` medido (calibra o `TIMEOUT_ENTREGA` da versão final)
 - [ ] **Registrar** o menor PWM que move a esteira com peça (calibra `VELOCIDADE_MOTOR`)
@@ -358,7 +358,7 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - [ ] Entregas consecutivas de A e B decrementam o estoque corretamente
 - [ ] Peça C rejeitada com `{"evento":"erro","tipo":"peca_indisponivel"}` sem travar a FSM
 - [ ] Pedido com FSM ocupada gera evento `ocupado`
-- [ ] Timeout de 8 s → `ERRO`; `CMD:RESET` recupera o sistema
+- [ ] **Timeout de 12 s** → `ERRO`; `CMD:RESET` recupera o sistema
 - [ ] Status periódico (`status`, `sensores`, `esteiras`) publicado a cada ~1 s nos tópicos MQTT
 
 ---
@@ -374,7 +374,13 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | B1 | Bancada 3.1 — Ciclo completo | 18/08/2026 | ✅ Aprovado | tempo_ms: 5000 · PWM mínimo: 150 (calibrações aplicadas ao sketch principal) |
 | B2 | Bancada 3.2 — Sem estoque | 18/08/2026 | ✅ Aprovado | Rejeição `peca_indisponivel` + recuperação via reset OK |
 | B3 | Bancada 3.3 — LCD I2C | 18/08/2026 | ✅ Aprovado | Endereço I2C: 0x27 |
-| 2 | ESP32 → Broker → Node.js | | ⬜ Pendente | |
-| 3 | Comando via MQTT Box | | ⬜ Pendente | |
-| 4 | End-to-End (Dashboard) | | ⬜ Pendente | |
-| 5 | Duas esteiras (A + B) | | ⬜ Pendente | |
+| 2 | ESP32 → Broker → Node.js | 25/08/2026 | ✅ Aprovado | JSONs do Uno chegam via ESP32 aos tópicos dataflow/#; broker 0.0.0.0:1883 OK |
+| 3 | Comando via MQTT Box | 25/08/2026 | ⚠️ Parcial | Comando chega ao Uno, mas não testado isoladamente via MQTT Box (testado via Dashboard) |
+| 4 | End-to-End (Dashboard) | 25/08/2026 | ✅ Aprovado | Pedido de peça A via Dashboard → esteira parte → entrega completa |
+| 5 | Duas esteiras (A + B) | | ⬜ Pendente | Aguarda montagem da esteira B |
+| — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
+
+**Observações 25/08:**
+- `TIMEOUT_ENTREGA` ajustado de 8 s → **12 s** (peça chegava no sensor mas não saía da esteira secundária)
+- Adicionado `publicarEstoque()` em `setup()` e `CMD:RESET` para sincronizar LCD ↔ Dashboard
+- Divisor 1k/2kΩ + GND comum confirmados como criticos para UART Uno↔ESP32

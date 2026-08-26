@@ -72,7 +72,8 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // ============================================================
 #define VELOCIDADE_PRINCIPAL   180   // PWM 0-255
 #define VELOCIDADE_SECUNDARIA  200   // PWM 0-255
-#define TIMEOUT_ENTREGA        8000  // ms
+#define TIMEOUT_ENTREGA        12000 // ms (medição 25/08: peça leva ~5s até o sensor,
+                                      // mas precisa de folga extra para sair da esteira secundária)
 #define DEBOUNCE_BTN           200   // ms
 #define INTERVALO_PUBLICACAO   1000  // ms — intervalo para publicar status periódico
 
@@ -330,6 +331,7 @@ void processarComando() {
       pararTodasSecundarias();
       exibirEstoque();
       publicarEstado();
+      publicarEstoque(); // sincroniza dashboard com o LCD após reset
       estadoAtual = AGUARDANDO_PEDIDO;
     }
   }
@@ -346,6 +348,9 @@ void setup() {
   lcd.backlight();
   atualizarLCD("Data Flow", "Inventory v2.1");
   delay(2000);
+
+  // Publica estoque inicial para sincronizar com o dashboard
+  publicarEstoque();
 
   // Configura pinos dos motores (IRF520 — apenas 1 PWM por motor)
   int motores[] = { MOTOR_A, MOTOR_B, MOTOR_C };
