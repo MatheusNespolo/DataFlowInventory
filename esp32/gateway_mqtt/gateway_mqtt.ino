@@ -28,6 +28,7 @@
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include "secrets.h"   // credenciais Wi-Fi/MQTT — NÃO versionado (ver secrets.h.example)
 
 // ============================================================
 // CONFIGURAÇÃO SERIAL
@@ -40,8 +41,9 @@
 // ============================================================
 // CONFIGURAÇÃO WI-FI
 // ============================================================
-const char* SSID  = "MATHEUSN-NB01 7089";       // ← Alterar
-const char* SENHA = "v3(448T1";      // ← Alterar
+// Valores reais ficam em secrets.h (fora do controle de versão).
+const char* SSID  = SECRET_WIFI_SSID;
+const char* SENHA = SECRET_WIFI_PASS;
 
 // ============================================================
 // CONFIGURAÇÃO MQTT
@@ -57,16 +59,17 @@ const char* SENHA = "v3(448T1";      // ← Alterar
 // ============================================================
 #define USE_TLS false   // ← false = Mosquitto local | true = HiveMQ Cloud
 
+// Endpoints e credenciais vêm de secrets.h (fora do controle de versão).
 #if USE_TLS
-const char* MQTT_SERVER = "xxx.s1.eu.hivemq.com";  // ← Alterar (URL do cluster HiveMQ Cloud)
+const char* MQTT_SERVER = SECRET_MQTT_SERVER_CLOUD;
 const int   MQTT_PORT   = 8883;                     // Porta TLS
-const char* MQTT_USER   = "seu_usuario";            // ← Alterar
-const char* MQTT_PASS   = "sua_senha";              // ← Alterar
+const char* MQTT_USER   = SECRET_MQTT_USER_CLOUD;
+const char* MQTT_PASS   = SECRET_MQTT_PASS_CLOUD;
 #else
-const char* MQTT_SERVER = "10.84.23.136";           // ← Alterar (IP do PC com Mosquitto — ipconfig)
+const char* MQTT_SERVER = SECRET_MQTT_SERVER_LOCAL; // IP do PC com Mosquitto (ipconfig)
 const int   MQTT_PORT   = 1883;                     // Porta padrão sem TLS
-const char* MQTT_USER   = "";                       // vazio = sem autenticação
-const char* MQTT_PASS   = "";
+const char* MQTT_USER   = SECRET_MQTT_USER_LOCAL;   // vazio = sem autenticação
+const char* MQTT_PASS   = SECRET_MQTT_PASS_LOCAL;
 #endif
 
 const char* MQTT_CLIENT = "dataflow-esp32-gateway";
@@ -115,28 +118,65 @@ const unsigned long INTERVALO_RECONNECT = 5000; // 5 segundos
 String bufferSerial2 = "";
 
 // ============================================================
-// CONEXÃO WI-FI
+// ESTADO DA CONEXÃO WI-FI (máquina de estados não-bloqueante)
+// Tempos de espera configuráveis; nunca bloqueia o loop nem
+// reinicia o ESP32 no caminho normal (ver manterWiFi()).
 // ============================================================
-void conectarWiFi() {
+enum EstadoWiFi { WIFI_OCIOSO, WIFI_CONECTANDO, WIFI_CONECTADO };
+EstadoWiFi estadoWiFi = WIFI_OCIOSO;
+
+unsigned long wifiInicioTentativa = 0;
+unsigned long wifiUltimoRetry     = 0;
+const unsigned long WIFI_TIMEOUT_TENTATIVA_MS = 15000; // duração máx. de uma tentativa
+const unsigned long WIFI_INTERVALO_RETRY_MS   = 3000;  // espera entre tentativas
+
+// ============================================================
+// CONEXÃO WI-FI — NÃO-BLOQUEANTE
+// iniciarConexaoWiFi() dispara a tentativa; manterWiFi() roda a
+// cada loop() e cuida de timeout, nova tentativa e re-log ao
+// reconectar. Não bloqueia o loop nem chama ESP.restart() no
+// caminho normal — assim mqtt.loop() e lerSerial2() nunca ficam
+// parados durante uma queda de Wi-Fi.
+// ============================================================
+void iniciarConexaoWiFi() {
   Serial.print("[WiFi] Conectando a: ");
   Serial.println(SSID);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, SENHA);
+  wifiInicioTentativa = millis();
+  estadoWiFi = WIFI_CONECTANDO;
+}
 
-  int tentativas = 0;
-  while (WiFi.status() != WL_CONNECTED && tentativas < 30) {
-    delay(500);
-    Serial.print(".");
-    tentativas++;
+void manterWiFi() {
+  if (WiFi.status() == WL_CONNECTED) {
+    if (estadoWiFi != WIFI_CONECTADO) {
+      estadoWiFi = WIFI_CONECTADO;
+      Serial.print("[WiFi] Conectado! IP: ");
+      Serial.println(WiFi.localIP());
+    }
+    return;
   }
 
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println();
-    Serial.print("[WiFi] Conectado! IP: ");
-    Serial.println(WiFi.localIP());
-  } else {
-    Serial.println();
-    Serial.println("[WiFi] Falha ao conectar. Reiniciando...");
-    ESP.restart();
+  // A partir daqui: Wi-Fi NÃO conectado.
+  if (estadoWiFi == WIFI_CONECTADO) {
+    Serial.println("[WiFi] Conexao perdida — retomando tentativas...");
+    estadoWiFi = WIFI_OCIOSO;
+    wifiUltimoRetry = millis();
+  }
+
+  if (estadoWiFi == WIFI_CONECTANDO) {
+    if (millis() - wifiInicioTentativa >= WIFI_TIMEOUT_TENTATIVA_MS) {
+      Serial.println("[WiFi] Tentativa expirou — nova tentativa em breve.");
+      WiFi.disconnect();
+      estadoWiFi = WIFI_OCIOSO;
+      wifiUltimoRetry = millis();
+    }
+    return; // ainda dentro da janela desta tentativa
+  }
+
+  // WIFI_OCIOSO: aguarda o intervalo configurável e dispara nova tentativa
+  if (millis() - wifiUltimoRetry >= WIFI_INTERVALO_RETRY_MS) {
+    iniciarConexaoWiFi();
   }
 }
 
@@ -164,8 +204,29 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
       const char* acao = doc["acao"];
       String cmdSerial = "";
 
+      if (acao == nullptr) {
+        Serial.println("[MQTT] Comando sem campo \"acao\" — ignorado");
+        return;
+      }
+
       if (String(acao) == "solicitar_peca") {
         const char* peca = doc["peca"];
+        // Valida a peça ANTES de encaminhar: o payload pode vir de um
+        // cliente MQTT arbitrário (Teste 3), não só do servidor Node.
+        if (peca == nullptr || strlen(peca) != 1 ||
+            (peca[0] != 'A' && peca[0] != 'B' && peca[0] != 'C')) {
+          Serial.print("[MQTT] Peca invalida em solicitar_peca: ");
+          Serial.println(peca == nullptr ? "(ausente)" : peca);
+          StaticJsonDocument<160> rej;
+          rej["type"]   = "comando";
+          rej["acao"]   = "solicitar_peca";
+          rej["status"] = "rejeitado";
+          rej["motivo"] = "peca_invalida";
+          String rejStr;
+          serializeJson(rej, rejStr);
+          mqtt.publish(TOPICO_CMD_PUB, rejStr.c_str());
+          return;
+        }
         cmdSerial = "CMD:PECA:" + String(peca);
       } else if (String(acao) == "reset") {
         cmdSerial = "CMD:RESET";
@@ -254,7 +315,12 @@ void processarLinhaArduino(String linha) {
       else if (String(tipo) == "sensores") topico = TOPICO_SENSORES;
       else if (String(tipo) == "esteiras") topico = TOPICO_ESTEIRAS;
 
-      bool ok = mqtt.publish(topico, linha.c_str());
+      // Estoque publicado como RETAINED: um assinante que conectar
+      // depois (dashboard recarregado, server reiniciado) recebe
+      // imediatamente o último estoque conhecido, sem esperar a
+      // próxima entrega. (status/gateway seguem via LWT retained.)
+      bool retain = (String(tipo) == "estoque");
+      bool ok = mqtt.publish(topico, linha.c_str(), retain);
 
       Serial.print("[MQTT →] Tipo: ");
       Serial.print(tipo);
@@ -308,8 +374,9 @@ void setup() {
   Serial.println();
   Serial.println("=== Data Flow Inventory — Gateway ESP32 ===");
 
-  // Configura Wi-Fi
-  conectarWiFi();
+  // Inicia a conexão Wi-Fi de forma não-bloqueante.
+  // O loop() (manterWiFi / conectarMQTT) assume a partir daqui.
+  iniciarConexaoWiFi();
 
 #if USE_TLS
   // TLS: aceita o certificado do broker sem validação de CA
@@ -333,14 +400,11 @@ void setup() {
 // LOOP PRINCIPAL
 // ============================================================
 void loop() {
-  // Mantém Wi-Fi conectado
-  if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("[WiFi] Desconectado. Reconectando...");
-    conectarWiFi();
-  }
+  // Wi-Fi: máquina de estados de reconexão não-bloqueante
+  manterWiFi();
 
-  // Mantém MQTT conectado (com intervalo entre tentativas)
-  if (!mqtt.connected()) {
+  // MQTT: só tenta com Wi-Fi de pé, respeitando o intervalo entre tentativas
+  if (WiFi.status() == WL_CONNECTED && !mqtt.connected()) {
     unsigned long agora = millis();
     if (agora - ultimoReconnect >= INTERVALO_RECONNECT) {
       ultimoReconnect = agora;
@@ -350,6 +414,7 @@ void loop() {
 
   mqtt.loop();
 
-  // Lê mensagens do Arduino Uno (Serial2) e publica no MQTT
+  // Lê mensagens do Arduino Uno (Serial2). Roda SEMPRE — inclusive
+  // durante reconexão de Wi-Fi/MQTT — para não perder dados na UART.
   lerSerial2();
 }

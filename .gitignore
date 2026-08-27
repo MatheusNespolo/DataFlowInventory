@@ -11,6 +11,11 @@ npm-debug.log*
 .env
 server/.env
 
+# Segredos de firmware (Wi-Fi / MQTT) — cada bancada cria o seu a partir do .example
+secrets.h
+*_secrets.h
+arduino_secrets.h
+
 # Arduino / PlatformIO
 *.ino.elf
 *.ino.hex

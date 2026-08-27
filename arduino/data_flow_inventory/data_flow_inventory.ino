@@ -119,6 +119,16 @@ unsigned long ultimaPublicacao = 0;
 bool   erroTimeout = false;
 bool   erroSemEstoque = false;
 
+// Buffer para leitura NÃO-BLOQUEANTE de comandos da Serial (do ESP32).
+// Substitui Serial.readStringUntil(), que trava o loop por até 1 s se a
+// linha chegar fragmentada — crítico durante ENTREGANDO_PECA.
+String bufferComando = "";
+
+// Pausa pós-entrega sem bloquear o loop (substitui o antigo delay(1500)).
+bool          aguardandoLimpezaEntrega = false;
+unsigned long tempoLimpezaEntrega      = 0;
+const unsigned long PAUSA_POS_ENTREGA_MS = 1500;
+
 // ============================================================
 // FUNÇÕES AUXILIARES — MOTORES (IRF520)
 // Com IRF520, basta controlar o PWM em 1 pino por motor.
@@ -323,14 +333,19 @@ void publicarStatusEsteiras() {
 }
 
 // ============================================================
-// RECEBIMENTO DE COMANDOS VIA SERIAL (do ESP32)
-// Formato esperado: CMD:PECA:A  ou  CMD:RESET
+// RECEBIMENTO DE COMANDOS VIA SERIAL (do ESP32) — NÃO-BLOQUEANTE
+// Acumula caracteres até '\n' e só então interpreta a linha, sem
+// Serial.readStringUntil() (que bloquearia o loop se a linha viesse
+// fragmentada). Espelha o lerSerial2() do gateway ESP32.
+// Formato esperado: CMD:PECA:A | CMD:PECA:B | CMD:PECA:C | CMD:RESET
+// Rejeições explícitas (não travam a FSM, informam o dashboard):
+//   peca_invalida       — letra fora de A/B/C
+//   ocupado             — pedido com a FSM fora de AGUARDANDO_PEDIDO
+//   comando_desconhecido — linha não reconhecida
 // ============================================================
-void processarComando() {
-  if (!Serial.available()) return;
-
-  String linha = Serial.readStringUntil('\n');
+void interpretarComando(String linha) {
   linha.trim();
+  if (linha.length() == 0) return;
 
   if (linha.startsWith("CMD:PECA:")) {
     char pecaChar = linha.charAt(9); // A, B ou C
@@ -339,21 +354,47 @@ void processarComando() {
     else if (pecaChar == 'B') peca = 2;
     else if (pecaChar == 'C') peca = 3;
 
-    if (peca > 0 && estadoAtual == AGUARDANDO_PEDIDO) {
-      pecaSolicitada = peca;
-      publicarPedido(pecaChar);
-      estadoAtual = VERIFICANDO_ESTOQUE;
+    if (peca == 0) {
+      publicarErro("peca_invalida");
+      return;
     }
+    if (estadoAtual != AGUARDANDO_PEDIDO) {
+      publicarErro("ocupado");
+      return;
+    }
+    pecaSolicitada = peca;
+    publicarPedido(pecaChar);
+    estadoAtual = VERIFICANDO_ESTOQUE;
+
   } else if (linha.startsWith("CMD:RESET")) {
     if (estadoAtual == ERRO) {
       erroTimeout = false;
       erroSemEstoque = false;
+      aguardandoLimpezaEntrega = false;
       pecaSolicitada = 0;
       pararTodasSecundarias();
       exibirEstoque();
       publicarEstado();
       publicarEstoque(); // sincroniza dashboard com o LCD após reset
       estadoAtual = AGUARDANDO_PEDIDO;
+    }
+    // RESET fora de ERRO: ignorado de propósito (sistema já estável)
+
+  } else {
+    publicarErro("comando_desconhecido");
+  }
+}
+
+void processarComando() {
+  while (Serial.available()) {
+    char c = (char)Serial.read();
+    if (c == '\n') {
+      interpretarComando(bufferComando);
+      bufferComando = "";
+    } else if (c != '\r') {
+      bufferComando += c;
+      // Proteção contra lixo / linha sem terminador na serial
+      if (bufferComando.length() > 80) bufferComando = "";
     }
   }
 }
@@ -418,10 +459,14 @@ void loop() {
   // Processa comandos recebidos do ESP32
   processarComando();
 
-  // Publicação periódica de status
+  // Publicação periódica de status.
+  // Inclui o estoque: no trecho UART Arduino→ESP32 as mensagens são QoS 0;
+  // republicar a cada ciclo reconcilia o dashboard caso o pacote do boot
+  // ou de uma entrega se perca.
   if (millis() - ultimaPublicacao >= INTERVALO_PUBLICACAO) {
     ultimaPublicacao = millis();
     publicarEstado();
+    publicarEstoque();
     publicarSensores();
     publicarStatusEsteiras();
   }
@@ -489,6 +534,21 @@ void loop() {
     // ESTADO 4: ENTREGANDO PEÇA
     // ----------------------------------------------------------
     case ENTREGANDO_PECA: {
+      // Pausa pós-entrega não-bloqueante: mantém "Entrega OK!" no LCD por
+      // PAUSA_POS_ENTREGA_MS sem travar o loop — processarComando() e a
+      // publicação periódica seguem rodando durante a espera.
+      if (aguardandoLimpezaEntrega) {
+        if (millis() - tempoLimpezaEntrega >= PAUSA_POS_ENTREGA_MS) {
+          aguardandoLimpezaEntrega = false;
+          pecaSolicitada = 0;
+          exibirEstoque();
+          publicarEstado();
+          publicarStatusEsteiras();
+          estadoAtual = AGUARDANDO_PEDIDO;
+        }
+        break;
+      }
+
       bool pecaChegou = false;
 
       if (pecaSolicitada == 1) pecaChegou = sensorJuncaoJ1();
@@ -517,12 +577,10 @@ void loop() {
         publicarEntrega((char)('A' + pecaSolicitada - 1));
         publicarEstoque();
 
-        delay(1500);
-        pecaSolicitada = 0;
-        exibirEstoque();
-        publicarEstado();
-        publicarStatusEsteiras();
-        estadoAtual = AGUARDANDO_PEDIDO;
+        // Inicia a pausa não-bloqueante; a volta para AGUARDANDO_PEDIDO
+        // acontece no topo deste case quando o tempo expira.
+        aguardandoLimpezaEntrega = true;
+        tempoLimpezaEntrega = millis();
 
       } else if (millis() - tempoInicio > TIMEOUT_ENTREGA) {
         // Timeout
