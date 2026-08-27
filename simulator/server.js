@@ -22,7 +22,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 // ============================================================
 // CONFIGURAÇÃO DA SIMULAÇÃO
@@ -31,6 +31,10 @@ const DELAY_VERIFICACAO = 300;   // ms — delay simulado da verificação
 const DELAY_ACIONAMENTO = 200;   // ms — delay simulado do acionamento
 const DELAY_ENTREGA     = 1500;  // ms — delay simulado da entrega
 const ESTOQUE_INICIAL   = 5;     // peças de cada tipo
+
+// Intervalo mínimo (ms) entre comandos de um mesmo cliente (anti-flood).
+// Mesmo comportamento do servidor real (../server/server.js).
+const COMANDO_INTERVALO_MS = parseInt(process.env.COMANDO_INTERVALO_MS, 10) || 500;
 
 // ============================================================
 // ESTADO SIMULADO (espelha a FSM do Arduino)
@@ -108,14 +112,23 @@ function estadoInicial() {
 // LÓGICA DA MÁQUINA DE ESTADOS SIMULADA
 // ============================================================
 
+/**
+ * Processa um pedido de peça.
+ * Retorna null se aceito, ou uma string com o motivo da recusa — assim o
+ * chamador consegue devolver "comando_erro" ao cliente (mesmo contrato do
+ * servidor real), em vez de ignorar silenciosamente.
+ */
 function solicitarPeca(peca) {
-  if (sim.estado !== 'AGUARDANDO_PEDIDO') {
-    console.log(`[SIM] Ignorado — sistema não está aguardando (estado: ${sim.estado})`);
-    return;
+  const idx = PECAS.indexOf(peca);
+  if (idx === -1) {
+    console.warn(`[SIM] Peça inválida recebida: ${peca}`);
+    return `Peça inválida: ${peca}`;
   }
 
-  const idx = PECAS.indexOf(peca);
-  if (idx === -1) return;
+  if (sim.estado !== 'AGUARDANDO_PEDIDO') {
+    console.log(`[SIM] Ignorado — sistema não está aguardando (estado: ${sim.estado})`);
+    return `Sistema ocupado (estado: ${sim.estado})`;
+  }
 
   console.log(`[SIM] Pedido recebido: Peça ${peca}`);
   sim.pecaSolicitada = idx + 1;
@@ -124,6 +137,7 @@ function solicitarPeca(peca) {
   emitirEvento('pedido', peca);
 
   setTimeout(() => verificarEstoque(peca), DELAY_VERIFICACAO);
+  return null;   // aceito
 }
 
 function verificarEstoque(peca) {
@@ -215,12 +229,44 @@ io.on('connection', (socket) => {
   socket.emit('estado_inicial', estadoInicial());
   socket.emit('gateway', { status: 'online', type: 'gateway' });
 
+  // Rate limit por cliente (mesmo contrato do servidor real)
+  socket.data.ultimoComandoMs = 0;
+
+  function podeEnviarComando(acao) {
+    const agora = Date.now();
+    if (agora - socket.data.ultimoComandoMs < COMANDO_INTERVALO_MS) {
+      socket.emit('comando_erro', {
+        erro: `Muitos comandos — aguarde ${COMANDO_INTERVALO_MS}ms entre envios`,
+        acao,
+      });
+      console.warn(`[SIM] Rate limit: ${acao} rejeitado (${socket.id})`);
+      return false;
+    }
+    socket.data.ultimoComandoMs = agora;
+    return true;
+  }
+
   socket.on('solicitar_peca', (data) => {
-    io.emit('comando', { acao: 'solicitar_peca', peca: data.peca });
-    solicitarPeca(data.peca);
+    // Validação de entrada — espelha o servidor real
+    const peca = data && typeof data.peca === 'string' ? data.peca.toUpperCase() : null;
+    if (!PECAS.includes(peca)) {
+      socket.emit('comando_erro', { erro: `Peça inválida: ${data?.peca}`, acao: 'solicitar_peca' });
+      console.warn(`[SIM] Peça inválida recebida de ${socket.id}:`, data?.peca);
+      return;
+    }
+    if (!podeEnviarComando('solicitar_peca')) return;
+
+    const recusa = solicitarPeca(peca);
+    if (recusa) {
+      // Antes o pedido era descartado em silêncio; agora o dashboard sabe o motivo
+      socket.emit('comando_erro', { erro: recusa, acao: 'solicitar_peca' });
+      return;
+    }
+    io.emit('comando', { acao: 'solicitar_peca', peca });
   });
 
   socket.on('reset_sistema', () => {
+    if (!podeEnviarComando('reset')) return;
     io.emit('comando', { acao: 'reset' });
     resetSistema();
   });

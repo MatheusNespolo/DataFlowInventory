@@ -3,15 +3,15 @@
 # ============================================================
 
 # Node.js
-server/node_modules/
-server/package-lock.json
+# Obs.: os package-lock.json SÃO versionados (builds reprodutíveis).
+node_modules/
 npm-debug.log*
 
 # Variáveis de ambiente (senhas!)
+.env
 server/.env
 
 # Arduino / PlatformIO
-.vscode/
 *.ino.elf
 *.ino.hex
 .build/
