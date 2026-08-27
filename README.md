@@ -145,6 +145,7 @@ DataFlowInventory/
 │       ├── plano_de_testes.md             # Plano de testes de integração (Serial → E2E)
 │       ├── roteiros/                      # Roteiros diários de execução dos testes
 │       └── validações/                    # Checklists e automação de validação de infra
+│           ├── README.md                  # Guia dos artefatos de validação
 │           ├── checklist_pre_teste_rede_infra.md
 │           ├── validar_infra.ps1          # Script PowerShell de validação (broker/firewall/portas)
 │           └── tabela_mudancas_artigo_final.md
