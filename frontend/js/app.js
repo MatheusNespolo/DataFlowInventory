@@ -65,6 +65,7 @@ const els = {
   btnSolicitarA: document.getElementById('btn-solicitar-a'),
   btnSolicitarB: document.getElementById('btn-solicitar-b'),
   btnSolicitarC: document.getElementById('btn-solicitar-c'),
+  btnReset: document.getElementById('btn-reset'),
 
   // Histórico
   historicoLista: document.getElementById('historico-lista'),
@@ -420,6 +421,13 @@ function resetSistema() {
   socket.emit('reset_sistema');
   adicionarHistorico('comando_enviado', '', 'reset');
 }
+
+// Ligação dos botões via JS (sem onclick inline — a CSP do helmet bloqueia
+// handlers inline: script-src-attr 'none'). O script roda após o DOM.
+els.btnSolicitarA.addEventListener('click', () => solicitarPeca('A'));
+els.btnSolicitarB.addEventListener('click', () => solicitarPeca('B'));
+els.btnSolicitarC.addEventListener('click', () => solicitarPeca('C'));
+els.btnReset.addEventListener('click', () => resetSistema());
 
 // ============================================================
 // FUNÇÕES AUXILIARES

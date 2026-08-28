@@ -43,6 +43,29 @@ if not exist "%ROOT%server\node_modules" (
     echo.
 )
 
+REM ---------- Pre-voo: porta 1883 ja ocupada? ----------
+REM Se OUTRO broker (ex.: o servico automatico do Windows, que escuta
+REM so em loopback) ja detem a 1883, subir um segundo Mosquitto PARTICIONA
+REM a rede MQTT: o server cai num broker e o ESP32 no outro, e o dashboard
+REM fica preso em "ESP32 Offline". Ver docs/CHANGELOG.md.
+netstat -ano | findstr /R /C:":1883 .*LISTENING" >nul
+if not errorlevel 1 (
+    echo [ERRO] A porta 1883 JA esta em uso por outro processo.
+    echo        Provavel causa: o servico "mosquitto" do Windows esta ativo.
+    echo        Isso particiona a rede MQTT ^(server e ESP32 em brokers diferentes^).
+    echo.
+    echo        Quem esta usando a 1883:
+    netstat -ano | findstr ":1883"
+    echo.
+    echo        Solucao ^(PowerShell como admin^):
+    echo          net stop mosquitto ^&^& sc config mosquitto start= demand
+    echo        Depois rode este script novamente.
+    echo.
+    pause
+    exit /b 1
+)
+
+
 REM ---------- 1) Broker Mosquitto ----------
 echo [1/3] Iniciando Mosquitto (broker MQTT, porta 1883)...
 start "MOSQUITTO (broker) - NAO FECHAR" cmd /k ""%MOSQUITTO_EXE%" -c "%MOSQUITTO_CONF%" -v"

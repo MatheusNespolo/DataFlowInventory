@@ -124,6 +124,15 @@ bool   erroSemEstoque = false;
 // linha chegar fragmentada — crítico durante ENTREGANDO_PECA.
 String bufferComando = "";
 
+// Fase de SAÍDA DA ESTEIRA: depois que a peça atinge o sensor de junção, a
+// esteira secundária continua ligada por este tempo para a peça sair
+// fisicamente da esteira (a junção só marca "quase no fim"). Calibrar em
+// bancada — a soma (tempo até o sensor + este valor) deve caber no
+// TIMEOUT_ENTREGA. Medição 25/08: ~5 s até o sensor.
+const unsigned long TEMPO_SAIDA_ESTEIRA_MS = 3000;
+bool          saindoDaEsteira    = false;
+unsigned long tempoSaidaIniciada = 0;
+
 // Pausa pós-entrega sem bloquear o loop (substitui o antigo delay(1500)).
 bool          aguardandoLimpezaEntrega = false;
 unsigned long tempoLimpezaEntrega      = 0;
@@ -370,6 +379,7 @@ void interpretarComando(String linha) {
     if (estadoAtual == ERRO) {
       erroTimeout = false;
       erroSemEstoque = false;
+      saindoDaEsteira = false;
       aguardandoLimpezaEntrega = false;
       pecaSolicitada = 0;
       pararTodasSecundarias();
@@ -534,9 +544,9 @@ void loop() {
     // ESTADO 4: ENTREGANDO PEÇA
     // ----------------------------------------------------------
     case ENTREGANDO_PECA: {
-      // Pausa pós-entrega não-bloqueante: mantém "Entrega OK!" no LCD por
-      // PAUSA_POS_ENTREGA_MS sem travar o loop — processarComando() e a
-      // publicação periódica seguem rodando durante a espera.
+      // --- Fase C: pausa pós-entrega (LCD "Entrega OK!"), motor já parado.
+      //     Não-bloqueante: processarComando() e a publicação periódica
+      //     seguem rodando durante a espera.
       if (aguardandoLimpezaEntrega) {
         if (millis() - tempoLimpezaEntrega >= PAUSA_POS_ENTREGA_MS) {
           aguardandoLimpezaEntrega = false;
@@ -549,6 +559,37 @@ void loop() {
         break;
       }
 
+      // --- Fase B: peça já passou pelo sensor de junção. Mantém a esteira
+      //     ligada por TEMPO_SAIDA_ESTEIRA_MS para a peça SAIR da esteira;
+      //     só então para o motor e conclui a entrega.
+      if (saindoDaEsteira) {
+        if (millis() - tempoSaidaIniciada >= TEMPO_SAIDA_ESTEIRA_MS) {
+          saindoDaEsteira = false;
+
+          if (pecaSolicitada == 1) pararEsteiraA();
+          if (pecaSolicitada == 2) pararEsteiraB();
+          if (pecaSolicitada == 3) pararEsteiraC();
+
+          // Separador: CÓDIGO COMENTADO — verificar implementação futura
+          // moverSeparador((char)('A' + pecaSolicitada - 1));
+
+          estoque[pecaSolicitada]--;
+
+          String msg = "Entregue! ";
+          msg += (char)('A' + pecaSolicitada - 1);
+          msg += ":" + String(estoque[pecaSolicitada]);
+          atualizarLCD("Entrega OK!", msg);
+
+          publicarEntrega((char)('A' + pecaSolicitada - 1));
+          publicarEstoque();
+
+          aguardandoLimpezaEntrega = true;
+          tempoLimpezaEntrega = millis();
+        }
+        break;
+      }
+
+      // --- Fase A: esteira ligada, aguardando a peça chegar ao sensor.
       bool pecaChegou = false;
 
       if (pecaSolicitada == 1) pecaChegou = sensorJuncaoJ1();
@@ -556,34 +597,13 @@ void loop() {
       if (pecaSolicitada == 3) pecaChegou = sensorJuncaoJ3();
 
       if (pecaChegou) {
-        // Para esteira secundária
-        if (pecaSolicitada == 1) pararEsteiraA();
-        if (pecaSolicitada == 2) pararEsteiraB();
-        if (pecaSolicitada == 3) pararEsteiraC();
-
-        // Separador: CÓDIGO COMENTADO — verificar implementação futura
-        // moverSeparador((char)('A' + pecaSolicitada - 1));
-
-        // Atualiza estoque
-        estoque[pecaSolicitada]--;
-
-        // Feedback
-        String msg = "Entregue! ";
-        msg += (char)('A' + pecaSolicitada - 1);
-        msg += ":" + String(estoque[pecaSolicitada]);
-        atualizarLCD("Entrega OK!", msg);
-
-        // Publica eventos
-        publicarEntrega((char)('A' + pecaSolicitada - 1));
-        publicarEstoque();
-
-        // Inicia a pausa não-bloqueante; a volta para AGUARDANDO_PEDIDO
-        // acontece no topo deste case quando o tempo expira.
-        aguardandoLimpezaEntrega = true;
-        tempoLimpezaEntrega = millis();
+        // NÃO para o motor ainda — inicia a fase de saída da esteira.
+        atualizarLCD("Saindo da", "esteira...");
+        saindoDaEsteira = true;
+        tempoSaidaIniciada = millis();
 
       } else if (millis() - tempoInicio > TIMEOUT_ENTREGA) {
-        // Timeout
+        // Timeout — peça nunca chegou ao sensor de junção
         pararTodasSecundarias();
         erroTimeout = true;
         publicarErro("timeout");

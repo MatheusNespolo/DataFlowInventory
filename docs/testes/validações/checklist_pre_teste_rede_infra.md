@@ -24,6 +24,17 @@
 
 - [ ] `mosquitto.conf` existe com `listener 1883 0.0.0.0` + `allow_anonymous true`
 - [ ] **Broker escutando em 0.0.0.0**: `netstat -ano | findstr :1883` → `0.0.0.0:1883 LISTENING`
+- [ ] ⚠️ **UM ÚNICO broker na 1883** (crítico — ver [CHANGELOG](../../CHANGELOG.md)):
+      ```powershell
+      Get-NetTCPConnection -State Listen | Where-Object LocalPort -eq 1883 |
+        Select-Object LocalAddress,OwningProcess
+      ```
+      Deve aparecer **um só PID**. Se houver dois (ex.: `0.0.0.0` num PID e
+      `127.0.0.1`/`::1` noutro), o **serviço automático do Windows** está ativo e
+      **particiona a rede MQTT** — o server cai num broker e o ESP32 no outro,
+      travando o dashboard em "ESP32 Offline". Corrija com (admin):
+      `net stop mosquitto` e `sc config mosquitto start= demand`
+- [ ] Serviço do Windows desabilitado: `Get-Service mosquitto` → `Stopped` / `Manual`
 - [ ] **Firewall 1883 liberado** (Admin): regra entrada TCP existe
 - [ ] **Smoke test CLI**: `mosquitto_pub -h localhost -t "dataflow/status" -m '{"type":"status","estado":"ok"}'` aparece no `mqtt_probe`
 
@@ -39,7 +50,7 @@
 
 ## 5. Server Node + Frontend
 
-- [ ] `server/.env` existe com `MQTT_BROKER_URL=mqtt://localhost` + `MQTT_PORT=1883`
+- [ ] `server/.env` existe com `MQTT_BROKER_URL=mqtt://127.0.0.1` + `MQTT_PORT=1883` (use `127.0.0.1`, **não** `localhost` — ver [CHANGELOG](../../CHANGELOG.md))
 - [ ] `cd server && npm install` executado (node_modules presente)
 - [ ] Porta 3000 livre: `netstat -ano | findstr :3000` → nada ou server rodando
 - [ ] Dashboard `http://localhost:3000` carrega com indicadores "Conectado" + "ESP32 Online"
