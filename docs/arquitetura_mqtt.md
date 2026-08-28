@@ -41,8 +41,9 @@ O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores 
 │  │   Mosquitto (local) ou HiveMQ Cloud  │                           │
 │  │                                      │                           │
 │  │  Tópicos:                            │                           │
-│  │  ├── dataflow/status                 │                           │
-│  │  ├── dataflow/estoque                │                           │
+│  │  ├── dataflow/status                 │ ← (gateway ESP32, retained)│
+│  │  ├── dataflow/status/server          │ ← (server Node, retained)  │
+│  │  ├── dataflow/estoque                │ ← (retained)               │
 │  │  ├── dataflow/eventos                │                           │
 │  │  ├── dataflow/sensores               │                           │
 │  │  ├── dataflow/esteiras               │                           │
@@ -195,8 +196,9 @@ ESP32 publica confirmação em 'dataflow/comandos/pub'
 
 | Tópico | Direção | Descrição |
 |--------|---------|-----------|
-| `dataflow/status` | ESP32 → Server | Estado atual da FSM e uptime |
-| `dataflow/estoque` | ESP32 → Server | Quantidade de peças A, B, C |
+| `dataflow/status` | ESP32 → Server | Estado da FSM/uptime **e** presença do gateway (`{"type":"gateway",...}` retained via LWT). **Exclusivo do ESP32.** |
+| `dataflow/status/server` | Server → (dashboard/probe) | Presença do **servidor Node** (`{"type":"server","status":"online\|offline"}` retained + LWT). Separado do tópico do gateway. |
+| `dataflow/estoque` | ESP32 → Server | Quantidade de peças A, B, C (**retained** — reconcilia clientes tardios) |
 | `dataflow/eventos` | ESP32 → Server | Pedidos, entregas, erros, inicialização |
 | `dataflow/sensores` | ESP32 → Server | Leituras dos 6 sensores IR |
 | `dataflow/esteiras` | ESP32 → Server | Status ligada/desligada de cada esteira |
@@ -204,6 +206,8 @@ ESP32 publica confirmação em 'dataflow/comandos/pub'
 | `dataflow/comandos/pub` | ESP32 → Server | Confirmação de comandos encaminhados |
 
 > Os nomes dos tópicos são configuráveis no `server/.env` e nas constantes `TOPICO_*` do `gateway_mqtt.ino`. Arduino/ESP32 e servidor devem usar os **mesmos** nomes.
+>
+> ⚠️ **Importante — separação de status:** `dataflow/status` é **exclusivo do gateway ESP32**; o servidor Node publica seu próprio status em `dataflow/status/server`. Ambos são retained. Publicar o status do server no mesmo tópico do gateway sobrescreveria o retained e travaria o Dashboard em "ESP32 Offline" (regressão histórica — ver [`CHANGELOG`](../CHANGELOG.md)).
 
 ---
 
@@ -301,7 +305,7 @@ MQTT_PORT=8883
 MQTT_USERNAME=<SEU_USERNAME>
 MQTT_PASSWORD=<SUA_SENHA>
 ```
-4. Configurar as constantes no `gateway_mqtt.ino` (`MQTT_SERVER`, `MQTT_USER`, `MQTT_PASS`). O ESP32 usa `WiFiClientSecure` para a conexão TLS na porta 8883.
+4. No ESP32, preencher `esp32/gateway_mqtt/secrets.h` (`SECRET_MQTT_SERVER_CLOUD`, `SECRET_MQTT_USER_CLOUD`, `SECRET_MQTT_PASS_CLOUD`) e mudar `USE_TLS=true` no `gateway_mqtt.ino`. O ESP32 usa `WiFiClientSecure` para a conexão TLS na porta 8883. **Credenciais ficam só no `secrets.h` (não versionado), nunca no `.ino`.**
 
 ### Outras opções de nuvem
 
@@ -361,7 +365,8 @@ DataFlowInventory/
 │
 ├── esp32/
 │   └── gateway_mqtt/
-│       └── gateway_mqtt.ino           # Código ESP32 (Serial2 ↔ MQTT)
+│       ├── gateway_mqtt.ino           # Código ESP32 (Serial2 ↔ MQTT)
+│       └── secrets.h.example          # Modelo de credenciais (copie p/ secrets.h — NÃO versionado)
 │
 ├── server/
 │   ├── package.json                   # Dependências Node.js
@@ -448,10 +453,15 @@ mosquitto -d
 
 #### 3. Configurar o ESP32
 
-1. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino` na Arduino IDE
-2. Alterar `SSID`, `SENHA` (Wi-Fi) e `MQTT_SERVER`/`MQTT_USER`/`MQTT_PASS` (broker)
-3. Selecionar placa: **ESP32 Dev Module**
-4. Fazer upload
+1. Na pasta `esp32/gateway_mqtt/`, copiar `secrets.h.example` para `secrets.h` (arquivo **não versionado**):
+   ```bash
+   copy secrets.h.example secrets.h   # Windows
+   cp   secrets.h.example secrets.h   # Linux/Mac
+   ```
+2. Preencher em `secrets.h`: `SECRET_WIFI_SSID`/`SECRET_WIFI_PASS` e `SECRET_MQTT_SERVER_LOCAL` (IP do PC com o broker) ou os `SECRET_MQTT_*_CLOUD`
+3. Em `gateway_mqtt.ino`, ajustar apenas a flag `USE_TLS` (`false` = Mosquitto local / `true` = HiveMQ Cloud). **As credenciais não ficam mais no `.ino`.**
+4. Selecionar placa: **ESP32 Dev Module**
+5. Fazer upload
 
 #### 4. Instalar e rodar o Server
 

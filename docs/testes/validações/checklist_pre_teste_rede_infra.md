@@ -18,7 +18,7 @@
 
 - [ ] **Rede 2.4 GHz** (ESP32 não suporta 5 GHz) — hotspot Windows ou rede externa
 - [ ] **IP do PC anotado**: `ipconfig` → IPv4 da interface Wi-Fi/Ethernet usada
-- [ ] **SSID/SENHA** no `gateway_mqtt.ino` corretos para a rede escolhida
+- [ ] **`SECRET_WIFI_SSID`/`SECRET_WIFI_PASS`** em `esp32/gateway_mqtt/secrets.h` corretos para a rede escolhida (credenciais NÃO ficam mais no `.ino`)
 
 ## 3. Broker MQTT (Mosquitto)
 
@@ -29,12 +29,13 @@
 
 ## 4. ESP32 (Gateway)
 
-- [ ] `MQTT_SERVER` = **IP do PC** na rede Wi-Fi (NÃO `localhost`, NÃO IP hardcoded antigo)
-- [ ] `USE_TLS = false` (broker local)
-- [ ] `MQTT_USER`/`MQTT_PASS` vazios (allow_anonymous true)
+- [ ] `esp32/gateway_mqtt/secrets.h` criado a partir de `secrets.h.example` (NÃO versionado — confirmar que não aparece em `git status`)
+- [ ] `SECRET_MQTT_SERVER_LOCAL` em `secrets.h` = **IP do PC** na rede Wi-Fi (NÃO `localhost`, NÃO IP hardcoded antigo)
+- [ ] `USE_TLS = false` no `gateway_mqtt.ino` (broker local)
+- [ ] `SECRET_MQTT_USER_LOCAL`/`SECRET_MQTT_PASS_LOCAL` vazios (allow_anonymous true)
 - [ ] Sketch `gateway_mqtt` (não `esp32_teste_serial`) foi feito upload
 - [ ] Monitor serial (115200) mostra `[WiFi] Conectado!` + `[MQTT] Conectado!`
-- [ ] `mqtt_probe` mostra LWT retained `{"type":"gateway","status":"online"}` em `dataflow/status`
+- [ ] `mqtt_probe` mostra retained `{"type":"gateway","status":"online"}` em `dataflow/status` **e** `{"type":"server","status":"online"}` em `dataflow/status/server` (tópicos separados)
 
 ## 5. Server Node + Frontend
 
@@ -53,7 +54,7 @@
 > Só aplicável quando executando o Teste 6 (`plano_de_testes.md`) ou o Bloco 4 (stretch goal) dos roteiros diários. Não é pré-requisito da bancada local.
 
 - [ ] Cluster gratuito criado em [cloud.hivemq.com](https://cloud.hivemq.com) e credenciais (username/password) gerados
-- [ ] ESP32: `USE_TLS = true`, `MQTT_SERVER = <cluster>.s1.eu.hivemq.com`, `MQTT_PORT = 8883`, `MQTT_USER`/`MQTT_PASS` preenchidos
+- [ ] ESP32: `USE_TLS = true` no `.ino`; em `secrets.h`, `SECRET_MQTT_SERVER_CLOUD = <cluster>.s1.eu.hivemq.com`, `SECRET_MQTT_USER_CLOUD`/`SECRET_MQTT_PASS_CLOUD` preenchidos (porta 8883 já fixada pelo `#if USE_TLS`)
 - [ ] `server/.env`: `MQTT_BROKER_URL=mqtts://<cluster>.s1.eu.hivemq.com`, `MQTT_PORT=8883` + credenciais
 - [ ] **Não é necessário** liberar firewall/porta 1883 local nem garantir bind `0.0.0.0` — a conexão sai pela internet (TLS/8883)
 - [ ] Certificado: protótipo usa `setInsecure()`; produção exigiria `setCACert()` com o certificado raiz do broker (ISRG Root X1 no HiveMQ Cloud)

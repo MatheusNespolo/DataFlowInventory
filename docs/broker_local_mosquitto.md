@@ -112,17 +112,22 @@ ipconfig
 # Anotar o "Endereço IPv4" da interface Wi-Fi/Ethernet (ex.: 192.168.0.10)
 ```
 
-2. No `esp32/gateway_mqtt/gateway_mqtt.ino`, configurar:
+2. Em `esp32/gateway_mqtt/secrets.h` (copie de `secrets.h.example` — arquivo **não versionado**), configurar o broker local:
 
 ```cpp
-#define USE_TLS false                    // broker local, sem TLS
-const char* MQTT_SERVER = "192.168.0.10"; // IP do PC (ipconfig)
-const int   MQTT_PORT   = 1883;
-const char* MQTT_USER   = "";            // vazio = sem autenticação
-const char* MQTT_PASS   = "";
+// ---------- Wi-Fi ----------
+#define SECRET_WIFI_SSID          "SUA_REDE_WIFI"   // 2,4 GHz; mesma rede do PC
+#define SECRET_WIFI_PASS          "SUA_SENHA_WIFI"
+
+// ---------- MQTT: broker LOCAL (USE_TLS false) ----------
+#define SECRET_MQTT_SERVER_LOCAL  "192.168.0.10"    // IP do PC (ipconfig -> Endereço IPv4)
+#define SECRET_MQTT_USER_LOCAL    ""                // vazio = sem autenticação
+#define SECRET_MQTT_PASS_LOCAL    ""
 ```
 
-   E o Wi-Fi (`SSID` / `SENHA`) — **o ESP32 deve estar na mesma rede do PC**.
+   E, em `gateway_mqtt.ino`, deixar a flag `#define USE_TLS false` (broker local, porta
+   1883). **As credenciais não ficam mais no `.ino`** — apenas a flag de modo.
+   O ESP32 deve estar na **mesma rede 2,4 GHz do PC**.
 
 3. Fazer upload no ESP32 e abrir o Monitor Serial (115200):
 

@@ -66,6 +66,13 @@ const TOPICS = {
   esteiras: process.env.MQTT_TOPIC_ESTEIRAS || 'dataflow/esteiras',
   cmdSub:   process.env.MQTT_TOPIC_CMD_SUB  || 'dataflow/comandos/sub',
   cmdPub:   process.env.MQTT_TOPIC_CMD_PUB  || 'dataflow/comandos/pub',
+
+  // Tópico PRÓPRIO do servidor Node (online/offline + LWT).
+  // NÃO reutiliza dataflow/status: aquele tópico é exclusivo do gateway
+  // ESP32 (também retained). Publicar o status do server lá sobrescrevia
+  // o retained do gateway e travava o badge "ESP32 Offline" no dashboard
+  // (regressão do commit 9a7ce25). Ver docs/CHANGELOG.md.
+  statusServer: process.env.MQTT_TOPIC_STATUS_SERVER || 'dataflow/status/server',
 };
 
 // ============================================================
@@ -169,8 +176,9 @@ const mqttOptions = {
   // Se este processo cair (queda, kill, falha de rede), o broker publica
   // automaticamente esta mensagem retida — assim o dashboard e o probe
   // conseguem distinguir "servidor fora do ar" de "sem dados".
+  // Publicado em TOPICS.statusServer (NÃO em dataflow/status, que é do ESP32).
   will: {
-    topic:   TOPICS.status,
+    topic:   TOPICS.statusServer,
     payload: JSON.stringify({ type: 'server', status: 'offline' }),
     qos:     1,
     retain:  true,
@@ -200,8 +208,9 @@ mqttClient.on('connect', () => {
 
   // Anuncia que o servidor está online (retida, para novos assinantes).
   // Complementa o LWT configurado em mqttOptions.will.
+  // Vai para TOPICS.statusServer para não sobrescrever o retained do gateway.
   mqttClient.publish(
-    TOPICS.status,
+    TOPICS.statusServer,
     JSON.stringify({ type: 'server', status: 'online' }),
     { qos: 1, retain: true }
   );
@@ -441,7 +450,7 @@ function shutdown(sinal) {
 
   if (mqttClient && mqttClient.connected) {
     mqttClient.publish(
-      TOPICS.status,
+      TOPICS.statusServer,
       JSON.stringify({ type: 'server', status: 'offline' }),
       { qos: 1, retain: true },
       () => mqttClient.end(false, {}, encerrar)

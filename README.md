@@ -36,6 +36,7 @@ Engenharia de Controle e Automação
 - [Como Rodar](#como-rodar)
 - [Próximos Passos](#próximos-passos)
 - [Equipe](#equipe)
+- [Contribuindo](#contribuindo)
 - [Licença](#licença)
 - [Referências](#referências)
 
@@ -286,11 +287,15 @@ Acessar http://localhost:3000 no navegador.
 
 #### 2. Configurar o ESP32
 
-1. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino`
-2. Definir o modo de conexão pela flag `USE_TLS`:
+1. Na pasta `esp32/gateway_mqtt/`, criar o arquivo de segredos a partir do exemplo (arquivo **não versionado**, ignorado pelo `.gitignore`):
+   ```bash
+   copy secrets.h.example secrets.h   # Windows
+   cp   secrets.h.example secrets.h   # Linux/Mac
+   ```
+2. Preencher em `secrets.h` as credenciais de Wi-Fi (`SECRET_WIFI_*`) e do broker (`SECRET_MQTT_*_LOCAL` ou `SECRET_MQTT_*_CLOUD`). **As credenciais não ficam mais no `.ino`.**
+3. Abrir `esp32/gateway_mqtt/gateway_mqtt.ino` e definir o modo de conexão pela flag `USE_TLS`:
    - `false` → broker **local** Mosquitto (porta 1883) — ideal para testes sem nuvem. Veja [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md)
    - `true` → broker **nuvem** HiveMQ Cloud (porta 8883, TLS)
-3. Alterar as credenciais Wi-Fi e MQTT no início do arquivo
 4. Selecionar placa: **ESP32 Dev Module**
 5. Fazer upload
 
@@ -325,6 +330,14 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 | **Vitor Marcolongo Silva** | |
 
 **Orientação:** Prof. Dr.
+
+## Contribuindo
+
+Contribuições são bem-vindas! Antes de abrir um PR, leia o
+[**Guia de Contribuição**](CONTRIBUTING.md) — ele cobre as **regras de segurança**
+(segredos em `secrets.h` / `.env`, nunca no código), convenções de commit e as
+validações obrigatórias. O histórico de mudanças fica em
+[`docs/CHANGELOG.md`](docs/CHANGELOG.md).
 
 ## Licença
 
