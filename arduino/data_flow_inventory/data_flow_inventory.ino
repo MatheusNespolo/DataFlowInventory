@@ -83,7 +83,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // ============================================================
 #define VELOCIDADE_PRINCIPAL   180   // PWM 0-255
 #define VELOCIDADE_SECUNDARIA  200   // PWM 0-255
-#define TIMEOUT_ENTREGA        12000 // ms (medição 25/08: peça leva ~5s até o sensor,
+#define TIMEOUT_ENTREGA        9000 // ms (medição 25/08: peça leva ~5s até o sensor,
                                       // mas precisa de folga extra para sair da esteira secundária)
 #define DEBOUNCE_BTN           200   // ms
 #define INTERVALO_PUBLICACAO   1000  // ms — intervalo para publicar status periódico
