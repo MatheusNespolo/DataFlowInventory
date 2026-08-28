@@ -51,6 +51,46 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   > ```
   > (publicar payload vazio com `-r` apaga a mensagem retida do tópico).
 
+- **Dashboard AINDA em "ESP32 Offline" após a correção acima — segunda causa: broker
+  MQTT duplicado / rede particionada.**
+
+  Mesmo com a separação de tópicos, o badge continuava vermelho. O diagnóstico ao vivo
+  (`Get-NetTCPConnection` na porta 1883) revelou **dois processos `mosquitto.exe`**
+  escutando simultaneamente:
+  - O **serviço automático do Windows** (`StartType: Automatic`), iniciado **sem** o
+    `mosquitto.conf`, tomava a 1883 **apenas em loopback** (`127.0.0.1` + `::1`).
+  - O broker do `start_services.bat` (com `-c mosquitto.conf`) subia em `0.0.0.0`
+    (toda a rede) — sem conflito, porque o primeiro só ocupava o loopback.
+
+  Com isso a rede MQTT ficava **particionada**:
+  - O **servidor Node** conectava em `mqtt://localhost` → resolvido para `::1` (IPv6) →
+    caía no broker **loopback-only**.
+  - O **ESP32** conectava no IP `192.168.x.x` → caía no broker **`0.0.0.0`**.
+
+  Os dois publicavam/assinavam em brokers **diferentes**: o retained
+  `{"type":"gateway","status":"online"}` do ESP32 nunca chegava ao servidor,
+  `estadoAtual.gateway` ficava `{}` e o `estado_inicial` enviado ao dashboard não
+  trazia o gateway — o badge permanecia no estado padrão do HTML ("ESP32 Offline").
+
+  **Correção:** desabilitar o serviço automático do Windows para que exista **um único
+  broker** (o do `start_services.bat`):
+  ```
+  net stop mosquitto
+  sc config mosquitto start= demand
+  ```
+  **Confirmação:** após a correção, `Get-NetTCPConnection` mostrou server, `mqtt_probe`
+  e ESP32 todos conectados ao **mesmo** PID de broker, e `GET /api/status` passou a
+  retornar `"gateway":"online"` com contadores crescentes em `dataflow/status`.
+
+  **Endurecimentos aplicados para evitar recorrência:**
+  - `server/.env` e `.env.example`: `MQTT_BROKER_URL` passou de `mqtt://localhost` para
+    `mqtt://127.0.0.1` (IPv4 explícito) — remove a ambiguidade `localhost`→`::1` que
+    ajudou a mascarar a partição.
+  - `start_services.bat`: **checagem de pré-voo** — se a porta 1883 já estiver em uso
+    por outro processo, o script aborta com instruções em vez de subir um segundo broker
+    silenciosamente.
+  - `checklist_pre_teste_rede_infra.md`: passo "garantir um único listener na 1883".
+
 ### Alterado
 
 - `server/.env.example`: documentada a nova variável `MQTT_TOPIC_STATUS_SERVER`
