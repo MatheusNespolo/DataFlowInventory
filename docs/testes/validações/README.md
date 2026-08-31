@@ -10,7 +10,6 @@ Este diretório contém artefatos de suporte à **preparação e validação** d
 |----------|------|----------|
 | [`checklist_pre_teste_rede_infra.md`](checklist_pre_teste_rede_infra.md) | Checklist manual | Validação passo a passo das camadas física, Wi-Fi, broker, ESP32, server e automação — inclui seção 7 opcional para broker remoto (HiveMQ Cloud). |
 | [`validar_infra.ps1`](validar_infra.ps1) | Script PowerShell | Verificação automatizada de broker, firewall/porta 1883 e smoke test MQTT. Executar como Admin; gera saída PASS/FAIL por item. |
-| [`tabela_mudancas_artigo_final.md`](tabela_mudancas_artigo_final.md) | Referência técnica | Tabela cronológica das mudanças mais relevantes do projeto (divisor de tensão, Mosquitto, timeout, sincronismo, estratégia local-first), com impacto no sistema — destinada ao artigo final. |
 
 ---
 
@@ -31,7 +30,7 @@ Este diretório contém artefatos de suporte à **preparação e validação** d
 
 - **Broker remoto (HiveMQ Cloud)** — A seção 7 do checklist cobre a preparação para testes via nuvem (TLS/8883). Essa seção só deve ser executada quando o Teste 6 (`plano_de_testes.md`) ou o Bloco 4 (stretch goal dos roteiros diários) estiverem sendo executados. Não é pré-requisito para bancadas locais.
 - **Atualização dos artefatos** — Ao adicionar uma nova verificação ao script PowerShell, manter o checklist (`checklist_pre_teste_rede_infra.md`) sincronizado e vice-versa.
-- **Tabela de mudanças** — Manter `tabela_mudancas_artigo_final.md` atualizada sempre que uma decisão técnica ou correção relevante for tomada — cada linha é autoexplicativa e pode ser citada diretamente no artigo.
+- **Evolução técnica no artigo** — Todas as decisões técnicas e correções de arquitetura encontram-se formalmente consolidadas e versionadas na seção de desenvolvimento e na Tabela 1 do documento `docs/artigo/Projeto de pesquisa - Final.docx`.
 
 ---
 

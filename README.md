@@ -148,8 +148,7 @@ DataFlowInventory/
 │       └── validações/                    # Checklists e automação de validação de infra
 │           ├── README.md                  # Guia dos artefatos de validação
 │           ├── checklist_pre_teste_rede_infra.md
-│           ├── validar_infra.ps1          # Script PowerShell de validação (broker/firewall/portas)
-│           └── tabela_mudancas_artigo_final.md
+│           └── validar_infra.ps1          # Script PowerShell de validação (broker/firewall/portas)
 │
 ├── start_services.bat                     # Sobe broker + probe + server em sequência
 ├── .gitignore

@@ -63,15 +63,16 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define SENSOR_TOPO_A     A0
 #define SENSOR_TOPO_B     A1
 #define SENSOR_JUNCAO_J1  A3
-#define SENSOR_JUNCAO_J2  A4
+#define SENSOR_JUNCAO_J2  2     // D2 (evita conflito com A4/SDA do LCD I2C)
 
 // ============================================================
 // PARÂMETROS DO SISTEMA
 // ============================================================
 #define VELOCIDADE_PRINCIPAL   180   // PWM 0-255
 #define VELOCIDADE_SECUNDARIA  200   // PWM 0-255
-#define TIMEOUT_ENTREGA        3000  // ms
+#define TIMEOUT_ENTREGA        9000  // ms (recalibrado 27/08: ~5s até o sensor + margem de escoamento)
 #define INTERVALO_PUBLICACAO   1000  // ms — status periódico
+const unsigned long TEMPO_SAIDA_ESTEIRA_MS = 3000;
 
 // ============================================================
 // ESTADOS DA MÁQUINA DE ESTADOS (iguais ao código final)
@@ -115,6 +116,7 @@ unsigned long tempoInicio = 0;
 unsigned long ultimaPublicacao = 0;
 bool   erroTimeout = false;
 bool   erroSemEstoque = false;
+String bufferComando = "";
 
 // ============================================================
 // FUNÇÕES AUXILIARES — MOTORES (IRF520)
@@ -249,17 +251,15 @@ void publicarStatusEsteiras() {
 }
 
 // ============================================================
-// RECEBIMENTO DE COMANDOS VIA SERIAL (do ESP32)
+// RECEBIMENTO DE COMANDOS VIA SERIAL (do ESP32) — NÃO-BLOQUEANTE
 // Formato: CMD:PECA:A | CMD:PECA:B | CMD:RESET
 // Cenários de rejeição (importantes para o Teste 5):
 //   - Peça C           → erro "peca_indisponivel" (não trava a FSM)
 //   - Sistema ocupado  → erro "ocupado" (FSM fora de AGUARDANDO)
 // ============================================================
-void processarComando() {
-  if (!Serial.available()) return;
-
-  String linha = Serial.readStringUntil('\n');
+void interpretarComando(String linha) {
   linha.trim();
+  if (linha.length() == 0) return;
 
   if (linha.startsWith("CMD:PECA:")) {
     char pecaChar = linha.charAt(9); // A, B ou C
@@ -284,7 +284,7 @@ void processarComando() {
         publicarErro("ocupado", pecaChar);
       }
     }
-  } else if (linha == "CMD:RESET") {
+  } else if (linha.startsWith("CMD:RESET")) {
     if (estadoAtual == ERRO) {
       erroTimeout = false;
       erroSemEstoque = false;
@@ -292,7 +292,21 @@ void processarComando() {
       pararTodasSecundarias();
       exibirEstoque();
       publicarEstado();
+      publicarEstoque();
       estadoAtual = AGUARDANDO_PEDIDO;
+    }
+  }
+}
+
+void processarComando() {
+  while (Serial.available()) {
+    char c = (char)Serial.read();
+    if (c == '\n') {
+      interpretarComando(bufferComando);
+      bufferComando = "";
+    } else if (c != '\r') {
+      bufferComando += c;
+      if (bufferComando.length() > 80) bufferComando = "";
     }
   }
 }
