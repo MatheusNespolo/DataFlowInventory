@@ -91,12 +91,12 @@ Este documento define os testes de integração da cadeia de comunicação do si
 3. Enviar `CMD:PECA:A`
 4. Observar a sequência: `acionando` → motor liga com soft-start (rampa ~300 ms) → peça sai do sensor → motor para → evento `entregue` com `tempo_ms`
 5. Repetir **sem peça** no sensor → evento `erro` tipo `sem_estoque` → enviar `CMD:RESET`
-6. Repetir **segurando a peça** sobre o sensor → após **12 s**, `erro` tipo `timeout` → `CMD:RESET`
+6. Repetir **segurando a peça** sobre o sensor → após **9 s**, `erro` tipo `timeout` → `CMD:RESET`
 
 #### Critérios de validação
 - [ ] Ciclo completo: comando → motor liga → peça sai do sensor → motor para → `{"evento":"entregue","tempo_ms":...}`
 - [ ] Sem peça: `{"evento":"erro","tipo":"sem_estoque"}` sem acionar o motor
-- [ ] **Timeout de 12 s** funciona e para o motor
+- [ ] **Timeout de 9 s** funciona e para o motor
 - [ ] `CMD:RESET` recupera o sistema do estado ERRO
 - [ ] **Registrar** o `tempo_ms` medido (calibra o `TIMEOUT_ENTREGA` da versão final)
 - [ ] **Registrar** o menor PWM que move a esteira com peça (calibra `VELOCIDADE_MOTOR`)
@@ -359,7 +359,7 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - [ ] Entregas consecutivas de A e B decrementam o estoque corretamente
 - [ ] Peça C rejeitada com `{"evento":"erro","tipo":"peca_indisponivel"}` sem travar a FSM
 - [ ] Pedido com FSM ocupada gera evento `ocupado`
-- [ ] **Timeout de 12 s** → `ERRO`; `CMD:RESET` recupera o sistema
+- [ ] **Timeout de 9 s** → `ERRO`; `CMD:RESET` recupera o sistema
 - [ ] Status periódico (`status`, `sensores`, `esteiras`) publicado a cada ~1 s nos tópicos MQTT
 
 ---
@@ -411,10 +411,16 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
 **Observações 25/08:**
-- `TIMEOUT_ENTREGA` ajustado de 8 s → **12 s** (peça chegava no sensor mas não saía da esteira secundária)
+- `TIMEOUT_ENTREGA` ajustado de 8 s → **12 s** preliminarmente (peça chegava no sensor mas não saía da esteira secundária)
 - Adicionado `publicarEstoque()` em `setup()` e `CMD:RESET` para sincronizar LCD ↔ Dashboard
 - Divisor 1k/2kΩ + GND comum confirmados como críticos para UART Uno↔ESP32
 
 **Observações 26/08:**
 - Introduzida automação de validação de infraestrutura (`docs/testes/validações/validar_infra.ps1`) e checklist de rede/infra correspondente
 - Sistema ainda opera com **broker local (Mosquitto)**; conexão com **broker remoto (HiveMQ Cloud)** planejada para rodada futura (Teste 6), condicionada à consolidação da esteira A
+
+**Observações 27–28/08:**
+- `TIMEOUT_ENTREGA` recalibrado para **9 s** (`TIMEOUT_ENTREGA = 9000` + `TEMPO_SAIDA_ESTEIRA_MS = 3000`) após validação com esteira A física (travessia ~5 s até o sensor + 3 s de saída cabem com folga em 9 s). Aprovado com recuperação via `CMD:RESET`.
+- Separação de tópicos de status (`dataflow/status` para gateway ESP32 e `dataflow/status/server` para backend Node.js), eliminando conflito de sobrescrita de mensagem retained.
+- Estoque retained em `dataflow/estoque` aprovado: Dashboard sincroniza imediatamente no carregamento inicial e reconexões.
+- Rejeições explícitas de comando (`peca_invalida`, `ocupado`, `comando_desconhecido`) e tolerância a payloads malformados validadas no gateway ESP32.

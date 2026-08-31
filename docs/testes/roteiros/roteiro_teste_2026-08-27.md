@@ -16,7 +16,7 @@ Antes de executar, relembrar o que já está **fechado** para não retrabalhar:
 | Teste 2 — ESP32 → Broker → Node (JSONs em `dataflow/#`) | 25/08 | ✅ Validado | #4 |
 | Teste 3 — Comando via MQTT Box (isolado) | 25/08 | ⚠️ Parcial (via Dashboard, não via MQTT Box puro) | #9 |
 | Teste 4 — End-to-End Dashboard (pedido A → entrega) | 25/08 | ✅ Validado | #7 |
-| Timeout de entrega 12 s + sincronismo de estoque LCD ↔ Dashboard | 26/08 | ✅ Validado | #11, #12 |
+| Timeout de entrega 12 s + sincronismo de estoque LCD ↔ Dashboard | 26/08 | ✅ Validado (recalibrado para **9 s** em 27–28/08) | #11, #12 |
 | Plano B — Simulador (frontend sem hardware) | 25/08 | ✅ Validado | #7 |
 
 **Mudanças aplicadas na última rodada — a serem validadas neste roteiro:**
@@ -46,27 +46,27 @@ Antes de executar, relembrar o que já está **fechado** para não retrabalhar:
 
 > ⚠️ **Mudou desde 25/08:** as credenciais de Wi-Fi/MQTT **não são mais editadas dentro de `gateway_mqtt.ino`**. Agora ficam em `esp32/gateway_mqtt/secrets.h` — arquivo **não versionado** (ignorado pelo `.gitignore`). O `.ino` inclui `#include "secrets.h"`.
 
-- [ ] Na pasta `esp32/gateway_mqtt/`, criar o `secrets.h` a partir do exemplo (uma vez por máquina):
+- [✅] Na pasta `esp32/gateway_mqtt/`, criar o `secrets.h` a partir do exemplo (uma vez por máquina):
   - Windows: `copy secrets.h.example secrets.h`
   - Linux/Mac: `cp secrets.h.example secrets.h`
-- [ ] Preencher em `secrets.h` os valores de **hoje**:
-  - [ ] `SECRET_WIFI_SSID` / `SECRET_WIFI_PASS` — rede da bancada de hoje
-  - [ ] `SECRET_MQTT_SERVER_LOCAL` — **IP do PC com Mosquitto** (`ipconfig`; ESP32 e PC na MESMA rede)
-  - [ ] `SECRET_MQTT_USER_LOCAL` / `SECRET_MQTT_PASS_LOCAL` — vazios se `allow_anonymous true`
+- [✅] Preencher em `secrets.h` os valores de **hoje**:
+  - [✅] `SECRET_WIFI_SSID` / `SECRET_WIFI_PASS` — rede da bancada de hoje
+  - [✅] `SECRET_MQTT_SERVER_LOCAL` — **IP do PC com Mosquitto** (`ipconfig`; ESP32 e PC na MESMA rede)
+  - [✅] `SECRET_MQTT_USER_LOCAL` / `SECRET_MQTT_PASS_LOCAL` — vazios se `allow_anonymous true`
   - [ ] (Só se for usar nuvem no Bloco 4) `SECRET_MQTT_*_CLOUD`
-- [ ] Confirmar no `.ino`: `USE_TLS false` para broker local (Mosquitto), `true` para HiveMQ Cloud
-- [ ] Confirmar que `secrets.h` **NÃO** aparece em `git status` (deve estar ignorado)
+- [✅] Confirmar no `.ino`: `USE_TLS false` para broker local (Mosquitto), `true` para HiveMQ Cloud
+- [✅] Confirmar que `secrets.h` **NÃO** aparece em `git status` (deve estar ignorado)
 
 ### 0.b — Infra e reupload
 
 - [ ] Executar [`validar_infra.ps1`](../validações/validar_infra.ps1) como Admin (pré-voo, antes dos serviços) → PASS nos checks de config/firewall
-- [ ] Rodar o [checklist de rede/infra](../validações/checklist_pre_teste_rede_infra.md) (seções 1 a 5)
-- [ ] Fiação UART reconferida (TX→divisor→GPIO16 / GPIO17→RX / GND comum)
-- [ ] `server/.env` criado a partir de `server/.env.example` (uma vez) com `ALLOWED_ORIGIN` cobrindo a URL do Dashboard de hoje (`http://localhost:3000` e/ou `http://<IP-do-PC>:3000`)
-- [ ] **Reupload dos sketches:**
-  - [ ] `arduino/data_flow_inventory/` no Uno (ESP32 fora dos pinos 0/1 durante upload)
-  - [ ] `esp32/gateway_mqtt/` no ESP32 (agora lendo de `secrets.h`)
-- [ ] Subir serviços: `start_services.bat` (broker + probe + server) + Dashboard em `http://localhost:3000`
+- [✅] Rodar o [checklist de rede/infra](../validações/checklist_pre_teste_rede_infra.md) (seções 1 a 5)
+- [✅] Fiação UART reconferida (TX→divisor→GPIO16 / GPIO17→RX / GND comum)
+- [✅] `server/.env` criado a partir de `server/.env.example` (uma vez) com `ALLOWED_ORIGIN` cobrindo a URL do Dashboard de hoje (`http://localhost:3000` e/ou `http://<IP-do-PC>:3000`)
+- [✅] **Reupload dos sketches:**
+  - [✅] `arduino/data_flow_inventory/` no Uno (ESP32 fora dos pinos 0/1 durante upload)
+  - [✅] `esp32/gateway_mqtt/` no ESP32 (agora lendo de `secrets.h`)
+- [✅] Subir serviços: `start_services.bat` (broker + probe + server) + Dashboard em `http://localhost:3000`
 - [ ] Executar `validar_infra.ps1 -PosSubida` como Admin (depois dos serviços de pé) → PASS em todos os checks de rede
 
 ### 0.c — Ordem de subida (evita o bug de retained)
@@ -76,27 +76,28 @@ Antes de executar, relembrar o que já está **fechado** para não retrabalhar:
 - [ ] Mosquitto → probe → server Node → **por último** energizar o ESP32
 
 Critério de liberação do Bloco 0:
-- [ ] `mqtt_probe` mostra JSONs periódicos do Uno em `dataflow/status`, `dataflow/sensores`, `dataflow/esteiras`
-- [ ] `mqtt_probe` mostra retained `{"type":"gateway","status":"online"}` em `dataflow/status` **e** `{"type":"server","status":"online"}` em `dataflow/status/server` (tópicos **separados**, sem sobrescrita)
-- [ ] Dashboard indica **WebSocket conectado** + **ESP32 Online** (badge verde)
-- [ ] `curl http://localhost:3000/api/status` retorna `"gateway":"online"` e `"mqtt":true`
+- [✅] `mqtt_probe` mostra JSONs periódicos do Uno em `dataflow/status`, `dataflow/sensores`, `dataflow/esteiras`
+- [✅] `mqtt_probe` mostra retained `{"type":"gateway","status":"online"}` em `dataflow/status` **e** `{"type":"server","status":"online"}` em `dataflow/status/server` (tópicos **separados**, sem sobrescrita)
+- [✅] Dashboard indica **WebSocket conectado** + **ESP32 Online** (badge verde)
+- [✅] `curl http://localhost:3000/api/status` retorna `"gateway":"online"` e `"mqtt":true`
 
 ---
 
-## 3. Bloco 1 — Validação da correção do TIMEOUT (12 s)
+## 3. Bloco 1 — Validação da correção do TIMEOUT (9 s)
 
-**Objetivo:** confirmar que o novo tempo permite a peça sair completamente da esteira secundária.
+**Objetivo:** confirmar que o tempo vigente (`TIMEOUT_ENTREGA = 9000` + `TEMPO_SAIDA_ESTEIRA_MS = 3000`) permite a peça sair completamente da esteira secundária, sem falso `ERRO`.
+
 
 1. Colocar peça A no sensor do topo, garantir `estoque[A] > 0`.
 2. **Solicitar Peça A** pelo Dashboard.
 3. Cronometrar e observar:
-   - [ ] Motor da esteira A liga (soft-start)
-   - [ ] Peça atravessa e **sai fisicamente** da esteira secundária (não apenas chega ao sensor)
-   - [ ] Evento `entrega` publicado antes de estourar o timeout
-   - [ ] LCD mostra `Entrega OK!` e o novo estoque
+   - [✅] Motor da esteira A liga (soft-start)
+   - [✅] Peça atravessa e **sai fisicamente** da esteira secundária (não apenas chega ao sensor)
+   - [✅] Evento `entrega` publicado antes de estourar o timeout
+   - [✅] LCD mostra `Entrega OK!` e o novo estoque
 4. **Teste de timeout real** (segurar a peça sobre o sensor de junção):
-   - [ ] Após **~12 s**, estado vira `ERRO` tipo `timeout`, motor para
-   - [ ] `CMD:RESET` (botão Reset do Dashboard) recupera para `AGUARDANDO_PEDIDO`
+   - [✅] Após **~9 s**, estado vira `ERRO` tipo `timeout`, motor para
+   - [✅] `CMD:RESET` (botão Reset do Dashboard) recupera para `AGUARDANDO_PEDIDO`
 
 📝 **Registrar:** tempo real de travessia (s) da peça A. Se ainda insuficiente, calibrar `TIMEOUT_ENTREGA` novamente.
 
@@ -107,16 +108,16 @@ Critério de liberação do Bloco 0:
 **Objetivo:** confirmar que LCD e Dashboard mostram sempre o **mesmo** valor de estoque, em todas as situações.
 
 1. **Sincronismo inicial:** reiniciar o Uno (botão reset físico) e observar:
-   - [ ] Dashboard recebe o estoque inicial (`A:5 B:5 C:5`) **sem precisar de um pedido** — valida `publicarEstoque()` no `setup()`
-   - [ ] LCD e Dashboard idênticos após boot
+   - [✅] Dashboard recebe o estoque inicial (`A:5 B:5 C:5`) **sem precisar de um pedido** — valida `publicarEstoque()` no `setup()`
+   - [✅] LCD e Dashboard idênticos após boot
 2. **Sincronismo após entrega bem-sucedida:**
-   - [ ] Solicitar A → após entrega, LCD e Dashboard decrementam **juntos** (ex.: ambos vão a `A:4`)
+   - [✅] Solicitar A → após entrega, LCD e Dashboard decrementam **juntos** (ex.: ambos vão a `A:4`)
 3. **Sincronismo após ERRO + RESET** (o cenário que falhou em 25/08):
-   - [ ] Forçar timeout (segurar peça) → `ERRO`
-   - [ ] `CMD:RESET` pelo Dashboard → LCD e Dashboard voltam a mostrar o **mesmo** estoque — valida `publicarEstoque()` no `CMD:RESET`
+   - [✅] Forçar timeout (segurar peça) → `ERRO`
+   - [✅] `CMD:RESET` pelo Dashboard → LCD e Dashboard voltam a mostrar o **mesmo** estoque — valida `publicarEstoque()` no `CMD:RESET`
 4. **Teste de estresse do relato de 25/08** (5 pedidos, alguns falhos):
-   - [ ] Executar 5 solicitações de A (misturar sucessos e timeouts forçados)
-   - [ ] Ao final, **LCD == Dashboard** (o bug era LCD=3 / Dashboard=0)
+   - [✅] Executar 5 solicitações de A (misturar sucessos e timeouts forçados)
+   - [✅] Ao final, **LCD == Dashboard** (o bug era LCD=3 / Dashboard=0)
 
 📝 **Registrar:** valores finais de LCD e Dashboard após a sequência de 5 pedidos.
 
@@ -128,11 +129,11 @@ Aproveitar que a esteira A está integrada para cobrir cenários de borda antes 
 
 1. **Pedido com FSM ocupada:** solicitar A e, durante a entrega, solicitar A de novo:
    - [ ] Segundo pedido é rejeitado **com feedback explícito** (`ocupado`) — comportamento novo do commit `35fe3d5`; antes era silencioso
-   - [ ] FSM não trava e a entrega em curso conclui normalmente
+   - [✅] FSM não trava e a entrega em curso conclui normalmente
 2. **Peça indisponível:** solicitar B ou C (sem esteira/estoque):
-   - [ ] Evento `sem_estoque` / `peca_indisponivel` sem acionar motor
+   - [✅] Evento `sem_estoque` / `peca_indisponivel` sem acionar motor
 3. **Reset fora do estado ERRO:** enviar `CMD:RESET` em `AGUARDANDO_PEDIDO`:
-   - [ ] Sistema permanece estável (reset só age em `ERRO`)
+   - [✅] Sistema permanece estável (reset só age em `ERRO`)
 4. **Resiliência de rede (LWT)** — os itens que ficaram pendentes em 25/08:
    - [ ] Desligar o ESP32 → `mqtt_probe` recebe `{"type":"gateway","status":"offline"}` (LWT) em `dataflow/status`
    - [ ] Dashboard indica **ESP32 Offline** (badge vermelho) e registra o evento no histórico
@@ -155,16 +156,16 @@ Aproveitar que a esteira A está integrada para cobrir cenários de borda antes 
    ```
    "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t dataflow/comandos/sub -m "{\"acao\":\"solicitar_peca\",\"peca\":\"Z\"}"
    ```
-   - [ ] Monitor serial do ESP32 mostra o comando recebido
-   - [ ] Retorno `peca_invalida` (não silencioso), motor **não** aciona
+   - [✅] Monitor serial do ESP32 mostra o comando recebido
+   - [✅] Retorno `peca_invalida` (não silencioso), motor **não** aciona
 2. **Comando desconhecido** — `{"acao":"voar"}`:
-   - [ ] Retorno `comando_desconhecido`, sistema estável
+   - [✅] Retorno `comando_desconhecido`, sistema estável
 3. **JSON malformado** — publicar `{{{`:
-   - [ ] ESP32 loga erro de parse e **não trava** (segue respondendo a comandos válidos depois)
+   - [✅] ESP32 loga erro de parse e **não trava** (segue respondendo a comandos válidos depois)
 4. **Comando durante entrega** (FSM ocupada) — ver Bloco 3 item 1:
    - [ ] Retorno `ocupado`
 5. **Comando válido logo após as rejeições:**
-   - [ ] `{"acao":"solicitar_peca","peca":"A"}` funciona normalmente (sem estado residual)
+   - [✅] `{"acao":"solicitar_peca","peca":"A"}` funciona normalmente (sem estado residual)
 
 📝 **Registrar:** qual retorno apareceu em cada caso (`peca_invalida` / `ocupado` / `comando_desconhecido`).
 
@@ -175,10 +176,10 @@ Aproveitar que a esteira A está integrada para cobrir cenários de borda antes 
 **Objetivo:** validar que o `dataflow/estoque` retained (commit `35fe3d5`) reconcilia o Dashboard sem esperar uma entrega.
 
 1. **Dashboard tardio:** com o sistema já rodando e estoque diferente do inicial (ex.: após 2 entregas), abrir o Dashboard em uma **aba nova**:
-   - [ ] Estoque correto aparece **imediatamente**, sem precisar solicitar peça
+   - [✅] Estoque correto aparece **imediatamente**, sem precisar solicitar peça
 2. **Restart do server Node** (`Ctrl+C` + `npm start`), sem mexer no Arduino/ESP32:
-   - [ ] Dashboard volta com o estoque correto (veio do retained, não de uma nova publicação)
-   - [ ] Badge **ESP32 Online** volta sozinho — valida a correção de tópicos separados
+   - [✅] Dashboard volta com o estoque correto (veio do retained, não de uma nova publicação)
+   - [✅] Badge **ESP32 Online** volta sozinho — valida a correção de tópicos separados
 3. **Inspeção direta do retained:**
    ```
    "C:\Program Files\mosquitto\mosquitto_sub.exe" -h localhost -t "dataflow/estoque" -v -W 3
@@ -219,7 +220,7 @@ Aproveitar que a esteira A está integrada para cobrir cenários de borda antes 
    socket.emit('solicitar_peca', { peca: 'Z' });
    socket.emit('solicitar_peca', { peca: '../../etc' });
    ```
-   - [ ] Servidor **rejeita** e loga; nada é publicado no broker (conferir no `mqtt_probe`)
+   - [✅] Servidor **rejeita** e loga; nada é publicado no broker (conferir no `mqtt_probe`)
    - [ ] Contador `comandosRejeitados` sobe em `/api/status`
 2. **Rate limit por socket** (`COMANDO_INTERVALO_MS`, padrão 500 ms):
    ```js
@@ -231,8 +232,8 @@ Aproveitar que a esteira A está integrada para cobrir cenários de borda antes 
    ```
    curl http://localhost:3000/api/status
    ```
-   - [ ] Retorna `mqtt`, `gateway`, `clientesWs`, `metricas`, `uptime`
-   - [ ] Com o **broker parado**, retorna **HTTP 503**
+   - [✅] Retorna `mqtt`, `gateway`, `clientesWs`, `metricas`, `uptime`
+   - [✅] Com o **broker parado**, retorna **HTTP 503**
 4. **Cabeçalhos de segurança (helmet/CSP):**
    ```
    curl -I http://localhost:3000
@@ -300,7 +301,7 @@ Pontos **cruciais** para prosseguir depois de estabilizar a esteira A:
 - [ ] Transferir aprovados/reprovados para o [`plano_de_testes.md`](../plano_de_testes.md)
 - [ ] **Atualizar os cards do GitHub Projects:**
   - **#11** Sincronismo estoque LCD/Dashboard → Done após Bloco 2
-  - **#12** Timeout 12 s → Done após Bloco 1
+  - **#12** Timeout 9 s → Done após Bloco 1
   - **#10** Teste 5 (esteira B) → continua Blocked (aguarda hardware)
   - Novo card: Robustez/LWT esteira A → conforme Bloco 3
 
@@ -311,7 +312,7 @@ Pontos **cruciais** para prosseguir depois de estabilizar a esteira A:
 | Etapa | Resultado | Medições / Observações |
 |-------|-----------|------------------------|
 | 0 — Pré-voo (infra + reupload) | ⬜ | IP do PC hoje: ____ · rede: ____ |
-| 1 — Timeout 12 s (travessia real) | ⬜ | Tempo real de travessia: ____ s |
+| 1 — Timeout 9 s (travessia real) | ⬜ | Tempo real de travessia: ____ s |
 | 1 — Timeout forçado → ERRO/RESET | ⬜ | |
 | 2 — Sync inicial (boot do Uno) | ⬜ | LCD == Dashboard no boot? ____ |
 | 2 — Sync após entrega | ⬜ | |

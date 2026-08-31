@@ -167,7 +167,7 @@ O Arduino opera com **5 estados**:
 | 1 | **AGUARDANDO_PEDIDO** | Sistema em repouso, monitora botões e comandos remotos |
 | 2 | **VERIFICANDO_ESTOQUE** | Verifica sensor do topo + contador interno |
 | 3 | **ACIONANDO_ESTEIRA** | Liga motor da esteira secundária correspondente |
-| 4 | **ENTREGANDO_PECA** | Monitora sensor da junção com timeout de 12s |
+| 4 | **ENTREGANDO_PECA** | Monitora sensor da junção com timeout de 9s |
 | 5 | **ERRO** | Sinaliza falha no LCD, aguarda reset manual |
 
 > 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/fluxogramas/fluxograma_funcionamento.md`](docs/fluxogramas/fluxograma_funcionamento.md).
