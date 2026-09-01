@@ -396,9 +396,9 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 
 | # | Teste | Data | Resultado | Observações |
 |---|-------|------|-----------|-------------|
-| B0.1 | Setup da placa (Blink + Serial) | | ⬜ Pendente | |
+| B0.1 | Setup da placa (Blink + Serial) | 12/08/2026 | ✅ Aprovado | Teste inicial |
 | B0.2 | Sensor IR isolado | 01/09/2026 | ✅ Aprovado | Sensores TCRT5000 testados e calibrados isoladamente (sensores de topo e de junção para as esteiras adicionais B e C) |
-| B0.3 | Motor isolado (IRF520) | | ⬜ Pendente | Registrar PWM mínimo |
+| B0.3 | Motor isolado (IRF520) | 12/08/2026 | ✅ Aprovad | PWM mínimo: 150 |
 | 1 | Serial Arduino ↔ ESP32 | 12/08/2026 | ✅ Aprovado | JSON recebido corretamente no ESP32 |
 | B1 | Bancada 3.1 — Ciclo completo | 18/08/2026 | ✅ Aprovado | tempo_ms: 5000 · PWM mínimo: 150 (calibrações aplicadas ao sketch principal) |
 | B2 | Bancada 3.2 — Sem estoque | 18/08/2026 | ✅ Aprovado | Rejeição `peca_indisponivel` + recuperação via reset OK |
