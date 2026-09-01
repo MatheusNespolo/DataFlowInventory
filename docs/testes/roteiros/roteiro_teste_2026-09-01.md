@@ -197,15 +197,15 @@ O simulador **não** substitui LWT do ESP32 nem o Teste 5.
 
 | Etapa | Resultado | Medições / Observações |
 |-------|-----------|------------------------|
-| 0 — Pré-voo (infra + um único broker) | ⬜ | IP do PC: ____ · rede: ____ |
-| 1.1 — LWT gateway offline/online | ⬜ | Dashboard reconectou sozinho? ____ |
-| 1.2 — Reconexão do broker (retained intacto) | ⬜ | |
-| 1.3 — `ocupado` / `peca_invalida` / `comando_desconhecido` / JSON malformado | ⬜ | Retornos: ____ |
-| 1.4 — Wi-Fi não-bloqueante | ⬜ | Tempo até reconectar: ____ s · executado? ____ |
-| 2 — Teste 3 puro (MQTT Box) | ⬜ | |
-| 3 — Teste 5 esteira B (se hardware) | ⬜ | Hardware presente? ____ · tempo_ms A/B: ____ |
-| 4 — HiveMQ Cloud (stretch) | ⬜ | Executado ou adiado? ____ |
-| Plano B (simulador), se usado | ⬜ | |
+| 0 — Pré-voo (infra + um único broker) | ✅ | IP do PC: 10.84.23.81 · rede: BABRWNB000016 9493 |
+| 1.1 — LWT gateway offline/online | ✅ | Dashboard reconectou sozinho? Sim |
+| 1.2 — Reconexão do broker (retained intacto) | ✅ | |
+| 1.3 — `ocupado` / `peca_invalida` / `comando_desconhecido` / JSON malformado | ocupado: Ok, peca_invalida: Não acusa no dashboard | Retornos: Comando enviado: solicitar_peca  |
+| 1.4 — Wi-Fi não-bloqueante | ✅ | Tempo até reconectar: 23 s · executado? Sim |
+| 2 — Teste 3 puro (MQTT Box) | ✅ | |
+| 3 — Teste 5 esteira B (se hardware) | ✅ | Hardware presente? Não, apenas troca de pinagem · tempo_ms A/B: 9s |
+| 4 — HiveMQ Cloud (stretch) | ⬜ | Executado ou adiado? Adiado |
+| Plano B (simulador), se usado | ✅ | Não foi necessário |
 
 > Ao final: transferir para o [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards. Timeout 9 s e sync LCD/Dashboard **não** entram nesta tabela — já estão no registro de 27–28/08.
 
