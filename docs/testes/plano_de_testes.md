@@ -397,16 +397,16 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | # | Teste | Data | Resultado | Observações |
 |---|-------|------|-----------|-------------|
 | B0.1 | Setup da placa (Blink + Serial) | | ⬜ Pendente | |
-| B0.2 | Sensor IR isolado | | ⬜ Pendente | Anotar distância/trimpot calibrados |
+| B0.2 | Sensor IR isolado | 01/09/2026 | ✅ Aprovado | Sensores TCRT5000 testados e calibrados isoladamente (sensores de topo e de junção para as esteiras adicionais B e C) |
 | B0.3 | Motor isolado (IRF520) | | ⬜ Pendente | Registrar PWM mínimo |
 | 1 | Serial Arduino ↔ ESP32 | 12/08/2026 | ✅ Aprovado | JSON recebido corretamente no ESP32 |
 | B1 | Bancada 3.1 — Ciclo completo | 18/08/2026 | ✅ Aprovado | tempo_ms: 5000 · PWM mínimo: 150 (calibrações aplicadas ao sketch principal) |
 | B2 | Bancada 3.2 — Sem estoque | 18/08/2026 | ✅ Aprovado | Rejeição `peca_indisponivel` + recuperação via reset OK |
 | B3 | Bancada 3.3 — LCD I2C | 18/08/2026 | ✅ Aprovado | Endereço I2C: 0x27 |
 | 2 | ESP32 → Broker → Node.js | 25/08/2026 | ✅ Aprovado | JSONs do Uno chegam via ESP32 aos tópicos dataflow/#; broker 0.0.0.0:1883 OK |
-| 3 | Comando via MQTT Box | 25/08/2026 | ⚠️ Parcial | Comando chega ao Uno, mas não testado isoladamente via MQTT Box (testado via Dashboard) |
+| 3 | Comando via MQTT Box | 01/09/2026 | ✅ Aprovado | Comando direto via MQTT Box em `dataflow/comandos/sub` validado de forma desacoplada; ESP32 repassa `CMD:PECA:A` e FSM aciona esteira com confirmação em `dataflow/comandos/pub` |
 | 4 | End-to-End (Dashboard) | 25/08/2026 | ✅ Aprovado | Pedido de peça A via Dashboard → esteira parte → entrega completa |
-| 5 | Duas esteiras (A + B) | | ⬜ Pendente | Aguarda montagem da esteira B |
+| 5 | Duas esteiras (A + B) | | ⬜ Pendente | Aguarda montagem da esteira B (2º driver IRF520) |
 | 6 | Migração para broker remoto (HiveMQ Cloud) | | ⬜ Pendente | Planejado para rodada futura, após consolidação da esteira A |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
@@ -424,3 +424,12 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - Separação de tópicos de status (`dataflow/status` para gateway ESP32 e `dataflow/status/server` para backend Node.js), eliminando conflito de sobrescrita de mensagem retained.
 - Estoque retained em `dataflow/estoque` aprovado: Dashboard sincroniza imediatamente no carregamento inicial e reconexões.
 - Rejeições explícitas de comando (`peca_invalida`, `ocupado`, `comando_desconhecido`) e tolerância a payloads malformados validadas no gateway ESP32.
+
+**Observações 01/09:**
+- **Sensores das Esteiras Adicionais (B e C):** Realizado o teste e calibração prévia dos sensores reflexivos infravermelhos (TCRT5000) de topo e junção destinados às esteiras B e C, garantindo detecção e resposta digital estável (LOW/HIGH) antes da montagem mecânica completa (`B0.2`).
+- **Robustez e LWT do Gateway:** Queda de alimentação/desconexão física do ESP32 dispara publicação do LWT `{"type":"gateway","status":"offline"}` em `dataflow/status` e badge vermelho no Dashboard; religamento do ESP32 restabelece status `online` automaticamente sem necessidade de reload manual.
+- **Reconexão do Broker:** Queda e reinicialização do broker Mosquitto restauram a conexão do ESP32 e do Servidor Node.js, preservando mensagens com flag retained (`dataflow/estoque` e `dataflow/status`).
+- **Rejeições Explícitas e Resiliência da FSM:** Injeção direta via MQTT dos cenários `ocupado`, `peca_invalida`, `comando_desconhecido` e JSON malformado tratadas com resposta explícita pelo ESP32 e sem travamento da FSM do Arduino Uno.
+- **Teste 3 Puro (MQTT Box):** Validado e aprovado via cliente MQTT externo (MQTT Box / Explorer), formalizando a evidência de controle remoto desacoplada da interface web.
+- **Teste 5 (Esteiras A + B):** Mantido como `⬜ Pendente` / `Blocked` aguardando a disponibilização do segundo módulo IRF520 na bancada física.
+- **Teste 6 (HiveMQ Cloud):** Mantido como `⬜ Pendente` em Backlog como stretch goal.

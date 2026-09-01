@@ -193,20 +193,21 @@ O simulador **não** substitui LWT do ESP32 nem o Teste 5.
 
 ---
 
-## 9. Registro de resultados do dia (preencher durante os testes)
+## 9. Registro de resultados do dia (preenchido)
 
 | Etapa | Resultado | Medições / Observações |
 |-------|-----------|------------------------|
-| 0 — Pré-voo (infra + um único broker) | ⬜ | IP do PC: ____ · rede: ____ |
-| 1.1 — LWT gateway offline/online | ⬜ | Dashboard reconectou sozinho? ____ |
-| 1.2 — Reconexão do broker (retained intacto) | ⬜ | |
-| 1.3 — `ocupado` / `peca_invalida` / `comando_desconhecido` / JSON malformado | ⬜ | Retornos: ____ |
-| 1.4 — Wi-Fi não-bloqueante | ⬜ | Tempo até reconectar: ____ s · executado? ____ |
-| 2 — Teste 3 puro (MQTT Box) | ⬜ | |
-| 3 — Teste 5 esteira B (se hardware) | ⬜ | Hardware presente? ____ · tempo_ms A/B: ____ |
-| 4 — HiveMQ Cloud (stretch) | ⬜ | Executado ou adiado? ____ |
-| Plano B (simulador), se usado | ⬜ | |
+| 0 — Pré-voo (infra + um único broker) | ✅ | Mosquitto local + probe + server operando normalmente na porta 1883 |
+| 1.1 — LWT gateway offline/online | ✅ | Desconexão do ESP32 dispara `offline` no Dashboard; reconexão automática e status `online` sem reload |
+| 1.2 — Reconexão do broker (retained intacto) | ✅ | Broker reiniciado; ESP32 e Server reconectam; retained intacto |
+| 1.3 — `ocupado` / `peca_invalida` / `comando_desconhecido` / JSON malformado | ✅ | Respostas explícitas geradas pelo ESP32 sem travamento do parser ou da FSM |
+| 1.4 — Wi-Fi não-bloqueante | ✅ | Bridge serial e FSM continuam operando durante perda momentânea de sinal |
+| 2 — Teste 3 puro (MQTT Box) | ✅ | Comando publicado diretamente em `dataflow/comandos/sub` via MQTT Box executa com sucesso |
+| B0.2 — Sensores esteiras B e C | ✅ | Sensores TCRT5000 (topo e junção) das esteiras B e C testados e calibrados isoladamente |
+| 3 — Teste 5 esteira B (se hardware) | ⬜ | Mantido como Blocked (aguardando disponibilização do 2º módulo IRF520 na bancada) |
+| 4 — HiveMQ Cloud (stretch) | ⬜ | Mantido em Backlog como stretch goal (Teste 6) |
+| Plano B (simulador), se usado | — | Não necessário nesta rodada (hardware principal da esteira A operando) |
 
-> Ao final: transferir para o [`plano_de_testes.md`](../plano_de_testes.md) e atualizar os cards. Timeout 9 s e sync LCD/Dashboard **não** entram nesta tabela — já estão no registro de 27–28/08.
+> Resultados transferidos para o [`plano_de_testes.md`](../plano_de_testes.md). Timeout 9 s e sync LCD/Dashboard já constam validados no registro de 27–28/08.
 
 
