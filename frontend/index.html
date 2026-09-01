@@ -3,237 +3,241 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Flow Inventory — Dashboard</title>
+  <meta name="color-scheme" content="dark">
+  <title>Data Flow Inventory — Painel</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
   <!-- ============================================================ -->
-  <!-- HEADER -->
+  <!-- FAIXA ANUNCIADORA — estado do sistema em janelas gravadas    -->
   <!-- ============================================================ -->
-  <header class="header">
-    <div class="header-left">
-      <span class="header-icon">🏭</span>
-      <h1>Data Flow Inventory</h1>
-      <span id="driver-info" class="driver-badge">v2.1 · IRF520</span>
+  <header class="annun" role="status" aria-live="polite" aria-label="Estado do sistema">
+    <div class="annun-brand">
+      <span class="annun-brand-mark" aria-hidden="true">▚</span>
+      <span class="annun-brand-name">Data Flow Inventory</span>
+      <span id="driver-info" class="annun-fw">v2.1 · IRF520</span>
     </div>
-    <div class="header-right">
-      <!-- Status do gateway ESP32 (via LWT do broker MQTT) -->
-      <span id="gateway-status" class="status-badge status-offline" title="Status do hardware (ESP32) via MQTT LWT">
-        <span class="status-dot"></span>
-        ESP32 Offline
-      </span>
-      <span id="mqtt-status" class="status-badge status-offline">
-        <span class="status-dot"></span>
-        Desconectado
-      </span>
-      <span id="server-time" class="server-time">--:--:--</span>
+
+    <div class="annun-cells">
+      <div class="annun-cell" id="mqtt-status" data-state="off">
+        <span class="annun-led" aria-hidden="true"></span>
+        <span class="annun-k">Enlace</span>
+        <span class="annun-v">Desconectado</span>
+      </div>
+      <div class="annun-cell" id="gateway-status" data-state="off" title="Estado do hardware (ESP32) via MQTT LWT">
+        <span class="annun-led" aria-hidden="true"></span>
+        <span class="annun-k">Gateway</span>
+        <span class="annun-v">ESP32 offline</span>
+      </div>
+      <div class="annun-cell" id="annun-estado" data-state="idle">
+        <span class="annun-led" aria-hidden="true"></span>
+        <span class="annun-k">Estado</span>
+        <span class="annun-v" id="annun-estado-v">—</span>
+      </div>
+      <div class="annun-cell" id="annun-estoque" data-state="run">
+        <span class="annun-led" aria-hidden="true"></span>
+        <span class="annun-k">Estoque</span>
+        <span class="annun-v" id="annun-estoque-v">Normal</span>
+      </div>
     </div>
+
+    <time id="server-time" class="annun-clock">--:--:--</time>
   </header>
 
   <!-- ============================================================ -->
-  <!-- MAIN CONTENT -->
+  <!-- PAINEL PRINCIPAL                                             -->
   <!-- ============================================================ -->
-  <main class="dashboard">
+  <main class="cluster">
 
-    <!-- COLUNA ESQUERDA -->
-    <div class="col-left">
+    <!-- HERO: diagrama mímico do sistema -->
+    <section class="bay bay-mimic" aria-labelledby="t-mimic">
+      <h2 class="bay-title" id="t-mimic"><span class="bay-title-k">SYN</span> Diagrama do sistema</h2>
+      <div class="mimic">
+        <svg id="diagrama-svg" viewBox="0 0 500 300" class="mimic-svg" role="img" aria-label="Diagrama das esteiras e sensores">
+          <!-- Esteira Principal (horizontal) -->
+          <rect id="svg-esteira-principal" x="100" y="130" width="300" height="40" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
+          <text x="250" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="500">Esteira Principal</text>
 
-      <!-- Card: Estado do Sistema -->
-      <section class="card card-estado">
-        <h2 class="card-title">⚡ Estado do Sistema</h2>
-        <div class="estado-display">
-          <span id="estado-atual" class="estado-texto">AGUARDANDO_PEDIDO</span>
+          <!-- Esteira A (vertical) -->
+          <rect id="svg-esteira-a" x="120" y="30" width="60" height="100" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
+          <text x="150" y="80" text-anchor="middle" fill="white" font-size="11" font-weight="500">A</text>
+          <circle id="svg-sensor-topo-a" cx="150" cy="45" r="6" fill="#666"/>
+          <circle id="svg-sensor-j1" cx="150" cy="135" r="6" fill="#666"/>
+
+          <!-- Esteira B (vertical) -->
+          <rect id="svg-esteira-b" x="220" y="30" width="60" height="100" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
+          <text x="250" y="80" text-anchor="middle" fill="white" font-size="11" font-weight="500">B</text>
+          <circle id="svg-sensor-topo-b" cx="250" cy="45" r="6" fill="#666"/>
+          <circle id="svg-sensor-j2" cx="250" cy="135" r="6" fill="#666"/>
+
+          <!-- Esteira C (vertical) -->
+          <rect id="svg-esteira-c" x="320" y="30" width="60" height="100" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
+          <text x="350" y="80" text-anchor="middle" fill="white" font-size="11" font-weight="500">C</text>
+          <circle id="svg-sensor-topo-c" cx="350" cy="45" r="6" fill="#666"/>
+          <circle id="svg-sensor-j3" cx="350" cy="135" r="6" fill="#666"/>
+
+          <!-- Roda de Estoque (final da principal) -->
+          <circle cx="440" cy="150" r="35" fill="none" stroke="#777" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="440" y="145" text-anchor="middle" fill="#aaa" font-size="10">Roda</text>
+          <text x="440" y="158" text-anchor="middle" fill="#aaa" font-size="10">Estoque</text>
+
+          <!-- Sensores -->
+          <text x="10" y="45" fill="#888" font-size="9">Sensor Topo</text>
+          <text x="10" y="135" fill="#888" font-size="9">Sensor Junção</text>
+
+          <!-- Setas de fluxo -->
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#888"/>
+            </marker>
+          </defs>
+          <line x1="400" y1="150" x2="415" y2="150" stroke="#888" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Estado do sistema (detalhe) -->
+    <section class="bay card-estado" aria-labelledby="t-estado">
+      <h2 class="bay-title" id="t-estado"><span class="bay-title-k">SYS</span> Estado do sistema</h2>
+      <div class="readout" aria-live="polite">
+        <span id="estado-atual" class="readout-value">AGUARDANDO_PEDIDO</span>
+      </div>
+      <dl class="spec">
+        <div class="spec-row">
+          <dt>Peça solicitada</dt>
+          <dd id="peca-solicitada">—</dd>
         </div>
-        <div class="estado-info">
-          <div class="info-item">
-            <span class="info-label">Peça Solicitada:</span>
-            <span id="peca-solicitada" class="info-value">—</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Uptime:</span>
-            <span id="uptime" class="info-value">0s</span>
-          </div>
+        <div class="spec-row">
+          <dt>Tempo de atividade</dt>
+          <dd id="uptime" class="mono">0s</dd>
         </div>
-      </section>
+      </dl>
+    </section>
 
-      <!-- Card: Estoque -->
-      <section class="card card-estoque">
-        <h2 class="card-title">📦 Estoque</h2>
-        <div class="estoque-grid">
-          <div class="estoque-item estoque-a">
-            <div class="estoque-cor" style="background-color: #e74c3c;"></div>
-            <div class="estoque-info">
-              <span class="estoque-label">Peça A</span>
-              <span id="estoque-a" class="estoque-numero">5</span>
-              <span id="estoque-badge-a" class="estoque-badge" hidden></span>
-            </div>
-          </div>
-          <div class="estoque-item estoque-b">
-            <div class="estoque-cor" style="background-color: #2ecc71;"></div>
-            <div class="estoque-info">
-              <span class="estoque-label">Peça B</span>
-              <span id="estoque-b" class="estoque-numero">5</span>
-              <span id="estoque-badge-b" class="estoque-badge" hidden></span>
-            </div>
-          </div>
-          <div class="estoque-item estoque-c">
-            <div class="estoque-cor" style="background-color: #3498db;"></div>
-            <div class="estoque-info">
-              <span class="estoque-label">Peça C</span>
-              <span id="estoque-c" class="estoque-numero">5</span>
-              <span id="estoque-badge-c" class="estoque-badge" hidden></span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Card: Esteiras -->
-      <section class="card card-esteiras">
-        <h2 class="card-title">🔄 Esteiras</h2>
-        <div class="esteiras-lista">
-          <div class="esteira-item">
-            <span class="esteira-nome">Principal</span>
-            <span id="esteira-principal" class="esteira-status esteira-on">● Ligada</span>
-          </div>
-          <div class="esteira-item">
-            <span class="esteira-nome">Secundária A</span>
-            <span id="esteira-a" class="esteira-status esteira-off">● Parada</span>
-          </div>
-          <div class="esteira-item">
-            <span class="esteira-nome">Secundária B</span>
-            <span id="esteira-b" class="esteira-status esteira-off">● Parada</span>
-          </div>
-          <div class="esteira-item">
-            <span class="esteira-nome">Secundária C</span>
-            <span id="esteira-c" class="esteira-status esteira-off">● Parada</span>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- COLUNA CENTRAL -->
-    <div class="col-center">
-
-      <!-- Card: Diagrama Visual -->
-      <section class="card card-diagrama">
-        <h2 class="card-title">🗺️ Diagrama do Sistema</h2>
-        <div class="diagrama-container">
-          <svg id="diagrama-svg" viewBox="0 0 500 300" class="diagrama-svg">
-            <!-- Esteira Principal (horizontal) -->
-            <rect id="svg-esteira-principal" x="100" y="130" width="300" height="40" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
-            <text x="250" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="500">Esteira Principal</text>
-
-            <!-- Esteira A (vertical) -->
-            <rect id="svg-esteira-a" x="120" y="30" width="60" height="100" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
-            <text x="150" y="80" text-anchor="middle" fill="white" font-size="11" font-weight="500">A</text>
-            <circle id="svg-sensor-topo-a" cx="150" cy="45" r="6" fill="#666"/>
-            <circle id="svg-sensor-j1" cx="150" cy="135" r="6" fill="#666"/>
-
-            <!-- Esteira B (vertical) -->
-            <rect id="svg-esteira-b" x="220" y="30" width="60" height="100" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
-            <text x="250" y="80" text-anchor="middle" fill="white" font-size="11" font-weight="500">B</text>
-            <circle id="svg-sensor-topo-b" cx="250" cy="45" r="6" fill="#666"/>
-            <circle id="svg-sensor-j2" cx="250" cy="135" r="6" fill="#666"/>
-
-            <!-- Esteira C (vertical) -->
-            <rect id="svg-esteira-c" x="320" y="30" width="60" height="100" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
-            <text x="350" y="80" text-anchor="middle" fill="white" font-size="11" font-weight="500">C</text>
-            <circle id="svg-sensor-topo-c" cx="350" cy="45" r="6" fill="#666"/>
-            <circle id="svg-sensor-j3" cx="350" cy="135" r="6" fill="#666"/>
-
-            <!-- Roda de Estoque (final da principal) -->
-            <circle cx="440" cy="150" r="35" fill="none" stroke="#777" stroke-width="2" stroke-dasharray="5,3"/>
-            <text x="440" y="145" text-anchor="middle" fill="#aaa" font-size="10">Roda</text>
-            <text x="440" y="158" text-anchor="middle" fill="#aaa" font-size="10">Estoque</text>
-
-            <!-- Sensores -->
-            <text x="10" y="45" fill="#888" font-size="9">Sensor Topo</text>
-            <text x="10" y="135" fill="#888" font-size="9">Sensor Junção</text>
-
-            <!-- Setas de fluxo -->
-            <defs>
-              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#888"/>
-              </marker>
-            </defs>
-            <line x1="400" y1="150" x2="415" y2="150" stroke="#888" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-          </svg>
-        </div>
-      </section>
-
-      <!-- Card: Sensores -->
-      <section class="card card-sensores">
-        <h2 class="card-title">👁️ Sensores</h2>
-        <div class="sensores-grid">
-          <div class="sensor-group">
-            <h3>Topo (Estoque)</h3>
-            <div class="sensor-row">
-              <span class="sensor-label">A:</span>
-              <span id="sensor-topo-a" class="sensor-valor">0</span>
-              <span class="sensor-label">B:</span>
-              <span id="sensor-topo-b" class="sensor-valor">0</span>
-              <span class="sensor-label">C:</span>
-              <span id="sensor-topo-c" class="sensor-valor">0</span>
-            </div>
-          </div>
-          <div class="sensor-group">
-            <h3>Junções (Entrega)</h3>
-            <div class="sensor-row">
-              <span class="sensor-label">J1:</span>
-              <span id="sensor-j1" class="sensor-valor">0</span>
-              <span class="sensor-label">J2:</span>
-              <span id="sensor-j2" class="sensor-valor">0</span>
-              <span class="sensor-label">J3:</span>
-              <span id="sensor-j3" class="sensor-valor">0</span>
-            </div>
+    <!-- Estoque -->
+    <section class="bay card-estoque" aria-labelledby="t-estoque">
+      <h2 class="bay-title" id="t-estoque"><span class="bay-title-k">STK</span> Estoque</h2>
+      <div class="estoque-grid" aria-live="polite">
+        <div class="estoque-item estoque-a">
+          <span class="estoque-chip" style="--peca: #e74c3c;" aria-hidden="true"></span>
+          <div class="estoque-info">
+            <span class="estoque-label">Peça A</span>
+            <span id="estoque-a" class="estoque-numero">5</span>
+            <span id="estoque-badge-a" class="estoque-badge" hidden></span>
           </div>
         </div>
-      </section>
-    </div>
-
-    <!-- COLUNA DIREITA -->
-    <div class="col-right">
-
-      <!-- Card: Controle Remoto -->
-      <section class="card card-controle">
-        <h2 class="card-title">🎮 Controle Remoto</h2>
-        <p class="card-desc">Envie comandos via nuvem para o sistema</p>
-        <div class="botoes-controle">
-          <button id="btn-solicitar-a" class="btn btn-peca btn-a">
-            <span class="btn-icon">🟥</span>
-            Solicitar A
-          </button>
-          <button id="btn-solicitar-b" class="btn btn-peca btn-b">
-            <span class="btn-icon">🟩</span>
-            Solicitar B
-          </button>
-          <button id="btn-solicitar-c" class="btn btn-peca btn-c">
-            <span class="btn-icon">🟦</span>
-            Solicitar C
-          </button>
-          <button id="btn-reset" class="btn btn-reset">
-            <span class="btn-icon">🔄</span>
-            Reset
-          </button>
-        </div>
-      </section>
-
-      <!-- Card: Histórico -->
-      <section class="card card-historico">
-        <h2 class="card-title">📋 Histórico de Eventos</h2>
-        <div id="historico-lista" class="historico-lista">
-          <div class="historico-item historico-vazio">
-            Aguardando eventos...
+        <div class="estoque-item estoque-b">
+          <span class="estoque-chip" style="--peca: #2ecc71;" aria-hidden="true"></span>
+          <div class="estoque-info">
+            <span class="estoque-label">Peça B</span>
+            <span id="estoque-b" class="estoque-numero">5</span>
+            <span id="estoque-badge-b" class="estoque-badge" hidden></span>
           </div>
         </div>
-      </section>
-    </div>
+        <div class="estoque-item estoque-c">
+          <span class="estoque-chip" style="--peca: #3498db;" aria-hidden="true"></span>
+          <div class="estoque-info">
+            <span class="estoque-label">Peça C</span>
+            <span id="estoque-c" class="estoque-numero">5</span>
+            <span id="estoque-badge-c" class="estoque-badge" hidden></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Esteiras -->
+    <section class="bay bay-esteiras" aria-labelledby="t-esteiras">
+      <h2 class="bay-title" id="t-esteiras"><span class="bay-title-k">CNV</span> Esteiras</h2>
+      <ul class="esteiras-lista">
+        <li class="esteira-item">
+          <span class="esteira-nome">Principal</span>
+          <span id="esteira-principal" class="esteira-status esteira-on">● Ligada</span>
+        </li>
+        <li class="esteira-item">
+          <span class="esteira-nome">Secundária A</span>
+          <span id="esteira-a" class="esteira-status esteira-off">● Parada</span>
+        </li>
+        <li class="esteira-item">
+          <span class="esteira-nome">Secundária B</span>
+          <span id="esteira-b" class="esteira-status esteira-off">● Parada</span>
+        </li>
+        <li class="esteira-item">
+          <span class="esteira-nome">Secundária C</span>
+          <span id="esteira-c" class="esteira-status esteira-off">● Parada</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Sensores -->
+    <section class="bay bay-sensores" aria-labelledby="t-sensores">
+      <h2 class="bay-title" id="t-sensores"><span class="bay-title-k">SNS</span> Sensores</h2>
+      <div class="sensores-grid">
+        <div class="sensor-group">
+          <h3>Topo (estoque)</h3>
+          <div class="sensor-row">
+            <span class="sensor-label">A</span>
+            <span id="sensor-topo-a" class="sensor-valor">0</span>
+            <span class="sensor-label">B</span>
+            <span id="sensor-topo-b" class="sensor-valor">0</span>
+            <span class="sensor-label">C</span>
+            <span id="sensor-topo-c" class="sensor-valor">0</span>
+          </div>
+        </div>
+        <div class="sensor-group">
+          <h3>Junções (entrega)</h3>
+          <div class="sensor-row">
+            <span class="sensor-label">J1</span>
+            <span id="sensor-j1" class="sensor-valor">0</span>
+            <span class="sensor-label">J2</span>
+            <span id="sensor-j2" class="sensor-valor">0</span>
+            <span class="sensor-label">J3</span>
+            <span id="sensor-j3" class="sensor-valor">0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Controle remoto -->
+    <section class="bay bay-controle" aria-labelledby="t-controle">
+      <h2 class="bay-title" id="t-controle"><span class="bay-title-k">CMD</span> Controle remoto</h2>
+      <p class="bay-desc">Envie comandos ao sistema pela nuvem.</p>
+      <div class="botoes-controle">
+        <button id="btn-solicitar-a" class="btn btn-peca btn-a">
+          <span class="btn-icon" aria-hidden="true">🟥</span>
+          Solicitar A
+        </button>
+        <button id="btn-solicitar-b" class="btn btn-peca btn-b">
+          <span class="btn-icon" aria-hidden="true">🟩</span>
+          Solicitar B
+        </button>
+        <button id="btn-solicitar-c" class="btn btn-peca btn-c">
+          <span class="btn-icon" aria-hidden="true">🟦</span>
+          Solicitar C
+        </button>
+        <button id="btn-reset" class="btn btn-reset">
+          <span class="btn-icon" aria-hidden="true">🔄</span>
+          Reiniciar
+        </button>
+      </div>
+    </section>
+
+    <!-- Histórico -->
+    <section class="bay bay-historico" aria-labelledby="t-historico">
+      <h2 class="bay-title" id="t-historico"><span class="bay-title-k">LOG</span> Histórico de eventos</h2>
+      <div id="historico-lista" class="historico-lista" tabindex="0" role="log" aria-live="polite" aria-label="Histórico de eventos">
+        <div class="historico-item historico-vazio">
+          Aguardando eventos…
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ============================================================ -->
-  <!-- FOOTER -->
+  <!-- RODAPÉ -->
   <!-- ============================================================ -->
   <footer class="footer">
     <span>Data Flow Inventory — SENAI São Caetano do Sul — Engenharia de Controle e Automação</span>
