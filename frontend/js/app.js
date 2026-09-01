@@ -17,10 +17,14 @@ const socket = io();
 // REFERÊNCIAS DOS ELEMENTOS DO DOM
 // ============================================================
 const els = {
-  // Header
+  // Faixa anunciadora
   mqttStatus: document.getElementById('mqtt-status'),
   gatewayStatus: document.getElementById('gateway-status'),
   serverTime: document.getElementById('server-time'),
+  annunEstado: document.getElementById('annun-estado'),
+  annunEstadoV: document.getElementById('annun-estado-v'),
+  annunEstoque: document.getElementById('annun-estoque'),
+  annunEstoqueV: document.getElementById('annun-estoque-v'),
 
   // Estado
   estadoAtual: document.getElementById('estado-atual'),
@@ -81,6 +85,34 @@ const els = {
 // ============================================================
 let historicoEventos = [];
 const MAX_HISTORICO = 30;
+
+// Respeita a preferência do sistema por menos movimento.
+const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ============================================================
+// FAIXA ANUNCIADORA — janelas de estado
+// ============================================================
+// Estados: 'off' | 'idle' | 'run' | 'warn' | 'fault' | 'boot'
+const RANK_ANUNCIADOR = { off: 0, idle: 1, boot: 1, run: 1, warn: 2, fault: 3 };
+
+function setAnunciador(cell, estado, valor) {
+  if (!cell) return;
+  const anterior = cell.dataset.state || 'off';
+  const valEl = cell.querySelector('.annun-v');
+  if (valEl && valor !== undefined) valEl.textContent = valor;
+  if (estado === anterior) return;
+
+  cell.dataset.state = estado;
+
+  // Comportamento "first-out": pisca uma vez ao piorar, depois assenta.
+  const piorou = RANK_ANUNCIADOR[estado] > RANK_ANUNCIADOR[anterior];
+  if (piorou && !semMovimento) {
+    cell.classList.remove('is-alarm');
+    void cell.offsetWidth; // reinicia a animação
+    cell.classList.add('is-alarm');
+    setTimeout(() => cell.classList.remove('is-alarm'), 1400);
+  }
+}
 
 // ============================================================
 // ESTOQUE BAIXO — classificação por nível
@@ -223,29 +255,50 @@ socket.on('comando_erro', (data) => {
 // ============================================================
 
 function atualizarStatusConexao(conectado) {
-  if (conectado) {
-    els.mqttStatus.className = 'status-badge status-online';
-    els.mqttStatus.innerHTML = '<span class="status-dot"></span> Conectado';
-  } else {
-    els.mqttStatus.className = 'status-badge status-offline';
-    els.mqttStatus.innerHTML = '<span class="status-dot"></span> Desconectado';
-  }
+  setAnunciador(
+    els.mqttStatus,
+    conectado ? 'run' : 'fault',
+    conectado ? 'Conectado' : 'Sem enlace'
+  );
 }
 
 function atualizarGateway(data) {
-  if (!els.gatewayStatus) return;
-  if (data.status === 'online') {
-    els.gatewayStatus.className = 'status-badge status-online';
-    els.gatewayStatus.innerHTML = '<span class="status-dot"></span> ESP32 Online';
-  } else {
-    els.gatewayStatus.className = 'status-badge status-offline';
-    els.gatewayStatus.innerHTML = '<span class="status-dot"></span> ESP32 Offline';
-  }
+  const online = data.status === 'online';
+  setAnunciador(
+    els.gatewayStatus,
+    online ? 'run' : 'fault',
+    online ? 'ESP32 online' : 'ESP32 offline'
+  );
+}
+
+// Mapeia o estado da máquina para uma luz de sinalização.
+const LUZ_ESTADO = {
+  AGUARDANDO_PEDIDO: 'idle',
+  VERIFICANDO_ESTOQUE: 'warn',
+  ACIONANDO_ESTEIRA: 'run',
+  ENTREGANDO_PECA: 'run',
+  ERRO: 'fault',
+};
+
+function atualizarAnunciadorEstado(estado) {
+  setAnunciador(els.annunEstado, LUZ_ESTADO[estado] || 'boot', estado);
+}
+
+// Reflete o pior nível de estoque entre as três peças na faixa.
+const LUZ_ESTOQUE = { normal: 'run', aviso: 'warn', alerta: 'fault', critico: 'fault' };
+const TEXTO_ESTOQUE = { normal: 'Normal', aviso: 'Baixo', alerta: 'Alerta', critico: 'Crítico' };
+
+function atualizarAnunciadorEstoque() {
+  const pior = ['A', 'B', 'C']
+    .map((l) => nivelEstoque[l])
+    .reduce((a, b) => (NIVEIS_ESTOQUE.indexOf(b) > NIVEIS_ESTOQUE.indexOf(a) ? b : a), 'normal');
+  setAnunciador(els.annunEstoque, LUZ_ESTOQUE[pior], TEXTO_ESTOQUE[pior]);
 }
 
 function atualizarEstado(data) {
   const estado = data.estado || 'DESCONHECIDO';
   els.estadoAtual.textContent = estado;
+  atualizarAnunciadorEstado(estado);
 
   // Cor do estado baseado no tipo
   switch (estado) {
@@ -308,6 +361,7 @@ function atualizarEstoque(data) {
     avaliarEstoqueBaixo('C', data.pecaC, els.estoqueBadgeC);
   }
   estoqueSemeado = true;
+  atualizarAnunciadorEstoque();
 }
 
 // Classifica a quantidade da peça, atualiza o indicador inline e registra
@@ -525,27 +579,32 @@ function formatarUptime(segundos) {
 }
 
 function animarNumero(element, de, para) {
-  if (de === para) return;
+  if (de === para || Number.isNaN(para)) {
+    if (!Number.isNaN(para)) element.textContent = para;
+    return;
+  }
 
-  // Define a transição ANTES de alterar o valor (necessário para animar)
-  element.style.transition = 'all 0.3s ease';
   element.textContent = para;
+  if (semMovimento) return;
 
-  // Animação de destaque
-  element.style.transform = 'scale(1.3)';
-  element.style.color = 'var(--accent-yellow)';
+  // Destaque momentâneo ao trocar o valor.
+  element.style.transition = 'transform 0.3s ease, color 0.3s ease';
+  element.style.transform = 'scale(1.22)';
+  element.style.color = 'var(--led-warn)';
   setTimeout(() => {
     element.style.transform = 'scale(1)';
-    element.style.color = 'var(--text-primary)';
-  }, 400);
+    element.style.color = 'var(--readout)';
+  }, 380);
 }
 
 function flashCard(cardId, cor) {
+  if (semMovimento) return;
   const card = document.querySelector('.' + cardId);
   if (!card) return;
 
+  card.style.transition = 'border-color 0.2s ease, box-shadow 0.2s ease';
   card.style.borderColor = cor;
-  card.style.boxShadow = `0 0 20px ${cor}40`;
+  card.style.boxShadow = `0 0 22px ${cor}40`;
   setTimeout(() => {
     card.style.borderColor = '';
     card.style.boxShadow = '';
@@ -573,4 +632,4 @@ els.serverTime.textContent = new Date().toLocaleTimeString('pt-BR');
 // ============================================================
 // INICIALIZAÇÃO
 // ============================================================
-console.log('[Data Flow Inventory] Dashboard carregado');
+console.log('[Data Flow Inventory] Painel carregado');
