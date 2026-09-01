@@ -291,6 +291,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.4rem;
   flex: 1;
 }
 
@@ -303,6 +305,33 @@ body {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
+}
+
+/* Indicador de estoque baixo (por peça) */
+.estoque-badge {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+.estoque-badge-aviso {
+  color: var(--accent-yellow);
+  border: 1px solid var(--accent-yellow);
+}
+
+.estoque-badge-alerta {
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+}
+
+.estoque-badge-critico {
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+  font-weight: 700;
+  animation: pulse 1s ease-in-out infinite;
 }
 
 /* ============================================================
@@ -551,6 +580,10 @@ body {
 
 .historico-item.evento-inicio {
   border-left-color: var(--accent-purple);
+}
+
+.historico-item.evento-aviso {
+  border-left-color: var(--accent-yellow);
 }
 
 .historico-vazio {

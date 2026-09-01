@@ -32,6 +32,11 @@ const els = {
   estoqueB: document.getElementById('estoque-b'),
   estoqueC: document.getElementById('estoque-c'),
 
+  // Indicadores de estoque baixo (por peça)
+  estoqueBadgeA: document.getElementById('estoque-badge-a'),
+  estoqueBadgeB: document.getElementById('estoque-badge-b'),
+  estoqueBadgeC: document.getElementById('estoque-badge-c'),
+
   // Esteiras
   esteiraPrincipal: document.getElementById('esteira-principal'),
   esteiraA: document.getElementById('esteira-a'),
@@ -76,6 +81,34 @@ const els = {
 // ============================================================
 let historicoEventos = [];
 const MAX_HISTORICO = 30;
+
+// ============================================================
+// ESTOQUE BAIXO — classificação por nível
+// ============================================================
+// Limites (por peça):
+//   >= 4  -> normal   (indicador oculto)
+//   == 3  -> aviso
+//   == 2  -> alerta
+//   <= 1  -> critico   (0 ou 1)
+// O indicador inline no card sempre reflete o nível atual.
+// O histórico só registra quando a peça PIORA de nível.
+const NIVEIS_ESTOQUE = ['normal', 'aviso', 'alerta', 'critico'];
+const nivelEstoque = { A: 'normal', B: 'normal', C: 'normal' };
+let estoqueSemeado = false; // o 1º snapshot não gera linha no histórico
+
+const BADGE_ESTOQUE = {
+  normal:  { texto: '',                    classe: '' },
+  aviso:   { texto: '⚠️ Estoque baixo',    classe: 'estoque-badge-aviso' },
+  alerta:  { texto: '🔴 Estoque em alerta', classe: 'estoque-badge-alerta' },
+  critico: { texto: '🚨 Estoque crítico',  classe: 'estoque-badge-critico' },
+};
+
+function classificarEstoque(qtd) {
+  if (qtd >= 4) return 'normal';
+  if (qtd === 3) return 'aviso';
+  if (qtd === 2) return 'alerta';
+  return 'critico'; // 0 ou 1
+}
 
 // ============================================================
 // EVENTOS SOCKET.IO — RECEBIMENTO DE DADOS
@@ -264,12 +297,50 @@ function atualizarEstado(data) {
 function atualizarEstoque(data) {
   if (data.pecaA !== undefined) {
     animarNumero(els.estoqueA, parseInt(els.estoqueA.textContent), data.pecaA);
+    avaliarEstoqueBaixo('A', data.pecaA, els.estoqueBadgeA);
   }
   if (data.pecaB !== undefined) {
     animarNumero(els.estoqueB, parseInt(els.estoqueB.textContent), data.pecaB);
+    avaliarEstoqueBaixo('B', data.pecaB, els.estoqueBadgeB);
   }
   if (data.pecaC !== undefined) {
     animarNumero(els.estoqueC, parseInt(els.estoqueC.textContent), data.pecaC);
+    avaliarEstoqueBaixo('C', data.pecaC, els.estoqueBadgeC);
+  }
+  estoqueSemeado = true;
+}
+
+// Classifica a quantidade da peça, atualiza o indicador inline e registra
+// no histórico apenas quando o nível piora (normal < aviso < alerta < critico).
+function avaliarEstoqueBaixo(letra, valor, elBadge) {
+  const qtd = Number(valor);
+  if (!Number.isFinite(qtd)) return;
+
+  const nivel = classificarEstoque(qtd);
+  const anterior = nivelEstoque[letra];
+
+  atualizarBadgeEstoque(elBadge, nivel, qtd);
+
+  if (
+    estoqueSemeado &&
+    NIVEIS_ESTOQUE.indexOf(nivel) > NIVEIS_ESTOQUE.indexOf(anterior)
+  ) {
+    adicionarHistorico('estoque_' + nivel, letra, qtd);
+  }
+
+  nivelEstoque[letra] = nivel;
+}
+
+function atualizarBadgeEstoque(elBadge, nivel, qtd) {
+  if (!elBadge) return;
+  const cfg = BADGE_ESTOQUE[nivel];
+  elBadge.className = 'estoque-badge' + (cfg.classe ? ' ' + cfg.classe : '');
+  if (nivel === 'normal') {
+    elBadge.textContent = '';
+    elBadge.hidden = true;
+  } else {
+    elBadge.textContent = `${cfg.texto} (${qtd})`;
+    elBadge.hidden = false;
   }
 }
 
@@ -385,6 +456,18 @@ function adicionarHistorico(evento, peca, tipo, scroll = true) {
       break;
     case 'gateway_offline':
       msg = 'Gateway ESP32 OFFLINE (hardware desconectado)';
+      classe = 'evento-erro';
+      break;
+    case 'estoque_aviso':
+      msg = `Peça ${peca}: estoque baixo — ${tipo} ${tipo === 1 ? 'restante' : 'restantes'}`;
+      classe = 'evento-aviso';
+      break;
+    case 'estoque_alerta':
+      msg = `Peça ${peca}: estoque em alerta — ${tipo} ${tipo === 1 ? 'restante' : 'restantes'}`;
+      classe = 'evento-erro';
+      break;
+    case 'estoque_critico':
+      msg = `Peça ${peca}: estoque crítico — ${tipo} ${tipo === 1 ? 'restante' : 'restantes'}`;
       classe = 'evento-erro';
       break;
     default:
