@@ -465,6 +465,32 @@ body {
   pointer-events: none;
 }
 
+/* Cena 3D (three.js) — ocupa a moldura; fica entre a grade (::before)
+   e o reflexo de vidro (::after, z-index 2). Só aparece quando o
+   módulo consegue inicializar. */
+.mimic-3d {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+}
+
+.mimic-3d canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.mimic.diag-3d-ativo .mimic-3d {
+  display: block;
+}
+
+/* Com a cena 3D ativa, o SVG sai de cena (fica como fallback no DOM) */
+.mimic.diag-3d-ativo .mimic-stage {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Reflexo de vidro sutil no plano da frente */
 .mimic::after {
   content: "";

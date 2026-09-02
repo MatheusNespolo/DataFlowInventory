@@ -57,6 +57,7 @@
     <section class="bay bay-mimic" aria-labelledby="t-mimic">
       <h2 class="bay-title" id="t-mimic"><span class="bay-title-k">SYN</span> Diagrama do sistema</h2>
       <div class="mimic">
+        <div id="mimic-3d" class="mimic-3d" aria-hidden="true"></div>
         <div class="mimic-stage">
         <div class="mimic-sway">
         <svg id="diagrama-svg" viewBox="0 0 500 300" class="mimic-svg" role="img" aria-label="Diagrama das esteiras e sensores">
@@ -274,5 +275,8 @@
   <!-- ============================================================ -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="js/app.js"></script>
+  <!-- Aprimoramento progressivo: cena 3D do diagrama (three.js local).
+       Se falhar, o SVG acima continua valendo. -->
+  <script type="module" src="js/diagrama3d.js"></script>
 </body>
 </html>

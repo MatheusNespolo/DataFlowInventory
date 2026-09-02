@@ -93,6 +93,10 @@ const MAX_HISTORICO = 30;
 // Respeita a preferência do sistema por menos movimento.
 const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Estado compartilhado com a cena 3D do diagrama (js/diagrama3d.js).
+// Se o three.js/WebGL não carregar, este objeto simplesmente fica ocioso.
+window.EstadoDiagrama = { esteiras: {}, sensores: {} };
+
 // Dedupe de histórico durante o handshake do Socket.IO.
 let historicoSemeado = false;   // replay de estado_inicial só na 1ª vez
 let jaConectou = false;         // distingue 1ª conexão de reconexões
@@ -459,6 +463,8 @@ function atualizarEsteiras(data) {
   if (data.secC !== undefined) {
     attrsSvg(els.svgEsteiraC, data.secC ? { fill: '#3498db', stroke: '#2980b9' } : { fill: '#555', stroke: '#777' });
   }
+
+  Object.assign(window.EstadoDiagrama.esteiras, data);
 }
 
 function atualizarEsteira(element, ligada) {
@@ -481,6 +487,14 @@ function atualizarSensores(data) {
     atualizarSensor(els.sensorJ1, els.svgSensorJ1, data.juncao.J1);
     atualizarSensor(els.sensorJ2, els.svgSensorJ2, data.juncao.J2);
     atualizarSensor(els.sensorJ3, els.svgSensorJ3, data.juncao.J3);
+  }
+
+  const s = window.EstadoDiagrama.sensores;
+  if (data.topo) {
+    s.topoA = !!data.topo.A; s.topoB = !!data.topo.B; s.topoC = !!data.topo.C;
+  }
+  if (data.juncao) {
+    s.J1 = !!data.juncao.J1; s.J2 = !!data.juncao.J2; s.J3 = !!data.juncao.J3;
   }
 }
 

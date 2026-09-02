@@ -1,0 +1,4 @@
+# Biblioteca de terceiros embutida (three.js) — não conta em estatísticas
+# de linguagem, não aparece em diffs e não sofre normalização de EOL.
+frontend/vendor/** linguist-vendored
+frontend/vendor/*.min.js -text -diff
