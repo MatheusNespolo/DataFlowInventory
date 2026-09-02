@@ -51,12 +51,13 @@
   <!-- ============================================================ -->
   <!-- PAINEL PRINCIPAL                                             -->
   <!-- ============================================================ -->
-  <main class="cluster">
+  <main class="cluster view" id="view-principal" aria-label="Painel principal" tabindex="-1">
 
     <!-- HERO: diagrama mímico do sistema -->
     <section class="bay bay-mimic" aria-labelledby="t-mimic">
       <h2 class="bay-title" id="t-mimic"><span class="bay-title-k">SYN</span> Diagrama do sistema</h2>
       <div class="mimic">
+        <div class="mimic-stage">
         <svg id="diagrama-svg" viewBox="0 0 500 300" class="mimic-svg" role="img" aria-label="Diagrama das esteiras e sensores">
           <!-- Esteira Principal (horizontal) -->
           <rect id="svg-esteira-principal" x="100" y="130" width="300" height="40" rx="8" fill="#555" stroke="#777" stroke-width="2"/>
@@ -97,6 +98,7 @@
           </defs>
           <line x1="400" y1="150" x2="415" y2="150" stroke="#888" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </svg>
+        </div>
       </div>
     </section>
 
@@ -149,6 +151,45 @@
       </div>
     </section>
 
+    <!-- Controle remoto -->
+    <section class="bay bay-controle" aria-labelledby="t-controle">
+      <h2 class="bay-title" id="t-controle"><span class="bay-title-k">CMD</span> Controle remoto</h2>
+      <p class="bay-desc">Envie comandos ao sistema pela nuvem.</p>
+      <div class="botoes-controle">
+        <button id="btn-solicitar-a" class="btn btn-peca btn-a">
+          <span class="btn-icon" aria-hidden="true">🟥</span>
+          Solicitar A
+        </button>
+        <button id="btn-solicitar-b" class="btn btn-peca btn-b">
+          <span class="btn-icon" aria-hidden="true">🟩</span>
+          Solicitar B
+        </button>
+        <button id="btn-solicitar-c" class="btn btn-peca btn-c">
+          <span class="btn-icon" aria-hidden="true">🟦</span>
+          Solicitar C
+        </button>
+        <button id="btn-reset" class="btn btn-reset">
+          <span class="btn-icon" aria-hidden="true">🔄</span>
+          Reiniciar
+        </button>
+      </div>
+    </section>
+
+    <!-- Ir para o painel de equipamentos e histórico -->
+    <section class="bay bay-nav" aria-labelledby="t-nav">
+      <h2 class="bay-title" id="t-nav"><span class="bay-title-k">NAV</span> Equipamentos &amp; histórico</h2>
+      <p class="bay-desc">Estado das esteiras e sensores, com o registro completo de eventos.</p>
+      <a class="btn btn-nav" href="#/status">Abrir equipamentos &amp; histórico&nbsp;→</a>
+    </section>
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- PAINEL DE EQUIPAMENTOS & HISTÓRICO                           -->
+  <!-- ============================================================ -->
+  <main class="painel-status view" id="view-status" aria-label="Equipamentos e histórico" tabindex="-1" hidden>
+
+    <a class="voltar" href="#/">←&nbsp;Painel principal</a>
+
     <!-- Esteiras -->
     <section class="bay bay-esteiras" aria-labelledby="t-esteiras">
       <h2 class="bay-title" id="t-esteiras"><span class="bay-title-k">CNV</span> Esteiras</h2>
@@ -198,30 +239,6 @@
             <span id="sensor-j3" class="sensor-valor">0</span>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Controle remoto -->
-    <section class="bay bay-controle" aria-labelledby="t-controle">
-      <h2 class="bay-title" id="t-controle"><span class="bay-title-k">CMD</span> Controle remoto</h2>
-      <p class="bay-desc">Envie comandos ao sistema pela nuvem.</p>
-      <div class="botoes-controle">
-        <button id="btn-solicitar-a" class="btn btn-peca btn-a">
-          <span class="btn-icon" aria-hidden="true">🟥</span>
-          Solicitar A
-        </button>
-        <button id="btn-solicitar-b" class="btn btn-peca btn-b">
-          <span class="btn-icon" aria-hidden="true">🟩</span>
-          Solicitar B
-        </button>
-        <button id="btn-solicitar-c" class="btn btn-peca btn-c">
-          <span class="btn-icon" aria-hidden="true">🟦</span>
-          Solicitar C
-        </button>
-        <button id="btn-reset" class="btn btn-reset">
-          <span class="btn-icon" aria-hidden="true">🔄</span>
-          Reiniciar
-        </button>
       </div>
     </section>
 
