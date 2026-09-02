@@ -453,6 +453,10 @@ body {
 /* ============================================================
    HERO — diagrama mímico
    ============================================================ */
+/* Tela recuada: moldura escura com sombra interna profunda. A grade
+   fica numa camada própria bem ao fundo (.mimic::before), o SVG à
+   frente (.mimic-sway) e um brilho de vidro por cima (.mimic::after).
+   Os ângulos são pequenos — dá profundidade sem distorcer os elementos. */
 .mimic {
   position: relative;
   display: flex;
@@ -460,17 +464,43 @@ body {
   align-items: center;
   padding: clamp(0.75rem, 2vw, 1.5rem);
   background:
-    linear-gradient(var(--etch) 1px, transparent 1px) 0 0 / 100% 24px,
-    linear-gradient(90deg, var(--etch) 1px, transparent 1px) 0 0 / 24px 100%,
-    var(--bay-inset);
-  background-blend-mode: soft-light, soft-light, normal;
+    radial-gradient(120% 90% at 50% 12%, #1a1e27, var(--bay-inset) 70%);
   border: 1px solid var(--etch);
   border-radius: var(--radius-sm);
-  box-shadow: var(--bevel);
+  box-shadow:
+    var(--bevel),
+    inset 0 34px 60px -26px rgba(0, 0, 0, 0.75),
+    inset 0 -22px 44px -24px rgba(0, 0, 0, 0.55);
   min-height: 240px;
-  perspective: 1300px;
-  perspective-origin: 50% 34%;
+  perspective: 1000px;
+  perspective-origin: 50% 32%;
   overflow: hidden;
+  isolation: isolate;
+}
+
+/* Grade recuada, deslocada pelo parallax para separar do SVG */
+.mimic::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    linear-gradient(var(--etch) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, var(--etch) 1px, transparent 1px) 0 0 / 26px 100%;
+  opacity: 0.5;
+  transform: translateZ(-190px) translate3d(calc(var(--par-x, 0) * -26px), calc(var(--par-y, 0) * -26px), 0) scale(1.35);
+  transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Reflexo de vidro sutil no plano da frente */
+.mimic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.05), transparent 42%, transparent 78%, rgba(0, 0, 0, 0.14));
+  transform: translateZ(70px);
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* O hero preenche a altura do rail (Estado + Estoque + Controle),
@@ -484,35 +514,62 @@ body {
   flex: 1;
 }
 
-/* Camada de profundidade: inclina levemente o conjunto, sem distorcer
-   os elementos (ângulo pequeno, sem recorte). O parallax do ponteiro
-   ajusta --tilt-x / --tilt-y via JS; desligado em movimento reduzido. */
+/* Camada do ponteiro: inclina o conjunto conforme --tilt-x / --tilt-y
+   (ajustados por JS dentro de limites curtos). */
 .mimic-stage {
   width: 100%;
   display: flex;
   justify-content: center;
   transform-style: preserve-3d;
-  transform: rotateX(var(--tilt-x, 6deg)) rotateY(var(--tilt-y, 0deg));
+  transform: rotateX(var(--tilt-x, 7deg)) rotateY(var(--tilt-y, 0deg)) translateZ(24px);
   transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
   will-change: transform;
 }
 
-.mimic-stage::after {
+/* Camada do SVG dentro do palco 3D — ancora o halo e a sombra de
+   contato. Sem animação perpétua: a vida vem do parallax do ponteiro
+   e da separação entre as camadas. */
+.mimic-sway {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  transform-style: preserve-3d;
+}
+
+/* Halo de tela atrás do SVG */
+.mimic-sway::before {
   content: "";
   position: absolute;
-  inset: 10% 8%;
-  border-radius: 14px;
-  background: radial-gradient(58% 52% at 50% 46%, rgba(0, 0, 0, 0.42), transparent 76%);
-  transform: translateZ(-70px);
+  inset: 12% 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--led-idle) 22%, transparent), transparent 70%);
+  transform: translateZ(-30px);
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+/* Sombra de contato no "chão" */
+.mimic-sway::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 4%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(60% 100% at 50% 100%, rgba(0, 0, 0, 0.55), transparent 72%);
+  transform: translateZ(-60px) rotateX(72deg);
+  filter: blur(10px);
   z-index: -1;
   pointer-events: none;
 }
 
 .mimic-svg {
+  position: relative;
   width: 100%;
   max-width: 620px;
   height: auto;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.5));
 }
 
 /* ============================================================
@@ -998,13 +1055,16 @@ body {
     transition-duration: 0.001ms !important;
   }
   .mimic-stage {
-    transform: rotateX(4deg);
+    transform: rotateX(4deg) translateZ(20px);
+  }
+  .mimic::before {
+    transform: translateZ(-190px) scale(1.35);
   }
 }
 
 /* Sem ponteiro fino (toque): mantém só a inclinação de repouso */
 @media (hover: none) {
   .mimic-stage {
-    transform: rotateX(5deg);
+    transform: rotateX(5deg) translateZ(20px);
   }
 }

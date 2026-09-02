@@ -717,9 +717,10 @@ roteador(false);
 // ============================================================
 // PROFUNDIDADE DO DIAGRAMA — parallax suave do ponteiro
 // ============================================================
-// Inclinação de repouso pequena (definida no CSS). O ponteiro ajusta
-// --tilt-x / --tilt-y dentro de limites curtos, sem distorcer os
-// elementos. Desligado em movimento reduzido e em telas sem ponteiro.
+// O ponteiro inclina o palco (--tilt-x / --tilt-y) e desloca a grade ao
+// fundo (--par-x / --par-y) no sentido oposto, criando profundidade sem
+// distorcer os elementos. Só roda durante a interação; desligado em
+// movimento reduzido e em telas sem ponteiro.
 (function parallaxDiagrama() {
   if (semMovimento) return;
   if (!window.matchMedia('(hover: hover)').matches) return;
@@ -728,8 +729,8 @@ roteador(false);
   const stage = document.querySelector('.mimic-stage');
   if (!mimic || !stage) return;
 
-  const BASE_X = 6;   // graus
-  const AMPL = 3.2;   // amplitude do parallax
+  const BASE_X = 7;   // graus (inclinação de repouso)
+  const AMPL = 3.6;   // amplitude do parallax do ponteiro
   let raf = 0;
 
   mimic.addEventListener('pointermove', (e) => {
@@ -740,6 +741,8 @@ roteador(false);
     raf = requestAnimationFrame(() => {
       stage.style.setProperty('--tilt-y', (nx * AMPL * 2).toFixed(2) + 'deg');
       stage.style.setProperty('--tilt-x', (BASE_X - ny * AMPL).toFixed(2) + 'deg');
+      mimic.style.setProperty('--par-x', nx.toFixed(3));
+      mimic.style.setProperty('--par-y', ny.toFixed(3));
     });
   });
 
@@ -747,6 +750,8 @@ roteador(false);
     cancelAnimationFrame(raf);
     stage.style.setProperty('--tilt-y', '0deg');
     stage.style.setProperty('--tilt-x', BASE_X + 'deg');
+    mimic.style.setProperty('--par-x', '0');
+    mimic.style.setProperty('--par-y', '0');
   });
 })();
 
