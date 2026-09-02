@@ -15,6 +15,11 @@
   box-sizing: border-box;
 }
 
+/* O atributo hidden vence regras de display de classe (ex.: .painel-status) */
+[hidden] {
+  display: none !important;
+}
+
 :root {
   /* --- estrutura do painel --- */
   --panel:        #14161c;   /* fundo da bancada */
@@ -66,7 +71,7 @@
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
   --bevel: inset 0 1px 0 rgba(255, 255, 255, 0.04), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
-  --transition: 200ms ease;
+  --transition: 240ms cubic-bezier(0.2, 0.7, 0.2, 1);
 
   /* --- tipografia --- */
   --font-ui:  'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -201,6 +206,15 @@ body {
 .annun-cell[data-state="idle"]  { --led: var(--led-idle); }
 .annun-cell[data-state="boot"]  { --led: var(--led-boot); }
 
+/* Fonte de dados perdida: janela esmaecida, sem alarme */
+.annun-cell[data-state="stale"] {
+  --led: var(--muted);
+  opacity: 0.68;
+}
+.annun-cell[data-state="stale"] .annun-v {
+  color: var(--muted);
+}
+
 .annun-cell[data-state="fault"],
 .annun-cell[data-state="warn"] {
   border-color: color-mix(in srgb, var(--led) 45%, var(--etch));
@@ -220,6 +234,10 @@ body {
 
 .annun-cell[data-state="run"] .annun-led {
   animation: breathe 2.6s ease-in-out infinite;
+}
+
+.annun-cell[data-state="fault"] .annun-led {
+  animation: breathe 1.5s ease-in-out infinite;
 }
 
 .annun-k {
@@ -259,6 +277,8 @@ body {
 /* ============================================================
    PAINEL — grade de instrumentos
    ============================================================ */
+/* Uma única faixa: Estado/Estoque à esquerda, Diagrama ao centro (o
+   maior, mas pode encolher), Controle remoto à direita. */
 .cluster {
   flex: 1;
   width: 100%;
@@ -267,22 +287,94 @@ body {
   padding: clamp(0.75rem, 2vw, 1.5rem);
   display: grid;
   gap: clamp(0.6rem, 1.4vw, 1rem);
-  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr) minmax(0, 22rem);
+  grid-template-columns: minmax(12rem, 17rem) minmax(0, 1fr) minmax(11rem, 15rem);
   grid-template-areas:
-    "estado    mimic     controle"
-    "estoque   mimic     controle"
-    "esteiras  sensores  historico"
-    "esteiras  sensores  historico";
+    "estado   mimic  controle"
+    "estoque  mimic  controle";
   align-content: start;
 }
 
 .bay-mimic      { grid-area: mimic; }
 .card-estado    { grid-area: estado; }
 .card-estoque   { grid-area: estoque; }
-.bay-esteiras   { grid-area: esteiras; }
-.bay-sensores   { grid-area: sensores; }
 .bay-controle   { grid-area: controle; }
-.bay-historico  { grid-area: historico; }
+
+/* ============================================================
+   VISTAS (roteamento por hash) + navegação
+   ============================================================ */
+.view {
+  animation: viewIn 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Alvo de foco programático na troca de vista — sem contorno visível */
+.view:focus {
+  outline: none;
+}
+
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Painel de equipamentos & histórico (#/status) */
+.painel-status {
+  flex: 1;
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  display: grid;
+  gap: clamp(0.6rem, 1.4vw, 1rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "voltar    voltar"
+    "esteiras  sensores"
+    "historico historico";
+  align-content: start;
+}
+
+.painel-status .voltar { grid-area: voltar; }
+.bay-esteiras  { grid-area: esteiras; }
+.bay-sensores  { grid-area: sensores; }
+.bay-historico { grid-area: historico; }
+
+.voltar {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--readout-dim);
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--etch);
+  border-radius: var(--radius-sm);
+  background: var(--bay-raised);
+  box-shadow: var(--bevel);
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.voltar:hover {
+  color: var(--readout);
+  border-color: var(--etch-strong);
+}
+
+/* Atalho para #/status no rodapé (a página inicial não tem card de nav) */
+.footer-link {
+  color: var(--readout-dim);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.footer-link:hover {
+  color: var(--readout);
+  border-bottom-color: currentColor;
+}
 
 /* ============================================================
    JANELA (bay) — contêiner base
@@ -329,28 +421,138 @@ body {
 /* ============================================================
    HERO — diagrama mímico
    ============================================================ */
+/* Tela recuada: moldura escura com sombra interna profunda. A grade
+   fica numa camada própria bem ao fundo (.mimic::before), o SVG à
+   frente (.mimic-sway) e um brilho de vidro por cima (.mimic::after).
+   Os ângulos são pequenos — dá profundidade sem distorcer os elementos. */
 .mimic {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: clamp(0.75rem, 2vw, 1.5rem);
+  /* Ambiente tipo "light probe": luz fria difusa vindo de cima,
+     penumbra neutra ao centro, chão escuro embaixo. */
   background:
-    linear-gradient(var(--etch) 1px, transparent 1px) 0 0 / 100% 24px,
-    linear-gradient(90deg, var(--etch) 1px, transparent 1px) 0 0 / 24px 100%,
-    var(--bay-inset);
-  background-blend-mode: soft-light, soft-light, normal;
+    radial-gradient(75% 55% at 32% 8%, rgba(120, 170, 235, 0.16), transparent 60%),
+    radial-gradient(90% 70% at 68% 108%, rgba(0, 0, 0, 0.55), transparent 55%),
+    linear-gradient(180deg, #20242e, #14171f 58%, #0c0e14);
   border: 1px solid var(--etch);
   border-radius: var(--radius-sm);
-  box-shadow: var(--bevel);
-  min-height: 260px;
+  box-shadow:
+    var(--bevel),
+    inset 0 34px 60px -26px rgba(0, 0, 0, 0.75),
+    inset 0 -22px 44px -24px rgba(0, 0, 0, 0.55),
+    inset 0 0 120px 30px rgba(0, 0, 0, 0.45);   /* vinheta */
+  min-height: 240px;
+  perspective: 1000px;
+  perspective-origin: 50% 32%;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Grade recuada, deslocada pelo parallax para separar do SVG */
+.mimic::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    linear-gradient(var(--etch) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, var(--etch) 1px, transparent 1px) 0 0 / 26px 100%;
+  opacity: 0.5;
+  transform: translateZ(-190px) translate3d(calc(var(--par-x, 0) * -26px), calc(var(--par-y, 0) * -26px), 0) scale(1.35);
+  transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Reflexo de vidro sutil no plano da frente */
+.mimic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.05), transparent 42%, transparent 78%, rgba(0, 0, 0, 0.14));
+  transform: translateZ(70px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* O hero preenche a altura do rail (Estado + Estoque + Controle),
+   sem deixar vão morto à direita da seção Controle. */
+.bay-mimic {
+  display: flex;
+  flex-direction: column;
+}
+
+.bay-mimic .mimic {
+  flex: 1;
+}
+
+/* Camada do ponteiro: inclina o conjunto conforme --tilt-x / --tilt-y
+   (ajustados por JS dentro de limites curtos). */
+.mimic-stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x, 7deg)) rotateY(var(--tilt-y, 0deg)) translateZ(24px);
+  transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: transform;
+}
+
+/* Camada do SVG dentro do palco 3D — ancora o halo e a sombra de
+   contato. Sem animação perpétua: a vida vem do parallax do ponteiro
+   e da separação entre as camadas. */
+.mimic-sway {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  transform-style: preserve-3d;
+}
+
+/* Luz principal (quente-fria, canto superior esquerdo) + luz de
+   preenchimento (fraca, canto inferior direito) atrás do SVG */
+.mimic-sway::before {
+  content: "";
+  position: absolute;
+  inset: -6% -4%;
+  background:
+    radial-gradient(38% 42% at 26% 16%, rgba(150, 195, 255, 0.30), transparent 70%),
+    radial-gradient(42% 46% at 78% 92%, rgba(255, 210, 170, 0.10), transparent 72%);
+  transform: translateZ(-30px);
+  filter: blur(26px);
+  pointer-events: none;
+}
+
+/* Sombra de contato no "chão" */
+.mimic-sway::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 4%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(60% 100% at 50% 100%, rgba(0, 0, 0, 0.55), transparent 72%);
+  transform: translateZ(-60px) rotateX(72deg);
+  filter: blur(10px);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .mimic-svg {
+  position: relative;
   width: 100%;
   max-width: 620px;
   height: auto;
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.5));
+}
+
+/* Iluminação especular só nas esteiras (superfícies maiores) */
+#svg-esteira-principal,
+#svg-esteira-a,
+#svg-esteira-b,
+#svg-esteira-c {
+  filter: url(#reluz);
 }
 
 /* ============================================================
@@ -368,12 +570,12 @@ body {
 
 .readout-value {
   font-family: var(--font-mono);
-  font-size: var(--step-1);
+  font-size: clamp(0.92rem, 0.55rem + 1vw, 1.15rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--led-idle);
   text-shadow: 0 0 14px color-mix(in srgb, currentColor 45%, transparent);
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .spec {
@@ -771,14 +973,24 @@ body {
 /* ============================================================
    RESPONSIVO
    ============================================================ */
-@media (max-width: 1080px) {
+@media (max-width: 1024px) {
   .cluster {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
       "mimic    mimic"
       "estado   estoque"
-      "esteiras sensores"
-      "controle historico";
+      "controle controle";
+  }
+}
+
+@media (max-width: 900px) {
+  .painel-status {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "voltar"
+      "esteiras"
+      "sensores"
+      "historico";
   }
 }
 
@@ -789,10 +1001,7 @@ body {
       "mimic"
       "estado"
       "estoque"
-      "esteiras"
-      "sensores"
-      "controle"
-      "historico";
+      "controle";
   }
 
   .annun {
@@ -824,5 +1033,18 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+  .mimic-stage {
+    transform: rotateX(4deg) translateZ(20px);
+  }
+  .mimic::before {
+    transform: translateZ(-190px) scale(1.35);
+  }
+}
+
+/* Sem ponteiro fino (toque): mantém só a inclinação de repouso */
+@media (hover: none) {
+  .mimic-stage {
+    transform: rotateX(5deg) translateZ(20px);
   }
 }

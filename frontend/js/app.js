@@ -78,6 +78,10 @@ const els = {
 
   // Histórico
   historicoLista: document.getElementById('historico-lista'),
+
+  // Vistas (roteamento por hash)
+  viewPrincipal: document.getElementById('view-principal'),
+  viewStatus: document.getElementById('view-status'),
 };
 
 // ============================================================
@@ -89,11 +93,16 @@ const MAX_HISTORICO = 30;
 // Respeita a preferência do sistema por menos movimento.
 const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Dedupe de histórico durante o handshake do Socket.IO.
+let historicoSemeado = false;   // replay de estado_inicial só na 1ª vez
+let jaConectou = false;         // distingue 1ª conexão de reconexões
+let ultimoGatewayStatus = null; // evita linhas repetidas de gateway
+
 // ============================================================
 // FAIXA ANUNCIADORA — janelas de estado
 // ============================================================
-// Estados: 'off' | 'idle' | 'run' | 'warn' | 'fault' | 'boot'
-const RANK_ANUNCIADOR = { off: 0, idle: 1, boot: 1, run: 1, warn: 2, fault: 3 };
+// Estados: 'off' | 'stale' | 'idle' | 'run' | 'warn' | 'fault' | 'boot'
+const RANK_ANUNCIADOR = { off: 0, stale: 0, idle: 1, boot: 1, run: 1, warn: 2, fault: 3 };
 
 function setAnunciador(cell, estado, valor) {
   if (!cell) return;
@@ -150,18 +159,22 @@ function classificarEstoque(qtd) {
 socket.on('connect', () => {
   console.log('[WS] Conectado ao servidor — ID:', socket.id);
   atualizarStatusConexao(true);
+  if (jaConectou) adicionarHistorico('reconectado', '', '');
+  jaConectou = true;
 });
 
 // Desconectado do servidor
 socket.on('disconnect', () => {
   console.log('[WS] Desconectado do servidor');
   atualizarStatusConexao(false);
+  marcarSemDados();
 });
 
 // Erro de conexão (servidor offline, porta errada, etc.)
 socket.on('connect_error', (err) => {
   console.error('[WS] Erro de conexão:', err.message);
   atualizarStatusConexao(false);
+  marcarSemDados();
   adicionarHistorico('erro', '', `Conexão perdida: ${err.message}`);
 });
 
@@ -181,12 +194,16 @@ socket.on('estado_inicial', (data) => {
   if (data.esteiras) {
     atualizarEsteiras(data.esteiras);
   }
-  if (data.eventos && data.eventos.length > 0) {
+  // Replay do histórico apenas na primeira vez — reconexões não repetem.
+  if (!historicoSemeado && data.eventos && data.eventos.length > 0) {
     data.eventos.forEach(evt => {
       adicionarHistorico(evt.evento, evt.peca, evt.tipo, false);
     });
   }
+  historicoSemeado = true;
+
   if (data.gateway && data.gateway.status) {
+    ultimoGatewayStatus = data.gateway.status;
     atualizarGateway(data.gateway);
   }
 });
@@ -195,11 +212,14 @@ socket.on('estado_inicial', (data) => {
 // O broker publica "offline" automaticamente se o ESP32 cair.
 socket.on('gateway', (data) => {
   atualizarGateway(data);
-  adicionarHistorico(
-    data.status === 'online' ? 'gateway_online' : 'gateway_offline',
-    '',
-    ''
-  );
+  if (data.status !== ultimoGatewayStatus) {
+    ultimoGatewayStatus = data.status;
+    adicionarHistorico(
+      data.status === 'online' ? 'gateway_online' : 'gateway_offline',
+      '',
+      ''
+    );
+  }
 });
 
 // Status do sistema
@@ -289,10 +309,29 @@ const LUZ_ESTOQUE = { normal: 'run', aviso: 'warn', alerta: 'fault', critico: 'f
 const TEXTO_ESTOQUE = { normal: 'Normal', aviso: 'Baixo', alerta: 'Alerta', critico: 'Crítico' };
 
 function atualizarAnunciadorEstoque() {
-  const pior = ['A', 'B', 'C']
-    .map((l) => nivelEstoque[l])
-    .reduce((a, b) => (NIVEIS_ESTOQUE.indexOf(b) > NIVEIS_ESTOQUE.indexOf(a) ? b : a), 'normal');
-  setAnunciador(els.annunEstoque, LUZ_ESTOQUE[pior], TEXTO_ESTOQUE[pior]);
+  let pior = 'normal';
+  let piorLetra = '';
+  ['A', 'B', 'C'].forEach((l) => {
+    if (NIVEIS_ESTOQUE.indexOf(nivelEstoque[l]) > NIVEIS_ESTOQUE.indexOf(pior)) {
+      pior = nivelEstoque[l];
+      piorLetra = l;
+    }
+  });
+  const texto = pior === 'normal'
+    ? TEXTO_ESTOQUE.normal
+    : `${TEXTO_ESTOQUE[pior]} · ${piorLetra}`;
+  setAnunciador(els.annunEstoque, LUZ_ESTOQUE[pior], texto);
+}
+
+// Fonte de dados perdida: Estado / Estoque / Gateway esmaecem até
+// chegarem eventos reais na reconexão. (Enlace continua marcando falha.)
+function marcarSemDados() {
+  [els.annunEstado, els.annunEstoque, els.gatewayStatus].forEach((cell) => {
+    if (!cell) return;
+    cell.dataset.state = 'stale';
+    const v = cell.querySelector('.annun-v');
+    if (v) v.textContent = 'sem dados';
+  });
 }
 
 function atualizarEstado(data) {
@@ -392,6 +431,9 @@ function atualizarBadgeEstoque(elBadge, nivel, qtd) {
   if (nivel === 'normal') {
     elBadge.textContent = '';
     elBadge.hidden = true;
+  } else if (nivel === 'critico' && qtd === 0) {
+    elBadge.textContent = '🚨 Sem estoque';
+    elBadge.hidden = false;
   } else {
     elBadge.textContent = `${cfg.texto} (${qtd})`;
     elBadge.hidden = false;
@@ -512,6 +554,10 @@ function adicionarHistorico(evento, peca, tipo, scroll = true) {
       msg = 'Gateway ESP32 OFFLINE (hardware desconectado)';
       classe = 'evento-erro';
       break;
+    case 'reconectado':
+      msg = 'Reconectado ao servidor';
+      classe = 'evento-inicio';
+      break;
     case 'estoque_aviso':
       msg = `Peça ${peca}: estoque baixo — ${tipo} ${tipo === 1 ? 'restante' : 'restantes'}`;
       classe = 'evento-aviso';
@@ -521,7 +567,9 @@ function adicionarHistorico(evento, peca, tipo, scroll = true) {
       classe = 'evento-erro';
       break;
     case 'estoque_critico':
-      msg = `Peça ${peca}: estoque crítico — ${tipo} ${tipo === 1 ? 'restante' : 'restantes'}`;
+      msg = tipo === 0
+        ? `Peça ${peca}: sem estoque`
+        : `Peça ${peca}: estoque crítico — 1 restante`;
       classe = 'evento-erro';
       break;
     default:
@@ -628,6 +676,88 @@ setInterval(() => {
 
 // Relógio inicial
 els.serverTime.textContent = new Date().toLocaleTimeString('pt-BR');
+
+// ============================================================
+// ROTEAMENTO POR HASH — principal (#/) e equipamentos+histórico (#/status)
+// ============================================================
+// Uma única conexão Socket.IO alimenta as duas vistas; alternar é só
+// mostrar/ocultar. A faixa anunciadora fica fora das duas (sempre visível).
+const TITULO_BASE = 'Data Flow Inventory — Painel';
+const TITULO_STATUS = 'Equipamentos & histórico — Data Flow Inventory';
+
+function definirLive(container, valor) {
+  if (!container) return;
+  container.querySelectorAll('[aria-live]').forEach((el) => el.setAttribute('aria-live', valor));
+}
+
+function roteador(mudarFoco) {
+  const status = location.hash === '#/status';
+  const ativa = status ? els.viewStatus : els.viewPrincipal;
+  const inativa = status ? els.viewPrincipal : els.viewStatus;
+  if (!ativa || !inativa) return;
+
+  inativa.hidden = true;
+  ativa.hidden = false;
+  document.title = status ? TITULO_STATUS : TITULO_BASE;
+
+  // O atalho no rodapé só faz sentido na página inicial.
+  const footerNav = document.getElementById('footer-nav');
+  if (footerNav) footerNav.hidden = status;
+
+  // A vista oculta não deve anunciar atualizações para leitores de tela.
+  definirLive(inativa, 'off');
+  definirLive(ativa, 'polite');
+
+  // Só move o foco quando o usuário navega (não no carregamento inicial).
+  if (mudarFoco) {
+    ativa.focus({ preventScroll: false });
+    window.scrollTo(0, 0);
+  }
+}
+
+window.addEventListener('hashchange', () => roteador(true));
+roteador(false);
+
+// ============================================================
+// PROFUNDIDADE DO DIAGRAMA — parallax suave do ponteiro
+// ============================================================
+// O ponteiro inclina o palco (--tilt-x / --tilt-y) e desloca a grade ao
+// fundo (--par-x / --par-y) no sentido oposto, criando profundidade sem
+// distorcer os elementos. Só roda durante a interação; desligado em
+// movimento reduzido e em telas sem ponteiro.
+(function parallaxDiagrama() {
+  if (semMovimento) return;
+  if (!window.matchMedia('(hover: hover)').matches) return;
+
+  const mimic = document.querySelector('.mimic');
+  const stage = document.querySelector('.mimic-stage');
+  if (!mimic || !stage) return;
+
+  const BASE_X = 7;   // graus (inclinação de repouso)
+  const AMPL = 3.6;   // amplitude do parallax do ponteiro
+  let raf = 0;
+
+  mimic.addEventListener('pointermove', (e) => {
+    const r = mimic.getBoundingClientRect();
+    const nx = (e.clientX - r.left) / r.width - 0.5;   // -0.5 .. 0.5
+    const ny = (e.clientY - r.top) / r.height - 0.5;
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      stage.style.setProperty('--tilt-y', (nx * AMPL * 2).toFixed(2) + 'deg');
+      stage.style.setProperty('--tilt-x', (BASE_X - ny * AMPL).toFixed(2) + 'deg');
+      mimic.style.setProperty('--par-x', nx.toFixed(3));
+      mimic.style.setProperty('--par-y', ny.toFixed(3));
+    });
+  });
+
+  mimic.addEventListener('pointerleave', () => {
+    cancelAnimationFrame(raf);
+    stage.style.setProperty('--tilt-y', '0deg');
+    stage.style.setProperty('--tilt-x', BASE_X + 'deg');
+    mimic.style.setProperty('--par-x', '0');
+    mimic.style.setProperty('--par-y', '0');
+  });
+})();
 
 // ============================================================
 // INICIALIZAÇÃO
