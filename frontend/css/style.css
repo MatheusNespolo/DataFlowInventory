@@ -277,6 +277,8 @@ body {
 /* ============================================================
    PAINEL — grade de instrumentos
    ============================================================ */
+/* Uma única faixa: Estado/Estoque à esquerda, Diagrama ao centro (o
+   maior, mas pode encolher), Controle remoto à direita. */
 .cluster {
   flex: 1;
   width: 100%;
@@ -285,12 +287,10 @@ body {
   padding: clamp(0.75rem, 2vw, 1.5rem);
   display: grid;
   gap: clamp(0.6rem, 1.4vw, 1rem);
-  grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
+  grid-template-columns: minmax(12rem, 17rem) minmax(0, 1fr) minmax(11rem, 15rem);
   grid-template-areas:
-    "estado    mimic"
-    "estoque   mimic"
-    "controle  mimic"
-    "nav       nav";
+    "estado   mimic  controle"
+    "estoque  mimic  controle";
   align-content: start;
 }
 
@@ -298,7 +298,6 @@ body {
 .card-estado    { grid-area: estado; }
 .card-estoque   { grid-area: estoque; }
 .bay-controle   { grid-area: controle; }
-.bay-nav        { grid-area: nav; }
 
 /* ============================================================
    VISTAS (roteamento por hash) + navegação
@@ -363,49 +362,18 @@ body {
   border-color: var(--etch-strong);
 }
 
-.bay-nav {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1.25rem;
-}
-
-.bay-nav .bay-title {
-  margin-bottom: 0;
-}
-
-.bay-nav .bay-desc {
-  margin-bottom: 0;
-  flex: 1;
-  min-width: 12rem;
-}
-
-.btn-nav {
-  --btn: var(--led-idle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.85rem 1rem;
-  border: 1px solid color-mix(in srgb, var(--btn) 45%, var(--etch));
-  border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--btn) 18%, transparent), color-mix(in srgb, var(--btn) 8%, transparent)),
-    var(--bay-inset);
-  color: var(--readout);
-  font-family: var(--font-ui);
-  font-size: var(--step-0);
-  font-weight: 600;
-  letter-spacing: 0.01em;
+/* Atalho para #/status no rodapé (a página inicial não tem card de nav) */
+.footer-link {
+  color: var(--readout-dim);
   text-decoration: none;
-  box-shadow: var(--bevel);
-  transition: transform var(--transition), border-color var(--transition);
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
 }
 
-.btn-nav:hover {
-  transform: translateY(-1px);
-  border-color: var(--btn);
+.footer-link:hover {
+  color: var(--readout);
+  border-bottom-color: currentColor;
 }
 
 /* ============================================================
@@ -463,14 +431,19 @@ body {
   justify-content: center;
   align-items: center;
   padding: clamp(0.75rem, 2vw, 1.5rem);
+  /* Ambiente tipo "light probe": luz fria difusa vindo de cima,
+     penumbra neutra ao centro, chão escuro embaixo. */
   background:
-    radial-gradient(120% 90% at 50% 12%, #1a1e27, var(--bay-inset) 70%);
+    radial-gradient(75% 55% at 32% 8%, rgba(120, 170, 235, 0.16), transparent 60%),
+    radial-gradient(90% 70% at 68% 108%, rgba(0, 0, 0, 0.55), transparent 55%),
+    linear-gradient(180deg, #20242e, #14171f 58%, #0c0e14);
   border: 1px solid var(--etch);
   border-radius: var(--radius-sm);
   box-shadow:
     var(--bevel),
     inset 0 34px 60px -26px rgba(0, 0, 0, 0.75),
-    inset 0 -22px 44px -24px rgba(0, 0, 0, 0.55);
+    inset 0 -22px 44px -24px rgba(0, 0, 0, 0.55),
+    inset 0 0 120px 30px rgba(0, 0, 0, 0.45);   /* vinheta */
   min-height: 240px;
   perspective: 1000px;
   perspective-origin: 50% 32%;
@@ -536,15 +509,17 @@ body {
   transform-style: preserve-3d;
 }
 
-/* Halo de tela atrás do SVG */
+/* Luz principal (quente-fria, canto superior esquerdo) + luz de
+   preenchimento (fraca, canto inferior direito) atrás do SVG */
 .mimic-sway::before {
   content: "";
   position: absolute;
-  inset: 12% 14%;
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--led-idle) 22%, transparent), transparent 70%);
+  inset: -6% -4%;
+  background:
+    radial-gradient(38% 42% at 26% 16%, rgba(150, 195, 255, 0.30), transparent 70%),
+    radial-gradient(42% 46% at 78% 92%, rgba(255, 210, 170, 0.10), transparent 72%);
   transform: translateZ(-30px);
-  filter: blur(24px);
+  filter: blur(26px);
   pointer-events: none;
 }
 
@@ -572,6 +547,14 @@ body {
   filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.5));
 }
 
+/* Iluminação especular só nas esteiras (superfícies maiores) */
+#svg-esteira-principal,
+#svg-esteira-a,
+#svg-esteira-b,
+#svg-esteira-c {
+  filter: url(#reluz);
+}
+
 /* ============================================================
    ESTADO — leitura retroiluminada
    ============================================================ */
@@ -587,12 +570,12 @@ body {
 
 .readout-value {
   font-family: var(--font-mono);
-  font-size: var(--step-1);
+  font-size: clamp(0.92rem, 0.55rem + 1vw, 1.15rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--led-idle);
   text-shadow: 0 0 14px color-mix(in srgb, currentColor 45%, transparent);
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .spec {
@@ -990,16 +973,14 @@ body {
 /* ============================================================
    RESPONSIVO
    ============================================================ */
-@media (max-width: 1080px) {
+@media (max-width: 1024px) {
   .cluster {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
       "mimic    mimic"
       "estado   estoque"
-      "controle controle"
-      "nav      nav";
+      "controle controle";
   }
-  .bay-mimic { align-self: stretch; }
 }
 
 @media (max-width: 900px) {
@@ -1020,8 +1001,7 @@ body {
       "mimic"
       "estado"
       "estoque"
-      "controle"
-      "nav";
+      "controle";
   }
 
   .annun {

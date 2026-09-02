@@ -700,6 +700,10 @@ function roteador(mudarFoco) {
   ativa.hidden = false;
   document.title = status ? TITULO_STATUS : TITULO_BASE;
 
+  // O atalho no rodapé só faz sentido na página inicial.
+  const footerNav = document.getElementById('footer-nav');
+  if (footerNav) footerNav.hidden = status;
+
   // A vista oculta não deve anunciar atualizações para leitores de tela.
   definirLive(inativa, 'off');
   definirLive(ativa, 'polite');

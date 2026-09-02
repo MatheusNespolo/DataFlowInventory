@@ -96,6 +96,18 @@
             <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
               <polygon points="0 0, 10 3.5, 0 7" fill="#888"/>
             </marker>
+            <!-- Realce especular: luz difusa vinda do canto superior esquerdo,
+                 dá às esteiras um brilho de superfície levemente arredondada -->
+            <filter id="reluz" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="1.3" result="b"/>
+              <feSpecularLighting in="b" surfaceScale="1.8" specularConstant="0.38"
+                specularExponent="22" lighting-color="#dce6ff" result="s">
+                <feDistantLight azimuth="235" elevation="58"/>
+              </feSpecularLighting>
+              <feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/>
+              <feComposite in="SourceGraphic" in2="sc" operator="arithmetic"
+                k1="0" k2="1" k3="0.55" k4="0"/>
+            </filter>
           </defs>
           <line x1="400" y1="150" x2="415" y2="150" stroke="#888" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </svg>
@@ -176,13 +188,6 @@
         </button>
       </div>
     </section>
-
-    <!-- Ir para o painel de equipamentos e histórico -->
-    <section class="bay bay-nav" aria-labelledby="t-nav">
-      <h2 class="bay-title" id="t-nav"><span class="bay-title-k">NAV</span> Equipamentos &amp; histórico</h2>
-      <p class="bay-desc">Estado das esteiras e sensores, com o registro completo de eventos.</p>
-      <a class="btn btn-nav" href="#/status">Abrir equipamentos &amp; histórico&nbsp;→</a>
-    </section>
   </main>
 
   <!-- ============================================================ -->
@@ -260,6 +265,7 @@
   <!-- ============================================================ -->
   <footer class="footer">
     <span>Data Flow Inventory — SENAI São Caetano do Sul — Engenharia de Controle e Automação</span>
+    <a id="footer-nav" class="footer-link" href="#/status">Equipamentos &amp; histórico&nbsp;→</a>
     <span>2026</span>
   </footer>
 
