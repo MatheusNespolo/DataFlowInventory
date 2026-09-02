@@ -289,7 +289,8 @@ body {
   grid-template-areas:
     "estado    mimic"
     "estoque   mimic"
-    "controle  nav";
+    "controle  mimic"
+    "nav       nav";
   align-content: start;
 }
 
@@ -364,7 +365,20 @@ body {
 
 .bay-nav {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+}
+
+.bay-nav .bay-title {
+  margin-bottom: 0;
+}
+
+.bay-nav .bay-desc {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 12rem;
 }
 
 .btn-nav {
@@ -373,7 +387,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: auto;
   padding: 0.85rem 1rem;
   border: 1px solid color-mix(in srgb, var(--btn) 45%, var(--etch));
   border-radius: var(--radius-sm);
@@ -460,7 +473,8 @@ body {
   overflow: hidden;
 }
 
-/* O hero ocupa a altura da sua faixa (some o vão vazio ao lado do rail) */
+/* O hero preenche a altura do rail (Estado + Estoque + Controle),
+   sem deixar vão morto à direita da seção Controle. */
 .bay-mimic {
   display: flex;
   flex-direction: column;
@@ -925,7 +939,8 @@ body {
     grid-template-areas:
       "mimic    mimic"
       "estado   estoque"
-      "controle nav";
+      "controle controle"
+      "nav      nav";
   }
   .bay-mimic { align-self: stretch; }
 }
