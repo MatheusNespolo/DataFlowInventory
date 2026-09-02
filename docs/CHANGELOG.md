@@ -12,6 +12,19 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Frontend — Redesign do Painel Anunciador Industrial (02/09/2026)**
+  - Painel anunciador com indicadores visuais IEC-60073 (LED status: verde/amarelo/vermelho).
+  - Tipografia IBM Plex Sans (UI) e IBM Plex Mono (readouts de estado).
+  - Roteamento hash de vistas: `#/` (painel principal) e `#/status` (histórico/equipamentos).
+  - Depth panorâmico CSS-only (sem three.js) com parallax controller.
+  - Single-row layout para o painel principal: Estado | Diagrama | Controle em uma banda horizontal.
+  - Deduplicação de eventos em reconexão Socket.IO.
+  - Alertas de estoque graduados: aviso (=3), alerta (=2), crítico (≤1).
+  - Responsividade testada: 1920x1080, 1366x768, ≤720px.
+  - **PR #19 mergeada**: `feat/dashboard-split-status-page` (commits e2669d7, 346f5b7, 55c82cb, 886cd04, 741e211).
+
 ### Corrigido
 
 - **Dashboard travado em "ESP32 Offline" mesmo com o gateway online** — *regressão
