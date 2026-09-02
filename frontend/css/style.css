@@ -592,16 +592,33 @@ body {
   padding: 0.85rem 1rem;
   margin-bottom: 1rem;
   text-align: center;
+  /* Altura reservada: o box não muda de tamanho quando o código de
+     estado é longo (VERIFICANDO_ESTOQUE etc.), então nada empurra o
+     resto do painel durante o pedido. */
+  min-height: 3.9rem;
+  display: grid;
+  place-items: center;
 }
 
 .readout-value {
   font-family: var(--font-mono);
   font-size: clamp(0.92rem, 0.55rem + 1vw, 1.15rem);
   font-weight: 600;
+  line-height: 1.18;
   letter-spacing: 0.03em;
   color: var(--led-idle);
   text-shadow: 0 0 14px color-mix(in srgb, currentColor 45%, transparent);
   overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Estados com muitos caracteres: fonte um pouco menor para caber numa
+   linha, dimensionada pela largura da COLUNA (cqi), não da viewport —
+   assim no mobile, onde a coluna é larga, a fonte não fica minúscula.
+   O box não muda de tamanho de qualquer forma (min-height acima). */
+.readout-value--compacto {
+  font-size: clamp(0.9rem, 5.4cqi, 1.08rem);
+  letter-spacing: 0.02em;
 }
 
 .spec {

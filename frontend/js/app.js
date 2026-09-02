@@ -341,6 +341,10 @@ function marcarSemDados() {
 function atualizarEstado(data) {
   const estado = data.estado || 'DESCONHECIDO';
   els.estadoAtual.textContent = estado;
+  // Códigos de estado bem longos (ex.: VERIFICANDO_ESTOQUE) usam fonte
+  // menor para caber numa linha. O box não muda de altura de qualquer
+  // forma (min-height reservado no CSS).
+  els.estadoAtual.classList.toggle('readout-value--compacto', estado.length > 18);
   atualizarAnunciadorEstado(estado);
 
   // Cor do estado baseado no tipo
