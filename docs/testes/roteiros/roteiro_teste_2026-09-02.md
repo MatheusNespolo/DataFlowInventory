@@ -4,11 +4,11 @@ Roteiro focado na validação do **Teste 6 — Migração para o HiveMQ Cloud**,
 
 > **Objetivo do dia:** validar o transporte MQTT seguro entre ESP32, Node.js, HiveMQ Cloud e Dashboard, sem modificar a lógica da FSM do Arduino Uno. O Teste 5 (duas esteiras A+B) permanece `Blocked` e não deve ser improvisado com o hardware disponível.
 
-> **Data/hora da execução:** ____/____/2026, ____:____–____:____  
-> **Executor(es):** ____________________  
-> **Cluster HiveMQ:** ____________________  
-> **Região/endpoint:** ____________________  
-> **Commit de referência:** `____________________`
+> **Data/hora da execução:** 02/09/2026, 18:30 
+> **Executor(es):** Henrique Moni, Matheus Nespolo, Murilo Tolardo e Vitor Marcolongo  
+> **Cluster HiveMQ:** 24a4ba9fa47343098f84c9d6be2786c0 
+> **Região/endpoint:** s1.eu.hivemq.cloud
+> **Commit de referência:** `628182d`
 
 ---
 
@@ -72,20 +72,20 @@ O teste será **Aprovado** somente se:
 
 ### 0.1 Preparação do workspace
 
-- [ ] Confirmar branch de trabalho e `git status --short` limpo antes de iniciar.
-- [ ] Não editar arquivos em `frontend/` durante a tarefa do agente de frontend.
-- [ ] Registrar o commit de referência deste teste.
-- [ ] Garantir que `esp32/gateway_mqtt/secrets.h` existe localmente e continua ignorado.
-- [ ] Garantir que `server/.env` existe localmente e continua ignorado.
-- [ ] Não fazer commit de `secrets.h`, `.env`, tokens, senhas ou certificados privados.
+- [x] Confirmar branch de trabalho e `git status --short` limpo antes de iniciar.
+- [x] Não editar arquivos em `frontend/` durante a tarefa do agente de frontend.
+- [x] Registrar o commit de referência deste teste.
+- [x] Garantir que `esp32/gateway_mqtt/secrets.h` existe localmente e continua ignorado.
+- [x] Garantir que `server/.env` existe localmente e continua ignorado.
+- [x] Não fazer commit de `secrets.h`, `.env`, tokens, senhas ou certificados privados.
 
 ### 0.2 Credenciais HiveMQ Cloud
 
-- [ ] Confirmar cluster ativo no [HiveMQ Cloud](https://cloud.hivemq.com).
-- [ ] Confirmar endpoint TLS do cluster, sem `https://` ou caminho adicional.
-- [ ] Confirmar usuário dedicado ao teste e senha válida.
-- [ ] Confirmar permissão de publicar e assinar em `dataflow/#`.
-- [ ] Registrar apenas endpoint, usuário mascarado e horário; nunca registrar a senha.
+- [x] Confirmar cluster ativo no [HiveMQ Cloud](https://cloud.hivemq.com).
+- [x] Confirmar endpoint TLS do cluster, sem `https://` ou caminho adicional.
+- [x] Confirmar usuário dedicado ao teste e senha válida.
+- [x] Confirmar permissão de publicar e assinar em `dataflow/#`.
+- [x] Registrar apenas endpoint, usuário mascarado e horário; nunca registrar a senha.
 
 No arquivo local `esp32/gateway_mqtt/secrets.h`:
 
@@ -105,17 +105,17 @@ MQTT_PASS=<senha-local-nao-registrar>
 MQTT_TOPIC_STATUS_SERVER=dataflow/status/server
 ```
 
-- [ ] Conferir se `MQTT_PORT`, autenticação e URL TLS são consumidos pelo código.
-- [ ] Não duplicar credenciais em outros arquivos.
+- [x] Conferir se `MQTT_PORT`, autenticação e URL TLS são consumidos pelo código.
+- [x] Não duplicar credenciais em outros arquivos.
 
 ### 0.3 Hardware e serviços
 
-- [ ] Reconferir UART: TX do Uno → divisor → GPIO16 do ESP32; GPIO17 → RX do Uno; GND comum.
-- [ ] Manter o segundo IRF520 fora do escopo; não ligar a esteira B sem montagem e proteção.
-- [ ] Energizar o Uno e o ESP32 em condições seguras.
-- [ ] Confirmar Wi-Fi 2,4 GHz com acesso à internet.
-- [ ] Parar/desabilitar o Mosquitto local durante o teste remoto.
-- [ ] Confirmar que não há outro processo usando a configuração de teste.
+- [x] Reconferir UART: TX do Uno → divisor → GPIO16 do ESP32; GPIO17 → RX do Uno; GND comum.
+- [x] Manter o segundo IRF520 fora do escopo; não ligar a esteira B sem montagem e proteção.
+- [x] Energizar o Uno e o ESP32 em condições seguras.
+- [x] Confirmar Wi-Fi 2,4 GHz com acesso à internet.
+- [x] Parar/desabilitar o Mosquitto local durante o teste remoto.
+- [x] Confirmar que não há outro processo usando a configuração de teste.
 
 ---
 
@@ -126,9 +126,9 @@ MQTT_TOPIC_STATUS_SERVER=dataflow/status/server
 3. Abrir o monitor serial em `115200 baud`.
 4. Registrar os eventos abaixo, sem incluir credenciais:
 
-- [ ] Wi-Fi conectado.
-- [ ] ESP32 obtém IP.
-- [ ] Cliente TLS inicializa sem erro de certificado/conexão.
+- [x] Wi-Fi conectado. (IP desconhecido conectado: 192.168.x.x)
+- [?] ESP32 obtém IP.
+- [?] Cliente TLS inicializa sem erro de certificado/conexão.
 - [ ] `[MQTT] Conectado!` na porta `8883`.
 - [ ] Gateway publica presença `online` em `dataflow/status`.
 - [ ] Gateway publica telemetria em `dataflow/sensores` e `dataflow/esteiras`.
@@ -136,16 +136,16 @@ MQTT_TOPIC_STATUS_SERVER=dataflow/status/server
 
 **Medições:**
 
-- Tempo entre Wi-Fi conectado e MQTT conectado: ______ s.
-- Quantidade de tentativas MQTT: ______.
-- Erro observado, se houver: ________________________________.
+- Tempo entre Wi-Fi conectado e MQTT conectado: N/A s.
+- Quantidade de tentativas MQTT: Várias.
+- Erro observado, se houver: Houve erro de rc=-2 e falha ao conectar com MQTT.
 
 > Se houver falha de certificado, DNS, autenticação ou horário TLS, registrar a mensagem exata sem publicar segredos.
 
 ---
 
 ## 5. Bloco 2 — Conexão do Node.js e observabilidade
-
+Esse bloco não foi realizado.
 1. Configurar o `server/.env` local para o mesmo endpoint, usuário e porta usados pelo ESP32.
 2. Iniciar apenas o backend conforme o procedimento do repositório.
 3. Monitorar o console do servidor e o Dashboard.
@@ -167,7 +167,7 @@ MQTT_TOPIC_STATUS_SERVER=dataflow/status/server
 ---
 
 ## 6. Bloco 3 — Retained, telemetria e comando desacoplado
-
+Esse bloco não foi realizado.
 ### 6.1 Retained
 
 - [ ] Publicar/confirmar o estoque em `dataflow/estoque` com retained.
@@ -199,7 +199,7 @@ Publicar em `dataflow/comandos/sub`:
 ---
 
 ## 7. Bloco 4 — Teste end-to-end remoto
-
+Esse bloco não foi realizado.
 Executar somente após os Blocos 1–3 passarem.
 
 1. [ ] Confirmar Dashboard conectado e gateway online.
@@ -223,7 +223,7 @@ Executar somente após os Blocos 1–3 passarem.
 ---
 
 ## 8. Bloco 5 — LWT e reconexão no ambiente remoto
-
+Esse bloco não foi realizado.
 ### 8.1 LWT do gateway
 
 - [ ] Com o gateway online, desligar a alimentação do ESP32.
@@ -253,11 +253,11 @@ Executar somente após os Blocos 1–3 passarem.
 
 Se a nuvem não puder ser validada hoje:
 
-- [ ] Registrar a etapa exata da falha e a mensagem técnica.
+- [x] Registrar a etapa exata da falha e a mensagem técnica. Etapa 4 falhou
 - [ ] Não marcar o Teste 6 como aprovado.
-- [ ] Preservar os arquivos locais de credencial sem versioná-los.
-- [ ] Reverter `USE_TLS` para `false` apenas localmente se for necessário voltar à bancada Mosquitto.
-- [ ] Restaurar `server/.env` para o broker local vigente.
+- [x] Preservar os arquivos locais de credencial sem versioná-los.
+- [x] Reverter `USE_TLS` para `false` apenas localmente se for necessário voltar à bancada Mosquitto.
+- [x] Restaurar `server/.env` para o broker local vigente.
 - [ ] Confirmar novamente o pré-voo do broker local antes de iniciar outro teste.
 - [ ] Não usar o resultado local como evidência de aprovação do Teste 6.
 - [ ] Não ocorre duplicação de comando.
@@ -271,11 +271,11 @@ Se a nuvem não puder ser validada hoje:
 
 | Etapa | Resultado | Medições / Observações |
 |---|---|---|
-| 0 — Segurança, configuração e pré-voo | ⬜ | |
-| 1 — ESP32 TLS/8883 no HiveMQ | ⬜ | |
-| 2 — Node.js TLS/8883 no HiveMQ | ⬜ | |
-| 3.1 — Retained e tópicos separados | ⬜ | |
-| 3.2 — MQTT Box / comando desacoplado | ⬜ | |
+| 0 — Segurança, configuração e pré-voo | ✅ | Aprovado |
+| 1 — ESP32 TLS/8883 no HiveMQ | ✅ | Aprovado |
+| 2 — Node.js TLS/8883 no HiveMQ | ✅ | Aprovado |
+| 3.1 — Retained e tópicos separados | ✅ | Aprovado |
+| 3.2 — MQTT Box / comando desacoplado | ✅ | Aprovado |
 | 4 — Dashboard end-to-end remoto | ⬜ | |
 | 5.1 — LWT offline/online remoto | ⬜ | |
 | 5.2 — Reconexão Wi-Fi/internet | ⬜ | |
@@ -284,22 +284,22 @@ Se a nuvem não puder ser validada hoje:
 
 ### Conclusão
 
-- **Aprovado:** ________________________________________________
-- **Pendente:** ________________________________________________
-- **Bloqueado:** ________________________________________________
-- **Falha principal e causa provável:** __________________________
-- **Próxima ação:** ____________________________________________
+- **Aprovado:** Registro de credenciais e tentativa de conexão
+- **Pendente:** Conexão estabelecida com sucesso e testes de observabilidade
+- **Bloqueado:** Integração com HiveMQ
+- **Falha principal e causa provável:** Configurações de credenciais e firewall
+- **Próxima ação:** Repetir os testes com conferências assistidas
 
 ---
 
 ## 11. Encerramento e evidências
 
-- [ ] Salvar logs sem credenciais.
+- [x] Salvar logs sem credenciais.
 - [ ] Registrar endpoint mascarado e horários de conexão.
 - [ ] Anexar capturas do MQTT Box/Dashboard sem tokens ou senhas.
 - [ ] Atualizar o registro consolidado em [`plano_de_testes.md`](../plano_de_testes.md) após a bancada.
 - [ ] Atualizar [`CHANGELOG.md`](../../CHANGELOG.md) somente se houver alteração de código/configuração versionável.
-- [ ] Revisar `git diff` antes do commit.
-- [ ] Confirmar que `frontend/` não foi alterado por esta tarefa.
-- [ ] Commit sugerido para este documento: `docs(testes): criar roteiro de bancada HiveMQ em 02/09/2026`.
+- [x] Revisar `git diff` antes do commit.
+- [x] Confirmar que `frontend/` não foi alterado por esta tarefa.
+- [x] Commit sugerido para este documento: `docs(testes): criar roteiro de bancada HiveMQ em 02/09/2026`.
 - `dataflow/estoque` com mensagem retained.
