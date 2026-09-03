@@ -134,7 +134,6 @@ function solicitarPeca(peca) {
   sim.pecaSolicitada = idx + 1;
   sim.estado = 'VERIFICANDO_ESTOQUE';
   emitirStatus();
-  emitirEvento('pedido', peca);
 
   setTimeout(() => verificarEstoque(peca), DELAY_VERIFICACAO);
   return null;   // aceito
@@ -146,6 +145,7 @@ function verificarEstoque(peca) {
 
   if (temSensor && temEstoque) {
     console.log(`[SIM] Estoque OK — Peça ${peca} detectada`);
+    emitirEvento('pedido', peca);   // registra o pedido somente após validar estoque
     sim.estado = 'ACIONANDO_ESTEIRA';
     emitirStatus();
     setTimeout(() => acionarEsteira(peca), DELAY_ACIONAMENTO);
