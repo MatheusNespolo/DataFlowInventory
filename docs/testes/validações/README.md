@@ -22,7 +22,7 @@ Este diretório contém artefatos de suporte à **preparação e validação** d
    ```
    Todos os itens devem retornar **PASS** antes de prosseguir.
 3. **Subir serviços** — `start_services.bat` na raiz do repositório (Mosquitto + `mqtt_probe` + server Node).
-4. **Executar bancada** — Seguir o roteiro do dia (ex.: `roteiro_teste_2026-08-26.md`) somente após validação completa da infraestrutura.
+4. **Executar bancada** — Seguir o roteiro do dia (ex.: `semana_01_18-20_agosto.md`) somente após validação completa da infraestrutura.
 
 ---
 

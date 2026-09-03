@@ -128,7 +128,7 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 - **Bloco de Teste:** `B1`, `T4` · **Prioridade:** `P0-Crítico`
 - **Data Validação:** **28/08/2026**
 - **Labels:** `area:firmware-uno`, `tipo:hardening`, `tipo:teste`
-- **Evidência:** commits `b5727ad`, `ac02d13` · `docs/testes/roteiros/roteiro_teste_2026-09-01.md` (seção 1) · `docs/testes/plano_de_testes.md`
+- **Evidência:** commits `b5727ad`, `ac02d13` · `docs/testes/roteiros/semana_04_01-03_setembro.md` (seção 1) · `docs/testes/plano_de_testes.md`
 
 **Descrição:** o valor original de `TIMEOUT_ENTREGA` (8 s, depois elevado provisoriamente para 12 s em 25/08) não refletia a dinâmica real da esteira A, gerando timeouts falsos ou mascarando travamentos reais.
 

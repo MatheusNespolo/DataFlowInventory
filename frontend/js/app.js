@@ -262,16 +262,26 @@ socket.on('esteiras', (data) => {
   atualizarEsteiras(data);
 });
 
-// Confirmação de comando
+// Confirmação de comando (encaminhado ao Arduino com sucesso)
+// Recebido de dataflow/comandos/pub quando o ESP32 confirma o encaminhamento.
+// Se o ESP32 rejeitou (status="rejeitado"), emite 'comando_erro' em vez de
+// adicionar ao histórico como enviado — evita que "CMD:PECA:Z" apareça como
+// "comando enviado" no painel de histórico.
 socket.on('comando', (data) => {
-  console.log('[WS] Comando confirmado:', data);
-  adicionarHistorico('comando_enviado', data.peca, data.acao);
+  console.log('[WS] Comando recebido:', data);
+  if (data.status === 'rejeitado') {
+    console.warn('[WS] Comando rejeitado pelo gateway:', data.motivo);
+    adicionarHistorico('erro', data.peca || '', data.motivo || 'rejeitado');
+  } else {
+    adicionarHistorico('comando_enviado', data.peca, data.acao);
+  }
 });
 
-// Erro de comando
+// Erro de comando (validação no servidor, broker offline, rate limit,
+// ou rejeição do gateway ESP32)
 socket.on('comando_erro', (data) => {
   console.error('[WS] Erro de comando:', data);
-  adicionarHistorico('erro', '', data.erro);
+  adicionarHistorico('erro', data.peca || '', data.erro);
 });
 
 // ============================================================
@@ -616,13 +626,17 @@ function adicionarHistorico(evento, peca, tipo, scroll = true) {
 function solicitarPeca(peca) {
   console.log(`[UI] Solicitando peça ${peca}`);
   socket.emit('solicitar_peca', { peca: peca });
-  adicionarHistorico('comando_enviado', peca, 'solicitar_peca');
+  // NOTA: o histórico é adicionado SOMENTE quando o servidor confirma
+  // (evento 'comando') ou rejeita (evento 'comando_erro'). Antes, este
+  // registro era adicionado antes da validação, fazendo com que comandos
+  // rejeitados (ex.: CMD:PECA:Z via MQTT Box) aparecessem como
+  // "comando enviado" no painel de histórico.
 }
 
 function resetSistema() {
   console.log('[UI] Resetando sistema');
   socket.emit('reset_sistema');
-  adicionarHistorico('comando_enviado', '', 'reset');
+  // O histórico é adicionado quando o servidor confirma (evento 'comando').
 }
 
 // Ligação dos botões via JS (sem onclick inline — a CSP do helmet bloqueia

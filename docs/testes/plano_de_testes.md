@@ -433,3 +433,13 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - **Teste 3 Puro (MQTT Box):** Validado e aprovado via cliente MQTT externo (MQTT Box / Explorer), formalizando a evidência de controle remoto desacoplada da interface web.
 - **Teste 5 (Esteiras A + B):** Mantido como `⬜ Pendente` / `Blocked` aguardando a disponibilização do segundo módulo IRF520 na bancada física.
 - **Teste 6 (HiveMQ Cloud):** Mantido como `⬜ Pendente` em Backlog como stretch goal.
+
+**Observações 02/09:**
+- **Teste 6 (HiveMQ Cloud) — Parcialmente Validado:** Conexão TLS/8883 estabelecida com sucesso tanto no ESP32 (`WiFiClientSecure` + `setCACert`) quanto no Node.js (`mqtts://` + opções TLS). Tópicos retained (`dataflow/estoque`, `dataflow/status`) sincronizam corretamente. Comando via MQTT Box remoto (desacoplado do Dashboard) validado.
+- **Dashboard E2E Remoto (Pendente):** Tentativa de validação end-to-end via Dashboard ficou bloqueada por questões de firewall corporativo; equipe abortou ajuste temporário. Itens **Bloco 4** (Dashboard E2E remoto) e **Bloco 5** (LWT offline/online remoto, reconexão Wi-Fi, reinício Node.js) ficaram pendentes para 03/09.
+- **Teste 5 (Esteiras A + B):** Permanece `⬜ Blocked` aguardando segundo módulo IRF520 MOSFET.
+
+**Observações 03/09:**
+- **Fix de Rejeição de Comandos:** Corrigido bug crítico onde comandos inválidos (ex.: `CMD:PECA:Z`) ou rejeitados pelo gateway (ex.: `peca_invalida`, `sem_estoque`) apareciam como "Comando enviado" no histórico do Dashboard. Causa raiz dupla: (1) `server.js` emitia evento `comando` para **todas** as mensagens do tópico `dataflow/comandos/pub`, independente do campo `status`; (2) `app.js` adicionava entradas de histórico **antes** da confirmação do servidor (optimistic UI sem rollback). Solução: `server.js` agora inspeciona `msgJson.status` e roteia `'rejeitado'` para evento `comando_erro` separado; `app.js` só adiciona histórico após receber confirmação via Socket.IO. Validação pendente de execução (roteiro de hoje).
+- **Teste 6 (HiveMQ Cloud) — Validação Completa Pendente:** Blocos 4 e 5 (Dashboard E2E remoto, LWT/reconexão remota) aguardando execução conforme roteiro de 03/09, condicionado à resolução do firewall ou ambiente de rede alternativo.
+- **Teste 5 (Esteiras A + B):** Permanece `⬜ Blocked` aguardando hardware.

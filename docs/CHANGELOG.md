@@ -27,6 +27,48 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Corrigido
 
+- **Comando inválido (ex.: `CMD:PECA:Z`) aparecia como "Comando enviado" no
+  histórico do Dashboard, mesmo sendo rejeitado pelo gateway ESP32** *(03/09/2026)*.
+
+  **Sintoma:** ao enviar um comando com peça inválida diretamente via MQTT Box
+  (`{"acao":"solicitar_peca","peca":"Z"}` em `dataflow/comandos/sub`), o gateway
+  ESP32 corretamente rejeitava o comando (`status: "rejeitado"`, `motivo:
+  "peca_invalida"`) e publicava a rejeição em `dataflow/comandos/pub`. No
+  entanto, o servidor Node.js emitia *todos* os payloads de `cmdPub` como evento
+  `comando` para o frontend, que os adicionava ao histórico como
+  `"comando_enviado"` — sem distinguir entre `status: "encaminhado"` e `status:
+  "rejeitado"`. Adicionalmente, a função `solicitarPeca()` no frontend adicionava
+  o registro ao histórico *antes* de o servidor confirmar ou rejeitar.
+
+  **Causa-raiz (2 camadas):**
+  1. `server/server.js` — handler `TOPICS.cmdPub`: emitia `io.emit('comando', msgJson)`
+     sem checar `msgJson.status`, tratando rejeições do ESP32 idênticas a confirmações.
+  2. `frontend/js/app.js` — `solicitarPeca()` e `resetSistema()`: chamavam
+     `adicionarHistorico('comando_enviado', ...)` imediatamente ao clicar o botão,
+     *antes* de qualquer validação. Além disso, o handler `socket.on('comando')`
+     não inspecionava `data.status` para distinguir `encaminhado` de `rejeitado`.
+
+  **Correção:**
+  - `server/server.js`: o handler de `cmdPub` agora verifica `msgJson.status`.
+    Se `"rejeitado"`, emite `comando_erro` (não `comando`) com `motivo` e `peca`.
+  - `frontend/js/app.js`: `solicitarPeca()` e `resetSistema()` não adicionam mais
+    registro ao histórico prematuramente — o registro é criado somente quando o
+    servidor emite `comando` (confirmação) ou `comando_erro` (rejeição/erro).
+  - `frontend/js/app.js`: o handler `comando` agora verifica `data.status`:
+    se `"rejeitado"`, exibe como erro (borda vermelha) em vez de "comando enviado".
+  - `frontend/js/app.js`: o handler `comando_erro` agora inclui `data.peca` (se
+    disponível) na mensagem, melhorando a rastreabilidade do erro.
+
+  **Comportamento esperado agora:**
+  - Dashboard: peças A/B/C clicadas → "Comando enviado" aparece SOMENTE após
+    confirmação do servidor/ESP32.
+  - MQTT Box `peca: "Z"` → Histórico mostra "Erro: peca_invalida — Peça Z" com
+    borda vermelha, NÃO "Comando enviado".
+  - Servidor rejeita peça inválida no Socket.IO → `comando_erro` sem chegar ao MQTT.
+  - `simulator/server.js`: o evento `pedido` passou a ser registrado somente apos a validacao de estoque (antes era emitido antes, seguido de `erro` quando a peca estava sem estoque) - alinhando o simulador ao fix aplicado no servidor real.
+
+
+
 - **Dashboard travado em "ESP32 Offline" mesmo com o gateway online** — *regressão
   introduzida em `9a7ce25`*.
 
@@ -113,10 +155,10 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - `README.md` — passo "Configurar o ESP32"
   - `docs/arquitetura_mqtt.md` — "Como Rodar", seção HiveMQ Cloud e árvore de diretórios
   - `docs/testes/validações/checklist_pre_teste_rede_infra.md` — seções 2, 4 e 7
-  - `docs/testes/roteiros/roteiro_teste_2026-08-27.md` — novo Bloco 0.a (setup do `secrets.h`)
+  - `docs/testes/roteiros/semana_03_27-28_agosto.md` — novo Bloco 0.a (setup do `secrets.h`)
 - `docs/arquitetura_mqtt.md`: tabela de tópicos agora identifica quais são **retained**
   e qual componente é o **dono** de cada tópico de status.
-- `docs/testes/roteiros/roteiro_teste_2026-08-27.md`: título corrigido (estava
+- `docs/testes/roteiros/semana_03_27-28_agosto.md`: título corrigido (estava
   "26/08/2026" em um arquivo de 27/08) e roteiro reescrito para cobrir as mudanças
   de `35fe3d5` e `9a7ce25` — novos blocos **3.A** (rejeições explícitas de comando),
   **3.B** (estoque retained/reconciliação), **3.C** (reconexão Wi-Fi não-bloqueante)

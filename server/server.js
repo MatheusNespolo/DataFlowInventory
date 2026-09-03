@@ -314,8 +314,20 @@ mqttClient.on('message', (topic, message) => {
       break;
 
     case TOPICS.cmdPub:
-      io.emit('comando', msgJson);
-      console.log(`[WS →] Comando confirmado: ${msgJson.acao}`);
+      // Rejeições vindas do ESP32 (ex.: peca_invalida, comando_desconhecido)
+      // são reencaminhadas como 'comando_erro' para que o frontend as exiba
+      // como erro em vez de "comando enviado".
+      if (msgJson.status === 'rejeitado') {
+        io.emit('comando_erro', {
+          erro: msgJson.motivo || 'Comando rejeitado pelo gateway',
+          acao: msgJson.acao,
+          peca: msgJson.peca,
+        });
+        console.warn(`[WS →] Comando rejeitado: ${msgJson.acao} — ${msgJson.motivo}`);
+      } else {
+        io.emit('comando', msgJson);
+        console.log(`[WS →] Comando confirmado: ${msgJson.acao}`);
+      }
       break;
 
     default:
