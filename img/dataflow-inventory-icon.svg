@@ -1,0 +1,36 @@
+<svg width="260" height="220" viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+  <title>Data Flow Inventory — ícone</title>
+
+  <!-- trilho da esteira -->
+  <rect x="-6" y="176" width="150" height="6" rx="3" fill="#0f1116"/>
+  <rect x="-6" y="176" width="150" height="2" rx="1" fill="#3a3f4d"/>
+
+  <!-- peças fluindo até a caixa (A / B / C) -->
+  <polygon points="4,164 22,172 4,180" fill="#e74c3c"/>
+  <polygon points="26,161 48,172 26,183" fill="#2ecc71"/>
+  <polygon points="52,158 78,172 52,186" fill="#3498db"/>
+
+  <!-- caixa isométrica — topo -->
+  <polygon points="130,25 204,68 130,110 56,68" fill="#9fd6ff"/>
+  <polygon points="130,25 204,68 130,67.75" fill="#aee0ff"/>
+  <polygon points="204,68 130,110 130,67.75" fill="#8fc9f5"/>
+  <polygon points="130,110 56,68 130,67.75" fill="#9ad4fa"/>
+  <polygon points="56,68 130,25 130,67.75" fill="#b4e4ff"/>
+
+  <!-- caixa isométrica — face esquerda (meio-tom, cor de marca) -->
+  <polygon points="56,68 130,110 130,195 56,152" fill="#4aa3ff"/>
+  <polygon points="56,68 130,110 93,131.25" fill="#58aaff"/>
+  <polygon points="130,110 130,195 93,131.25" fill="#3f93e8"/>
+  <polygon points="130,195 56,152 93,131.25" fill="#4696e0"/>
+  <polygon points="56,152 56,68 93,131.25" fill="#4d9df2"/>
+
+  <!-- caixa isométrica — face direita (sombra) -->
+  <polygon points="204,68 204,152 130,195 130,110" fill="#2a63a3"/>
+  <polygon points="204,68 204,152 167,131.25" fill="#2f6fb8"/>
+  <polygon points="204,152 130,195 167,131.25" fill="#245a97"/>
+  <polygon points="130,195 130,110 167,131.25" fill="#2a63a3"/>
+  <polygon points="130,110 204,68 167,131.25" fill="#346fb0"/>
+
+  <!-- friso do lacre da caixa -->
+  <line x1="130" y1="25" x2="130" y2="110" stroke="#e8f5ff" stroke-opacity="0.55" stroke-width="1.5"/>
+</svg>

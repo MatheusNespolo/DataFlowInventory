@@ -1,0 +1,64 @@
+<svg width="720" height="260" viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg">
+  <title>Data Flow Inventory</title>
+
+  <!-- Painel de fundo — mesma linguagem visual do dashboard (bancada industrial) -->
+  <rect x="1" y="1" width="718" height="258" rx="22" fill="#14161c" stroke="#3a3f4d" stroke-width="1.5"/>
+  <rect x="9" y="9" width="702" height="242" rx="16" fill="none" stroke="#ffffff" stroke-opacity="0.03" stroke-width="1"/>
+
+  <!-- ============================================================
+       ÍCONE — caixa de inventário low-poly (isométrica, facetada)
+       com peças coloridas (A/B/C) fluindo para dentro pela esteira
+       ============================================================ -->
+  <g transform="translate(38,20)">
+
+    <!-- trilho da esteira -->
+    <rect x="-6" y="176" width="150" height="6" rx="3" fill="#0f1116"/>
+    <rect x="-6" y="176" width="150" height="2" rx="1" fill="#3a3f4d"/>
+
+    <!-- peças fluindo até a caixa (A / B / C) -->
+    <polygon points="4,164 22,172 4,180" fill="#e74c3c"/>
+    <polygon points="26,161 48,172 26,183" fill="#2ecc71"/>
+    <polygon points="52,158 78,172 52,186" fill="#3498db"/>
+
+    <!-- caixa isométrica — topo -->
+    <polygon points="130,25 204,68 130,110 56,68" fill="#9fd6ff"/>
+    <polygon points="130,25 204,68 130,67.75" fill="#aee0ff"/>
+    <polygon points="204,68 130,110 130,67.75" fill="#8fc9f5"/>
+    <polygon points="130,110 56,68 130,67.75" fill="#9ad4fa"/>
+    <polygon points="56,68 130,25 130,67.75" fill="#b4e4ff"/>
+
+    <!-- caixa isométrica — face esquerda (meio-tom, cor de marca) -->
+    <polygon points="56,68 130,110 130,195 56,152" fill="#4aa3ff"/>
+    <polygon points="56,68 130,110 93,131.25" fill="#58aaff"/>
+    <polygon points="130,110 130,195 93,131.25" fill="#3f93e8"/>
+    <polygon points="130,195 56,152 93,131.25" fill="#4696e0"/>
+    <polygon points="56,152 56,68 93,131.25" fill="#4d9df2"/>
+
+    <!-- caixa isométrica — face direita (sombra) -->
+    <polygon points="204,68 204,152 130,195 130,110" fill="#2a63a3"/>
+    <polygon points="204,68 204,152 167,131.25" fill="#2f6fb8"/>
+    <polygon points="204,152 130,195 167,131.25" fill="#245a97"/>
+    <polygon points="130,195 130,110 167,131.25" fill="#2a63a3"/>
+    <polygon points="130,110 204,68 167,131.25" fill="#346fb0"/>
+
+    <!-- friso do lacre da caixa -->
+    <line x1="130" y1="25" x2="130" y2="110" stroke="#e8f5ff" stroke-opacity="0.55" stroke-width="1.5"/>
+  </g>
+
+  <!-- ============================================================
+       WORDMARK
+       ============================================================ -->
+  <g font-family="Segoe UI, Arial, sans-serif" font-weight="800">
+    <text x="336" y="118" font-size="60">
+      <tspan fill="#aab2c5">Data</tspan><tspan fill="#4aa3ff">Flow</tspan>
+    </text>
+    <text x="338" y="156" font-size="27" font-weight="700" letter-spacing="7" fill="#4aa3ff">INVENTORY</text>
+
+    <!-- luzes de status (mesma paleta das peças) -->
+    <circle cx="341" cy="177" r="4.5" fill="#e74c3c"/>
+    <circle cx="357" cy="177" r="4.5" fill="#2ecc71"/>
+    <circle cx="373" cy="177" r="4.5" fill="#3498db"/>
+
+    <text x="338" y="207" font-size="18" font-weight="500" letter-spacing="0.5" fill="#8b93a7">Arduino + ESP32 conveyor automation</text>
+  </g>
+</svg>
