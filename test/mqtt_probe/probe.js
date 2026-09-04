@@ -9,7 +9,7 @@
 //   no relatório ou salvar em arquivo).
 //
 // QUANDO USAR:
-//   - Teste 2 do plano de testes (docs/plano_de_testes.md):
+//   - Teste 2 do plano de testes (docs/testes/plano_de_testes.md):
 //     verificar se o ESP32 está publicando no broker.
 //   - Teste 3: observar as confirmações em dataflow/comandos/pub.
 //   - Depuração geral: ver tudo que trafega no broker em tempo real.
