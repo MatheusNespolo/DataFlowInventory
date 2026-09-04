@@ -4,7 +4,7 @@ Guia de organização e sincronização do board [Data Flow Inventory (GitHub Pr
 
 Define **colunas, campos customizados, labels, hierarquia de épicos/sub-issues, templates de comentário e o catálogo consolidado de cards** — incluindo as validações de bancada concluídas em 27–28/08/2026 e o roadmap de testes em nuvem via HiveMQ Cloud.
 
-> **Princípio de rastreabilidade:** o board é a camada de acompanhamento visual; os documentos em `docs/` ([`plano_de_testes.md`](../testes/plano_de_testes.md), [roteiros diários](../testes/roteiros/), [`CHANGELOG.md`](../CHANGELOG.md) e `docs/artigo/Projeto de pesquisa - Final.docx`) são a fonte da verdade técnica. Todo card deve referenciar o documento ou commit comprobatório.
+> **Princípio de rastreabilidade:** o board é a camada de acompanhamento visual; os documentos em `docs/` ([`plano_de_testes.md`](../testes/plano_de_testes.md), [roteiros semanais](../testes/roteiros/), [`CHANGELOG.md`](../CHANGELOG.md) e `docs/artigo/Projeto de pesquisa - Final.docx`) são a fonte da verdade técnica. Todo card deve referenciar o documento ou commit comprobatório.
 
 ---
 
