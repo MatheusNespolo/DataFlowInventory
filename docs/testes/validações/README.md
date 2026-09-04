@@ -1,6 +1,6 @@
 # Diretório de Validações — Infraestrutura e Testes
 
-Este diretório contém artefatos de suporte à **preparação e validação** da infraestrutura (rede, broker, portas, firewall) antes de cada sessão de bancada. São ferramentas complementares ao [`plano_de_testes.md`](../plano_de_testes.md) e aos [roteiros diários](../roteiros/).
+Este diretório contém artefatos de suporte à **preparação e validação** da infraestrutura (rede, broker, portas, firewall) antes de cada sessão de bancada. São ferramentas complementares ao [`plano_de_testes.md`](../plano_de_testes.md) e aos [roteiros semanais](../roteiros/).
 
 ---
 
