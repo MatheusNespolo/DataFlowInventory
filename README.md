@@ -16,7 +16,6 @@
 ![Docs](https://img.shields.io/badge/Docs-Markdown-083fa1?logo=markdown&logoColor=white)
 
 ---
-<br>
 <img src="img/DataFlowInventory.png" width="1865" height="884" alt="DataFlowInventory">
 <br>
 ---
