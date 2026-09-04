@@ -144,7 +144,7 @@ DataFlowInventory/
 │   │   └── fluxograma_funcionamento.md    # Fluxogramas (FSM, operação, sequência)
 │   └── testes/
 │       ├── plano_de_testes.md             # Plano de testes de integração (Serial → E2E)
-│       ├── roteiros/                      # Roteiros diários de execução dos testes
+│       ├── roteiros/                      # Roteiros semanais de execução dos testes
 │       └── validações/                    # Checklists e automação de validação de infra
 │           ├── README.md                  # Guia dos artefatos de validação
 │           ├── checklist_pre_teste_rede_infra.md
