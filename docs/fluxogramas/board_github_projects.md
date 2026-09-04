@@ -243,9 +243,9 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 
     ## 🧪 Rodada de bancada — DD/MM/AAAA
 
-    **Roteiro:** `docs/testes/roteiros/roteiro_teste_AAAA-MM-DD.md`
+    **Roteiro:** `docs/testes/roteiros/semana_XX_DD-MM_mês.md`
     **Ambiente:** Mosquitto local `<IP>:1883` · Wi-Fi 2,4 GHz `<SSID>` · Node v18+
-    **Firmware vigente:** `TIMEOUT_ENTREGA=9000` · `TEMPO_SAIDA_ESTEIRA_MS=3000`
+    **Firmware vigente:** `<commit SHA ou tag> — ver `git log --oneline -1`
 
     | Etapa | Resultado | Medição |
     |---|---|---|

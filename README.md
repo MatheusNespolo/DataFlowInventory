@@ -12,7 +12,8 @@
 ![School](https://img.shields.io/badge/SENAI-São%20Caetano%20do%20Sul-blue)
 ![Year](https://img.shields.io/badge/Ano-2026-orange)
 ![IoT](https://img.shields.io/badge/IoT-Arduino%20+%20ESP32-teal)
-![Industria4](https://img.shields.io/badge/Indústria-4.0-red)
+[![Industria4](https://img.shields.io/badge/Indústria-4.0-red)](https://github.com/MatheusNespolo/DataFlowInventory#sobre)
+![Docs](https://img.shields.io/badge/Docs-Markdown-083fa1?logo=markdown&logoColor=white)
 
 <br>
 
@@ -28,7 +29,9 @@ Engenharia de Controle e Automação
 ## Sumário
 
 - [Sobre](#sobre)
+- [⚡ Quick Start — Simulador](#-quick-start--simulador)
 - [Visão Geral](#visão-geral)
+- [Destaques Técnicos](#destaques-técnicos)
 - [Arquitetura](#arquitetura)
 - [Estrutura do Repositório](#estrutura-do-repositório)
 - [Funcionamento](#funcionamento)
@@ -53,6 +56,20 @@ O projeto se insere no setor de **Automação Industrial da Logística**, com fo
 
 > 📄 Para o projeto completo, consulte `Projeto de pesquisa - Final.docx` na pasta `docs/artigo/`.
 
+## ⚡ Quick Start — Simulador
+
+Experimente o dashboard em **menos de 30 segundos**, sem nenhum hardware:
+
+```bash
+git clone https://github.com/MatheusNespolo/DataFlowInventory.git
+cd DataFlowInventory/simulator
+npm install && npm start
+```
+
+Abra [http://localhost:3000](http://localhost:3000) — pronto! O simulador reproduz o ciclo completo (pedido → verificação de estoque → acionamento da esteira → entrega) emitindo os **mesmos eventos Socket.IO** que o servidor real, então o frontend funciona sem nenhuma alteração.
+
+> 💡 Para o modo completo com hardware (Arduino + ESP32 + MQTT), veja a seção [Como Rodar](#como-rodar) abaixo.
+
 ## Visão Geral
 
 O sistema é composto por:
@@ -69,6 +86,28 @@ O sistema é composto por:
 | ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (parcialmente validado — TLS/8883 OK, E2E remoto pendente) |
 
 > A roda giratória é um aprimoramento futuro do projeto, uma sugestão de melhoria. Atualmente existem menções ao controle no motor de passo no código, mas ele está comentado para ajustes durante o desenvolvimento até a integração final.
+
+## Destaques Técnicos
+
+| Capacidade | Detalhe |
+|------------|---------|
+| 🏭 **Indicadores IEC-60073** | Painel anunciador com LEDs de status: verde (ok) / amarelo (atenção) / vermelho (fault), seguindo a norma de cores para sinais industriais. |
+| 🔮 **Diagrama 3D** | Visualização panorâmica da bancada com three.js e depth CSS, com parallax controller — SVG estático como fallback. |
+| 🎨 **Tipografia IBM Plex** | Sans (UI) e Mono (readouts de estado), reforçando a identidade visual industrial. |
+| 📊 **Alertas de estoque graduados** | Aviso (=3 peças), alerta (=2), crítico (≤1) — com badges, cores e anunciador luminoso dedicados. |
+| 🔐 **Segurança** | Helmet + CSP, CORS restrito por `ALLOWED_ORIGIN`, rate limit por socket (`COMANDO_INTERVALO_MS`), validação de entrada de comandos. |
+| 📡 **LWT e Health Check** | Last Will and Testament para monitoramento de presença; endpoint `/api/status` retorna HTTP 503 quando o broker está indisponível. |
+| 🔄 **Resiliência** | Reconexão Wi-Fi não-bloqueante, shutdown gracioso (SIGINT/SIGTERM), estoque e gateway como retained. |
+| 📱 **Responsivo** | Layout adaptável testado em 1920×1080, 1366×768 e ≤720px. |
+| 🗺️ **Hash routing** | Vistas `#/` (painel principal) e `#/status` (histórico/equipamentos) com navegação por hash. |
+| 🖥️ **Simulador offline** | FSM completa em JavaScript emitindo os mesmos eventos Socket.IO do servidor real — teste sem hardware. |
+
+<!-- TODO: Adicionar screenshots/GIFs do dashboard aqui (seção C1) -->
+<!-- Sugestão: adicionar imagens em docs/screenshots/ e referenciar como:
+![Painel Principal](docs/screenshots/dashboard_painel.png)
+![Diagrama 3D](docs/screenshots/dashboard_3d.png)
+![Indicadores IEC](docs/screenshots/dashboard_indicadores.png)
+-->
 
 ## Arquitetura
 

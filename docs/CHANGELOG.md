@@ -14,6 +14,12 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Documentação — Reorganização dos roteiros de teste (03/09/2026)**
+  - Consolidação de 8 arquivos diários em 4 arquivos semanais (`semana_01` a `semana_04`).
+  - Atualização de todas as referências internas em `README.md`, `arquitetura_mqtt.md`,
+    `board_github_projects.md`, `checklist_pre_teste_rede_infra.md` e `validações/README.md`.
+  - READMEs adicionados em `simulator/`, `server/` e `frontend/` para melhor navegação.
+
 - **Frontend — Redesign do Painel Anunciador Industrial (02/09/2026)**
   - Painel anunciador com indicadores visuais IEC-60073 (LED status: verde/amarelo/vermelho).
   - Tipografia IBM Plex Sans (UI) e IBM Plex Mono (readouts de estado).
