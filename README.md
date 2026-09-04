@@ -14,6 +14,7 @@
 ![IoT](https://img.shields.io/badge/IoT-Arduino%20+%20ESP32-teal)
 [![Industria4](https://img.shields.io/badge/Indústria-4.0-red)](https://github.com/MatheusNespolo/DataFlowInventory#sobre)
 ![Docs](https://img.shields.io/badge/Docs-Markdown-083fa1?logo=markdown&logoColor=white)
+
 <br>
 <img src="img/DataFlowInventory.png" width="1865" height="884" alt="DataFlowInventory">
 <br>
