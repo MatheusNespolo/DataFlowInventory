@@ -104,12 +104,9 @@ O sistema é composto por:
 | 🗺️ **Hash routing** | Vistas `#/` (painel principal) e `#/status` (histórico/equipamentos) com navegação por hash. |
 | 🖥️ **Simulador offline** | FSM completa em JavaScript emitindo os mesmos eventos Socket.IO do servidor real — teste sem hardware. |
 
-<!-- TODO: Adicionar screenshots/GIFs do dashboard aqui (seção C1) -->
-<!-- Sugestão: adicionar imagens em docs/screenshots/ e referenciar como:
-![Painel Principal](docs/screenshots/dashboard_painel.png)
-![Diagrama 3D](docs/screenshots/dashboard_3d.png)
-![Indicadores IEC](docs/screenshots/dashboard_indicadores.png)
--->
+<div align="center">
+<img src="img/DataFlowInventoryConcept.jpeg" width="200" height="200" alt="Concept">
+</div>
 
 ## Arquitetura
 
@@ -395,6 +392,6 @@ MIT License — Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 ---
 
 <div align="center">
-<img width="100" height="100" alt="DataFlowInventory" src="img\dataflow-inventory-icon.svg" />
+<img src="img/dataflow-inventory-icon.svg" width="100" height="100" alt="Icon">
 "A forma mais fácil de estagnar é considerar que não há nada a aprender."
 </div>
