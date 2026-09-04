@@ -418,7 +418,7 @@ DataFlowInventory/
     │   └── maquina_de_estados_fsm_arduino_uno.png
     └── testes/
         ├── plano_de_testes.md         # Plano de testes (B0–B3 e Testes 1–5)
-        └── roteiros/                  # Roteiros diários de execução dos testes
+        └── roteiros/                  # Roteiros semanais de execução dos testes
 ```
 
 ---
