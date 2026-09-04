@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="img/dataflow-inventory-logo.svg" width="1865" height="500">
+<img src="img/dataflow-inventory-logo.svg" width="1865" height="500" alt="Logo">
 
 **Centro de Distribuição Automatizado — Protótipo IoT em Escala Reduzida**
 
@@ -16,7 +16,7 @@
 ![Docs](https://img.shields.io/badge/Docs-Markdown-083fa1?logo=markdown&logoColor=white)
 
 <br>
-<img width="1865" height="884" alt="DataFlowInventory" src="img\DataFlowInventory.png" />
+<img src="img/DataFlowInventory.png" width="1865" height="884" alt="DataFlowInventory">
 
 <br>
 
