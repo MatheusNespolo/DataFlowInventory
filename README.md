@@ -29,7 +29,7 @@ Engenharia de Controle e Automação
 ## Sumário
 
 - [Sobre](#sobre)
-- [⚡ Quick Start — Simulador](#-quick-start--simulador)
+- [Quick Start — Simulador](#-quick-start--simulador)
 - [Visão Geral](#visão-geral)
 - [Destaques Técnicos](#destaques-técnicos)
 - [Arquitetura](#arquitetura)
