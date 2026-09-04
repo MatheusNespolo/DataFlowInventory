@@ -41,9 +41,9 @@ O sistema de comunicação conecta o protótipo físico (Arduino Uno + sensores 
 │  │   Mosquitto (local) ou HiveMQ Cloud  │                           │
 │  │                                      │                           │
 │  │  Tópicos:                            │                           │
-│  │  ├── dataflow/status                 │ ← (gateway ESP32, retained)│
-│  │  ├── dataflow/status/server          │ ← (server Node, retained)  │
-│  │  ├── dataflow/estoque                │ ← (retained)               │
+│  │  ├── dataflow/status                 │ ←(gateway ESP32, retained)│
+│  │  ├── dataflow/status/server          │ ←(server Node, retained)  │
+│  │  ├── dataflow/estoque                │ ←(retained)               │
 │  │  ├── dataflow/eventos                │                           │
 │  │  ├── dataflow/sensores               │                           │
 │  │  ├── dataflow/esteiras               │                           │
@@ -417,8 +417,10 @@ DataFlowInventory/
     │   ├── fluxograma_operacional_ciclo_pedido.png
     │   └── maquina_de_estados_fsm_arduino_uno.png
     └── testes/
-        ├── plano_de_testes.md         # Plano de testes (B0–B3 e Testes 1–5)
-        └── roteiros/                  # Roteiros diários de execução dos testes
+        ├── plano_de_testes.md         # Plano de testes (B0–B3 e Testes 1–6)
+        ├── roteiros/                  # Roteiros semanais de execução dos testes
+        └── validações/                # Checklists e automação de validação de infra
+
 ```
 
 ---

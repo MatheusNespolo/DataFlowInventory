@@ -62,7 +62,7 @@
 
 ## 7. Broker Remoto (opcional — HiveMQ Cloud)
 
-> Só aplicável quando executando o Teste 6 (`plano_de_testes.md`) ou o Bloco 4 (stretch goal) dos roteiros diários. Não é pré-requisito da bancada local.
+> Só aplicável quando executando o Teste 6 (`plano_de_testes.md`) ou o Bloco 4 (stretch goal) dos roteiros semanais. Não é pré-requisito da bancada local.
 
 - [ ] Cluster gratuito criado em [cloud.hivemq.com](https://cloud.hivemq.com) e credenciais (username/password) gerados
 - [ ] ESP32: `USE_TLS = true` no `.ino`; em `secrets.h`, `SECRET_MQTT_SERVER_CLOUD = <cluster>.s1.eu.hivemq.com`, `SECRET_MQTT_USER_CLOUD`/`SECRET_MQTT_PASS_CLOUD` preenchidos (porta 8883 já fixada pelo `#if USE_TLS`)

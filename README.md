@@ -66,7 +66,7 @@ O sistema é composto por:
 | 📡 **ESP32** | Gateway MQTT (bridge Serial ↔ Wi-Fi) |
 | 🖥️ **Dashboard web** | HTML/CSS/JS + Socket.IO em tempo real |
 | ⚙️ **Servidor Node.js** | Ponte entre MQTT e WebSocket |
-| ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (planejado — ver [Próximos Passos](#próximos-passos)) |
+| ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (parcialmente validado — TLS/8883 OK, E2E remoto pendente) |
 
 > A roda giratória é um aprimoramento futuro do projeto, uma sugestão de melhoria. Atualmente existem menções ao controle no motor de passo no código, mas ele está comentado para ajustes durante o desenvolvimento até a integração final.
 
@@ -77,7 +77,7 @@ O sistema é composto por:
 Para testar o dashboard sem nenhum componente físico conectado, o projeto inclui um simulador (`simulator/`) que reproduz o ciclo da máquina de estados em JavaScript — pedido → verificação de estoque → acionamento da esteira → entrega — emitindo os **mesmos eventos Socket.IO** que o servidor real (`server/`), servindo o `frontend/` sem nenhuma alteração.
 
 
-Diferente do modo real, os tempos de verificação/acionamento/entrega são temporizadores fixos (não dependem de sensores físicos) e não há MQTT nem broker envolvidos. Cobre o fluxo de sucesso e a rejeição por falta de estoque; cenários de timeout e `ocupado` do firmware real ainda não são simulados.
+Diferente do modo real, os tempos de verificação/acionamento/entrega são temporizadores fixos (não dependem de sensores físicos) e não há MQTT nem broker envolvidos. Cobre o fluxo de sucesso e a rejeição por falta de estoque; cenários de timeout do firmware real ainda não são simulados, rejeição por estoque zero e FSM ocupada já são cobertos.
 
 > 🖥️ Detalhes de implementação em [`docs/arquitetura_mqtt.md`](docs/arquitetura_mqtt.md#modos-de-operação).
 
@@ -144,7 +144,7 @@ DataFlowInventory/
 │   │   └── fluxograma_funcionamento.md    # Fluxogramas (FSM, operação, sequência)
 │   └── testes/
 │       ├── plano_de_testes.md             # Plano de testes de integração (Serial → E2E)
-│       ├── roteiros/                      # Roteiros diários de execução dos testes
+│       ├── roteiros/                      # Roteiros semanais de execução dos testes
 │       └── validações/                    # Checklists e automação de validação de infra
 │           ├── README.md                  # Guia dos artefatos de validação
 │           ├── checklist_pre_teste_rede_infra.md
@@ -276,7 +276,7 @@ Acessar http://localhost:3000 no navegador.
 - [Node.js](https://nodejs.org/) v18+
 - [Mosquitto](https://mosquitto.org/) rodando localmente (porta 1883) — **caminho padrão validado em bancada**. Veja [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md)
 - Conexão Wi-Fi 2.4 GHz para o ESP32
-- *(Opcional, futuro)* Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com) — apenas para o Teste 6 de migração para broker remoto (TLS/8883)
+- Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com) — apenas para o Teste 6 de migração para broker remoto (TLS/8883)
 
 #### 1. Configurar o Arduino
 
@@ -315,9 +315,10 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## Próximos Passos
 
-- 🚧 **Esteira B/C:** montagem do hardware adicional (motores + sensores) e réplica das funções da esteira A no sketch principal.
-- ☁️ **Broker Remoto (HiveMQ Cloud):** o sistema hoje está validado com **Mosquitto local**. A próxima rodada de testes cobre a migração para o **HiveMQ Cloud** (MQTT sobre TLS, porta 8883), validando autenticação, certificados (`setCACert`) e a mesma cadeia end-to-end (Arduino → ESP32 → Broker → Dashboard) via internet. Ver [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) (Teste 6) e [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md#etapa-e--migração-para-hivemq-cloud-futuro).
+- 🚧 **Esteira B/C:** montagem do hardware adicional (motores + sensores) e réplica das funções da esteira A no sketch principal - (bloqueado).
+- ☁️ **Broker Remoto (HiveMQ Cloud):** o sistema hoje está validado com **Mosquitto local**. parcialmente validado, E2E + LWT remoto pendentes. Ver [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) (Teste 6) e [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md#etapa-e--migração-para-hivemq-cloud-futuro).
 - 🧪 **Validação de infraestrutura:** script [`docs/testes/validações/validar_infra.ps1`](docs/testes/validações/validar_infra.ps1) automatiza a checagem de broker, firewall e serviços antes de cada bancada — inclui checklist manual complementar em [`checklist_pre_teste_rede_infra.md`](docs/testes/validações/checklist_pre_teste_rede_infra.md).
+- ⚠️ **Fix de rejeição:** implementado, validação em bancada pendente.
 
 ## Equipe
 
@@ -328,7 +329,7 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 | **Murilo Tolardo da Silva** | |
 | **Vitor Marcolongo Silva** | |
 
-**Orientação:** Prof. Dr.
+**Orientação:** Professora Tatiani de Paula Pinotti Sabaris Meglhioratti e Professor Jorge Antonio Giles Ferrer
 
 ## Contribuindo
 

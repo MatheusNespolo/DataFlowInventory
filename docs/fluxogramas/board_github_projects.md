@@ -4,7 +4,7 @@ Guia de organização e sincronização do board [Data Flow Inventory (GitHub Pr
 
 Define **colunas, campos customizados, labels, hierarquia de épicos/sub-issues, templates de comentário e o catálogo consolidado de cards** — incluindo as validações de bancada concluídas em 27–28/08/2026 e o roadmap de testes em nuvem via HiveMQ Cloud.
 
-> **Princípio de rastreabilidade:** o board é a camada de acompanhamento visual; os documentos em `docs/` ([`plano_de_testes.md`](../testes/plano_de_testes.md), [roteiros diários](../testes/roteiros/), [`CHANGELOG.md`](../CHANGELOG.md) e `docs/artigo/Projeto de pesquisa - Final.docx`) são a fonte da verdade técnica. Todo card deve referenciar o documento ou commit comprobatório.
+> **Princípio de rastreabilidade:** o board é a camada de acompanhamento visual; os documentos em `docs/` ([`plano_de_testes.md`](../testes/plano_de_testes.md), [roteiros semanais](../testes/roteiros/), [`CHANGELOG.md`](../CHANGELOG.md) e `docs/artigo/Projeto de pesquisa - Final.docx`) são a fonte da verdade técnica. Todo card deve referenciar o documento ou commit comprobatório.
 
 ---
 
@@ -128,7 +128,7 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 - **Bloco de Teste:** `B1`, `T4` · **Prioridade:** `P0-Crítico`
 - **Data Validação:** **28/08/2026**
 - **Labels:** `area:firmware-uno`, `tipo:hardening`, `tipo:teste`
-- **Evidência:** commits `b5727ad`, `ac02d13` · `docs/testes/roteiros/semana_04_01-03_setembro.md` (seção 1) · `docs/testes/plano_de_testes.md`
+- **Evidência:** commits `b5727ad`, `ac02d13` · `docs/testes//semana_04_01-03_setembro.md` (seção 1) · `docs/testes/plano_de_testes.md`
 
 **Descrição:** o valor original de `TIMEOUT_ENTREGA` (8 s, depois elevado provisoriamente para 12 s em 25/08) não refletia a dinâmica real da esteira A, gerando timeouts falsos ou mascarando travamentos reais.
 
@@ -228,7 +228,7 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 
     ## 📄 Referências
     - Plano de testes: `docs/testes/plano_de_testes.md#<âncora>`
-    - Roteiro: `docs/testes/roteiros/roteiro_teste_AAAA-MM-DD.md`
+    - Roteiro: `docs/testes/roteiros/semana_XX_DD-DD_mês.md`
     - Código: `<caminho/arquivo>`
 
     ## ✅ Critério de aceite
