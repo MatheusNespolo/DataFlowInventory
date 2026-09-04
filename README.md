@@ -104,8 +104,8 @@ O sistema é composto por:
 | 🗺️ **Hash routing** | Vistas `#/` (painel principal) e `#/status` (histórico/equipamentos) com navegação por hash. |
 | 🖥️ **Simulador offline** | FSM completa em JavaScript emitindo os mesmos eventos Socket.IO do servidor real — teste sem hardware. |
 
-<div align="center">
-<img src="img/DataFlowInventoryConcept.jpeg" width="200" height="200" alt="Concept">
+<div align="right">
+<img src="img/DataFlowInventoryConcept.jpeg" width="400" height="400" alt="Concept">
 </div>
 
 ## Arquitetura
