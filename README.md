@@ -329,7 +329,7 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 | **Murilo Tolardo da Silva** | |
 | **Vitor Marcolongo Silva** | |
 
-**Orientação:** Prof. Dr.
+**Orientação:** Professora Tatiani de Paula Pinotti Sabaris Meglhioratti e Professor Jorge Antonio Giles Ferrer
 
 ## Contribuindo
 
