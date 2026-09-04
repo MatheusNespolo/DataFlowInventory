@@ -1,6 +1,6 @@
 <div align="center">
 
-# Data Flow Inventory
+<img src="img/dataflow-inventory-logo.svg" width="1865" height="500">
 
 **Centro de Distribuição Automatizado — Protótipo IoT em Escala Reduzida**
 
@@ -14,6 +14,9 @@
 ![IoT](https://img.shields.io/badge/IoT-Arduino%20+%20ESP32-teal)
 [![Industria4](https://img.shields.io/badge/Indústria-4.0-red)](https://github.com/MatheusNespolo/DataFlowInventory#sobre)
 ![Docs](https://img.shields.io/badge/Docs-Markdown-083fa1?logo=markdown&logoColor=white)
+
+<br>
+<img width="1865" height="884" alt="DataFlowInventory" src="img\DataFlowInventory.png" />
 
 <br>
 
@@ -393,5 +396,6 @@ MIT License — Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 ---
 
 <div align="center">
+<img width="100" height="100" alt="DataFlowInventory" src="img\dataflow-inventory-icon.svg" />
 "A forma mais fácil de estagnar é considerar que não há nada a aprender."
 </div>
