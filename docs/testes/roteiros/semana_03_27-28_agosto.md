@@ -174,4 +174,4 @@ cd simulator && npm start
 
 ## 10. Continuação
 
-Ver [`semana_04_01-03_setembro.md`](semana_04_01-03_setembro.md) — robustez/LWT finalizados, Teste 3 puro, HiveMQ Cloud, fix de rejeição de comandos.
+Ver [`semana_04_08-12_setembro.md`](semana_04_08-12_setembro.md) — integração das esteiras B e C (Teste 5 completo), HiveMQ Cloud como subtarefa, spec de integração do simulador com PC industrial Beckhoff CX9240.
