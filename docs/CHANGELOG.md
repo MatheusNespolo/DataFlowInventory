@@ -20,6 +20,27 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
     `board_github_projects.md`, `checklist_pre_teste_rede_infra.md` e `validações/README.md`.
   - READMEs adicionados em `simulator/`, `server/` e `frontend/` para melhor navegação.
 
+- **Documentação — Reorganização do roteiro da Semana 4 (08/09/2026)**
+  - Roteiro `semana_04_01-03_setembro.md` renomeado para `semana_04_08-12_setembro.md`,
+    com início em 08/09 (hardware das esteiras B/C chegou no fim de semana).
+  - Prioridade da semana realinhada: integração das esteiras **B e C** (Teste 5 completo
+    A+B+C), desbloqueando o card #9.
+  - **HiveMQ Cloud (Teste 6)** rebaixado a **subtarefa** da semana — execução condicionada
+    a folga de tempo; cards #15/#16 concluídos e #17 (E2E remoto) pendente.
+  - Referências ao nome antigo atualizadas em `board_github_projects.md` e
+    `semana_03_27-28_agosto.md`.
+
+- **Melhoria planejada — Integração do Simulador com o PC industrial Beckhoff CX9240 (08/09/2026)**
+  - Proposta de melhoria futura para **persistência dos dados de estoque em banco
+    MySQL/PostgreSQL** via comunicação MQTT entre o simulador e o PC Beckhoff CX9240.
+  - Contrato proposto (tópicos/payload) documentado no roteiro
+    `semana_04_08-12_setembro.md` (seção 7), a ser validado de forma cruzada com o agente
+    responsável pelo programa do CX9240, que será desenvolvido por outro agente.
+  - Validação prevista para **bancada de testes própria** (desacoplada da esteira A);
+    a implementação completa fica para sprints/agentes futuros.
+  - Sugerida a criação de card de melhoria (Template A / backlog) para rastreabilidade no
+    GitHub Projects.
+
 - **Frontend — Redesign do Painel Anunciador Industrial (02/09/2026)**
   - Painel anunciador com indicadores visuais IEC-60073 (LED status: verde/amarelo/vermelho).
   - Tipografia IBM Plex Sans (UI) e IBM Plex Mono (readouts de estado).
