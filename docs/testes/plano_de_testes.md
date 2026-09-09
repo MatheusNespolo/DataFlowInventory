@@ -23,7 +23,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | 2 | ESP32 → Broker → Node.js | Item 1 + PC com Mosquitto + server Node | ESP32 publica no broker → Node.js recebe | Mensagem aparece nos logs do servidor |
 | 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / LCD) |
 | 4 | End-to-End (Dashboard) | Item 2 + navegador | Clicar no dashboard → Arduino executa → dashboard atualiza | Ciclo completo pedido → entrega refletido na UI |
-| 5 | Duas esteiras (A + B) | Itens 1–3 + 2ª esteira secundária + 2 sensores | Validar FSM completa com 2 esteiras e cenários de rejeição | Entregas A/B, rejeição de C, `ocupado`, timeout + reset |
+| 5 | **Três esteiras (A + B + C)** | Itens 1–3 + 2ª/3ª esteira secundária + 4 sensores TCRT5000 + 3 drivers IRF520 | Validar FSM completa com 3 esteiras e cenários de rejeição | Entregas A/B/C, rejeição de peça inexistente, `ocupado`, timeout + reset |
 | 6 | Migração para broker remoto (HiveMQ Cloud) | Item 2 aprovado + conta HiveMQ Cloud + `USE_TLS=true` no ESP32 | Repetir a cadeia de comunicação (Serial → MQTT → Dashboard) usando um broker em nuvem via TLS, sem alterar lógica de FSM | Mesmo ciclo end-to-end do Teste 4, porém via internet/TLS (porta 8883) |
 
 ---
@@ -443,3 +443,60 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - **Fix de Rejeição de Comandos:** Corrigido bug crítico onde comandos inválidos (ex.: `CMD:PECA:Z`) ou rejeitados pelo gateway (ex.: `peca_invalida`, `sem_estoque`) apareciam como "Comando enviado" no histórico do Dashboard. Causa raiz dupla: (1) `server.js` emitia evento `comando` para **todas** as mensagens do tópico `dataflow/comandos/pub`, independente do campo `status`; (2) `app.js` adicionava entradas de histórico **antes** da confirmação do servidor (optimistic UI sem rollback). Solução: `server.js` agora inspeciona `msgJson.status` e roteia `'rejeitado'` para evento `comando_erro` separado; `app.js` só adiciona histórico após receber confirmação via Socket.IO. Validação pendente de execução (roteiro de hoje).
 - **Teste 6 (HiveMQ Cloud) — Validação Completa Pendente:** Blocos 4 e 5 (Dashboard E2E remoto, LWT/reconexão remota) aguardando execução conforme roteiro de 03/09, condicionado à resolução do firewall ou ambiente de rede alternativo.
 - **Teste 5 (Esteiras A + B):** Permanece `⬜ Blocked` aguardando hardware.
+
+**Observações 08–12/09:**
+- **Teste 5 (Três Esteiras A+B+C) — CONCLUÍDO:** Hardware adicional (2º/3º driver IRF520 + motores + sensores TCRT5000 de topo/junção para B e C) integrado com sucesso. Comando MQTT Box enviado com sucesso para peças B e C. Cenários de rejeição (timeout, comando inválido, `ocupado`, `sem_estoque`) replicados com sucesso seguindo o padrão validado para a esteira A. Calibração de sensores revalidada na montagem real. Ajuste mecânico das demais esteiras concluído. Card #9 → **Done**.
+- **Subtarefa HiveMQ Cloud:** Permanece em `⬜ Pendente` como subtarefa — executar somente se Blocos 1–3 fecharem com folga (fecharam ✅). Blocos 4 e 5 (Dashboard E2E remoto, LWT/reconexão remota) ainda aguardando resolução de firewall ou ambiente de rede alternativo.
+- **Spec Beckhoff CX9240:** Escopo definido como apenas especificação (sem implementação). Contrato de tópico/payload proposto em `arquitetura_mqtt.md` para validação cruzada com o agente do Beckhoff.
+- **Tarefas mecânicas restantes:** Base MDF, soldagem/fiação, pintura e estética do protótipo.
+
+---
+
+## Sugestões de Comentários para Cards do GitHub Projects
+
+> **Instrução:** copiar e colar nos respectivos cards do board. Ajustar datas e detalhes conforme feedback do time.
+
+### Card #9 — Integração Esteiras B/C
+
+> **Status: Done ✅** (08–12/09/2026)
+>
+> Esteiras B e C integradas com sucesso. Hardware adicional (2º/3º IRF520, motores, 4 sensores TCRT5000) instalado e alimentado. Comando MQTT Box validado para peças B e C. Todos os cenários de rejeição (timeout, `ocupado`, `sem_estoque`, `CMD:RESET`) replicados seguindo o padrão da esteira A. Calibração de sensores revalidada na montagem real. Ajuste mecânico das demais esteiras concluído.
+>
+> **Feito por:** [nome] · **Tempo total:** [X]h · **Referência:** `docs/testes/roteiros/semana_04_08-12_setembro.md` §3, §4, §5
+
+### Card #15 — HiveMQ Cloud (Credenciais)
+
+> **Status: Done ✅**
+>
+> Cluster HiveMQ (`s1.eu.hivemq.cloud`) configurado. Credenciais salvas em `esp32/gateway_mqtt/secrets.h` (USE_TLS=true). Conexão TLS/8883 validada no ESP32 e no Node.js. Tópicos retained sincronizando corretamente.
+
+### Card #16 — HiveMQ Cloud (TLS/8883)
+
+> **Status: Done ✅**
+>
+> TLS/8883 validado entre ESP32 → HiveMQ Cloud e HiveMQ Cloud → Node.js. Certificado CA embutido via `WiFiClientSecure`. Teste 3 puro (MQTT Box remoto) aprovado.
+
+### Card #17 — HiveMQ Cloud (E2E Remoto)
+
+> **Status: Pendente ⬜** — Bloqueado por firewall corporativo.
+>
+> Pós-03/09: validação E2E via Dashboard remoto requer ambiente de rede alternativo ou resolução do firewall. Blocos 4 e 5 do roteiro HiveMQ permanecem pendentes. **Sugestão:** mover para semana 5 como subtarefa, condicionado a ambiente de rede acessível.
+
+### Card novo — Melhoria: Integração Simulador ↔ Beckhoff CX9240
+
+> **Status: Backlog 📋** · **Template: A** · **Prioridade: Baixa** · **Milestone: Futuro**
+>
+> **Como** responsável pelo PC industrial Beckhoff CX9240,
+> **Quero** que o simulador publique o estoque de peças via MQTT (`dataflow/estoque`, retained, QoS 1),
+> **Para que** eu possa inscrever o CX9240 e persistir o estoque em banco MySQL/MariaDB.
+>
+> **Critério de aceite:**
+> - [ ] Simulador publica em `dataflow/estoque` com payload `{\"pecaA\":N,\"pecaB\":N,\"pecaC\":N}`
+> - [ ] Modo `MQTT_PUBLISH=true` configurável em `simulator/package.json`
+> - [ ] Teste em bancada própria (separada da esteira A): CX9240 recebe e grava no banco
+> - [ ] Contrato de tópico/payload validado cruzadamente entre os dois agentes
+>
+> **Dependência:** alinhar tópicos com o agente do Beckhoff antes de implementar. Não interferir no fluxo do Teste 5.
+>
+> **Referência:** `docs/testes/roteiros/semana_04_08-12_setembro.md` §7
+
