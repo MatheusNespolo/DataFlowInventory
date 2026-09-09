@@ -450,6 +450,11 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - **Spec Beckhoff CX9240:** Escopo definido como apenas especificação (sem implementação). Contrato de tópico/payload proposto em `arquitetura_mqtt.md` para validação cruzada com o agente do Beckhoff.
 - **Tarefas mecânicas restantes:** Base MDF, soldagem/fiação, pintura e estética do protótipo.
 
+**Observações 15/09 (Roteiro Semana 5):**
+- **Roteiro da semana elaborado:** `docs/testes/roteiros/semana_05_15-19_setembro.md` criado. Foco: verificação de solda dos módulos IRF520 (B/C), conclusão da subtarefa HiveMQ Cloud (Teste 6 — Blocos 4 e 5), diagrama elétrico consolidado e avanço na spec de persistência DB para integração com Beckhoff CX9240.
+- **Teste 6 (HiveMQ Cloud):** Permanece como subtarefa de alta prioridade, condicionada à resolução do firewall/ambiente de rede alternativo. Bloco 1 (solda IRF520) deve ser aprovado antes de sua execução.
+- **Beckhoff CX9240:** Avanço incremental — contrato de tópico/payload a ser validado (simulado) sem implementação. Persistência DB fora do escopo desta semana.
+
 ---
 
 ## Sugestões de Comentários para Cards do GitHub Projects
