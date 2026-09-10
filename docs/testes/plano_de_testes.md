@@ -453,7 +453,7 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 **Observações 15/09 (Roteiro Semana 5):**
 - **Roteiro da semana elaborado:** `docs/testes/roteiros/semana_05_15-19_setembro.md` criado. Foco: verificação de solda dos módulos IRF520 (B/C), conclusão da subtarefa HiveMQ Cloud (Teste 6 — Blocos 4 e 5), diagrama elétrico consolidado e avanço na spec de persistência DB para integração com Beckhoff CX9240.
 - **Teste 6 (HiveMQ Cloud):** Permanece como subtarefa de alta prioridade, condicionada à resolução do firewall/ambiente de rede alternativo. Bloco 1 (solda IRF520) deve ser aprovado antes de sua execução.
-- **Beckhoff CX9240:** Avanço incremental — contrato de tópico/payload a ser validado (simulado) sem implementação. Persistência DB fora do escopo desta semana.
+- **Beckhoff CX9240 — Simulador CONCLUÍDO:** Escopo avançou além da spec — implementada e testada a publicação MQTT opcional no `simulator/server.js` (dependência `mqtt@^5.10.0`, modo `MQTT_PUBLISH=true`/`npm run start:mqtt`). Publica `dataflow/estoque` retained (QoS 1) a cada mudança de estoque e imediatamente ao conectar. Validado localmente: broker Mosquitto recebeu e reteve `{"type":"estoque","pecaA":5,"pecaB":5,"pecaC":5}`, confirmado via `mosquitto_sub`. Modo é opcional e não-bloqueante — não afeta o funcionamento offline padrão via Socket.IO. Persistência DB e código do lado Beckhoff permanecem fora do escopo (dependem do agente responsável pelo CX9240).
 
 ---
 
@@ -496,10 +496,12 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 > **Para que** eu possa inscrever o CX9240 e persistir o estoque em banco MySQL/MariaDB.
 >
 > **Critério de aceite:**
-> - [ ] Simulador publica em `dataflow/estoque` com payload `{\"pecaA\":N,\"pecaB\":N,\"pecaC\":N}`
-> - [ ] Modo `MQTT_PUBLISH=true` configurável em `simulator/package.json`
+> - [x] Simulador publica em `dataflow/estoque` com payload `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}` — implementado em `simulator/server.js`, testado localmente (retained confirmado via `mosquitto_sub`)
+> - [x] Modo `MQTT_PUBLISH=true` configurável em `simulator/package.json` (dependência `mqtt@^5.10.0` + script `start:mqtt`)
 > - [ ] Teste em bancada própria (separada da esteira A): CX9240 recebe e grava no banco
 > - [ ] Contrato de tópico/payload validado cruzadamente entre os dois agentes
+>
+> **Atualização 15/09:** lado do simulador **concluído e testado**. Detalhes em `docs/arquitetura_mqtt.md` (seção "Integração Beckhoff CX9240") e `docs/testes/roteiros/semana_05_15-19_setembro.md` (Bloco 4). Card pode avançar de `Backlog` para `Ready` assim que o agente do Beckhoff confirmar disponibilidade para a bancada própria.
 >
 > **Dependência:** alinhar tópicos com o agente do Beckhoff antes de implementar. Não interferir no fluxo do Teste 5.
 >

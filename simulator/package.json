@@ -1,15 +1,17 @@
 {
   "name": "data-flow-inventory-simulator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "Simulador offline do Data Flow Inventory",
+  "description": "Simulador offline do Data Flow Inventory (com publicação MQTT opcional para integração Beckhoff CX9240)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "start:mqtt": "MQTT_PUBLISH=true node server.js"
   },
   "dependencies": {
     "express": "^5.2.1",
+    "mqtt": "^5.15.2",
     "socket.io": "^4.8.3"
   }
 }

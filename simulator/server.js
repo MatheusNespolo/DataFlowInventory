@@ -55,6 +55,72 @@ let sim = {
 const PECAS = ['A', 'B', 'C'];
 
 // ============================================================
+// INTEGRAÇÃO MQTT (OPCIONAL — modo Beckhoff CX9240)
+// ============================================================
+// Ativa com: MQTT_PUBLISH=true npm start  (ou npm run start:mqtt)
+//
+// Quando ativo, o simulador publica o estoque em:
+//   tópico : MQTT_TOPIC_ESTOQUE   (padrão: dataflow/estoque)
+//   payload: {"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}
+//   QoS    : 1 | retained: true
+//
+// Contrato validado cruzadamente com o agente do Beckhoff CX9240.
+// Ver: docs/arquitetura_mqtt.md §"Integração Beckhoff CX9240"
+// ============================================================
+const MQTT_PUBLISH    = process.env.MQTT_PUBLISH === 'true';
+const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL || 'mqtt://127.0.0.1';
+const MQTT_PORT       = parseInt(process.env.MQTT_PORT, 10) || 1883;
+const MQTT_USER       = process.env.MQTT_USER || '';
+const MQTT_PASS       = process.env.MQTT_PASS || '';
+const MQTT_TOPIC_ESTOQUE = process.env.MQTT_TOPIC_ESTOQUE || 'dataflow/estoque';
+
+let mqttClient = null;
+
+if (MQTT_PUBLISH) {
+  const mqtt = require('mqtt');
+  const mqttOpts = {
+    port:     MQTT_PORT,
+    clientId: `sim-beckhoff-${Math.random().toString(16).slice(2, 8)}`,
+    clean:    true,
+    ...(MQTT_USER && { username: MQTT_USER, password: MQTT_PASS }),
+  };
+
+  mqttClient = mqtt.connect(MQTT_BROKER_URL, mqttOpts);
+
+  mqttClient.on('connect', () => {
+    console.log(`[SIM/MQTT] Conectado ao broker ${MQTT_BROKER_URL} (modo Beckhoff)`);
+    // Publica o estoque atual imediatamente (retained) para sincronizar
+    // o CX9240 mesmo que não haja entrega pendente no momento da conexão.
+    publicarEstoqueMqtt();
+  });
+
+  mqttClient.on('error', (err) => {
+    console.error('[SIM/MQTT] Erro de conexão:', err.message);
+  });
+
+  mqttClient.on('offline', () => {
+    console.warn('[SIM/MQTT] Broker offline — tentando reconectar...');
+  });
+}
+
+/**
+ * Publica o estoque atual no broker MQTT (retained, QoS 1).
+ * Só executa se MQTT_PUBLISH=true e o cliente estiver conectado.
+ * Payload: {"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}
+ */
+function publicarEstoqueMqtt() {
+  if (!mqttClient || !mqttClient.connected) return;
+  const payload = JSON.stringify({ type: 'estoque', ...sim.estoque });
+  mqttClient.publish(MQTT_TOPIC_ESTOQUE, payload, { qos: 1, retain: true }, (err) => {
+    if (err) {
+      console.error('[SIM/MQTT] Falha ao publicar estoque:', err.message);
+    } else {
+      console.log(`[SIM/MQTT] Estoque publicado → ${MQTT_TOPIC_ESTOQUE}: ${payload}`);
+    }
+  });
+}
+
+// ============================================================
 // SERVE O FRONT-END UNIFICADO (../frontend)
 // ============================================================
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
@@ -77,6 +143,7 @@ function emitirStatus() {
 
 function emitirEstoque() {
   io.emit('estoque', { ...sim.estoque });
+  publicarEstoqueMqtt(); // modo Beckhoff: retained, QoS 1 (no-op se MQTT_PUBLISH=false)
 }
 
 function emitirEsteiras() {
@@ -292,7 +359,13 @@ server.listen(PORT, () => {
   console.log('  ╔══════════════════════════════════════════════════╗');
   console.log('  ║  Data Flow Inventory — Simulador                 ║');
   console.log(`  ║  Rodando em: http://localhost:${PORT}               ║`);
-  console.log('  ║  Modo: SIMULADO (sem hardware, sem MQTT)         ║');
+  if (MQTT_PUBLISH) {
+    console.log('  ║  Modo: SIMULADO + MQTT (integração Beckhoff)     ║');
+    console.log(`  ║  Broker: ${(MQTT_BROKER_URL + ':' + MQTT_PORT).padEnd(40)}║`);
+    console.log(`  ║  Tópico: ${MQTT_TOPIC_ESTOQUE.padEnd(40)}║`);
+  } else {
+    console.log('  ║  Modo: SIMULADO (sem hardware, sem MQTT)         ║');
+  }
   console.log('  ║  Front-end: ../frontend (unificado)              ║');
   console.log('  ╚══════════════════════════════════════════════════╝');
   console.log('');

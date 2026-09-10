@@ -211,6 +211,61 @@ ESP32 publica confirmação em 'dataflow/comandos/pub'
 
 ---
 
+## Integração Beckhoff CX9240 (simulador → MQTT → persistência)
+
+> **Status:** contrato implementado no simulador (`simulator/server.js`) e **validado localmente** contra broker Mosquitto (mensagem `retained` confirmada via `mosquitto_sub`). O lado do **PC industrial Beckhoff CX9240** (assinatura do tópico + persistência em MySQL/MariaDB/PostgreSQL) será desenvolvido por outro agente e testado em **bancada própria**, desacoplada da esteira A.
+
+### Contrato de integração
+
+| Item | Valor |
+|------|-------|
+| Direção | Simulador → Broker MQTT → Beckhoff CX9240 |
+| Tópico | `dataflow/estoque` (mesmo tópico usado pelo gateway ESP32 real) |
+| Payload | `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}` |
+| QoS | 1 |
+| Retained | `true` — garante que o CX9240 recebe o último estoque conhecido mesmo se conectar depois |
+| Broker | Mosquitto local (`mqtt://127.0.0.1:1883`) por padrão; configurável via `MQTT_BROKER_URL`/`MQTT_PORT` |
+
+### Ativação no simulador
+
+A publicação MQTT é **opcional e desativada por padrão** (o simulador continua funcionando em modo 100% offline via Socket.IO sem nenhuma dependência de broker). Para habilitar:
+
+```bash
+cd simulator
+npm install          # instala a dependência mqtt (^5.10.0)
+
+# Opção 1 — variável de ambiente
+MQTT_PUBLISH=true npm start
+
+# Opção 2 — script dedicado
+npm run start:mqtt
+```
+
+**Variáveis de ambiente disponíveis:**
+
+| Variável | Padrão | Descrição |
+|----------|--------|-----------|
+| `MQTT_PUBLISH` | `false` | Habilita a publicação MQTT do estoque |
+| `MQTT_BROKER_URL` | `mqtt://127.0.0.1` | URL do broker (local ou dedicado à integração) |
+| `MQTT_PORT` | `1883` | Porta do broker |
+| `MQTT_USER` / `MQTT_PASS` | — | Credenciais, se o broker exigir autenticação |
+| `MQTT_TOPIC_ESTOQUE` | `dataflow/estoque` | Tópico de publicação do estoque |
+
+### Comportamento
+
+- Publica o estoque **a cada mudança** (toda entrega decrementa e republica) e **imediatamente ao conectar** ao broker, garantindo que o CX9240 sempre tenha o valor mais recente mesmo em reconexões.
+- Publicação é **não-bloqueante**: falhas de conexão MQTT são logadas (`[SIM/MQTT] ...`) mas não impedem o funcionamento normal do dashboard via Socket.IO.
+- O simulador **não assina** nenhum tópico do Beckhoff — a comunicação é unidirecional (simulador → broker → CX9240), evitando acoplamento reverso.
+
+### Pré-requisitos da bancada própria (fora do escopo desta integração)
+
+- PC Beckhoff CX9240 + ambiente TwinCAT (ou cliente MQTT equivalente, ex. `TF6720`)
+- MySQL, MariaDB ou PostgreSQL para persistência do estoque
+- Broker MQTT acessível a ambos os lados (pode ser o Mosquitto local da bancada ou um broker dedicado)
+- Validação cruzada final do contrato com o agente responsável pelo programa do CX9240
+
+---
+
 ## Formatos de Mensagem
 
 ### Arduino → ESP32 (Serial JSON)

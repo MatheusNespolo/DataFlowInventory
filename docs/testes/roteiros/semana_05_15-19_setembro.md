@@ -152,25 +152,29 @@ Antes de prosseguir, confirmar:
 ## 6. Bloco 4 — Persistência DB (spec Beckhoff CX9240)
 
 > **Objetivo:** avançar na especificação do contrato de integração com o PC industrial Beckhoff CX9240, sem implementar código Beckhoff nem persistência em banco. Esta semana: documentar e validar o contrato de tópico/payload.
+>
+> **Atualização:** escopo avançou além do previsto — o simulador agora publica de fato no broker MQTT (modo opcional `MQTT_PUBLISH=true`), validado localmente contra Mosquitto. O código/persistência do **lado Beckhoff** continua fora do escopo (outro agente).
 
 ### 6.1 — Documentação do contrato
 
-- [ ] Publicar tópico e payload da integração Beckhoff em `arquitetura_mqtt.md`
-- [ ] Decidir se o simulador ganha modo `MQTT_PUBLISH=true` (reutilizando `mqtt.js` de `simulator/package.json`)
-- [ ] Confirmar se o payload proposto `{\"pecaA\":N,\"pecaB\":N,\"pecaC\":N}` é aceitável para o agente do Beckhoff
+- [x] Publicar tópico e payload da integração Beckhoff em `arquitetura_mqtt.md` (seção "Integração Beckhoff CX9240")
+- [x] Simulador ganhou modo `MQTT_PUBLISH=true` (dependência `mqtt@^5.10.0` em `simulator/package.json`)
+- [ ] Confirmar se o payload `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}` é aceitável para o agente do Beckhoff (pendente de validação cruzada)
 
-### 6.2 — Validação do contrato (simulada)
+### 6.2 — Validação do contrato (implementada e testada localmente)
 
-- [ ] Simular publicação do payload via MQTT Box no tópico `dataflow/estoque`
-- [ ] Confirmar que o formato é parseável por um subscriber genérico (prova de conceito sem Beckhoff real)
+- [x] Simulador publica em `dataflow/estoque` via `mqtt.js` (retained, QoS 1) — testado com `MQTT_PUBLISH=true npm start`
+- [x] Confirmado via `mosquitto_sub -t dataflow/estoque -C 1` que a mensagem chega retained: `{"type":"estoque","pecaA":5,"pecaB":5,"pecaC":5}`
+- [ ] Validação com subscriber real do Beckhoff (aguarda ambiente/agente)
 
 ### 6.3 — Escopo NESTA semana
 
-- [ ] **Não** implementar persistência DB no simulador
+- [x] Implementado no simulador: publicação MQTT opcional, não-bloqueante, desativada por padrão
+- [ ] **Não** implementar persistência DB (fica para o lado Beckhoff)
 - [ ] **Não** implementar código para o Beckhoff CX9240
-- [ ] Esboçar card de melhoria (Template A) com critério de aceite para bancada própria
+- [ ] Esboçar card de melhoria (Template A) com critério de aceite para bancada própria — atualizar critério de aceite já que a publicação MQTT do simulador está pronta
 
-> **Dependência externa:** alinhar tópicos/formato com o agente do Beckhoff antes de avançar. Bancada própria será testada separadamente.
+> **Dependência externa:** alinhar tópicos/formato com o agente do Beckhoff antes de avançar para a bancada própria. Lado simulador já não é mais bloqueante.
 
 ---
 
@@ -194,7 +198,7 @@ cd simulator && npm start
 | 1 — Verificação solda IRF520 (B/C) | ⬜ | Todos os testes elétricos e firmware aprovados? |
 | 2 — HiveMQ Cloud (Teste 6 completo) | ⬜ | Latência: `____` ms · LWT remoto: `____` |
 | 3 — Diagrama elétrico consolidado | ⬜ | Publicado em `docs/diagramas/`? |
-| 4 — Spec Beckhoff (contrato) | ⬜ | Contrato em `arquitetura_mqtt.md`? Payload validado? |
+| 4 — Spec Beckhoff (contrato) | ✅ | Contrato publicado em `arquitetura_mqtt.md`; simulador publica MQTT (retained, QoS 1) testado localmente. Validação com CX9240 real pendente (fora do escopo do simulador). |
 | Plano B | — | Se usado |
 
 ---
