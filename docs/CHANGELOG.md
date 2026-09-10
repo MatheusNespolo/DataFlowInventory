@@ -14,6 +14,23 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Simulador — Publicação MQTT opcional para integração Beckhoff CX9240 (15/09/2026)**
+  - `simulator/server.js`: novo modo opcional (`MQTT_PUBLISH=true`, desativado por padrão) que
+    publica o estoque no broker MQTT via cliente `mqtt` (nova dependência `^5.10.0`).
+  - Tópico `dataflow/estoque`, payload `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}`,
+    QoS 1 e **retained** — publica a cada mudança de estoque e imediatamente ao conectar,
+    reproduzindo o mesmo contrato usado pelo gateway ESP32 real.
+  - Validado localmente contra broker Mosquitto: mensagem confirmada como retained via
+    `mosquitto_sub`. Publicação é não-bloqueante (falhas de conexão MQTT não afetam o
+    funcionamento offline padrão via Socket.IO).
+  - Variáveis de ambiente: `MQTT_PUBLISH`, `MQTT_BROKER_URL`, `MQTT_PORT`, `MQTT_USER`,
+    `MQTT_PASS`, `MQTT_TOPIC_ESTOQUE`. Script `npm run start:mqtt` adicionado.
+  - Documentação: nova seção "Integração Beckhoff CX9240" em `docs/arquitetura_mqtt.md`;
+    `simulator/README.md` atualizado; critério de aceite do card de melhoria (lado simulador)
+    marcado como concluído em `docs/testes/plano_de_testes.md`.
+  - Persistência em banco (MySQL/MariaDB/PostgreSQL) e o programa do lado Beckhoff CX9240
+    continuam fora do escopo — a cargo de outro agente, a validar em bancada própria.
+
 - **Documentação — Reorganização dos roteiros de teste (03/09/2026)**
   - Consolidação de 8 arquivos diários em 4 arquivos semanais (`semana_01` a `semana_04`).
   - Atualização de todas as referências internas em `README.md`, `arquitetura_mqtt.md`,
