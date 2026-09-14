@@ -353,10 +353,11 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## Próximos Passos
 
-- 🚧 **Esteira B/C:** montagem do hardware adicional (motores + sensores) e réplica das funções da esteira A no sketch principal - (bloqueado).
-- ☁️ **Broker Remoto (HiveMQ Cloud):** o sistema hoje está validado com **Mosquitto local**. parcialmente validado, E2E + LWT remoto pendentes. Ver [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) (Teste 6) e [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md#etapa-e--migração-para-hivemq-cloud-futuro).
-- 🧪 **Validação de infraestrutura:** script [`docs/testes/validações/validar_infra.ps1`](docs/testes/validações/validar_infra.ps1) automatiza a checagem de broker, firewall e serviços antes de cada bancada — inclui checklist manual complementar em [`checklist_pre_teste_rede_infra.md`](docs/testes/validações/checklist_pre_teste_rede_infra.md).
-- ⚠️ **Fix de rejeição:** implementado, validação em bancada pendente.
+- 🚀 **CI/CD Automatizado:** workflows de linting, secret detection e compilação de firmware via GitHub Actions (ver [`docs/CI-CD.md`](docs/CI-CD.md)).
+- 🎡 **Roda de Separação (3 compartimentos):** motor de passo 28BYJ-48 + ULN2003 para separação automática das peças A/B/C ao fim da esteira principal (ver [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md)).
+- 🏭 **Integração Beckhoff CX9240:** persistência do histórico e estoque em banco de dados relacional (lado do simulador implementado; validação com PC industrial em bancada própria).
+- ☁️ **Broker Remoto (HiveMQ Cloud):** validação E2E via internet/TLS (porta 8883) com credenciais em nuvem (parcialmente validado). Ver [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) (Teste 6).
+- 🧪 **Validação de infraestrutura:** scripts em `scripts/` e `docs/testes/validações/validar_infra.ps1` automatizam a checagem de broker, firewall e serviços antes de cada bancada.
 
 ## Equipe
 

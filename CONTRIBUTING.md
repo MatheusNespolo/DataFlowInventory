@@ -56,12 +56,26 @@ Tipos: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`.
 
 ## 5. Validações antes do PR
 
-**Servidor Node:**
+**Automação local (recomendada):**
+```bash
+# Executa validação de segredos e checagem de sintaxe JS
+bash scripts/precommit-checks.sh
 ```
+
+**Servidor Node:**
+```bash
 cd server
 node --check server.js          # sintaxe
 npm install                     # dependências
 npm start                       # sobe o server (precisa de broker + .env)
+```
+
+**Simulador:**
+```bash
+cd simulator
+node --check server.js          # sintaxe
+npm install                     # dependências
+npm start                       # sobe o simulador offline
 ```
 
 **Firmware (ESP32 / Arduino):** compile na Arduino IDE (ou `arduino-cli compile`).
@@ -70,6 +84,8 @@ Lembre de **desconectar o ESP32 dos pinos 0/1** durante o upload no Uno.
 **Bancada / integração:** siga o roteiro do dia em
 [`docs/testes/roteiros/`](docs/testes/roteiros/) e o
 [checklist de infra](docs/testes/validações/checklist_pre_teste_rede_infra.md).
+
+**Pipelines de CI/CD:** o repositório conta com GitHub Actions automatizado (`.github/workflows/lint-and-security.yaml`). Consulte [`docs/CI-CD.md`](docs/CI-CD.md) para detalhes.
 
 **Regra de ouro dos tópicos MQTT:** `dataflow/status` é **exclusivo do gateway ESP32**.
 O servidor publica seu status em `dataflow/status/server`. Nunca faça o server publicar

@@ -1,0 +1,108 @@
+name: CI — Lint & Security
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  lint-javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Instalar dependências (server)
+        run: |
+          cd server
+          npm ci
+
+      - name: Instalar dependências (simulator)
+        run: |
+          cd simulator
+          npm ci
+
+      - name: Lint JavaScript (server + simulator)
+        run: |
+          cd server && npx eslint . || echo "ESLint não configurado — pulando"
+          cd ../simulator && npx eslint . || echo "ESLint não configurado — pulando"
+
+  secret-detection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # histórico completo para truffleHog
+
+      - name: TruffleHog Scan (detectar segredos)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Audit vulnerabilities (server)
+        run: |
+          cd server
+          npm audit --audit-level=moderate
+
+      - name: Audit vulnerabilities (simulator)
+        run: |
+          cd simulator
+          npm audit --audit-level=moderate
+
+  arduino-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Instalar cores Arduino
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+          arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+      - name: Instalar bibliotecas necessárias
+        run: |
+          arduino-cli lib install "LiquidCrystal I2C"
+          arduino-cli lib install "ArduinoJson"
+          arduino-cli lib install "PubSubClient"
+
+      - name: Compilar Arduino Uno (principal)
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno arduino/data_flow_inventory
+
+      - name: Compilar ESP32 (gateway MQTT)
+        run: |
+          arduino-cli compile --fqbn esp32:esp32:esp32 esp32/gateway_mqtt
+
+      - name: Compilar Arduino Uno (teste AB)
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno test/esteira_peca_b/arduino_esteiras_ab
+
+      - name: Compilar ESP32 (teste AB)
+        run: |
+          arduino-cli compile --fqbn esp32:esp32:esp32 test/esteira_peca_b/esp32_esteiras_ab

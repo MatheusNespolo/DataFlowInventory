@@ -219,7 +219,34 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 
 ---
 
-## 5. Templates de comentário
+## 5. Novos Cards — Sprint 5 (14–19/09/2026): CI/CD, Separador e Beckhoff
+
+> Artefatos completos prontos para uso em `docs/cards_comments/`
+
+### 🔹 Card #18 — CI/CD: GitHub Actions (Linting + Secret Detection)
+
+- **Coluna:** `Todo` · **Área:** `Infra/Rede` · **Prioridade:** `P0-Crítico`
+- **Labels:** `area:infra`, `tipo:hardening`, `p0-critico`
+- **Arquivo de Comentário:** `docs/cards_comments/card_cicd_lint_security.md`
+- **Objetivo:** Implementar pipeline no GitHub Actions para validação sintática (ESLint), compilação firmware (arduino-cli), detecção de segredos (truffleHog) e scripts locais de onboarding.
+
+### 🔹 Card #19 — Integração Separador (Roda de Separação — 3 Compartimentos)
+
+- **Coluna:** `Todo` · **Área:** `Hardware` + `Firmware-Uno` · **Prioridade:** `P1-Alto`
+- **Labels:** `area:hardware`, `area:firmware-uno`, `tipo:feature`, `p1-alto`
+- **Arquivo de Comentário:** `docs/cards_comments/card_separador_integration.md`
+- **Objetivo:** Descomentarincludes motor 28BYJ-48 + ULN2003 na FSM do Arduino Uno, integrando a etapa de separação física em 3 compartimentos (A/B/C) ao fim da esteira principal.
+
+### 🔹 Card #20 (Já criado no board) — Integração CX9240 (Beckhoff): Persistência MQTT → Banco de Dados
+
+- **Coluna:** `Backlog` · **Área:** `Backend` + `Beckhoff` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:backend`, `tipo:feature`, `stretch:beckhoff`, `p2-medio`
+- **Arquivo de Comentário:** `docs/cards_comments/card_beckhoff_cx9240_comment.md`
+- **Status:** Lado simulador ✅ CONCLUÍDO (15/09); lado Beckhoff ⏳ aguarda agente/bancada própria.
+
+---
+
+## 6. Templates de comentário
 
 ### Template A — Abertura de card (Definition of Done)
 

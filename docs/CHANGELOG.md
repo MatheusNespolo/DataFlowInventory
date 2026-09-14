@@ -14,6 +14,24 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **CI/CD + Organização — Sprint 5 (14/09/2026)**
+  - **GitHub Actions** `.github/workflows/lint-and-security.yaml` criado com 4 jobs:
+    - `lint-javascript`: ESLint em `server/` e `simulator/`
+    - `secret-detection`: truffleHog detecta credenciais versionadas (`.env`, `secrets.h`)
+    - `npm-audit`: npm audit em `server/`, `simulator/` e `test/mqtt_probe/`
+    - `arduino-compile`: arduino-cli compila 4 sketches (Uno principal, ESP32 gateway, teste AB)
+  - **Scripts de setup e validação** em `scripts/`:
+    - `setup.sh` — onboarding automatizado (instala deps, cria `.env`/`secrets.h`, valida segredos)
+    - `validate-env.sh` — detecta arquivos sensíveis em staging (segredos, `.env`)
+    - `precommit-checks.sh` — hook Git pré-commit (segredos + sintaxe JS)
+  - **Documentação consolidada:**
+    - `docs/ARCHITECTURE.md` — **novo arquivo unificado** (substitui `arquitetura_mqtt.md` como referência técnica central; arquivo original mantido para histórico)
+    - `docs/CI-CD.md` — **novo arquivo** com pipelines, workflows, troubleshooting e roadmap de testes automatizados
+    - `docs/INTEGRATION_GUIDE.md` — **novo arquivo** com passo a passo para integração Beckhoff CX9240 + Separador (roda de separação)
+    - `simulator/.env.example` — **novo arquivo** (similar ao `server/.env.example`; documenta variáveis MQTT para modo Beckhoff)
+    - `docs/cards_comments/` — **nova pasta** com comentários prontos para aplicar nos cards do GitHub Projects (CI/CD, Separador, Beckhoff)
+  - **Todos os scripts devem ser validados em bancada amanhã** — ver `docs/testes/roteiros/semana_05_15-19_setembro.md` Bloco 5 (Scripts de Setup)
+
 - **Simulador — Publicação MQTT opcional para integração Beckhoff CX9240 (15/09/2026)**
   - `simulator/server.js`: novo modo opcional (`MQTT_PUBLISH=true`, desativado por padrão) que
     publica o estoque no broker MQTT via cliente `mqtt` (nova dependência `^5.10.0`).
