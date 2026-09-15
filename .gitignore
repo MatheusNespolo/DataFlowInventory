@@ -5,11 +5,15 @@
 # Node.js
 # Obs.: os package-lock.json SÃO versionados (builds reprodutíveis).
 node_modules/
+**/node_modules/
 npm-debug.log*
 
 # Variáveis de ambiente (senhas!)
 .env
+*.env
+*.env.local
 server/.env
+simulator/.env
 
 # Segredos de firmware (Wi-Fi / MQTT) — cada bancada cria o seu a partir do .example
 secrets.h
