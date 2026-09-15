@@ -93,9 +93,14 @@ No GitHub Projects, marcar como **Required Status Checks**:
 ### 4.1 Instalação
 
 ```bash
-# Criar arquivo .git/hooks/pre-commit (executável)
+# Linux / macOS / Git Bash:
 cp scripts/precommit-checks.sh .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
+```
+
+No Windows (PowerShell), você pode executar diretamente antes de commitar:
+```powershell
+.\scripts\precommit-checks.ps1
 ```
 
 ### 4.2 Validações

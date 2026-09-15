@@ -21,9 +21,11 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
     - `npm-audit`: npm audit em `server/`, `simulator/` e `test/mqtt_probe/`
     - `arduino-compile`: arduino-cli compila 4 sketches (Uno principal, ESP32 gateway, teste AB)
   - **Scripts de setup e validação** em `scripts/`:
-    - `setup.sh` — onboarding automatizado (instala deps, cria `.env`/`secrets.h`, valida segredos)
-    - `validate-env.sh` — detecta arquivos sensíveis em staging (segredos, `.env`)
-    - `precommit-checks.sh` — hook Git pré-commit (segredos + sintaxe JS)
+    - `setup.sh` / `setup.ps1` — onboarding automatizado (instala deps, cria `.env`/`secrets.h`, valida segredos)
+    - `validate-env.sh` / `validate-env.ps1` — detecta arquivos sensíveis em staging (segredos, `.env`)
+    - `precommit-checks.sh` / `precommit-checks.ps1` — hook Git pré-commit (segredos + sintaxe JS)
+  - **Limpeza do repositório:**
+    - Remoção de `node_modules` rastreados acidentalmente no índice git (`test/mqtt_probe/node_modules/` e `simulator/node_modules/`) e reforço no `.gitignore`.
   - **Documentação consolidada:**
     - `docs/ARCHITECTURE.md` — **novo arquivo unificado** (substitui `arquitetura_mqtt.md` como referência técnica central; arquivo original mantido para histórico)
     - `docs/CI-CD.md` — **novo arquivo** com pipelines, workflows, troubleshooting e roadmap de testes automatizados

@@ -294,6 +294,18 @@ O Arduino opera com **5 estados**:
 
 ## Como Rodar
 
+### Setup Automatizado (Recomendado)
+
+Você pode instalar as dependências e criar os arquivos de configuração necessários automaticamente:
+
+```bash
+# Windows (PowerShell):
+.\scripts\setup.ps1
+
+# Linux / macOS / Git Bash:
+bash scripts/setup.sh
+```
+
 ### Caminho rápido — Simulador (sem hardware)
 
 Para ver o dashboard funcionando sem montar nenhum componente físico:

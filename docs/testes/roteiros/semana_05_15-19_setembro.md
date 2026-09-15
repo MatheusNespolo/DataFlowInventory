@@ -178,25 +178,25 @@ Antes de prosseguir, confirmar:
 
 ---
 
-## 7. Bloco 5 — Validação dos Scripts de Setup e Automação (Amanhã — 15/09/2026)
+## 7. Bloco 5 — Validação dos Scripts de Setup e Automação (15/09/2026)
 
-> **Objetivo:** testar e validar os novos scripts criados na Sprint 5 (`scripts/setup.sh`, `scripts/validate-env.sh`, `scripts/precommit-checks.sh` e `.github/workflows/lint-and-security.yaml`) em ambiente limpo, garantindo que o onboarding automatizado e a detecção de segredos funcionam sem falhas antes de formalizar o processo de CI/CD.
+> **Objetivo:** testar e validar os novos scripts criados na Sprint 5 (`scripts/setup.sh` / `setup.ps1`, `scripts/validate-env.sh` / `validate-env.ps1`, `scripts/precommit-checks.sh` / `precommit-checks.ps1` e `.github/workflows/lint-and-security.yaml`) em ambiente limpo, garantindo que o onboarding automatizado e a detecção de segredos funcionam sem falhas antes de formalizar o processo de CI/CD.
 
 ### 7.1 — Itens de Validação dos Scripts
 
 | # | Script / Teste | Procedimento | Esperado | Status |
 |---|----------------|--------------|----------|--------|
-| **S1** | `scripts/setup.sh` em ambiente limpo | Executar `bash scripts/setup.sh` em diretório de teste | Detecta Node/npm/Git, instala deps em `server/`, `simulator/`, `test/mqtt_probe/`, cria `.env`/`secrets.h` a partir dos `.example` | ⬜ |
-| **S2** | `scripts/validate-env.sh` (caso positivo) | Executar `bash scripts/validate-env.sh` com repo limpo | Retorna código 0 ("Nenhum arquivo sensível em staging") | ⬜ |
-| **S3** | `scripts/validate-env.sh` (caso negativo) | Forçar `git add server/.env` (em branch de teste) e rodar o script | Detecta o arquivo sensível e retorna erro (código > 0) | ⬜ |
-| **S4** | `scripts/precommit-checks.sh` | Instalar como hook (`cp scripts/precommit-checks.sh .git/hooks/pre-commit`) e tentar commit de teste | Valida segredos + sintaxe JS com `node --check` | ⬜ |
+| **S1** | `scripts/setup.sh` / `setup.ps1` em ambiente limpo | Executar `bash scripts/setup.sh` ou `.\scripts\setup.ps1` em diretório de teste | Detecta Node/npm/Git, instala deps em `server/`, `simulator/`, `test/mqtt_probe/`, cria `.env`/`secrets.h` a partir dos `.example` | ⬜ |
+| **S2** | `scripts/validate-env.sh` / `validate-env.ps1` (caso positivo) | Executar `bash scripts/validate-env.sh` ou `.\scripts\validate-env.ps1` com repo limpo | Retorna código 0 ("Nenhum arquivo sensível em staging") | ⬜ |
+| **S3** | `scripts/validate-env.sh` / `validate-env.ps1` (caso negativo) | Forçar `git add server/.env` (em branch de teste) e rodar o script | Detecta o arquivo sensível e retorna erro (código > 0) | ⬜ |
+| **S4** | `scripts/precommit-checks.sh` / `precommit-checks.ps1` | Instalar como hook (`cp scripts/precommit-checks.sh .git/hooks/pre-commit`) ou rodar `.\scripts\precommit-checks.ps1` e tentar commit de teste | Valida segredos + sintaxe JS com `node --check` | ⬜ |
 | **S5** | `simulator/.env.example` | Copiar para `simulator/.env` e rodar `MQTT_PUBLISH=true npm start` | Simulador lê as variáveis do `.env` e conecta ao broker | ⬜ |
 | **S6** | Workflow CI local (simulação) | Rodar `node --check server/server.js` e `node --check simulator/server.js` | Sintaxe 100% válida em todos os arquivos | ⬜ |
 
 ### 7.2 — Critérios de Sucesso do Bloco 5
 - [ ] Todos os itens S1 a S6 retornam resultado esperado
 - [ ] Nenhum falso-positivo de detecção de segredos em arquivos `.example`
-- [ ] Scripts documentados e com permissão de execução
+- [ ] Scripts documentados e com suporte tanto a Bash (Linux/macOS/CI) quanto a PowerShell (Windows)
 
 ---
 

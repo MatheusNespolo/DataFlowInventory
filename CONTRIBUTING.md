@@ -58,8 +58,11 @@ Tipos: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`.
 
 **Automação local (recomendada):**
 ```bash
-# Executa validação de segredos e checagem de sintaxe JS
+# Linux / macOS / Git Bash:
 bash scripts/precommit-checks.sh
+
+# Windows (PowerShell):
+.\scripts\precommit-checks.ps1
 ```
 
 **Servidor Node:**
