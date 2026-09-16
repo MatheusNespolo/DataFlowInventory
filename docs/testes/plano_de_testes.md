@@ -406,8 +406,10 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | 2 | ESP32 → Broker → Node.js | 25/08/2026 | ✅ Aprovado | JSONs do Uno chegam via ESP32 aos tópicos dataflow/#; broker 0.0.0.0:1883 OK |
 | 3 | Comando via MQTT Box | 01/09/2026 | ✅ Aprovado | Comando direto via MQTT Box em `dataflow/comandos/sub` validado de forma desacoplada; ESP32 repassa `CMD:PECA:A` e FSM aciona esteira com confirmação em `dataflow/comandos/pub` |
 | 4 | End-to-End (Dashboard) | 25/08/2026 | ✅ Aprovado | Pedido de peça A via Dashboard → esteira parte → entrega completa |
-| 5 | Duas esteiras (A + B) | | ⬜ Pendente | Aguarda montagem da esteira B (2º driver IRF520) |
-| 6 | Migração para broker remoto (HiveMQ Cloud) | | ⬜ Pendente | Planejado para rodada futura, após consolidação da esteira A |
+| 5 | Três esteiras (A + B + C) | 08–12/09/2026 | ✅ Aprovado | 3 esteiras integradas (3× IRF520 + 6× TCRT5000), entregas A/B/C e rejeições validadas |
+| 6 | Migração para broker remoto (HiveMQ Cloud) | 02/09/2026 | ⚠️ Parcial | Conexão TLS 8883 e tópicos retained OK; E2E remoto em teste paralelo |
+| S | Scripts de Setup e CI/CD (S1–S6) | 15/09/2026 | ✅ Aprovado | Scripts `.sh`/`.ps1` (setup, validate-env, precommit), GitHub Actions e saneamento Git |
+| BK | Beckhoff — Simulador MQTT | 15/09/2026 | ✅ Aprovado | `simulator/` publica `dataflow/estoque` retained (QoS 1) via `MQTT_PUBLISH=true` |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
 **Observações 25/08:**
@@ -454,6 +456,11 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - **Roteiro da semana elaborado:** `docs/testes/roteiros/semana_05_15-19_setembro.md` criado. Foco: verificação de solda dos módulos IRF520 (B/C), conclusão da subtarefa HiveMQ Cloud (Teste 6 — Blocos 4 e 5), diagrama elétrico consolidado e avanço na spec de persistência DB para integração com Beckhoff CX9240.
 - **Teste 6 (HiveMQ Cloud):** Permanece como subtarefa de alta prioridade, condicionada à resolução do firewall/ambiente de rede alternativo. Bloco 1 (solda IRF520) deve ser aprovado antes de sua execução.
 - **Beckhoff CX9240 — Simulador CONCLUÍDO:** Escopo avançou além da spec — implementada e testada a publicação MQTT opcional no `simulator/server.js` (dependência `mqtt@^5.10.0`, modo `MQTT_PUBLISH=true`/`npm run start:mqtt`). Publica `dataflow/estoque` retained (QoS 1) a cada mudança de estoque e imediatamente ao conectar. Validado localmente: broker Mosquitto recebeu e reteve `{"type":"estoque","pecaA":5,"pecaB":5,"pecaC":5}`, confirmado via `mosquitto_sub`. Modo é opcional e não-bloqueante — não afeta o funcionamento offline padrão via Socket.IO. Persistência DB e código do lado Beckhoff permanecem fora do escopo (dependem do agente responsável pelo CX9240).
+- **Scripts e CI/CD Validados (Sprint 5 / Bloco 5):** Criação e aprovação multiplataforma dos scripts de automação (`setup.sh`/`setup.ps1`, `validate-env.sh`/`validate-env.ps1`, `precommit-checks.sh`/`precommit-checks.ps1`), workflow GitHub Actions e remoção dos arquivos `node_modules` órfãos do cache Git.
+
+**Observações 16/09 (Sprint 5 — Continuidade e Frentes Paralelas):**
+- **Continuidade de Hardware:** Continuidade e verificação elétrica dos módulos MOSFET IRF520 das esteiras B e C (Bloco 1 do roteiro).
+- **Trabalho Paralelo:** Execução em paralelo da transição do broker (HiveMQ Cloud Teste 6.3 E2E remoto sob rede 4G sem bloqueio de porta 8883) ou especificação detalhada da persistência SQL (MySQL/PostgreSQL) para o PC industrial Beckhoff CX9240.
 
 ---
 

@@ -62,34 +62,35 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 | #4 | Desenvolver gateway ESP32 (Serial ↔ MQTT) | `Firmware-ESP32` | `T1`, `T2` | 25/08/2026 |
 | #6 | Criar servidor Node.js (Express + WebSocket + MQTT) | `Backend` | `T2`, `T4` | 25/08/2026 |
 | #7 | Criar dashboard web (Frontend) | `Frontend` | `T4` | 25/08/2026 |
+| #9 | Teste 5 — Três esteiras (A + B + C) | `Hardware`/`Firmware-Uno` | `T5` | 12/09/2026 |
 | #10 | Simulador | `Backend`/`Frontend` | `N/A` | 25/08/2026 |
 | **#11** | **Sincronismo de estoque LCD ↔ Dashboard** | `Firmware-Uno`/`ESP32`/`Frontend` | `B3`, `T4` | **28/08/2026** |
 | **#12** | **Calibração do timeout de entrega (9 s) + recuperação via `CMD:RESET`** | `Firmware-Uno` | `B1`, `T4` | **28/08/2026** |
 | #13 | Infraestrutura de teste local (Mosquitto + scripts de validação) | `Infra/Rede` | `Infra` | 26/08/2026 |
+| #15 | Teste 6.1 — Provisionar cluster e credenciais HiveMQ Cloud | `Infra/Rede` | `T6-HiveMQ` | 02/09/2026 |
+| #16 | Teste 6.2 — Firmware ESP32 com suporte TLS/8883 | `Firmware-ESP32` | `T6-HiveMQ` | 02/09/2026 |
+| **#18** | **CI/CD: GitHub Actions + Scripts de Automação Multiplataforma** | `Infra/Rede` | `Infra` | **15/09/2026** |
 
 ### 🟡 Coluna `In Progress`
 
 | Card | Título | Área | Observação |
 |---|---|---|---|
-| #1 | Montagem mecânica das esteiras | `Hardware` | Épico — esteira A concluída; B/C pendentes |
-| #2 | Diagrama elétrico e ligações | `Hardware` | Épico — pinagem da A consolidada; B/C pendentes |
-| #8 | Escrever documentação e artigo | `Docs/Artigo` | Épico perene — falta seção de Resultados |
+| #1 | Montagem mecânica das esteiras | `Hardware` | Esteiras A/B/C integradas; fixação e base em andamento |
+| #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
+| #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
+| #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
+| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Código preparado; aguarda teste de bancada com motor 28BYJ-48 |
+| #20 | Integração CX9240 (Beckhoff): Persistência MQTT → Banco de Dados | `Backend`/`Beckhoff` | Simulador MQTT concluído (15/09); spec DDL SQL em elaboração |
 
 ### 🔴 Coluna `Blocked`
 
-| Card | Título | Área | Bloqueio |
-|---|---|---|---|
-| #9 | Teste 5 — Integração com duas esteiras (A + B) | `Hardware`/`Firmware-Uno` | Aguarda 2º driver IRF520 e sensores topo B / junção J2 |
+*(Nenhum card bloqueado no momento — dependências de hardware para B/C foram superadas).*
 
-### ☁️ Coluna `Backlog` — Teste 6 (HiveMQ Cloud)
+### ☁️ Coluna `Backlog`
 
 | Card | Título | Área | Bloco |
 |---|---|---|---|
-| **#15** | **Teste 6.1 — Provisionar cluster e credenciais HiveMQ Cloud** | `Infra/Rede` | `T6-HiveMQ` |
-| **#16** | **Teste 6.2 — Firmware ESP32 com suporte TLS/8883** | `Firmware-ESP32` | `T6-HiveMQ` |
-| **#17** | **Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud** | `Infra/Rede`/`Backend`/`Frontend` | `T6-HiveMQ` |
-
-> O card **#5** (“Configurar broker MQTT — HiveMQ Cloud”) deve ser **renomeado para “Teste 6 — Migração para broker remoto (HiveMQ Cloud)”** e convertido em épico guarda-chuva dos cards #15, #16 e #17, movendo-se de `Todo` para `Backlog` com a label `stretch:hivemq-cloud`.
+| #5 | Teste 6 — Migração para broker remoto (HiveMQ Cloud - Geral) | `Infra/Rede` | `T6-HiveMQ` |
 
 ---
 
@@ -223,12 +224,13 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 
 > Artefatos completos prontos para uso em `docs/cards_comments/`
 
-### 🔹 Card #18 — CI/CD: GitHub Actions (Linting + Secret Detection)
+### 🔹 Card #18 — CI/CD: GitHub Actions (Linting + Secret Detection) + Automação
 
-- **Coluna:** `Todo` · **Área:** `Infra/Rede` · **Prioridade:** `P0-Crítico`
+- **Coluna:** `Done` · **Área:** `Infra/Rede` · **Prioridade:** `P0-Crítico` · **Data Validação:** **15/09/2026**
 - **Labels:** `area:infra`, `tipo:hardening`, `p0-critico`
 - **Arquivo de Comentário:** `docs/cards_comments/card_cicd_lint_security.md`
-- **Objetivo:** Implementar pipeline no GitHub Actions para validação sintática (ESLint), compilação firmware (arduino-cli), detecção de segredos (truffleHog) e scripts locais de onboarding.
+- **Objetivo:** Implementar pipeline no GitHub Actions para validação sintática (ESLint), compilação firmware (arduino-cli), detecção de segredos (truffleHog) e scripts locais multiplataforma (`setup`, `validate-env`, `precommit-checks` em `.sh` e `.ps1`).
+- **Status:** ✅ CONCLUÍDO e testado (15/09/2026).
 
 ### 🔹 Card #19 — Integração Separador (Roda de Separação — 3 Compartimentos)
 

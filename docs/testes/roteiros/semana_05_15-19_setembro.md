@@ -194,13 +194,28 @@ Antes de prosseguir, confirmar:
 | **S6** | Workflow CI local (simulação) | Rodar `node --check server/server.js` e `node --check simulator/server.js` | Sintaxe 100% válida em todos os arquivos | ✅ |
 
 ### 7.2 — Critérios de Sucesso do Bloco 5
-- [✅] Todos os itens S1 a S6 retornam resultado esperado
-- [✅] Nenhum falso-positivo de detecção de segredos em arquivos `.example`
-- [✅] Scripts documentados e com suporte tanto a Bash (Linux/macOS/CI) quanto a PowerShell (Windows)
+- [x] Todos os itens S1 a S6 retornam resultado esperado
+- [x] Nenhum falso-positivo de detecção de segredos em arquivos `.example`
+- [x] Scripts documentados e com suporte tanto a Bash (Linux/macOS/CI) quanto a PowerShell (Windows)
+- [x] Saneamento do índice Git (`node_modules` órfãos removidos e regras de `.gitignore` atualizadas)
 
 ---
 
-## 8. Plano B — Simulador
+## 8. Plano de Execução — Dia 16/09/2026 (Continuidade e Atividades Paralelas)
+
+> **Contexto do Dia:** Continuidade direta do hardware validado e início em paralelo de uma das frentes prioritárias da semana.
+
+### 8.1 — Frente Primária: Continuidade de Hardware & Bancada
+1. Executar testes elétricos de continuidade e integridade de solda nos módulos IRF520 das esteiras B e C (**Bloco 1**).
+2. Validação dos acionamentos por PWM sem ruído no sensor IR.
+
+### 8.2 — Frentes Paralelas (Candidatas para início conjunto hoje)
+- **Opção A (Transição de Transporte — HiveMQ Cloud):** Executar **Blocos 2.4 e 2.5** (Teste 6.3 E2E remoto). Subir `gateway_mqtt` com `USE_TLS = true` na porta 8883, apontar `server/.env` para cluster HiveMQ via hotspot 4G (2.4 GHz) se o firewall corporativo bloquear a porta 8883, e validar dashboard web recebendo status.
+- **Opção B (Arquitetura de Dados — Persistência Beckhoff CX9240):** Refinar o schema relacional (DDL SQL para MySQL/PostgreSQL), especificar as tabelas de auditoria (`estoque_snapshots` e `eventos_log`) e detalhar a interface com o TwinCAT 3 (FB_MQTT / FB_Database) a ser compartilhada com o agente do CLP.
+
+---
+
+## 9. Plano B — Simulador
 
 ```bash
 start_services.bat
@@ -212,22 +227,23 @@ cd simulator && npm start
 
 ---
 
-## 8. Resultados
+## 10. Resultados Consolidados da Semana
 
 | Etapa | Resultado | Observações |
 |-------|-----------|-------------|
-| 0 — Pré-voo | ⬜ | IP: `____` |
-| 1 — Verificação solda IRF520 (B/C) | ⬜ | Todos os testes elétricos e firmware aprovados? |
-| 2 — HiveMQ Cloud (Teste 6 completo) | ⬜ | Latência: `____` ms · LWT remoto: `____` |
-| 3 — Diagrama elétrico consolidado | ⬜ | Publicado em `docs/diagramas/`? |
-| 4 — Spec Beckhoff (contrato) | ✅ | Contrato publicado em `arquitetura_mqtt.md`; simulador publica MQTT (retained, QoS 1) testado localmente. Validação com CX9240 real pendente (fora do escopo do simulador). |
-| Plano B | — | Se usado |
+| 0 — Pré-voo | ⬜ | Em andamento para a rodada de 16/09 |
+| 1 — Verificação solda IRF520 (B/C) | ⬜ | Testes elétricos com multímetro (16/09) |
+| 2 — HiveMQ Cloud (Teste 6 completo) | ⚠️ Parcial | Conexão TLS 8883 OK; E2E remoto em teste paralelo |
+| 3 — Diagrama elétrico consolidado | ⬜ | Publicação em `docs/diagramas/` |
+| 4 — Spec Beckhoff (contrato) | ✅ | Contrato em `arquitetura_mqtt.md` + simulador MQTT concluído localmente |
+| 5 — Scripts Setup / CI-CD | ✅ | Scripts `.sh` e `.ps1`, pre-commit hooks e saneamento Git (15/09) |
+| Plano B | — | Simulador operacional |
 
 ---
 
-## 9. Documentação
+## 11. Documentação
 
-- [ ] `CHANGELOG.md` — entrada da semana 5 (soldagem verificada, HiveMQ Cloud, diagrama)
-- [ ] `plano_de_testes.md` — registro de resultados 15–19/09; atualizar Teste 6 se concluído
-- [ ] `board_github_projects.md` — mover #17 para Done (se HiveMQ completo); Beckhoff card em Backlog
-- [ ] `arquitetura_mqtt.md` — contrato de tópico/payload Beckhoff
+- [x] `CHANGELOG.md` — registros de 15/09 (Sprint 5 scripts & simulador Beckhoff)
+- [x] `plano_de_testes.md` — registro de resultados atualizado até 15–16/09
+- [x] `board_github_projects.md` — cards #18, #19 e #20 atualizados
+- [x] `arquitetura_mqtt.md` / `ARCHITECTURE.md` — contrato Beckhoff e arquitetura unificada
