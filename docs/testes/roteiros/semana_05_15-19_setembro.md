@@ -35,23 +35,23 @@
 
 ### 2.1 — Infraestrutura
 
-- [ ] `start_services.bat` → Mosquitto + probe + server rodando
-- [ ] `mqtt_probe` mostra `online` retained em `dataflow/status`
-- [ ] Esteiras A, B e C operando no broker local
-- [ ] MQTT Box conectado ao broker local
-- [ ] WiFi/credentials confirmados (2,4 GHz)
+- [✅] `start_services.bat` → Mosquitto + probe + server rodando
+- [✅] `mqtt_probe` mostra `online` retained em `dataflow/status`
+- [✅] Esteiras A, B e C operando no broker local
+- [✅] MQTT Box conectado ao broker local
+- [✅] WiFi/credentials confirmados (2,4 GHz)
 
 ### 2.2 — Hardware
 
-- [ ] 3 drivers IRF520 alimentados (12 V / 5 V lógico)
-- [ ] Fiação UART reconferida (Uno ↔ ESP32, divisor + GND comum)
-- [ ] 4 sensores TCRT5000 (topo B, junção J2, topo C, junção J3) reportando na serial
-- [ ] Sensores topo A e junção J1 da esteira principal operacionais
+- [✅] 3 drivers IRF520 alimentados (12 V / 5 V lógico)
+- [✅] Fiação UART reconferida (Uno ↔ ESP32, divisor + GND comum)
+- [✅] 4 sensores TCRT5000 (topo B, junção J2, topo C, junção J3) reportando na serial
+- [✅] Sensores topo A e junção J1 da esteira principal operacionais
 ---
 
 ## 3. Bloco 1 — Verificação de solda dos módulos IRF520 (B/C)
 
-> **Objetivo:** validar que a soldagem dos 2º e 3º módulos IRF520 não introduziu falhas de continuidade, resistência parasita ou instabilidade no sinal PWM. Executar antes de qualquer teste funcional desta semana.
+> **Objetivo:** validar que a soldagem dos 2º e 3º módulos IRF520 não introduziu falhas de continuidade, resistência parasita ou instabilidade no sinal PWM. Executar antes de qualquer teste funcional desta semana. (Foi feita soldagem apenas da alimentação nas placas).
 
 ### 3.1 — Testes elétricos com multímetro
 
@@ -81,7 +81,7 @@
 
 ---
 
-## 4. Bloco 2 — Transição HiveMQ Cloud (Teste 6 completo)
+## 4. Bloco 2 — Transição HiveMQ Cloud (Teste 6 completo) (não houve avanço na transição Broker Local -> HiveMQ)
 
 > **Prioridade: ALTA.** Só executa se o Bloco 1 estiver aprovado e o problema de firewall/rede for resolvido (ou ambiente alternativo disponível — ex.: rede doméstica, 4G via hotspot).
 
@@ -186,17 +186,17 @@ Antes de prosseguir, confirmar:
 
 | # | Script / Teste | Procedimento | Esperado | Status |
 |---|----------------|--------------|----------|--------|
-| **S1** | `scripts/setup.sh` / `setup.ps1` em ambiente limpo | Executar `bash scripts/setup.sh` ou `.\scripts\setup.ps1` em diretório de teste | Detecta Node/npm/Git, instala deps em `server/`, `simulator/`, `test/mqtt_probe/`, cria `.env`/`secrets.h` a partir dos `.example` | ⬜ |
-| **S2** | `scripts/validate-env.sh` / `validate-env.ps1` (caso positivo) | Executar `bash scripts/validate-env.sh` ou `.\scripts\validate-env.ps1` com repo limpo | Retorna código 0 ("Nenhum arquivo sensível em staging") | ⬜ |
-| **S3** | `scripts/validate-env.sh` / `validate-env.ps1` (caso negativo) | Forçar `git add server/.env` (em branch de teste) e rodar o script | Detecta o arquivo sensível e retorna erro (código > 0) | ⬜ |
-| **S4** | `scripts/precommit-checks.sh` / `precommit-checks.ps1` | Instalar como hook (`cp scripts/precommit-checks.sh .git/hooks/pre-commit`) ou rodar `.\scripts\precommit-checks.ps1` e tentar commit de teste | Valida segredos + sintaxe JS com `node --check` | ⬜ |
-| **S5** | `simulator/.env.example` | Copiar para `simulator/.env` e rodar `MQTT_PUBLISH=true npm start` | Simulador lê as variáveis do `.env` e conecta ao broker | ⬜ |
-| **S6** | Workflow CI local (simulação) | Rodar `node --check server/server.js` e `node --check simulator/server.js` | Sintaxe 100% válida em todos os arquivos | ⬜ |
+| **S1** | `scripts/setup.sh` / `setup.ps1` em ambiente limpo | Executar `bash scripts/setup.sh` ou `.\scripts\setup.ps1` em diretório de teste | Detecta Node/npm/Git, instala deps em `server/`, `simulator/`, `test/mqtt_probe/`, cria `.env`/`secrets.h` a partir dos `.example` | ✅ |
+| **S2** | `scripts/validate-env.sh` / `validate-env.ps1` (caso positivo) | Executar `bash scripts/validate-env.sh` ou `.\scripts\validate-env.ps1` com repo limpo | Retorna código 0 ("Nenhum arquivo sensível em staging") | ✅ |
+| **S3** | `scripts/validate-env.sh` / `validate-env.ps1` (caso negativo) | Forçar `git add server/.env` (em branch de teste) e rodar o script | Detecta o arquivo sensível e retorna erro (código > 0) | ✅ |
+| **S4** | `scripts/precommit-checks.sh` / `precommit-checks.ps1` | Instalar como hook (`cp scripts/precommit-checks.sh .git/hooks/pre-commit`) ou rodar `.\scripts\precommit-checks.ps1` e tentar commit de teste | Valida segredos + sintaxe JS com `node --check` | ✅ |
+| **S5** | `simulator/.env.example` | Copiar para `simulator/.env` e rodar `MQTT_PUBLISH=true npm start` | Simulador lê as variáveis do `.env` e conecta ao broker | ✅ |
+| **S6** | Workflow CI local (simulação) | Rodar `node --check server/server.js` e `node --check simulator/server.js` | Sintaxe 100% válida em todos os arquivos | ✅ |
 
 ### 7.2 — Critérios de Sucesso do Bloco 5
-- [ ] Todos os itens S1 a S6 retornam resultado esperado
-- [ ] Nenhum falso-positivo de detecção de segredos em arquivos `.example`
-- [ ] Scripts documentados e com suporte tanto a Bash (Linux/macOS/CI) quanto a PowerShell (Windows)
+- [✅] Todos os itens S1 a S6 retornam resultado esperado
+- [✅] Nenhum falso-positivo de detecção de segredos em arquivos `.example`
+- [✅] Scripts documentados e com suporte tanto a Bash (Linux/macOS/CI) quanto a PowerShell (Windows)
 
 ---
 
