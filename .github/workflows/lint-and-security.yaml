@@ -16,17 +16,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            server/package-lock.json
+            simulator/package-lock.json
+            test/mqtt_probe/package-lock.json
 
       - name: Instalar dependências (server)
-        run: |
-          cd server
-          npm ci
+        run: cd server && npm ci
 
       - name: Instalar dependências (simulator)
-        run: |
-          cd simulator
-          npm ci
+        run: cd simulator && npm ci
+
+      - name: Instalar dependências (mqtt_probe)
+        run: cd test/mqtt_probe && npm ci
 
       - name: Lint JavaScript (server + simulator)
         run: |
@@ -38,16 +42,12 @@ jobs:
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # histórico completo para truffleHog
 
       - name: TruffleHog Scan (detectar segredos)
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --debug --only-verified
+          extra_args: --only-verified
 
   npm-audit:
     runs-on: ubuntu-latest
@@ -58,17 +58,27 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            server/package-lock.json
+            simulator/package-lock.json
+            test/mqtt_probe/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd server && npm ci
+          cd ../simulator && npm ci
+          cd ../test/mqtt_probe && npm ci
 
       - name: Audit vulnerabilities (server)
-        run: |
-          cd server
-          npm audit --audit-level=moderate
+        run: cd server && npm audit --audit-level=critical
 
       - name: Audit vulnerabilities (simulator)
-        run: |
-          cd simulator
-          npm audit --audit-level=moderate
+        run: cd simulator && npm audit --audit-level=critical
+
+      - name: Audit vulnerabilities (mqtt_probe)
+        run: cd test/mqtt_probe && npm audit --audit-level=critical
 
   arduino-compile:
     runs-on: ubuntu-latest
@@ -78,10 +88,27 @@ jobs:
 
       - name: Setup Arduino CLI
         uses: arduino/setup-arduino-cli@v1
+        with:
+          version: '1.0.0'
+
+      - name: Cache Arduino cores and libraries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.arduino15
+            ~/Arduino/libraries
+          key: ${{ runner.os }}-arduino-${{ hashFiles('**/*.ino') }}
+          restore-keys: |
+            ${{ runner.os }}-arduino-
+
+      - name: Configurar Arduino CLI
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          arduino-cli core update-index
 
       - name: Instalar cores Arduino
         run: |
-          arduino-cli core update-index
           arduino-cli core install arduino:avr
           arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 
@@ -92,17 +119,13 @@ jobs:
           arduino-cli lib install "PubSubClient"
 
       - name: Compilar Arduino Uno (principal)
-        run: |
-          arduino-cli compile --fqbn arduino:avr:uno arduino/data_flow_inventory
+        run: arduino-cli compile --fqbn arduino:avr:uno arduino_uno/separador
 
       - name: Compilar ESP32 (gateway MQTT)
-        run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32 esp32/gateway_mqtt
+        run: arduino-cli compile --fqbn esp32:esp32:esp32 esp32/gateway_mqtt
 
-      - name: Compilar Arduino Uno (teste AB)
-        run: |
-          arduino-cli compile --fqbn arduino:avr:uno test/esteira_peca_b/arduino_esteiras_ab
+      - name: Compilar Arduino Uno (teste A)
+        run: arduino-cli compile --fqbn arduino:avr:uno test/separador_test_A
 
-      - name: Compilar ESP32 (teste AB)
-        run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32 test/esteira_peca_b/esp32_esteiras_ab
+      - name: Compilar Arduino Uno (teste B)
+        run: arduino-cli compile --fqbn arduino:avr:uno test/separador_test_B

@@ -10,7 +10,7 @@
 # Uso:
 #   bash scripts/setup.sh
 #
-# Requer: Node.js 18+, npm 8+, Git
+# Requer: Node.js 22+, npm 9+, Git
 # ============================================================
 
 set -e  # exit on error
@@ -29,8 +29,8 @@ if ! command -v node &> /dev/null; then
 fi
 
 NODE_VERSION=$(node -v | sed 's/v//;s/\..*//')
-if [ "$NODE_VERSION" -lt 18 ]; then
-  echo "⚠️  Node.js v$NODE_VERSION detectado. Recomenda-se v18+."
+if [ "$NODE_VERSION" -lt 22 ]; then
+  echo "⚠️  Node.js v$NODE_VERSION detectado. Recomenda-se v22+ (suportamos v18+ com fallback)."
 fi
 
 if ! command -v npm &> /dev/null; then

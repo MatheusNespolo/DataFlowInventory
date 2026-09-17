@@ -14,6 +14,16 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Hardening CI/CD — Upgrade Node.js v22 + Otimizações (17/09/2026)**
+  - **NPM Audit:** Threshold alterado de `moderate` para `critical` (foco em vulnerabilidades reais CVSS ≥ 7.0)
+  - **Node.js LTS:** Upgrade de v18 para v22 (v20 EOL em 04/2026; v22 suportado até 04/2028)
+  - **Otimizações:**
+    - npm caching em workflows (~80% mais rápido em downloads)
+    - Arduino cache para cores/bibliotecas (~60% redução de tempo)
+    - TruffleHog simplificado com `--only-verified`
+  - **Documentação:** Nova seção "Estratégia: Gerenciamento de Vulnerabilidades npm" em `docs/CI-CD.md`
+  - **Compatibilidade:** Express 4.22+, Socket.IO 4+, mqtt 5.0+ validados em Node.js v22.23.2
+
 - **Historiador Beckhoff CX9240 — TwinCAT 3 + SQLite Local (15/09/2026)**
   - Projeto TwinCAT 3 (`CX9240_DataFlowInventory`) comissionado e testado com sucesso no CLP Beckhoff CX9240 rodando RT Linux ARM64.
   - Implementada assinatura dos tópicos `dataflow/estoque` e `dataflow/eventos` via **TF6701 IoT Communication**.

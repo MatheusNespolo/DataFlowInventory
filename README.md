@@ -6,7 +6,7 @@
 
 ![Arduino](https://img.shields.io/badge/Arduino-Uno-00979D?logo=arduino&logoColor=white)
 ![ESP32](https://img.shields.io/badge/ESP32-DevModule-000000?logo=espressif&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=node.js&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-v22+-339933?logo=node.js&logoColor=white)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-5391FE?logo=powershell&logoColor=white)
 ![MQTT](https://img.shields.io/badge/MQTT-Mosquitto%20%7C%20HiveMQ-660066?logo=mosquitto&logoColor=white)
 ![School](https://img.shields.io/badge/SENAI-São%20Caetano%20do%20Sul-blue)
@@ -323,7 +323,7 @@ Acessar http://localhost:3000 no navegador.
 #### Pré-requisitos
 
 - [Arduino IDE](https://www.arduino.cc/en/software) (com suporte a Arduino Uno e ESP32)
-- [Node.js](https://nodejs.org/) v18+
+- [Node.js](https://nodejs.org/) v22+
 - [Mosquitto](https://mosquitto.org/) rodando localmente (porta 1883) — **caminho padrão validado em bancada**. Veja [`docs/broker_local_mosquitto.md`](docs/broker_local_mosquitto.md)
 - Conexão Wi-Fi 2.4 GHz para o ESP32
 - Conta gratuita no [HiveMQ Cloud](https://cloud.hivemq.com) — apenas para o Teste 6 de migração para broker remoto (TLS/8883)

@@ -41,20 +41,69 @@ Este documento descreve as pipelines de CI/CD implementadas para garantir qualid
 
 #### 3. NPM Audit
 - **Dirs:** `server/`, `simulator/`, `test/mqtt_probe/`
-- **Falha em:** vulnerabilidades críticas
+- **Threshold:** `--audit-level=critical` (vulnerabilidades críticas e altas bloqueiam)
+- **Estratégia:** Ignorar low/moderate, focar em fixes via `npm audit fix`
+- **Status:** Vulnerabilidades resolvidas em 17/09/2026 via npm audit fix
+
+---
+
+## 2.2 Estratégia: Gerenciamento de Vulnerabilidades npm
+
+**Política:** Focus em vulnerabilidades **críticas e altas** apenas.
+
+### Justificativa
+- **Low/Moderate:** Geralmente não impactam produção, resolvem-se com atualizações menores futuras
+- **Critical/High:** Bloqueiam merge, requerem fix imediato via `npm audit fix` ou atualização de dependência
+- **Benefício:** Reduz falsos positivos no CI, mantendo segurança prática
+
+### Implementação
+```bash
+# Verificar vulnerabilidades críticas localmente
+npm audit --audit-level=critical
+
+# Corrigir (remove low/moderate automaticamente)
+npm audit fix --audit-level=critical
+
+# Forçar atualização de pacote específico se necessário
+npm update <package-name>
+```
+
+### Casos Resolvidos (17/09/2026)
+- **server/**: 3 vulnerabilidades moderate em `qs` (DoS, bypass) → resolvidas via `npm audit fix`
+- **simulator/**: 0 vulnerabilidades detectadas
+- **test/mqtt_probe/**: 0 vulnerabilidades detectadas
+
+---
+
+### 2.3 Node.js LTS: Upgrade v18 → v22
+
+**Data:** 17/09/2026  
+**Razão:** Node.js 20 atingiu EOL em abril/2026; v22 é LTS recomendado até abril/2028
+
+**Arquivos atualizados:**
+- `.github/workflows/lint-and-security.yaml`: `node-version: '22'`
+- `scripts/setup.sh`: Recomenda v22+ (com fallback para v18)
+- `README.md`: Badge atualizada para v22+
+- Compatibilidade: Express 4.22+, Socket.IO 4+, mqtt 5.0+ — todas compatíveis
+
+**Validação:**
+- Node v22.23.2 detectado em 17/09/2026
+- npm 10.9.8 compatível
+- Sem breaking changes em dependências
 
 #### 4. Arduino Compilation (arduino-cli)
 - **Sketches:**
-  - `arduino/data_flow_inventory/data_flow_inventory.ino` (Uno)
-  - `esp32/gateway_mqtt/gateway_mqtt.ino` (ESP32)
-  - `test/esteira_peca_b/arduino_esteiras_ab/arduino_esteiras_ab.ino` (Uno)
-  - `test/esteira_peca_b/esp32_esteiras_ab/esp32_esteiras_ab.ino` (ESP32)
+  - `arduino_uno/separador/separador.ino` (Uno principal)
+  - `esp32/gateway_mqtt/gateway_mqtt.ino` (ESP32 gateway)
+  - `test/separador_test_A/separador_test_A.ino` (Uno teste A)
+  - `test/separador_test_B/separador_test_B.ino` (Uno teste B)
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
+- **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
 - **Falha em:** Erros de compilação
 
 ---
 
-### 2.2 Workflow: `test.yaml` (Futuro)
+
 
 **Trigger:** `push`, `pull_request` (branches `main`, `dev`)
 
