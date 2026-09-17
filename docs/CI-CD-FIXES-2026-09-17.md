@@ -44,8 +44,8 @@ Corrigir falhas no pipeline GitHub Actions (lint-and-security.yaml) e implementa
 ### 5. Workflow Optimizations
 **Melhorias gerais:**
 - ✅ npm caching habilitado com `cache-dependency-path` (~80% mais rápido)
-- ✅ Caminhos de sketches corrigidos (`arduino_uno/separador`, `test/separador_test_A/B`)
-- ✅ Adicionada instalação de bibliotecas Arduino (LiquidCrystal I2C, ArduinoJson, PubSubClient)
+- ✅ Caminhos de sketches corrigidos (`arduino/data_flow_inventory`, `test/esteira_peca_b/*`)
+- ✅ Removida instalação de bibliotecas desnecessárias (já incluídas nos sketches)
 
 ---
 

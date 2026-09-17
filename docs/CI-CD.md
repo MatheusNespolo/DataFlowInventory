@@ -93,10 +93,10 @@ npm update <package-name>
 
 #### 4. Arduino Compilation (arduino-cli)
 - **Sketches:**
-  - `arduino_uno/separador/separador.ino` (Uno principal)
+  - `arduino/data_flow_inventory/data_flow_inventory.ino` (Uno principal)
   - `esp32/gateway_mqtt/gateway_mqtt.ino` (ESP32 gateway)
-  - `test/separador_test_A/separador_test_A.ino` (Uno teste A)
-  - `test/separador_test_B/separador_test_B.ino` (Uno teste B)
+  - `test/esteira_peca_b/arduino_esteiras_ab/arduino_esteiras_ab.ino` (Uno teste AB)
+  - `test/esteira_peca_b/esp32_esteiras_ab/esp32_esteiras_ab.ino` (ESP32 teste AB)
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
 - **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
 - **Falha em:** Erros de compilação
