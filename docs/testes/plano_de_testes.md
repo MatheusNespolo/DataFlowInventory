@@ -409,7 +409,8 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | 5 | Três esteiras (A + B + C) | 08–12/09/2026 | ✅ Aprovado | 3 esteiras integradas (3× IRF520 + 6× TCRT5000), entregas A/B/C e rejeições validadas |
 | 6 | Migração para broker remoto (HiveMQ Cloud) | 02/09/2026 | ⚠️ Parcial | Conexão TLS 8883 e tópicos retained OK; E2E remoto em teste paralelo |
 | S | Scripts de Setup e CI/CD (S1–S6) | 15/09/2026 | ✅ Aprovado | Scripts `.sh`/`.ps1` (setup, validate-env, precommit), GitHub Actions e saneamento Git |
-| BK | Beckhoff — Simulador MQTT | 15/09/2026 | ✅ Aprovado | `simulator/` publica `dataflow/estoque` retained (QoS 1) via `MQTT_PUBLISH=true` |
+| BK | Beckhoff — Historiador SQLite (CX9240) | 15/09/2026 | ✅ Aprovado | Persistência no SQLite local (`/var/lib/dfi/historian.db`) via TF6701 + TF6420 validada com simulador MQTT |
+| M1 | Montagem mecânica das esteiras | 15/09/2026 | ✅ Aprovado | Alinhamento e fixação das esteiras na estrutura mecânica concluídos |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
 **Observações 25/08:**
@@ -455,12 +456,13 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 **Observações 15/09 (Roteiro Semana 5):**
 - **Roteiro da semana elaborado:** `docs/testes/roteiros/semana_05_15-19_setembro.md` criado. Foco: verificação de solda dos módulos IRF520 (B/C), conclusão da subtarefa HiveMQ Cloud (Teste 6 — Blocos 4 e 5), diagrama elétrico consolidado e avanço na spec de persistência DB para integração com Beckhoff CX9240.
 - **Teste 6 (HiveMQ Cloud):** Permanece como subtarefa de alta prioridade, condicionada à resolução do firewall/ambiente de rede alternativo. Bloco 1 (solda IRF520) deve ser aprovado antes de sua execução.
-- **Beckhoff CX9240 — Simulador CONCLUÍDO:** Escopo avançou além da spec — implementada e testada a publicação MQTT opcional no `simulator/server.js` (dependência `mqtt@^5.10.0`, modo `MQTT_PUBLISH=true`/`npm run start:mqtt`). Publica `dataflow/estoque` retained (QoS 1) a cada mudança de estoque e imediatamente ao conectar. Validado localmente: broker Mosquitto recebeu e reteve `{"type":"estoque","pecaA":5,"pecaB":5,"pecaC":5}`, confirmado via `mosquitto_sub`. Modo é opcional e não-bloqueante — não afeta o funcionamento offline padrão via Socket.IO. Persistência DB e código do lado Beckhoff permanecem fora do escopo (dependem do agente responsável pelo CX9240).
+- **Beckhoff CX9240 (Historiador SQLite) — CONCLUÍDO:** Projeto TwinCAT 3 (`CX9240_DataFlowInventory`) comissionado no RT Linux ARM64 do Beckhoff CX9240. TF6701 assina `dataflow/estoque` e `dataflow/eventos`, e TF6420 em SQL Expert Mode grava transacionalmente no SQLite local (`/var/lib/dfi/historian.db`, WAL mode) preenchendo as tabelas `estoque_hist` e `eventos_hist`. Validado de ponta a ponta com o simulador `DataFlowInventory` (`MQTT_PUBLISH=true`).
+- **Avanços Mecânicos e Soldagem:** Realizados avanços estruturais na fixação e alinhamento mecânico das esteiras B e C na bancada. A etapa de soldagem dos drivers IRF520 e medições elétricas foi replanejada para a rodada seguinte por restrição de tempo.
 - **Scripts e CI/CD Validados (Sprint 5 / Bloco 5):** Criação e aprovação multiplataforma dos scripts de automação (`setup.sh`/`setup.ps1`, `validate-env.sh`/`validate-env.ps1`, `precommit-checks.sh`/`precommit-checks.ps1`), workflow GitHub Actions e remoção dos arquivos `node_modules` órfãos do cache Git.
 
 **Observações 16/09 (Sprint 5 — Continuidade e Frentes Paralelas):**
 - **Continuidade de Hardware:** Continuidade e verificação elétrica dos módulos MOSFET IRF520 das esteiras B e C (Bloco 1 do roteiro).
-- **Trabalho Paralelo:** Execução em paralelo da transição do broker (HiveMQ Cloud Teste 6.3 E2E remoto sob rede 4G sem bloqueio de porta 8883) ou especificação detalhada da persistência SQL (MySQL/PostgreSQL) para o PC industrial Beckhoff CX9240.
+- **Trabalho Paralelo:** Execução da transição do broker (HiveMQ Cloud Teste 6.3 E2E remoto sob rede 4G sem bloqueio de porta 8883) e integração física da roda de separação de 3 compartimentos.
 
 ---
 
@@ -514,3 +516,5 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 >
 > **Referência:** `docs/testes/roteiros/semana_04_08-12_setembro.md` §7
 
+- **Validação Nó Historiador Beckhoff CX9240 (15/09):** O projeto TwinCAT 3 no CX9240 (`CX9240_DataFlowInventory`) foi comissionado com sucesso no RT Linux ARM64. O CLP assina os tópicos `dataflow/estoque` e `dataflow/eventos` via TF6701 e grava no banco local SQLite (`/var/lib/dfi/historian.db`, WAL mode) via TF6420 em SQL Expert Mode, preenchendo as tabelas `estoque_hist` e `eventos_hist`. Validação de ponta a ponta executada contra o simulador `DataFlowInventory` com `MQTT_PUBLISH=true`, comprovando a persistência autônoma das variáveis de estoque (`pecaA`, `pecaB`, `pecaC`) e logs operacionais.
+- **Avanços Mecânicos e Soldagem (15/09):** Realizados avanços na fixação e alinhamento mecânico das esteiras B e C na bancada. A etapa final de soldagem e testes elétricos dos módulos IRF520 foi replanejada para a rodada seguinte devido à restrição de tempo.

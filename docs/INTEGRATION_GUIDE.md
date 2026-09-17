@@ -1,4 +1,4 @@
-# Guia de Integração — Beckhoff CX9240 + Separador (Roda de Separação)
+# Guia de Integração — Beckhoff CX9240 (Historiador SQLite) + Separador (Roda de Separação)
 
 > **Passo a passo para integração final com PC industrial e roda de separação**  
 > Data: 14/09/2026 · Sprint 5
@@ -38,16 +38,44 @@ mosquitto_sub -h localhost -t "dataflow/estoque" -C 1
 # Esperado: {"type":"estoque","pecaA":5,"pecaB":5,"pecaC":5}
 ```
 
-### 1.3 Especificação do Banco de Dados Relacional (MySQL / MariaDB / PostgreSQL)
+### 1.3 Arquitetura de Persistência no CX9240 — SQLite Local (Implementada & Validada)
 
-Para que o PC industrial Beckhoff CX9240 (ou simulador de persistência) registre o histórico de forma transacional e com auditoria, define-se a seguinte estrutura relacional recomendada:
+O Beckhoff CX9240 roda **TwinCAT 3 em RT Linux (ARM64)** com banco de dados local **SQLite** (`/var/lib/dfi/historian.db`), configurado em modo WAL (`PRAGMA journal_mode = WAL;`). Essa decisão de engenharia garante autonomia completa ao CLP, eliminando a dependência de conectividade de rede com servidores MySQL/MariaDB externos.
 
+#### Schema SQLite (`docs/schema_sqlite.sql` no projeto TwinCAT):
 ```sql
--- Criação do banco de dados
+PRAGMA journal_mode = WAL;
+
+-- Histórico de estoque: 1 linha por mudança e por amostra periódica
+CREATE TABLE IF NOT EXISTS estoque_hist (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts_plc     TEXT    NOT NULL,                        -- 'YYYY-MM-DD HH:MM:SS.mmm' (hora local)
+  ts_db      TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime')),
+  estoque_a  INTEGER NOT NULL,
+  estoque_b  INTEGER NOT NULL,
+  estoque_c  INTEGER NOT NULL,
+  origem     TEXT    NOT NULL CHECK (origem IN ('mudanca', 'periodico'))
+);
+CREATE INDEX IF NOT EXISTS ix_estoque_ts ON estoque_hist (ts_plc);
+
+-- Histórico de eventos operacionais e erros
+CREATE TABLE IF NOT EXISTS eventos_hist (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts_plc      TEXT    NOT NULL,
+  ts_db       TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime')),
+  evento      TEXT    NOT NULL,                        -- 'entrega', 'erro', 'inicializacao'
+  peca        TEXT,                                    -- 'A', 'B', 'C' ou NULL
+  detalhe     TEXT,                                    -- 'timeout', 'sem_estoque' ou NULL
+  payload_raw TEXT                                     -- JSON original recebido
+);
+CREATE INDEX IF NOT EXISTS ix_eventos_ts ON eventos_hist (ts_plc);
+```
+
+#### Schema Alternativo MariaDB / MySQL (Apêndice):
+```sql
 CREATE DATABASE IF NOT EXISTS dataflow_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE dataflow_db;
 
--- Tabela de snapshots de estoque (atualizada via dataflow/estoque)
 CREATE TABLE IF NOT EXISTS estoque_snapshots (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -59,35 +87,39 @@ CREATE TABLE IF NOT EXISTS estoque_snapshots (
     INDEX idx_timestamp (timestamp)
 ) ENGINE=InnoDB;
 
--- Tabela de histórico de eventos operacionais (atualizada via dataflow/eventos)
 CREATE TABLE IF NOT EXISTS eventos_log (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    evento VARCHAR(50) NOT NULL,          -- 'pedido', 'entregue', 'erro', 'status'
-    peca VARCHAR(10) NULL,               -- 'A', 'B', 'C'
-    tempo_execucao_ms INT NULL,          -- tempo medido do ciclo de entrega
-    detalhes VARCHAR(255) NULL,          -- 'sem_estoque', 'timeout_j1', etc.
+    evento VARCHAR(50) NOT NULL,
+    peca VARCHAR(10) NULL,
+    tempo_execucao_ms INT NULL,
+    detalhes VARCHAR(255) NULL,
     INDEX idx_evento (evento),
     INDEX idx_timestamp (timestamp)
 ) ENGINE=InnoDB;
 ```
 
-### 1.4 Arquitetura no TwinCAT 3 (PLC Beckhoff CX9240)
+### 1.4 Blocos de Função TwinCAT 3 (Projeto CX9240_DataFlowInventory)
 
-No ambiente TwinCAT 3, a persistência segue a seguinte estrutura de blocos de função (FBs):
-1. **`FB_IotMqttClient` (TF6701 IoT Communication):** Assina o tópico `dataflow/estoque` (QoS 1) com reconexão automática.
-2. **`FB_JsonDomParser` (TF6701 IoT Communication):** Converte a string JSON recebida para variáveis estruturadas (`ST_Estoque: pecaA, pecaB, pecaC`).
-3. **`FB_DBRecordInsert` (TF6420 Database Server):** Executa o comando `INSERT INTO estoque_snapshots (peca_a, peca_b, peca_c) VALUES (...)` acionado por borda de subida (`R_TRIG`) a cada alteração de payload.
+1. **`FB_IotMqttClient` (TF6701 IoT Communication):** Assina `dataflow/estoque` e `dataflow/eventos` com QoS 1 e reconexão automática.
+2. **`FB_DfiSqlBuilder` / Parser JSON:** Extrai as propriedades do JSON e constrói dinamicamente as queries `INSERT INTO estoque_hist ...` e `INSERT INTO eventos_hist ...`.
+3. **`FB_DBRecordInsert` (TF6420 Database Server — SQL Expert Mode):** Grava os registros no arquivo SQLite `/var/lib/dfi/historian.db`.
+4. **Configuração segura:** Credenciais e rotas carregadas de `/etc/dfi/historian.conf` (com permissão `chmod 600`).
+5. **Inspeção de Dados:**
+   ```bash
+   sqlite3 /var/lib/dfi/historian.db "SELECT * FROM estoque_hist ORDER BY id DESC LIMIT 10;"
+   sqlite3 /var/lib/dfi/historian.db "SELECT * FROM eventos_hist ORDER BY id DESC LIMIT 10;"
+   ```
 
-### 1.5 Checklist CX9240
+### 1.5 Checklist CX9240 — ✅ CONCLUÍDO (15/09/2026)
 
-- [x] Contrato MQTT e payload definidos (`dataflow/estoque`)
+- [x] Contrato MQTT e payload definidos (`dataflow/estoque` e `dataflow/eventos`)
 - [x] Publicação MQTT validada no simulador (`MQTT_PUBLISH=true`)
-- [ ] Subscriber MQTT criado no TwinCAT 3 (`FB_IotMqttClient`)
-- [ ] Parser JSON implementado (`FB_JsonDomParser`)
-- [ ] Tabelas `estoque_snapshots` e `eventos_log` criadas no SGBD
-- [ ] Inserção SQL testada contra o broker Mosquitto
-- [ ] Tratamento de reconexão e buffers offline no CLP
+- [x] Subscriber MQTT implementado no TwinCAT 3 (`FB_IotMqttClient`)
+- [x] Parser JSON implementado e integrado
+- [x] Banco SQLite comissionado no RT Linux ARM64 (`/var/lib/dfi/historian.db`)
+- [x] Inserções SQL validadas via TF6420 Database Server contra o broker e simulador
+- [x] Diagnóstico, reconexão e store-and-forward testados no CX9240
 
 ---
 

@@ -14,6 +14,16 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Historiador Beckhoff CX9240 — TwinCAT 3 + SQLite Local (15/09/2026)**
+  - Projeto TwinCAT 3 (`CX9240_DataFlowInventory`) comissionado e testado com sucesso no CLP Beckhoff CX9240 rodando RT Linux ARM64.
+  - Implementada assinatura dos tópicos `dataflow/estoque` e `dataflow/eventos` via **TF6701 IoT Communication**.
+  - Persistência transacional em banco **SQLite local (`/var/lib/dfi/historian.db`)** com suporte a WAL mode via **TF6420 Database Server** em SQL Expert Mode, gravando nas tabelas `estoque_hist` e `eventos_hist`.
+  - Integração validada de ponta a ponta contra o simulador `DataFlowInventory` (`MQTT_PUBLISH=true`), confirmando armazenamento fiel de `pecaA`, `pecaB`, `pecaC` e timestamps sincronizados.
+
+- **Bancada de Hardware — Avanços Mecânicos e Replanejamento de Solda (15/09/2026)**
+  - Realizados avanços estruturais na fixação, suporte e alinhamento mecânico das esteiras B e C na bancada de testes.
+  - Testes elétricos e soldagem final dos módulos IRF520 (B/C) reprogramados para a rodada seguinte devido à restrição de tempo no dia 15/09.
+
 - **CI/CD + Automação Multiplataforma — Sprint 5 (14–15/09/2026)**
   - **GitHub Actions** `.github/workflows/lint-and-security.yaml` criado com 4 jobs:
     - `lint-javascript`: ESLint em `server/` e `simulator/`

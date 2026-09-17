@@ -38,14 +38,14 @@ New-NetFirewallRule -DisplayName "Mosquitto MQTT" -Direction Inbound -Protocol T
 Em dois terminais separados:
 
 ```powershell
-# Terminal 1 — inscrever em todos os tópicos do projeto
-& "C:\Program Files\mosquitto\mosquitto_sub.exe" -h localhost -t "dataflow/#" -v
+# Terminal 1 — inscrever em todos os tópicos do projeto (use 127.0.0.1 IPv4 explícito)
+& "C:\Program Files\mosquitto\mosquitto_sub.exe" -h 127.0.0.1 -t "dataflow/#" -v
 ```
 
 ```powershell
 # Terminal 2 — publicar mensagem de teste
 # (no PowerShell, use aspas simples para o JSON — aspas duplas com \" causam erro de parsing)
-& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/status" -m '{"type":"status","estado":"Teste"}'
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h 127.0.0.1 -t "dataflow/status" -m '{"type":"status","estado":"Teste"}'
 ```
 
 ✅ **Critério de sucesso:** a mensagem aparece no Terminal 1.
@@ -61,10 +61,10 @@ cd server
 copy .env.example .env
 ```
 
-2. Editar o `.env` para apontar ao broker local:
+2. Editar o `.env` para apontar ao broker local (utilize `127.0.0.1` para evitar resolução IPv6 indesejada no Windows):
 
 ```env
-MQTT_BROKER_URL=mqtt://localhost
+MQTT_BROKER_URL=mqtt://127.0.0.1
 MQTT_PORT=1883
 MQTT_USERNAME=
 MQTT_PASSWORD=
@@ -85,16 +85,16 @@ npm start
 
 ```powershell
 # Simular atualização de estoque
-& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/estoque" -m '{"type":"estoque","pecaA":4,"pecaB":5,"pecaC":5}'
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h 127.0.0.1 -t "dataflow/estoque" -m '{"type":"estoque","pecaA":4,"pecaB":5,"pecaC":5}'
 
 # Simular evento de entrega
-& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/eventos" -m '{"type":"evento","evento":"entrega","peca":"A","estoqueA":4,"estoqueB":5,"estoqueC":5}'
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h 127.0.0.1 -t "dataflow/eventos" -m '{"type":"evento","evento":"entrega","peca":"A","estoqueA":4,"estoqueB":5,"estoqueC":5}'
 
 # Simular esteira ligada
-& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/esteiras" -m '{"type":"esteiras","principal":1,"secA":1,"secB":0,"secC":0}'
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h 127.0.0.1 -t "dataflow/esteiras" -m '{"type":"esteiras","principal":1,"secA":1,"secB":0,"secC":0}'
 
-# Simular gateway online (LWT) — o LWT real do ESP32 é publicado em dataflow/status, não em um tópico "gateway" separado
-& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h localhost -t "dataflow/status" -m '{"type":"gateway","status":"online"}'
+# Simular gateway online (LWT) — o LWT real do ESP32 é publicado em dataflow/status
+& "C:\Program Files\mosquitto\mosquitto_pub.exe" -h 127.0.0.1 -t "dataflow/status" -m '{"type":"gateway","status":"online"}'
 ```
 
 ✅ **Critério de sucesso:** o dashboard atualiza em tempo real (estoque, histórico, diagrama, badge "ESP32 Online").
@@ -155,14 +155,18 @@ MQTT_USERNAME=<usuario>
 MQTT_PASSWORD=<senha>
 ```
 
-2. **`gateway_mqtt.ino`:**
+2. **`esp32/gateway_mqtt/secrets.h`:**
 
 ```cpp
-#define USE_TLS true
-const char* MQTT_SERVER = "<SEU_CLUSTER>.s1.eu.hivemq.com";
-const int   MQTT_PORT   = 8883;
-const char* MQTT_USER   = "<usuario>";
-const char* MQTT_PASS   = "<senha>";
+// ---------- MQTT: broker NUVEM (USE_TLS true) ----------
+#define SECRET_MQTT_SERVER_CLOUD  "<SEU_CLUSTER>.s1.eu.hivemq.com"
+#define SECRET_MQTT_USER_CLOUD    "<usuario>"
+#define SECRET_MQTT_PASS_CLOUD    "<senha>"
+```
+
+3. Em `esp32/gateway_mqtt/gateway_mqtt.ino`, alterar a flag:
+```cpp
+#define USE_TLS true  // Ativa TLS (porta 8883 com certificado raiz DST Root CA X3 / ISRG Root X1)
 ```
 
 Nenhuma outra alteração de código é necessária.

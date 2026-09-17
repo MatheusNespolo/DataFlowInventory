@@ -354,7 +354,7 @@ Acessar http://localhost:3000 no navegador.
 cd server
 npm install
 # Editar .env conforme o broker escolhido:
-#   Local (padrão):  MQTT_BROKER_URL=mqtt://localhost  | MQTT_PORT=1883
+#   Local (padrão):  MQTT_BROKER_URL=mqtt://127.0.0.1  | MQTT_PORT=1883
 #   Nuvem (HiveMQ):  MQTT_BROKER_URL=mqtts://<cluster>.s1.eu.hivemq.com | MQTT_PORT=8883 + credenciais
 npm start
 ```

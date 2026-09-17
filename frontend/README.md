@@ -33,12 +33,11 @@ npm install && npm start
 
 ```
 frontend/
-├── index.html        # Página principal (painel + diagrama + controle)
-├── status.html       # Página de histórico e equipamentos
+├── index.html        # SPA principal (painel anunciador, diagrama 3D, controles e aba de status/histórico)
 ├── css/
-│   └── style.css     # Estilos (IBM Plex, IEC-60073, depth CSS)
+│   └── style.css     # Estilos (IBM Plex, IEC-60073, depth CSS, temas de status)
 ├── js/
-│   ├── app.js        # Lógica principal (Socket.IO, eventos, UI)
-│   └── diagrama3d.js # Diagrama 3D com three.js
-└── img/              # Ícones e imagens estáticas
+│   ├── app.js        # Lógica principal (Socket.IO, roteamento de hash, eventos, UI)
+│   └── diagrama3d.js # Diagrama 3D com Three.js
+└── vendor/           # Dependências locais (Socket.IO client, Three.js)
 ```

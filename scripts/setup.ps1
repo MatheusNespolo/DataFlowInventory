@@ -72,6 +72,20 @@ if (-not (Test-Path "esp32/gateway_mqtt/secrets.h")) {
     Write-Host "  esp32/gateway_mqtt/secrets.h ja existe - pulando" -ForegroundColor Yellow
 }
 
+if (-not (Test-Path "C:\mosquitto\mosquitto.conf")) {
+    try {
+        if (-not (Test-Path "C:\mosquitto")) { New-Item -ItemType Directory -Path "C:\mosquitto" -Force -ErrorAction SilentlyContinue | Out-Null }
+        @"
+# DataFlowInventory - Broker Local Mosquitto
+listener 1883 0.0.0.0
+allow_anonymous true
+"@ | Set-Content "C:\mosquitto\mosquitto.conf" -ErrorAction SilentlyContinue
+        if (Test-Path "C:\mosquitto\mosquitto.conf") {
+            Write-Host "  C:\mosquitto\mosquitto.conf criado" -ForegroundColor Green
+        }
+    } catch {}
+}
+
 # 4. Verificacao de segredos
 Write-Host "`n[4/5] Verificando que segredos nao estao rastreados no Git..." -ForegroundColor Cyan
 & "$PSScriptRoot\validate-env.ps1"

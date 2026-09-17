@@ -70,17 +70,17 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 | #15 | Teste 6.1 — Provisionar cluster e credenciais HiveMQ Cloud | `Infra/Rede` | `T6-HiveMQ` | 02/09/2026 |
 | #16 | Teste 6.2 — Firmware ESP32 com suporte TLS/8883 | `Firmware-ESP32` | `T6-HiveMQ` | 02/09/2026 |
 | **#18** | **CI/CD: GitHub Actions + Scripts de Automação Multiplataforma** | `Infra/Rede` | `Infra` | **15/09/2026** |
+| **#20** | **Integração CX9240 (Beckhoff): Persistência MQTT → SQLite** | `Backend`/`Beckhoff` | `T6-DB` | **15/09/2026** |
 
 ### 🟡 Coluna `In Progress`
 
 | Card | Título | Área | Observação |
 |---|---|---|---|
-| #1 | Montagem mecânica das esteiras | `Hardware` | Esteiras A/B/C integradas; fixação e base em andamento |
+| #1 | Montagem mecânica das esteiras e soldagem drivers | `Hardware` | Estrutura mecânica e alinhamento avançados (15/09); soldagem/elétrica replanejadas |
 | #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
 | #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
 | #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
 | #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Código preparado; aguarda teste de bancada com motor 28BYJ-48 |
-| #20 | Integração CX9240 (Beckhoff): Persistência MQTT → Banco de Dados | `Backend`/`Beckhoff` | Simulador MQTT concluído (15/09); spec DDL SQL em elaboração |
 
 ### 🔴 Coluna `Blocked`
 
@@ -239,12 +239,13 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 - **Arquivo de Comentário:** `docs/cards_comments/card_separador_integration.md`
 - **Objetivo:** Descomentarincludes motor 28BYJ-48 + ULN2003 na FSM do Arduino Uno, integrando a etapa de separação física em 3 compartimentos (A/B/C) ao fim da esteira principal.
 
-### 🔹 Card #20 (Já criado no board) — Integração CX9240 (Beckhoff): Persistência MQTT → Banco de Dados
+### 🔹 Card #20 — Integração CX9240 (Beckhoff): Persistência MQTT → SQLite Local
 
-- **Coluna:** `Backlog` · **Área:** `Backend` + `Beckhoff` · **Prioridade:** `P2-Médio`
-- **Labels:** `area:backend`, `tipo:feature`, `stretch:beckhoff`, `p2-medio`
+- **Coluna:** `Done` · **Área:** `Backend` + `Beckhoff` · **Prioridade:** `P1-Alto` · **Data Validação:** **15/09/2026**
+- **Labels:** `area:backend`, `tipo:feature`, `stretch:beckhoff`, `p1-alto`
 - **Arquivo de Comentário:** `docs/cards_comments/card_beckhoff_cx9240_comment.md`
-- **Status:** Lado simulador ✅ CONCLUÍDO (15/09); lado Beckhoff ⏳ aguarda agente/bancada própria.
+- **Objetivo:** Comissionar nó historiador no CLP Beckhoff CX9240 (TwinCAT 3 em RT Linux ARM64) assinando tópicos MQTT (`dataflow/estoque` e `dataflow/eventos`) via TF6701 e persistindo em SQLite local (`/var/lib/dfi/historian.db`) via TF6420 em SQL Expert Mode.
+- **Status:** ✅ CONCLUÍDO e validado E2E com o simulador MQTT (15/09/2026).
 
 ---
 

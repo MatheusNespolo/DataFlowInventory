@@ -82,12 +82,15 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 
 ## 6. Integrações Planejadas
 
-### 6.1 Beckhoff CX9240 (Persistência DB)
+### 6.1 Beckhoff CX9240 (Historiador Local MQTT → SQLite)
 
-**Status:** Lado simulador ✅ implementado; lado Beckhoff ⏳ pendente
+**Status:** ✅ **CONCLUÍDO E VALIDADO (15/09/2026)**
 
-**Tópico:** `dataflow/estoque` (retained, QoS 1)  
-**Payload:** `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}`
+- **Hardware/OS:** Beckhoff CX9240 rodando TwinCAT 3 em RT Linux ARM64.
+- **Banco de Dados:** SQLite local (`/var/lib/dfi/historian.db`) em modo WAL, operado via TF6420 Database Server (SQL Expert Mode).
+- **Assinatura MQTT:** TF6701 IoT Communication assinando `dataflow/estoque` e `dataflow/eventos` (QoS 1).
+- **Tabelas:** `estoque_hist` (snapshots por alteração e amostragem periódica) e `eventos_hist` (histórico de entregas, erros e alarmes).
+- **Integração:** Validado de ponta a ponta com o simulador `DataFlowInventory` (`MQTT_PUBLISH=true`).
 
 ### 6.2 Separador — Roda de Separação
 

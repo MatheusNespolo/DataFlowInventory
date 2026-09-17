@@ -25,9 +25,11 @@
 | Comando MQTT Box para peças B/C | 08–12/09 | ✅ |
 | Calibração sensores B/C na montagem real | 08–12/09 | ✅ |
 | Teste 6 — HiveMQ TLS/8883 (parcial) | 02/09 | ⚠️ Parcial (Bloco 4+5 pendentes) |
-| Beckhoff CX9240 — Spec definida | 08–12/09 | ⬜ Spec apenas |
+| Beckhoff CX9240 — Historiador MQTT → SQLite | 15/09 | ✅ **CONCLUÍDO** (TwinCAT 3 + SQLite local via simulador) |
+| Montagem mecânica das esteiras B/C | 15/09 | ✅ Avanços na estrutura e alinhamento |
+| Soldagem drivers IRF520 (B/C) | 15/09 | ⏳ Replanejada (tempo curto em 15/09) |
 
-**Contexto da semana:** Teste 5 está completo e validado. O foco desta semana é (1) garantir integridade elétrica dos novos módulos IRF520, (2) fechar a subtarefa HiveMQ Cloud — que depende de resolução de firewall ou ambiente de rede alternativo — e (3) avançar na documentação técnica (diagrama elétrico + spec Beckhoff).
+**Contexto da semana:** Teste 5 está completo e validado. O nó historiador Beckhoff CX9240 com TwinCAT 3 foi integrado e validado com sucesso gravando estoque em SQLite a partir do simulador. O foco restante da semana é (1) concluir a soldagem/verificação elétrica dos módulos IRF520 e fixação mecânica, (2) fechar a subtarefa HiveMQ Cloud — que depende de resolução de firewall ou ambiente de rede alternativo — e (3) consolidar o diagrama elétrico e a documentação técnica unificada.
 
 ---
 
@@ -51,7 +53,7 @@
 
 ## 3. Bloco 1 — Verificação de solda dos módulos IRF520 (B/C)
 
-> **Objetivo:** validar que a soldagem dos 2º e 3º módulos IRF520 não introduziu falhas de continuidade, resistência parasita ou instabilidade no sinal PWM. Executar antes de qualquer teste funcional desta semana. (Foi feita soldagem apenas da alimentação nas placas).
+> **Objetivo:** validar que a soldagem dos 2º e 3º módulos IRF520 não introduziu falhas de continuidade, resistência parasita ou instabilidade no sinal PWM. Executar antes de qualquer teste funcional desta semana. (Nota de 15/09: Foram priorizados avanços mecânicos na montagem e alinhamento das esteiras; a soldagem final e medições elétricas foram reprogramadas devido à restrição de tempo).
 
 ### 3.1 — Testes elétricos com multímetro
 
@@ -149,32 +151,28 @@ Antes de prosseguir, confirmar:
 
 ---
 
-## 6. Bloco 4 — Persistência DB (spec Beckhoff CX9240)
+## 6. Bloco 4 — Persistência DB (Nó Historiador Beckhoff CX9240 → SQLite)
 
-> **Objetivo:** avançar na especificação do contrato de integração com o PC industrial Beckhoff CX9240, sem implementar código Beckhoff nem persistência em banco. Esta semana: documentar e validar o contrato de tópico/payload.
+> **Objetivo:** implementar e validar a persistência de estoque e eventos operacionais no PC industrial Beckhoff CX9240 com TwinCAT 3 e banco local.
 >
-> **Atualização:** escopo avançou além do previsto — o simulador agora publica de fato no broker MQTT (modo opcional `MQTT_PUBLISH=true`), validado localmente contra Mosquitto. O código/persistência do **lado Beckhoff** continua fora do escopo (outro agente).
+> **Status:** ✅ **CONCLUÍDO e VALIDADO em 15/09/2026**. O nó historiador no CX9240 (TwinCAT 3 em RT Linux ARM64) foi desenvolvido, comissionado e testado com sucesso contra o simulador MQTT (`MQTT_PUBLISH=true`), persistindo em SQLite local (`/var/lib/dfi/historian.db`).
 
-### 6.1 — Documentação do contrato
+### 6.1 — Arquitetura Implementada (CX9240 TwinCAT 3)
+- **Runtime:** Beckhoff CX9240 com RT Linux (ARM64).
+- **TwinCAT Functions:** TF6701 (IoT Communication MQTT) + TF6420 (Database Server em SQL Expert Mode) + TF6020 (TcUnit).
+- **Banco de Dados Local:** SQLite (`/var/lib/dfi/historian.db`) com `PRAGMA journal_mode = WAL;`.
+  - *Decisão técnica:* O SQLite foi adotado pela robustez local no RT Linux ARM64, sem dependência de rede ou servidor externo.
+- **Tópicos Assinados:** `dataflow/estoque` e `dataflow/eventos` (TF6701, QoS 1).
+- **Tabelas Persistidas:**
+  - `estoque_hist`: registro de cada mudança e amostragem periódica (`estoque_a`, `estoque_b`, `estoque_c`, `origem`, `ts_plc`, `ts_db`).
+  - `eventos_hist`: histórico de eventos e alarmes (`evento`, `peca`, `detalhe`, `payload_raw`, `ts_plc`, `ts_db`).
 
-- [x] Publicar tópico e payload da integração Beckhoff em `arquitetura_mqtt.md` (seção "Integração Beckhoff CX9240")
-- [x] Simulador ganhou modo `MQTT_PUBLISH=true` (dependência `mqtt@^5.10.0` em `simulator/package.json`)
-- [ ] Confirmar se o payload `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}` é aceitável para o agente do Beckhoff (pendente de validação cruzada)
-
-### 6.2 — Validação do contrato (implementada e testada localmente)
-
-- [x] Simulador publica em `dataflow/estoque` via `mqtt.js` (retained, QoS 1) — testado com `MQTT_PUBLISH=true npm start`
-- [x] Confirmado via `mosquitto_sub -t dataflow/estoque -C 1` que a mensagem chega retained: `{"type":"estoque","pecaA":5,"pecaB":5,"pecaC":5}`
-- [ ] Validação com subscriber real do Beckhoff (aguarda ambiente/agente)
-
-### 6.3 — Escopo NESTA semana
-
-- [x] Implementado no simulador: publicação MQTT opcional, não-bloqueante, desativada por padrão
-- [ ] **Não** implementar persistência DB (fica para o lado Beckhoff)
-- [ ] **Não** implementar código para o Beckhoff CX9240
-- [ ] Esboçar card de melhoria (Template A) com critério de aceite para bancada própria — atualizar critério de aceite já que a publicação MQTT do simulador está pronta
-
-> **Dependência externa:** alinhar tópicos/formato com o agente do Beckhoff antes de avançar para a bancada própria. Lado simulador já não é mais bloqueante.
+### 6.2 — Validação E2E com Simulador (15/09/2026)
+- [x] Simulador `DataFlowInventory` iniciado com `MQTT_PUBLISH=true npm start`
+- [x] CLP CX9240 conectou ao broker Mosquitto e assinou os tópicos `dataflow/#`
+- [x] Alterações de estoque geradas pelo simulador foram recebidas e inseridas no banco SQLite
+- [x] Consultas via `sqlite3 /var/lib/dfi/historian.db "SELECT * FROM estoque_hist ORDER BY id DESC LIMIT 10;"` confirmaram integridade dos dados e timestamps
+- [x] Repositório TwinCAT estruturado em `TwinCAT/Banco-de-Dados/CX9240_DataFlowInventory`
 
 ---
 
@@ -235,7 +233,8 @@ cd simulator && npm start
 | 1 — Verificação solda IRF520 (B/C) | ⬜ | Testes elétricos com multímetro (16/09) |
 | 2 — HiveMQ Cloud (Teste 6 completo) | ⚠️ Parcial | Conexão TLS 8883 OK; E2E remoto em teste paralelo |
 | 3 — Diagrama elétrico consolidado | ⬜ | Publicação em `docs/diagramas/` |
-| 4 — Spec Beckhoff (contrato) | ✅ | Contrato em `arquitetura_mqtt.md` + simulador MQTT concluído localmente |
+| 4 — Beckhoff CX9240 (Historiador SQLite) | ✅ | Validado E2E com TwinCAT 3 + SQLite local via simulador (15/09) |
+| M — Montagem Mecânica Esteiras | ✅ | Avanços na fixação estrutural e alinhamento das esteiras (15/09) |
 | 5 — Scripts Setup / CI-CD | ✅ | Scripts `.sh` e `.ps1`, pre-commit hooks e saneamento Git (15/09) |
 | Plano B | — | Simulador operacional |
 

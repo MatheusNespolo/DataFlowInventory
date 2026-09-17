@@ -40,9 +40,9 @@ const PECAS_VALIDAS = ['A', 'B', 'C'];
 const COMANDO_INTERVALO_MS = parseInt(process.env.COMANDO_INTERVALO_MS, 10) || 500;
 
 const MQTT_CONFIG = {
-  // TODO: Altere MQTT_BROKER_URL no .env para o endpoint do seu broker
-  // Exemplos: mqtt://localhost (local) | mqtt://xxx.s1.eu.hivemq.com (nuvem)
-  brokerUrl:  process.env.MQTT_BROKER_URL || 'mqtt://localhost',
+  // Configuração do broker MQTT (padrão: 127.0.0.1 para evitar resolução IPv6 no Windows)
+  // Exemplos: mqtt://127.0.0.1 (local) | mqtts://xxx.s1.eu.hivemq.com (nuvem)
+  brokerUrl:  process.env.MQTT_BROKER_URL || 'mqtt://127.0.0.1',
 
   // TODO: Altere MQTT_PORT no .env conforme o broker:
   //   1883 = MQTT sem TLS (local) | 8883 = MQTT com TLS (nuvem)
