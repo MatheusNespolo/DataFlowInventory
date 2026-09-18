@@ -39,6 +39,13 @@ const PECAS_VALIDAS = ['A', 'B', 'C'];
 // Intervalo mínimo (ms) entre comandos de um mesmo cliente (anti-flood)
 const COMANDO_INTERVALO_MS = parseInt(process.env.COMANDO_INTERVALO_MS, 10) || 500;
 
+// Rate limit global (contra floods em múltiplas conexões)
+let comandosGlobaisContador = 0;
+const COMANDOS_GLOBAIS_MAX_POR_SEG = 15;
+setInterval(() => {
+  comandosGlobaisContador = 0;
+}, 1000);
+
 const MQTT_CONFIG = {
   // Configuração do broker MQTT (padrão: 127.0.0.1 para evitar resolução IPv6 no Windows)
   // Exemplos: mqtt://127.0.0.1 (local) | mqtts://xxx.s1.eu.hivemq.com (nuvem)
@@ -121,7 +128,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc:  ["'self'", 'https://cdn.socket.io'],
-      styleSrc:   ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      styleSrc:   ["'self'", 'https://fonts.googleapis.com'],
       fontSrc:    ["'self'", 'https://fonts.gstatic.com'],
       connectSrc: ["'self'", 'ws:', 'wss:'],
       imgSrc:     ["'self'", 'data:'],
@@ -261,6 +268,11 @@ mqttClient.on('message', (topic, message) => {
     return;
   }
 
+  if (!msgJson || typeof msgJson !== 'object' || Array.isArray(msgJson)) {
+    console.warn(`[MQTT] Payload MQTT inválido (não é um objeto) no tópico ${topic}`);
+    return;
+  }
+
   const timestamp = new Date().toISOString();
   msgJson._timestamp = timestamp;
   msgJson._topic = topic;
@@ -376,16 +388,26 @@ io.on('connection', (socket) => {
    */
   function podeEnviarComando(acao) {
     const agora = Date.now();
+    if (comandosGlobaisContador >= COMANDOS_GLOBAIS_MAX_POR_SEG) {
+      metricas.comandosRejeitados++;
+      socket.emit('comando_erro', {
+        erro: 'Sistema sob alta carga — aguarde um momento',
+        acao,
+      });
+      console.warn(`[WS ←] Rate limit global: ${acao} rejeitado (${socket.id})`);
+      return false;
+    }
     if (agora - socket.data.ultimoComandoMs < COMANDO_INTERVALO_MS) {
       metricas.comandosRejeitados++;
       socket.emit('comando_erro', {
         erro: `Muitos comandos — aguarde ${COMANDO_INTERVALO_MS}ms entre envios`,
         acao,
       });
-      console.warn(`[WS ←] Rate limit: ${acao} rejeitado (${socket.id})`);
+      console.warn(`[WS ←] Rate limit por socket: ${acao} rejeitado (${socket.id})`);
       return false;
     }
     socket.data.ultimoComandoMs = agora;
+    comandosGlobaisContador++;
     return true;
   }
 
