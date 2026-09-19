@@ -697,10 +697,6 @@ body {
   box-shadow: 0 0 10px color-mix(in srgb, var(--peca) 60%, transparent);
 }
 
-.estoque-chip-a { --peca: var(--peca-a); }
-.estoque-chip-b { --peca: var(--peca-b); }
-.estoque-chip-c { --peca: var(--peca-c); }
-
 .estoque-info {
   display: flex;
   justify-content: space-between;
