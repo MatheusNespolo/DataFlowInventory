@@ -24,8 +24,9 @@
 | Ajuste mecânico demais esteiras | 08–12/09 | ✅ |
 | Comando MQTT Box para peças B/C | 08–12/09 | ✅ |
 | Calibração sensores B/C na montagem real | 08–12/09 | ✅ |
-| Teste 6 — HiveMQ TLS/8883 (parcial) | 02/09 | ⚠️ Parcial (Bloco 4+5 pendentes) |
-| Beckhoff CX9240 — Historiador MQTT → SQLite | 15/09 | ✅ **CONCLUÍDO** (TwinCAT 3 + SQLite local via simulador) |
+| Teste 6 — HiveMQ TLS/8883 (E2E Remoto) | 19/09 | ✅ **CONCLUÍDO** (TLS 8883, credenciais `.env` corrigidas, E2E validado) |
+| Beckhoff CX9240 — Historiador MQTT → SQLite (Sistema Real) | 19/09 | ✅ **CONCLUÍDO** (Integrado ao sistema real via HiveMQ; tabelas `estoque_hist` e `eventos_hist` preenchidas) |
+| Descoberta de Rede — ICS do Windows | 19/09 | ℹ️ Documentado (necessário para CX9240 ponto-a-ponto obter gateway/DNS e rota para o HiveMQ) |
 | Montagem mecânica das esteiras B/C | 15/09 | ✅ Avanços na estrutura e alinhamento |
 | Soldagem drivers IRF520 (B/C) | 15/09 | ⏳ Replanejada (tempo curto em 15/09) |
 

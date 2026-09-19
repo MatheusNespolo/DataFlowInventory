@@ -24,7 +24,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / LCD) |
 | 4 | End-to-End (Dashboard) | Item 2 + navegador | Clicar no dashboard → Arduino executa → dashboard atualiza | Ciclo completo pedido → entrega refletido na UI |
 | 5 | **Três esteiras (A + B + C)** | Itens 1–3 + 2ª/3ª esteira secundária + 4 sensores TCRT5000 + 3 drivers IRF520 | Validar FSM completa com 3 esteiras e cenários de rejeição | Entregas A/B/C, rejeição de peça inexistente, `ocupado`, timeout + reset |
-| 6 | Migração para broker remoto (HiveMQ Cloud) | Item 2 aprovado + conta HiveMQ Cloud + `USE_TLS=true` no ESP32 | Repetir a cadeia de comunicação (Serial → MQTT → Dashboard) usando um broker em nuvem via TLS, sem alterar lógica de FSM | Mesmo ciclo end-to-end do Teste 4, porém via internet/TLS (porta 8883) |
+| 6 | Migração para broker remoto (HiveMQ Cloud) | Item 2 aprovado + conta HiveMQ Cloud + `USE_TLS=true` no ESP32 | Repetir a cadeia de comunicação (Serial → MQTT → Dashboard) usando um broker em nuvem via TLS, sem alterar lógica de FSM | ✅ **(CONCLUÍDO)** Conexão TLS/8883, integração real, E2E validado |
 
 ---
 
@@ -492,9 +492,23 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 
 ### Card #17 — HiveMQ Cloud (E2E Remoto)
 
-> **Status: Pendente ⬜** — Bloqueado por firewall corporativo.
+> **Status: Done ✅** (19/09/2026)
 >
-> Pós-03/09: validação E2E via Dashboard remoto requer ambiente de rede alternativo ou resolução do firewall. Blocos 4 e 5 do roteiro HiveMQ permanecem pendentes. **Sugestão:** mover para semana 5 como subtarefa, condicionado a ambiente de rede acessível.
+> Validação End-to-End remota concluída com sucesso após resolução da divergência de variáveis de ambiente (`MQTT_USERNAME`/`MQTT_PASSWORD` no `.env`). Comunicação completa Arduino/ESP32 → HiveMQ Cloud (TLS/8883) → Node.js Server → SQLite → Dashboard Web e CLP Beckhoff CX9240 operando sincronizados em nuvem.
+
+### Card #21 — Beckhoff CX9240: Historiador em Produção (Broker Remoto)
+
+> **Status: Done ✅** (19/09/2026)
+>
+> Nó historiador TwinCAT 3 no PC industrial Beckhoff CX9240 validado operando contra o broker remoto HiveMQ Cloud e o sistema físico real. O CLP recebe eventos reais de acionamento e atualização de estoque das esteiras e grava de forma transacional no banco SQLite local (`/var/lib/dfi/historian.db`, tabelas `estoque_hist` e `eventos_hist`).
+
+### Card #22 — Infraestrutura de Rede: Compartilhamento de Internet (ICS) para CX9240
+
+> **Status: Documentado ℹ️** (19/09/2026)
+>
+> Identificado que a conexão do CX9240 ponto-a-ponto com o computador de bancada exige ativação do Internet Connection Sharing (ICS) no Windows para que o CLP obtenha rota de saída para a internet (DNS + Gateway) e estabeleça o handshake TLS com o broker remoto HiveMQ Cloud.
+
+- **Validação Integrada HiveMQ Cloud + CX9240 com Sistema Real (19/09):** Realizada a migração e validação de ponta a ponta com o broker remoto HiveMQ Cloud. Resolvido o erro de autorização no servidor Node.js através da padronização das credenciais em `server/.env`. O CLP Beckhoff CX9240 foi conectado à internet via ICS do Windows (DNS `8.8.8.8` e saída TCP 8883), recebendo telemetria real dos sensores e acionamentos físicos das esteiras via MQTT TLS e gravando com sucesso nas tabelas de histórico SQLite locais. O fluxo completo (Arduino Uno/ESP32 → HiveMQ Cloud → Node.js/Dashboard → Beckhoff CX9240/SQLite) foi testado e homologado com sucesso.
 
 ### Card novo — Melhoria: Integração Simulador ↔ Beckhoff CX9240
 
