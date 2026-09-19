@@ -113,7 +113,7 @@ start "MQTT_PROBE (dataflow/#)" cmd /k "cd /d "%ROOT%test\mqtt_probe" && node pr
 
 REM ---------- 3) Server Node.js ----------
 echo [3/3] Iniciando servidor Node.js (dashboard em http://localhost:3000)...
-start "SERVER NODE (dashboard :3000)" cmd /k "cd /d "%ROOT%server" && npm start"
+start "SERVER NODE (dashboard :3000)" cmd /k "cd /d "%ROOT%server" && call npm start"
 
 echo.
 echo ============================================================
