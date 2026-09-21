@@ -14,6 +14,19 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Roteiro de Testes — Semana 6 (22–26/09/2026)**
+  - Documento completo em `docs/testes/roteiros/semana_06_22-26_setembro.md` com 5 blocos de trabalho:
+    - **Bloco 1:** Verificação de soldagem dos módulos IRF520 (B/C) — testes elétricos com multímetro, validação de sinal PWM e testes funcionais
+    - **Bloco 2:** Diagrama elétrico consolidado — levantamento de esquema, documentação CAD (unifilar + blocos), especificação de proteção (fusíveis/diodos)
+    - **Bloco 3:** Montagem mecânica — base MDF 60×40 cm, fixação de esteiras/motores/sensores, organização de fiação, acabamento visual
+    - **Bloco 4:** Validação integrada (burn-in test) — 7 cenários de stress test (sequência simples, carga concorrente, estoque vazio, reset durante operação, reconexão de rede, stress alta frequência, telemetria remota HiveMQ+CX9240)
+    - **Bloco 5:** Documentação e gaps — mapeamento de pendências (BOM, deployment guide, testes E2E automatizados, firmware versioning)
+  - Cronograma estruturado 22–26/09 com distribuição de tarefas por dia (manhã/tarde)
+  - Identificados **7 gaps prioritários** com classificação de impacto (Alta/Média/Baixa): BOM ausente, diagrama elétrico não publicado, deployment guide ausente, firmware sem versioning, testes E2E manuais, documentação inline mínima, performance telemetria ausente
+  - Sugestão de 5 cards para próxima sprint: BOM, Deployment Guide, Testes E2E Automatizados, Firmware Versioning, Telemetria Histórica (Grafana/InfluxDB)
+
+### Adicionado
+
 - **Hardening CI/CD — Upgrade Node.js v22 + Otimizações (17/09/2026)**
   - **NPM Audit:** Threshold alterado de `moderate` para `critical` (foco em vulnerabilidades reais CVSS ≥ 7.0)
   - **Node.js LTS:** Upgrade de v18 para v22 (v20 EOL em 04/2026; v22 suportado até 04/2028)
