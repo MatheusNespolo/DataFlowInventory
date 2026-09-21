@@ -112,14 +112,14 @@ jobs:
           arduino-cli core install arduino:avr
           arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 
-            - name: Compilar Arduino Uno (principal)
-        run: arduino-cli compile --fqbn arduino:avr:uno arduino/data_flow_inventory
+      - name: Compilar Arduino Uno (principal)
+        run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-property build.extra_flags=-DDEBUG arduino/data_flow_inventory/data_flow_inventory.ino
 
       - name: Compilar ESP32 (gateway MQTT)
-        run: arduino-cli compile --fqbn esp32:esp32:esp32 esp32/gateway_mqtt
+        run: arduino-cli compile --fqbn esp32:esp32:esp32 --warnings all esp32/gateway_mqtt/gateway_mqtt.ino
 
       - name: Compilar Arduino Uno (teste AB)
-        run: arduino-cli compile --fqbn arduino:avr:uno test/esteira_peca_b/arduino_esteiras_ab
+        run: arduino-cli compile --fqbn arduino:avr:uno --warnings all test/esteira_peca_b/arduino_esteiras_ab/arduino_esteiras_ab.ino
 
       - name: Compilar ESP32 (teste AB)
-        run: arduino-cli compile --fqbn esp32:esp32:esp32 test/esteira_peca_b/esp32_esteiras_ab
+        run: arduino-cli compile --fqbn esp32:esp32:esp32 --warnings all test/esteira_peca_b/esp32_esteiras_ab/esp32_esteiras_ab.ino
