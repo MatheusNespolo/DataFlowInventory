@@ -247,6 +247,46 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 - **Objetivo:** Comissionar nó historiador no CLP Beckhoff CX9240 (TwinCAT 3 em RT Linux ARM64) assinando tópicos MQTT (`dataflow/estoque` e `dataflow/eventos`) via TF6701 e persistindo em SQLite local (`/var/lib/dfi/historian.db`) via TF6420 em SQL Expert Mode.
 - **Status:** ✅ CONCLUÍDO e validado E2E com o simulador MQTT (15/09/2026).
 
+### 🔹 Card #21 — BOM (Bill of Materials) — Inventário de Componentes
+
+- **Coluna:** `Backlog` · **Área:** `Docs` + `Hardware` · **Prioridade:** `P1-Alto`
+- **Labels:** `area:docs`, `area:hardware`, `tipo:documentation`, `p1-alto`
+- **Arquivo de Comentário:** `docs/cards_comments/card_bom_bill_of_materials.md`
+- **Objetivo:** Publicar `docs/BILL_OF_MATERIALS.md` com todos os componentes eletrônicos e mecânicos do protótipo (SKUs, fornecedores, custos unitários/totais, datasheets) — permitindo reprodução completa por terceiros.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #22 — Deployment Guide — Guia de Implantação Completa
+
+- **Coluna:** `Backlog` · **Área:** `Docs` + `Infra` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:docs`, `area:infra`, `tipo:documentation`, `p2-medio`
+- **Arquivo de Comentário:** `docs/cards_comments/card_deployment_guide.md`
+- **Objetivo:** Criar `docs/DEPLOYMENT.md` com passo a passo completo (pré-requisitos, hardware, firmware, broker, servidor, validação pós-deploy) para implantar o sistema do zero em um novo ambiente — cobrindo cenários local, nuvem e simulador.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #23 — Testes E2E Automatizados — Dashboard + API
+
+- **Coluna:** `Backlog` · **Área:** `QA` + `Infra/CI-CD` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:qa`, `area:infra`, `tipo:feature`, `p2-medio`
+- **Arquivo de Comentário:** `docs/cards_comments/card_testes_e2e_automatizados.md`
+- **Objetivo:** Implementar suíte E2E automatizada (Cypress) cobrindo fluxo crítico do Dashboard web e da API REST/WebSocket, rodando contra o simulador no CI — detectando regressões antes do merge e eliminando dependência de validação manual exclusiva.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #24 — Firmware Versioning — Tags Git e Versão em Sketches
+
+- **Coluna:** `Backlog` · **Área:** `Firmware` + `Processo` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:firmware-uno`, `area:firmware-esp32`, `tipo:chore`, `p2-medio`
+- **Arquivo de Comentário:** `docs/cards_comments/card_firmware_versioning.md`
+- **Objetivo:** Introduzir cabeçalhos de versão semântica (`vX.Y.Z`) nos sketches Arduino/ESP32, criar tags Git retroativas para marcos já validados e documentar a convenção de versionamento em `CONTRIBUTING.md` — eliminando a ambiguidade de "qual versão está rodando na bancada".
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #25 — Telemetria Histórica — Grafana/InfluxDB (Métricas de Performance)
+
+- **Coluna:** `Backlog` · **Área:** `Infra/Observabilidade` · **Prioridade:** `P3-Baixo`
+- **Labels:** `area:infra`, `tipo:feature`, `p3-baixo`
+- **Arquivo de Comentário:** `docs/cards_comments/card_telemetria_historica_grafana.md`
+- **Objetivo:** Provisionar InfluxDB + Grafana (Docker) e instrumentar `server/server.js` com métricas de performance (latência MQTT p50/p95/p99, throughput de eventos, uptime) — complementando o historiador de negócio do CX9240 com observabilidade de infraestrutura.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
 ---
 
 ## 6. Templates de comentário
