@@ -226,6 +226,14 @@ O Arduino opera com **5 estados**:
 | `dataflow/comandos/sub` | Cloud → ESP32 | Comandos do front-end |
 | `dataflow/comandos/pub` | ESP32 → Cloud | Confirmação de comandos |
 
+## Diagrama Elétrico
+
+> 📐 **Diagrama elétrico completo do protótipo:**
+> - 🖼️ Visualização: [`docs/fluxogramas/Diagrama elétrico.png`](docs/fluxogramas/Diagrama%20el%C3%A9trico.png) (GitHub renderiza a imagem)
+> - 📝 Editável: [`docs/fluxogramas/Diagrama elétrico.pptx`](docs/fluxogramas/Diagrama%20el%C3%A9trico.pptx) (PowerPoint — baixe para editar)
+> - **Conteúdo:** Esquema unifilar com pinagem completa, alimentação 12V/5V, proteções (fusível, diodos), e integração com Arduino Uno, ESP32, 3× IRF520, 6× TCRT5000, LCD I²C e motor de passo 28BYJ-48
+> - **Publicação:** 23/09/2026 — Gap resolvido ✅
+
 ## Materiais
 
 ### Configuração Principal (Recomendada)

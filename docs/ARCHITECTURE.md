@@ -69,6 +69,8 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 | LCD 16x2 I2C | 1 | SDA/SCL (A4/A5) | 5V |
 | Motor de Passo 28BYJ-48 (Separador) | 1 | 5, 6, 7, 8 (ULN2003) | 5V |
 
+> 📐 **Diagrama elétrico completo:** [`docs/fluxogramas/Diagrama elétrico.png`](fluxogramas/Diagrama%20el%C3%A9trico.png) — esquema unifilar com todos os componentes, pinagem, alimentação e proteções recomendadas (fusível 12V, diodos flyback nos motores DC). Fonte editável: [`Diagrama elétrico.pptx`](fluxogramas/Diagrama%20el%C3%A9trico.pptx). *(Publicado em 23/09/2026)*
+
 ---
 
 ## 5. Modos de Operação
@@ -104,6 +106,7 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 ## 7. Documentação Correlata
 
 - `README.md` — Visão geral + quick start
+- `docs/fluxogramas/Diagrama elétrico.png` — **[NOVO]** Esquema unifilar completo do protótipo *(23/09/2026)*
 - `docs/broker_local_mosquitto.md` — Setup Mosquitto + firewall
 - `docs/testes/plano_de_testes.md` — Testes B0–6 completos
 - `docs/CI-CD.md` — **[NOVO]** GitHub Actions, validações, pipelines

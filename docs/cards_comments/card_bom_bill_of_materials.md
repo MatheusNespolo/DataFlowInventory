@@ -13,7 +13,7 @@ Publicar documento formal (`docs/BILL_OF_MATERIALS.md`) contendo todos os compon
 - **Hardware documentado parcialmente:** `README.md` §"Hardware Necessário" (tabela sem SKUs/custos)
 - **Configurações alternativas:** `README.md` §"Opção A/B/C — IRF520/Mega/L298N"
 - **Arquitetura eletrônica:** `docs/ARCHITECTURE.md` §"Hardware — Pinagem e Alimentação"
-- **Diagrama elétrico (referência cruzada):** `docs/diagramas/` (a criar — ver Bloco 2 da semana 6)
+- **Diagrama elétrico (referência cruzada):** ✅ [`docs/fluxogramas/Diagrama elétrico.png`](../fluxogramas/Diagrama%20el%C3%A9trico.png) + [`.pptx`](../fluxogramas/Diagrama%20el%C3%A9trico.pptx) *(publicado em 23/09/2026)*
 - **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
 
 ## ✅ Critério de Aceite

@@ -22,7 +22,7 @@ Criar documento (`docs/DEPLOYMENT.md`) com passo a passo completo para implantar
 ### Estrutura do Documento
 - [ ] Arquivo `docs/DEPLOYMENT.md` criado com seções:
   - **1. Pré-requisitos** (Node.js v22, Arduino IDE, mosquitto, hardware físico)
-  - **2. Setup de Hardware** (montagem, fiação — cross-ref `BILL_OF_MATERIALS.md` e diagrama elétrico)
+  - **2. Setup de Hardware** (montagem, fiação — cross-ref `BILL_OF_MATERIALS.md` e ✅ diagrama elétrico [`docs/fluxogramas/Diagrama elétrico.png`](../fluxogramas/Diagrama%20el%C3%A9trico.png))
   - **3. Setup de Firmware** (upload Arduino Uno + ESP32, `secrets.h`)
   - **4. Setup de Broker** (local Mosquitto OU nuvem HiveMQ — decisão documentada)
   - **5. Setup de Servidor** (`server/.env`, `npm install`, `npm start`)
@@ -42,9 +42,9 @@ Criar documento (`docs/DEPLOYMENT.md`) com passo a passo completo para implantar
 
 ## 🔗 Dependências
 
-- **Bloqueado por:** Card #Diagrama Elétrico (deploy de hardware referencia o diagrama)
+- ~~**Bloqueado por:** Card #Diagrama Elétrico (deploy de hardware referencia o diagrama)~~ → **✅ RESOLVIDO** em 23/09/2026 — Diagrama publicado
 - **Bloqueia:** Onboarding de novos integrantes/avaliadores externos
-- **Relacionado:** Card #BOM (lista de componentes necessários para o deploy)
+- **Relacionado:** Card #21 BOM (lista de componentes necessários para o deploy)
 
 ## 📋 Checklist de Execução
 

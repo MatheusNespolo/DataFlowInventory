@@ -14,6 +14,30 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Diagrama Elétrico Consolidado — Publicação Formal (23/09/2026)**
+  - Diagrama elétrico do protótipo finalizado e publicado em:
+    - `docs/fluxogramas/Diagrama elétrico.png` — renderização PNG (visualização direta no GitHub)
+    - `docs/fluxogramas/Diagrama elétrico.pptx` — fonte editável (PowerPoint) para revisões futuras
+  - Cobre esquema completo com todos os subsistemas:
+    - **Arduino Uno** (pinos PWM 9/10/11 → IRF520, A0–A3/2/4 → sensores TCRT5000, A4/A5 → LCD I²C, pinos 5–8 → ULN2003)
+    - **ESP32** (TX1/RX0 → divisor 1 kΩ/2 kΩ → Arduino UART; pinos 16/17 = bridge serial)
+    - **3× drivers IRF520** — alimentação 12 V + sinal PWM 5 V por esteira (A, B, C)
+    - **6× sensores TCRT5000** — entrada e junção de cada esteira
+    - **LCD 16×2 I²C**, motor de passo **28BYJ-48 + ULN2003**, fonte 12 V/5 A
+  - Referências cruzadas adicionadas em: `README.md`, `docs/ARCHITECTURE.md`, `docs/INTEGRATION_GUIDE.md`, `docs/cards_comments/card_bom_bill_of_materials.md`, `docs/cards_comments/card_deployment_guide.md`
+  - **Gap resolvido:** "Diagrama elétrico não publicado" (identificado em `semana_06_22-26_setembro.md` §7.2)
+  - Commits: `0f0782c`, `8d191fa`
+
+- **Avanços de Bancada — Semana 6, Dia 22/09/2026**
+  - **Soldagem das placas de passagem (IRF520 B/C) concluída** com sucesso
+  - **Teste de continuidade elétrica** (multímetro) aprovado para ambos os módulos:
+    - Continuidade VCC/GND verificada ✅
+    - Continuidade GND driver ↔ GND fonte ✅
+    - Resistência de ponte > 100 kΩ (motor desconectado) ✅
+  - **Montagem da base de MDF** (≈60×40 cm) quase concluída — estrutura, fixação de esteiras e motores realizados; resta o acabamento visual
+  - **Ajuste mecânico de esteira identificado:** costura da fita das esteiras apresenta ponto de atrito com a estrutura MDF, gerando eventual erro de processo → solução identificada (desbaste local) **reagendada para 25–27/09**, aguardando janela de desmontagem
+  - **Teste de funcionamento completo** do sistema com os novos elementos (IRF520 B/C soldados) agendado para **23/09**
+
 - **Roteiro de Testes — Semana 6 (22–26/09/2026)**
   - Documento completo em `docs/testes/roteiros/semana_06_22-26_setembro.md` com 5 blocos de trabalho:
     - **Bloco 1:** Verificação de soldagem dos módulos IRF520 (B/C) — testes elétricos com multímetro, validação de sinal PWM e testes funcionais

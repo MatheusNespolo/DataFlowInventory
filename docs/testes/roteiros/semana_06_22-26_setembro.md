@@ -17,9 +17,11 @@
 | Beckhoff CX9240 — Historiador SQLite + TwinCAT 3 | 19/09 | ✅ **CONCLUÍDO** |
 | Montagem mecânica avanços (B/C) | 15/09 | ✅ Estrutura/alinhamento |
 | CI/CD + Scripts multiplataforma | 14–15/09 | ✅ **CONCLUÍDO** (Node.js v22, npm audit, Arduino cache) |
-| **[PENDENTE] Soldagem IRF520 (B/C)** | 15/09 → **22/09** | ⏳ Replanejada |
-| **[PENDENTE] Diagrama elétrico consolidado** | — | ⬜ A publicar |
-| **[PENDENTE] Base MDF + acabamento** | — | ⬜ A completar |
+| Soldagem IRF520 (B/C) — placas de passagem | 22/09 | ✅ **CONCLUÍDO** — Continuidade aprovada |
+| Diagrama elétrico consolidado | 23/09 | ✅ **CONCLUÍDO** — `docs/fluxogramas/Diagrama elétrico.png` |
+| Base MDF — montagem principal | 22/09 | ✅ **CONCLUÍDO** — resta acabamento |
+| **[PENDENTE] Acabamento da base MDF** | — | ⏳ Em progresso |
+| **[PENDENTE] Desbaste costura fita esteira** | 25–27/09 | ⏳ Reagendado (requer desmontagem) |
 
 **Contexto:** Semana 5 completou testes de software/nuvem. Semana 6 foca na **finalização mecânica** (soldagem, diagrama, base) e **validação integrada** (burn-in test nas três esteiras).
 
@@ -49,41 +51,43 @@
 ## 3. Bloco 1 — Verificação de Solda dos Módulos IRF520 (B/C)
 
 > **Objetivo:** validar soldagem dos 2º e 3º módulos IRF520 sem falhas de continuidade ou PWM instável. **Execução prioritária no dia 22/09.**
+>
+> **⭐ STATUS (23/09): CONCLUÍDO** — Soldagem das placas de passagem (IRF520 B/C) finalizada com sucesso. Teste de continuidade realizado e aprovado em 22/09.
 
 ### 3.1 — Testes Elétricos com Multímetro
 
 | Teste | Método | Esperado | Status |
 |-------|--------|----------|--------|
-| Continuidade VCC motor B | Multímetro modo contínuo VCC/GND IRF520 #2 | Continuidade OK | ⬜ |
-| Continuidade VCC motor C | Multímetro modo contínuo VCC/GND IRF520 #3 | Continuidade OK | ⬜ |
-| Continuidade GND B | Multímetro GND driver ↔ GND fonte | Continuidade OK | ⬜ |
-| Continuidade GND C | Multímetro GND driver ↔ GND fonte | Continuidade OK | ⬜ |
-| Resistência ponte B | Multímetro ohm VCC/GND (motor desconectado) | > 100kΩ | ⬜ |
-| Resistência ponte C | Multímetro ohm VCC/GND (motor desconectado) | > 100kΩ | ⬜ |
+| Continuidade VCC motor B | Multímetro modo contínuo VCC/GND IRF520 #2 | Continuidade OK | ✅ 22/09 |
+| Continuidade VCC motor C | Multímetro modo contínuo VCC/GND IRF520 #3 | Continuidade OK | ✅ 22/09 |
+| Continuidade GND B | Multímetro GND driver ↔ GND fonte | Continuidade OK | ✅ 22/09 |
+| Continuidade GND C | Multímetro GND driver ↔ GND fonte | Continuidade OK | ✅ 22/09 |
+| Resistência ponte B | Multímetro ohm VCC/GND (motor desconectado) | > 100kΩ | ✅ 22/09 |
+| Resistência ponte C | Multímetro ohm VCC/GND (motor desconectado) | > 100kΩ | ✅ 22/09 |
 
 ### 3.2 — Validação de Sinal PWM
 
 | Teste | Método | Esperado | Status |
 |-------|--------|----------|--------|
-| PWM Motor B (pino 10) | Osciloscópio no SIG do IRF520 #2 | 5V onda quadrada, freq ~490 Hz | ⬜ |
-| PWM Motor C (pino 11) | Osciloscópio no SIG do IRF520 #3 | 5V onda quadrada, freq ~490 Hz | ⬜ |
-| Ruído no sinal | Zoom em edge; overshoot | < 0,5V overshoot; sem oscilação | ⬜ |
+| PWM Motor B (pino 10) | Osciloscópio no SIG do IRF520 #2 | 5V onda quadrada, freq ~490 Hz | ⏳ 23/09 (agendado) |
+| PWM Motor C (pino 11) | Osciloscópio no SIG do IRF520 #3 | 5V onda quadrada, freq ~490 Hz | ⏳ 23/09 (agendado) |
+| Ruído no sinal | Zoom em edge; overshoot | < 0,5V overshoot; sem oscilação | ⏳ 23/09 (agendado) |
 
 ### 3.3 — Teste Funcional Motor B
 
 | Teste | Método | Esperado | Status |
 |-------|--------|----------|--------|
-| Motor B liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"B"}'` | Motor gira sem travamento | ⬜ |
-| Motor B desliga | `CMD:RESET` | Motor para | ⬜ |
-| Feedback sensor topo B | Sensor → LOW → motor desliga | Desliga após 2–3 s | ⬜ |
+| Motor B liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"B"}'` | Motor gira sem travamento | ⏳ 23/09 (agendado) |
+| Motor B desliga | `CMD:RESET` | Motor para | ⏳ 23/09 (agendado) |
+| Feedback sensor topo B | Sensor → LOW → motor desliga | Desliga após 2–3 s | ⏳ 23/09 (agendado) |
 
 ### 3.4 — Teste Funcional Motor C
 
 | Teste | Método | Esperado | Status |
 |-------|--------|----------|--------|
-| Motor C liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"C"}'` | Motor gira sem travamento | ⬜ |
-| Motor C desliga | `CMD:RESET` | Motor para | ⬜ |
-| Feedback sensor topo C | Sensor → LOW → motor desliga | Desliga após 2–3 s | ⬜ |
+| Motor C liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"C"}'` | Motor gira sem travamento | ⏳ 23/09 (agendado) |
+| Motor C desliga | `CMD:RESET` | Motor para | ⏳ 23/09 (agendado) |
+| Feedback sensor topo C | Sensor → LOW → motor desliga | Desliga após 2–3 s | ⏳ 23/09 (agendado) |
 
 ### 3.5 — Critérios de Sucesso do Bloco 1
 
@@ -97,6 +101,8 @@
 ## 4. Bloco 2 — Diagrama Elétrico Consolidado
 
 > **Objetivo:** publicar diagrama elétrico formal mostrando todas as conexões, bitola de fios, proteção e alimentação. **Dias 22–24/09.**
+>
+> **⭐ STATUS (23/09): CONCLUÍDO** — Diagrama elétrico finalizado e publicado em [`docs/fluxogramas/Diagrama elétrico.png`](../../fluxogramas/Diagrama%20el%C3%A9trico.png) (formato PNG + PPTX editável). Commits: `0f0782c`, `8d191fa`.
 
 ### 4.1 — Levantamento de Esquema
 
@@ -115,10 +121,10 @@
 
 | Documento | Formato | Localização | Status |
 |-----------|---------|------------|--------|
-| Diagrama esquemático unifilar | Visio/KiCad | `docs/diagramas/esquema_unifilar.pdf` | ⬜ |
-| Diagrama de blocos | Draw.io | `docs/diagramas/blocos_sistema.pdf` | ⬜ |
-| Tabela de fiação (pinagem) | Markdown | `docs/ARCHITECTURE.md` (atualizar) | ⬜ |
-| Especificação bitola de fios | Markdown | `docs/ARCHITECTURE.md` (nova seção) | ⬜ |
+| Diagrama elétrico consolidado | PNG (renderizado) | `docs/fluxogramas/Diagrama elétrico.png` | ✅ 23/09 |
+| Diagrama elétrico (editável) | PPTX (fonte) | `docs/fluxogramas/Diagrama elétrico.pptx` | ✅ 23/09 |
+| Tabela de fiação (pinagem) | Markdown | `docs/ARCHITECTURE.md` §4 (Hardware) | ✅ (referência ao diagrama adicionada) |
+| Especificação bitola de fios | Markdown | `docs/ARCHITECTURE.md` (nova seção) | ⬜ Pendente |
 
 ### 4.3 — Critérios de Sucesso do Bloco 2
 
@@ -132,26 +138,29 @@
 ## 5. Bloco 3 — Montagem Mecânica: Base MDF + Acabamento
 
 > **Objetivo:** finalizar a estrutura física (base MDF, fixação das esteiras, acabamento visual). **Dias 23–24/09.**
+>
+> **⭐ STATUS (23/09): PARCIAL** — Base MDF quase concluída em 22/09; resta apenas o acabamento. Ajuste mecânico das esteiras (desbaste da costura da fita que se prende na estrutura MDF) **reagendado para 25–27/09**, pois requer desmontagem das esteiras.
 
 ### 5.1 — Tarefas Mecânicas
 
 | Tarefa | Detalhes | Status |
 |--------|----------|--------|
-| Montagem Base MDF | 60×40 cm, 15 mm, furos pré-marcados | ⬜ |
-| Fixação Esteiras A/B/C | Parafusos M4 + arruelas (4 pontos cada) | ⬜ |
-| Fixação Motor Principal | Parafusos M3 + suportes alumínio | ⬜ |
-| Fixação Motores B/C | Suportes 3D/alumínio; alinhamento com sensores | ⬜ |
-| Fixação Roda Separadora | Motor 28BYJ-48 + roda 3 compartimentos; tolerância < 2 mm | ⬜ |
-| Organização de Fiação | Passadores/canaletas; conectores fixos | ⬜ |
-| Soldagem Connectors | Pinos em placas perfuradas | ⬜ |
+| Montagem Base MDF | 60×40 cm, 15 mm, furos pré-marcados | ✅ 22/09 (quase concluída — resta acabamento) |
+| Fixação Esteiras A/B/C | Parafusos M4 + arruelas (4 pontos cada) | ✅ 22/09 |
+| Fixação Motor Principal | Parafusos M3 + suportes alumínio | ✅ 22/09 |
+| Fixação Motores B/C | Suportes 3D/alumínio; alinhamento com sensores | ✅ 22/09 |
+| **Desbaste de costura da fita** (novo) | Desbastar ponto de atrito da costura da fita da esteira contra o MDF (causa erros de processo) | ⏳ 25–27/09 (requer desmontagem) |
+| Fixação Roda Separadora | Motor 28BYJ-48 + roda 3 compartimentos; tolerância < 2 mm | ⬜ Depende separador |
+| Organização de Fiação | Passadores/canaletas; conectores fixos | 🔄 Em progresso |
+| Soldagem Connectors | Pinos em placas perfuradas (IRF520 B/C) | ✅ 22/09 |
 
 ### 5.2 — Acabamento Visual
 
 | Item | Detalhes | Status |
 |------|----------|--------|
-| Limpeza de base | Pano úmido + ar comprimido | ⬜ |
-| Pintura base MDF (opcional) | Cor neutra | ⬜ |
-| Identificação de componentes | Etiquetas A/B/C, motor principal, separador | ⬜ |
+| Limpeza de base | Pano úmido + ar comprimido | ⏳ Pendente (acabamento) |
+| Pintura base MDF (opcional) | Cor neutra | ⏳ Pendente (acabamento) |
+| Identificação de componentes | Etiquetas A/B/C, motor principal, separador | ⏳ Pendente (acabamento) |
 | Proteção de eletrônica | Caixa acrílica/suporte | ⬜ |
 
 ### 5.3 — Validação Mecânica
@@ -233,7 +242,7 @@ Observar simultaneamente:
 | Roteiro semana 6 (este arquivo) | `docs/testes/roteiros/semana_06_22-26_setembro.md` | 🔄 Em progresso |
 | Resultados consolidados | Seção 10 deste roteiro | ⬜ Preencher |
 | CHANGELOG atualizado | `docs/CHANGELOG.md` | ⬜ Adicionar semana 6 |
-| Diagrama elétrico | `docs/diagramas/` (nova pasta) | ⬜ Publicar |
+| Diagrama elétrico | `docs/fluxogramas/Diagrama elétrico.png` (+ `.pptx`) | ✅ 23/09 — PNG + PPTX publicados |
 | BOM (Bill of Materials) | `docs/BILL_OF_MATERIALS.md` (novo) | ⬜ Criar |
 | Deployment guide | `docs/DEPLOYMENT.md` (novo) | ⬜ Criar |
 | Board GitHub Projects | `docs/fluxogramas/board_github_projects.md` | ⬜ Atualizar |
@@ -243,7 +252,7 @@ Observar simultaneamente:
 | Gap | Impacto | Prioridade |
 |-----|---------|-----------|
 | BOM ausente | Difícil reproduzir protótipo | 🔴 Alta |
-| Diagrama elétrico não publicado | Novos integradores não sabem montar | 🔴 Alta |
+| ~~Diagrama elétrico não publicado~~ | ~~Novos integradores não sabem montar~~ | ✅ **RESOLVIDO 23/09** — `docs/fluxogramas/Diagrama elétrico.png` |
 | Deployment guide ausente | Sem passo a passo para novo ambiente | 🟡 Média |
 | Firmware sem versioning explícito | Histórico de `.ino` não rastreado no CHANGELOG | 🟡 Média |
 | Testes automatizados (E2E) | Validação manual; risco de regressão | 🟡 Média |
@@ -286,17 +295,17 @@ cd simulator && MQTT_PUBLISH=true npm start
 
 ## 10. Resultados Consolidados da Semana
 
-> **A PREENCHER ao final da semana (26/09).**
+> **Em preenchimento progressivo — última atualização: 23/09/2026.**
 
 | Etapa | Resultado | Observações |
 |-------|-----------|-------------|
-| 0 — Pré-voo | ⬜ | Validação em 22/09 |
-| 1 — Solda IRF520 (B/C) | ⬜ | Testes elétricos + funcionais |
-| 2 — Diagrama elétrico | ⬜ | CAD publicado em `docs/diagramas/` |
-| 3 — Montagem mecânica | ⬜ | Base MDF + acabamento |
-| 4 — Burn-in test | ⬜ | Cenários S1–S7 |
-| 5 — Documentação | ⬜ | CHANGELOG, BOM, Deployment |
-| Plano B | — | Simulador como fallback |
+| 0 — Pré-voo | ✅ | Infraestrutura validada (serviços, HiveMQ, WiFi) |
+| 1 — Solda IRF520 (B/C) | ✅ **Continuidade aprovada** | Teste elétrico (multímetro) concluído em 22/09. Teste funcional + PWM agendado para 23/09 |
+| 2 — Diagrama elétrico | ✅ **Publicado** | `docs/fluxogramas/Diagrama elétrico.png` + `.pptx` — commits `0f0782c`, `8d191fa` |
+| 3 — Montagem mecânica | 🔄 **Em progresso** | Base MDF quase concluída (22/09); acabamento e desbaste de esteiras pendentes (25–27/09) |
+| 4 — Burn-in test | ⬜ | Previsto 23–26/09 (após validação funcional dos IRF520) |
+| 5 — Documentação | 🔄 **Em progresso** | CHANGELOG atualizado; BOM e Deployment Guide planejados (Cards #21, #22) |
+| Plano B | — | Simulador disponível como fallback |
 
 ---
 

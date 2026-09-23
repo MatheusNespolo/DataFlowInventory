@@ -125,6 +125,8 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 
 ## 2. Integração Separador — Roda com 3 Compartimentos
 
+> 📐 **Referência:** Veja o diagrama elétrico completo em [`docs/fluxogramas/Diagrama elétrico.png`](../fluxogramas/Diagrama%20el%C3%A9trico.png) para pinagem e integração com os demais componentes (Arduino, ESP32, IRF520, sensores).
+
 ### 2.1 Hardware
 
 | Componente | Especificação | Pinos Arduino | Alimentação |
