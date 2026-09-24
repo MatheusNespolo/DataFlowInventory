@@ -231,6 +231,23 @@ Observar simultaneamente:
 
 ---
 
+### 6.5 — Incidentes de Bancada 22–23/09 e Diagnóstico Pendente
+
+> Dois problemas independentes foram identificados durante o teste funcional com as novas placas de passagem soldadas e a tentativa de conexão ao HiveMQ Cloud. Diagnóstico técnico e mitigação documentados em `docs/testes/validações/troubleshooting_bancada_22-23_09.md`.
+
+**Problema 1 — MQTT Cloud `rc=-2`:**
+- WiFi conectado, mas TCP/TLS na porta 8883 falha antes de negociar MQTT
+- **Causa provável:** firewall corporativo bloqueando 8883 (recorrência da 02/09, 03/09, 15/09)
+- **Mitigação:** validar via hotspot 4G; abrir ticket com TI SENAI para liberação permanente
+
+**Problema 2 — Esteiras B/C fracas:**
+- Motores B/C com velocidade/força reduzidas após soldagem das placas de passagem
+- **Hipótese principal:** queda de tensão nos novos cabos
+- **Diagnóstico:** roteiro de 4 fases com multímetro documentado
+- **Mitigação:** em curso — aquisição de expansores 110/220V→5V
+
+---
+
 ## 7. Bloco 5 — Documentação e Gaps
 
 > **Objetivo:** consolidar resultados, atualizar CHANGELOG e mapear próximas frentes. **Dia 26/09.**
@@ -258,6 +275,7 @@ Observar simultaneamente:
 | Testes automatizados (E2E) | Validação manual; risco de regressão | 🟡 Média |
 | Documentação inline mínima | `server.js` e `.ino` com poucos comentários de função | 🟢 Baixa |
 | Performance telemetria ausente | Sem métricas de latência ao longo do tempo | 🟢 Baixa |
+| Troubleshooting MQTT Cloud ausente | Plano de testes cobria apenas cenário local (1883) | 🟡 Média | ✅ **RESOLVIDO 24/09** — desdobrado em `plano_de_testes.md` e novo documento de troubleshooting |
 
 ### 7.3 — Cards Sugeridos para Próxima Sprint
 
@@ -276,7 +294,7 @@ Observar simultaneamente:
 | **22/09 (Seg)** | Bloco 0 (pré-voo) + Bloco 1.1–1.2 (multímetro) | Bloco 1.3–1.4 (PWM + motores B/C) |
 | **23/09 (Ter)** | Bloco 2.1–2.2 (levantamento + CAD) | Bloco 3.1 (base MDF + fixação) |
 | **24/09 (Qua)** | Bloco 3.2–3.3 (acabamento + soldagem) | Bloco 2.3–2.4 (finalizar diagrama) |
-| **25/09 (Qui)** | Bloco 4 (burn-in test S1–S4) | Bloco 4 (continuação S5–S7) |
+| **25/09 (Qui)** | Bloco 4 (burn-in test S1–S4) + diagnóstico elétrico B/C (fases 1-2) | Bloco 4 (continuação S5–S7) + diagnóstico elétrico B/C (fases 3-5) |
 | **26/09 (Sex)** | Bloco 4 (validação final) | Bloco 5 (documentação + CHANGELOG + board) |
 
 ---
@@ -300,7 +318,8 @@ cd simulator && MQTT_PUBLISH=true npm start
 | Etapa | Resultado | Observações |
 |-------|-----------|-------------|
 | 0 — Pré-voo | ✅ | Infraestrutura validada (serviços, HiveMQ, WiFi) |
-| 1 — Solda IRF520 (B/C) | ✅ **Continuidade aprovada** | Teste elétrico (multímetro) concluído em 22/09. Teste funcional + PWM agendado para 23/09 |
+| 1 — Solda IRF520 (B/C) | ⚠️ **Continuidade OK, teste funcional revelou queda de potência** | Continuidade elétrica (multímetro) ✅ em 22/09. Teste funcional (23/09) revelou motores B/C mais fracos. Diagnóstico em andamento. Ver §6.5 |
+| 1.1 — Conexão HiveMQ Cloud | ⚠️ **Falha `rc=-2`** | WiFi OK, mas TLS/8883 falha antes de MQTT. Suspeita: firewall corporativo (4ª recorrência). Validação via hotspot 4G pendente. Ver §6.5 |
 | 2 — Diagrama elétrico | ✅ **Publicado** | `docs/fluxogramas/Diagrama elétrico.png` + `.pptx` — commits `0f0782c`, `8d191fa` |
 | 3 — Montagem mecânica | 🔄 **Em progresso** | Base MDF quase concluída (22/09); acabamento e desbaste de esteiras pendentes (25–27/09) |
 | 4 — Burn-in test | ⬜ | Previsto 23–26/09 (após validação funcional dos IRF520) |

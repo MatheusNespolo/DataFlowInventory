@@ -49,6 +49,24 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Identificados **7 gaps prioritários** com classificação de impacto (Alta/Média/Baixa): BOM ausente, diagrama elétrico não publicado, deployment guide ausente, firmware sem versioning, testes E2E manuais, documentação inline mínima, performance telemetria ausente
   - Sugestão de 5 cards para próxima sprint: BOM, Deployment Guide, Testes E2E Automatizados, Firmware Versioning, Telemetria Histórica (Grafana/InfluxDB)
 
+### Problemas Conhecidos
+
+- **Firewall Corporativo Bloqueando MQTT Cloud/8883 — Recorrência (22–23/09/2026)**
+  - **Sintoma:** ESP32 conecta ao WiFi mas falha no broker HiveMQ Cloud com `rc=-2` (falha TCP/TLS)
+  - **Histórico:** 4ª recorrência em 02/09, 03/09, 15/09, agora 22-23/09 — indicador forte de bloqueio de rede corporativa
+  - **Mitigação curta prazo:** usar hotspot 4G do celular (rede alternativa) para validar se a causa é firewall
+  - **Mitigação longa prazo:** solicitar liberação da porta 8883 com TI da SENAI ou usar VPN corporativa
+  - **Referência técnica:** `docs/testes/validações/troubleshooting_bancada_22-23_09.md` §Problema 1
+
+- **Perda de Potência em Esteiras B/C Após Soldagem de Placas de Passagem (22–23/09/2026)**
+  - **Sintoma:** Motores B/C apresentam velocidade/força reduzidas após montagem das novas placas IRF520 soldadas
+  - **Hipótese principal:** Queda de tensão nos novos cabos (comprimento/bitola diferentes dos jumpers originais)
+  - **Hipóteses secundárias:** Solda fria nos pontos de solda das placas IRF520 · Dano térmico nos MOSFETs durante soldagem · Fonte 12V/5A compartilhada no limite de corrente
+  - **Diagnóstico:** Roteiro de 4 fases com multímetro documentado (teste com jumper curto + medição de tensão sob carga + teste de resistência de solda + teste de MOSFET)
+  - **Mitigação em curso:** Aquisição de 2 expansores 110/220V→5V para alimentação dedicada de cada placa de passagem — **configuração já prevista no diagrama elétrico** (sem alteração de documentação necessária)
+  - **Cronograma diagnóstico:** 25–27/09/2026 (paralelo ao burn-in test)
+  - **Referência técnica:** `docs/testes/validações/troubleshooting_bancada_22-23_09.md` §Problema 2
+
 ### Adicionado
 
 - **Hardening CI/CD — Upgrade Node.js v22 + Otimizações (17/09/2026)**
