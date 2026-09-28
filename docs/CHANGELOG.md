@@ -14,6 +14,18 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Roteiro de Testes — Semana 7 (28/09–02/10/2026)**
+  - Documento completo em `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` com 5 blocos de trabalho:
+    - **Bloco 1:** Validação HiveMQ Cloud via hotspot 4G (28/09) — diagnóstico definitivo do `rc=-2` isolando a variável de rede corporativa
+    - **Bloco 2:** Diagnóstico de potência IRF520 B/C (29/09) — roteiro de 4 fases com multímetro (jumper curto, tensão sob carga, resistência de soldas, teste de MOSFET)
+    - **Bloco 3:** Burn-in test completo (30/09–01/10) — 7 cenários de stress (S1–S7) cobrindo sequência simples, concorrência, estoque vazio, reset, reconexão, alta frequência e telemetria remota HiveMQ+CX9240
+    - **Bloco 4:** Acabamento mecânico (01/10) — finalização da base MDF (lixamento, fixação, organização de fiação) e desbaste da costura das esteiras para eliminar ponto de atrito
+    - **Bloco 5:** Documentação e Cards (02/10) — atualização do CHANGELOG, preenchimento de comentários dos Cards #21–#25 e movimentação no GitHub Projects
+  - Cronograma ajustado: Semana 7 inicia **segunda-feira 28/09** (não 29/09), 5 dias úteis até 02/10
+  - Herda contexto da Semana 6: soldagem IRF520 concluída, diagrama elétrico publicado, base MDF montada, sketch `test_mqtt_cloud.ino` criado
+  - Foco em **resolução dos dois problemas abertos** (rc=-2 HiveMQ e queda de potência B/C) antes do burn-in test integrado
+  - Templates de comentário preparados para os 5 cards de documentação/processo (#21 BOM, #22 Deployment Guide, #23 E2E Tests, #24 Firmware Versioning, #25 Telemetria)
+
 - **Diagrama Elétrico Consolidado — Publicação Formal (23/09/2026)**
   - Diagrama elétrico do protótipo finalizado e publicado em:
     - `docs/fluxogramas/Diagrama elétrico.png` — renderização PNG (visualização direta no GitHub)
