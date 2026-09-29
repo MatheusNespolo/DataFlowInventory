@@ -7,14 +7,18 @@ import { expect } from '@playwright/test';
 // e /api/status, cujo 404 (simulador) e 503 (broker fora) são respostas esperadas.
 const IGNORAR = /fonts\.(googleapis|gstatic)\.com|favicon\.ico|\/api\/status/;
 
-/** Registra erros de página/console. Retorna um array preenchido ao longo do teste. */
-export function coletarErros(page) {
+/**
+ * Registra erros de página/console. Retorna um array preenchido ao longo do teste.
+ * ignorarExtra: padrão adicional (ex.: um recurso bloqueado de propósito pelo teste).
+ */
+export function coletarErros(page, ignorarExtra = null) {
   const erros = [];
+  const ignora = (s) => IGNORAR.test(s) || (ignorarExtra && ignorarExtra.test(s));
   page.on('pageerror', (e) => erros.push(`pageerror: ${e.message}`));
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
     const url = (m.location() && m.location().url) || '';
-    if (IGNORAR.test(m.text()) || IGNORAR.test(url)) return;
+    if (ignora(m.text()) || ignora(url)) return;
     erros.push(`console: ${m.text()}`);
   });
   return erros;

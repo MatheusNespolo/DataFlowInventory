@@ -776,6 +776,40 @@ html {
 .arq-detalhes-corpo th { color: var(--legend); font-weight: 600; }
 .arq-fonte { margin-top: 0.3rem; font-size: 0.66rem; color: var(--legend); }
 
+/* Fallback 2D (sem WebGL): planta baixa com os mesmos estados */
+.arq-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.arq-fb-enlace {
+  --led: var(--muted);
+  fill: none;
+  stroke: var(--led);
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+.arq-fb-enlace[data-estado="ok"]           { --led: var(--led-run); }
+.arq-fb-enlace[data-estado="atencao"]      { --led: var(--led-warn); }
+.arq-fb-enlace[data-estado="falha"]        { --led: var(--led-fault); }
+.arq-fb-enlace[data-estado="desconhecido"] { --led: var(--led-idle); }
+.arq-fb-enlace[data-estado="fora-do-modo"] { --led: var(--etch-strong); opacity: 0.35; }
+.arq-fb-tracejado    { stroke-dasharray: 8 6; }
+.arq-fb-selecionado  { stroke-width: 7; }
+.arq-fb-rotulos {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.arq-fb-rotulos .arq-rotulo {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+/* Câmera e partículas não se aplicam à planta 2D */
+.arq-palco[data-pronto="fallback"] .arq-controles { display: none; }
+
 .arq-estado {
   --led: var(--muted);
   display: inline-flex;

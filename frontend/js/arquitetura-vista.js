@@ -16,6 +16,7 @@
 import { NOS_ARQ, ENLACES_ARQ, ROTULO_MODO, ROTULO_ESTADO } from './arquitetura-dados.js';
 import { derivarStatus } from './arquitetura-status.js';
 import { coletorCompartilhado } from './arquitetura-sinais.js';
+import { desenharFallback } from './arquitetura-fallback.js';
 
 const ROTA = '#/arquitetura';
 const palco = document.getElementById('arq-palco');
@@ -275,6 +276,11 @@ function ligarPainel(c) {
   });
 }
 
+function limparRestos3d() {
+  // Limpa restos de uma construção 3D que falhou no meio.
+  palco.querySelectorAll(':scope > canvas, :scope > .arq-camada-rotulos').forEach((n) => n.remove());
+}
+
 async function obterContexto() {
   try {
     const m = await import('./arquitetura3d.js');
@@ -283,16 +289,20 @@ async function obterContexto() {
       palco.dataset.pronto = '3d';
       return c;
     }
+    limparRestos3d();
   } catch (e) {
     console.warn('[ARQ] Cena 3D indisponível:', e && e.message);
+    limparRestos3d();
   }
-  // Sem WebGL/three.js: substituído pelo fallback SVG na Task 10.
-  const aviso = document.getElementById('arq-aviso');
-  if (aviso) {
-    aviso.textContent = 'WebGL indisponível neste navegador.';
-    aviso.hidden = false;
+  // Sem WebGL/three.js: planta 2D com os mesmos rótulos, estados e painel.
+  try {
+    const c = desenharFallback(palco, criarRotulo);
+    palco.dataset.pronto = 'fallback';
+    return c;
+  } catch (e) {
+    console.warn('[ARQ] Diagrama 2D indisponível:', e && e.message);
+    return null;
   }
-  return null;
 }
 
 function ativar(c, ativa) {
