@@ -1,4 +1,3 @@
-@ -0,0 +1,93 @@
 # Card: Bill of Materials (BOM) — Inventário de Componentes
 
 **Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🔴 Alta
