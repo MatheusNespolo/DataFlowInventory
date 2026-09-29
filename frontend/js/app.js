@@ -94,6 +94,17 @@ const els = {
 let historicoEventos = [];
 const MAX_HISTORICO = 30;
 
+// Eventos chegados com a vista #/status fechada (contador da tecla LOG).
+let eventosNaoVistos = 0;
+
+function atualizarContadorLog() {
+  const el = document.getElementById('log-contador');
+  if (!el) return;
+  el.hidden = eventosNaoVistos === 0;
+  const n = el.querySelector('.seletor-contador-n');
+  if (n) n.textContent = eventosNaoVistos > 99 ? '99+' : String(eventosNaoVistos);
+}
+
 // Respeita a preferência do sistema por menos movimento.
 const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -621,6 +632,11 @@ function adicionarHistorico(evento, peca, tipo, scroll = true) {
   if (itens.length > MAX_HISTORICO) {
     itens[itens.length - 1].remove();
   }
+
+  if (scroll && rotaAtual() !== '#/status') {
+    eventosNaoVistos++;
+    atualizarContadorLog();
+  }
 }
 
 // ============================================================
@@ -760,16 +776,16 @@ function roteador(mudarFoco) {
   ativa.hidden = false;
   definirLive(ativa, 'polite');
   document.title = ROTAS[rota].titulo;
+  if (rota === '#/status') {
+    eventosNaoVistos = 0;
+    atualizarContadorLog();
+  }
 
   // Seletor de vistas: marca a tecla da rota ativa.
   document.querySelectorAll('a.seletor-tecla').forEach((a) => {
     if (a.getAttribute('href') === rota) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   });
-
-  // O atalho no rodapé só faz sentido na página inicial.
-  const footerNav = document.getElementById('footer-nav');
-  if (footerNav) footerNav.hidden = rota !== '#/';
 
   // Só move o foco quando o usuário navega (não no carregamento inicial).
   if (mudarFoco) {

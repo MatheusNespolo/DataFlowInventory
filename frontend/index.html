@@ -15,38 +15,66 @@
   <!-- ============================================================ -->
   <!-- FAIXA ANUNCIADORA — estado do sistema em janelas gravadas    -->
   <!-- ============================================================ -->
-  <header class="annun" role="status" aria-live="polite" aria-label="Estado do sistema">
-    <div class="annun-brand">
-      <span class="annun-brand-mark" aria-hidden="true">▚</span>
-      <span class="annun-brand-name">Data Flow Inventory</span>
-      <span id="driver-info" class="annun-fw">v2.1 · IRF520</span>
-    </div>
+  <div class="topo">
+    <header class="annun" role="status" aria-live="polite" aria-label="Estado do sistema">
+      <div class="annun-brand">
+        <span class="annun-brand-mark" aria-hidden="true">▚</span>
+        <span class="annun-brand-name">Data Flow Inventory</span>
+        <span id="driver-info" class="annun-fw">v2.1 · IRF520</span>
+      </div>
 
-    <div class="annun-cells">
-      <div class="annun-cell" id="mqtt-status" data-state="off">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Enlace</span>
-        <span class="annun-v">Desconectado</span>
+      <div class="annun-cells">
+        <div class="annun-cell" id="mqtt-status" data-state="off">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Enlace</span>
+          <span class="annun-v">Desconectado</span>
+          <a class="annun-atalho" href="#/arquitetura" aria-label="Ver esta conexão na arquitetura"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        </div>
+        <div class="annun-cell" id="gateway-status" data-state="off" title="Estado do hardware (ESP32) via MQTT LWT">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Gateway</span>
+          <span class="annun-v">ESP32 offline</span>
+          <a class="annun-atalho" href="#/arquitetura" aria-label="Ver esta conexão na arquitetura"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        </div>
+        <div class="annun-cell" id="annun-estado" data-state="idle">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Estado</span>
+          <span class="annun-v" id="annun-estado-v">—</span>
+        </div>
+        <div class="annun-cell" id="annun-estoque" data-state="run">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Estoque</span>
+          <span class="annun-v" id="annun-estoque-v">Normal</span>
+        </div>
       </div>
-      <div class="annun-cell" id="gateway-status" data-state="off" title="Estado do hardware (ESP32) via MQTT LWT">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Gateway</span>
-        <span class="annun-v">ESP32 offline</span>
-      </div>
-      <div class="annun-cell" id="annun-estado" data-state="idle">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Estado</span>
-        <span class="annun-v" id="annun-estado-v">—</span>
-      </div>
-      <div class="annun-cell" id="annun-estoque" data-state="run">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Estoque</span>
-        <span class="annun-v" id="annun-estoque-v">Normal</span>
-      </div>
-    </div>
 
-    <time id="server-time" class="annun-clock">--:--:--</time>
-  </header>
+      <time id="server-time" class="annun-clock">--:--:--</time>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- SELETOR DE VISTAS — teclas de painel (barra inferior no celular) -->
+    <!-- ============================================================ -->
+    <nav class="seletor" aria-label="Vistas do painel">
+      <a class="seletor-tecla" href="#/">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <span class="seletor-k" aria-hidden="true">PNL</span>
+        <span class="seletor-rotulo">Painel</span>
+      </a>
+      <a class="seletor-tecla" href="#/status">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg>
+        <span class="seletor-k" aria-hidden="true">LOG</span>
+        <span class="seletor-rotulo"><span class="rotulo-longo">Equipamentos &amp; histórico</span><span class="rotulo-curto">Eventos</span></span>
+        <span id="log-contador" class="seletor-contador" hidden><span class="seletor-contador-n">0</span><span class="sr-only"> eventos novos</span></span>
+      </a>
+      <a class="seletor-tecla" href="#/arquitetura">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
+        <span class="seletor-k" aria-hidden="true">ARC</span>
+        <span class="seletor-rotulo">Arquitetura</span>
+        <span id="arc-led" class="seletor-led" data-estado="desconhecido" aria-hidden="true"></span>
+        <span id="arc-led-texto" class="sr-only">, conexões: status desconhecido</span>
+      </a>
+    </nav>
+  </div>
 
   <!-- ============================================================ -->
   <!-- PAINEL PRINCIPAL                                             -->
@@ -55,7 +83,7 @@
 
     <!-- HERO: diagrama mímico do sistema -->
     <section class="bay bay-mimic" aria-labelledby="t-mimic">
-      <h2 class="bay-title" id="t-mimic"><span class="bay-title-k">SYN</span> Diagrama do sistema</h2>
+      <h2 class="bay-title" id="t-mimic"><span class="bay-title-k">SYN</span> Diagrama do sistema<a class="bay-atalho" href="#/arquitetura">Ver arquitetura<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a></h2>
       <div class="mimic">
         <div id="mimic-3d" class="mimic-3d" aria-hidden="true"></div>
         <div class="mimic-stage">
@@ -196,8 +224,6 @@
   <!-- ============================================================ -->
   <main class="painel-status view" id="view-status" aria-label="Equipamentos e histórico" tabindex="-1" hidden>
 
-    <a class="voltar" href="#/">←&nbsp;Painel principal</a>
-
     <!-- Esteiras -->
     <section class="bay bay-esteiras" aria-labelledby="t-esteiras">
       <h2 class="bay-title" id="t-esteiras"><span class="bay-title-k">CNV</span> Esteiras</h2>
@@ -276,7 +302,6 @@
   <!-- ============================================================ -->
   <footer class="footer">
     <span>Data Flow Inventory — SENAI São Caetano do Sul — Engenharia de Controle e Automação</span>
-    <a id="footer-nav" class="footer-link" href="#/status">Equipamentos &amp; histórico&nbsp;→</a>
     <span>2026</span>
   </footer>
 

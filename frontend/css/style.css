@@ -118,9 +118,6 @@ body {
    FAIXA ANUNCIADORA
    ============================================================ */
 .annun {
-  position: sticky;
-  top: 0;
-  z-index: 100;
   display: flex;
   align-items: stretch;
   gap: clamp(0.5rem, 1.5vw, 1.25rem);
@@ -189,7 +186,7 @@ body {
   flex: 1 1 9rem;
   min-width: 8.5rem;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   grid-template-rows: auto auto;
   column-gap: 0.5rem;
   align-items: center;
@@ -275,6 +272,172 @@ body {
 }
 
 /* ============================================================
+   TOPO FIXO + SELETOR DE VISTAS (teclas de painel)
+   ============================================================ */
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+html {
+  /* O foco nunca fica escondido sob o topo fixo (WCAG 2.4.11). */
+  scroll-padding-top: 8.5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ico {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.seletor {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.45rem clamp(0.75rem, 2vw, 1.5rem);
+  background: var(--bay);
+  border-bottom: 1px solid var(--etch-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.seletor-tecla {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.45rem 0.95rem;
+  color: var(--readout-dim);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--step-0);
+  background: linear-gradient(180deg, var(--bay-raised), #191c24);
+  border: 1px solid var(--etch);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm), var(--bevel);
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.seletor-tecla:hover {
+  color: var(--readout);
+  border-color: var(--etch-strong);
+  background: linear-gradient(180deg, var(--bg-card-hover), var(--bay-raised));
+}
+
+.seletor-tecla:active {
+  transform: translateY(1px);
+}
+
+/* Tecla ativa: "afundada" no painel, com borda de sinalização azul */
+.seletor-tecla[aria-current="page"] {
+  color: var(--readout);
+  background: var(--bay-inset);
+  border-color: var(--led-idle);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(74, 163, 255, 0.18);
+}
+
+.seletor-k {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--legend);
+  border: 1px solid var(--etch);
+  border-radius: 4px;
+  padding: 0.08rem 0.34rem;
+}
+
+.seletor-tecla[aria-current="page"] .seletor-k {
+  color: var(--led-idle);
+  border-color: color-mix(in srgb, var(--led-idle) 45%, var(--etch));
+}
+
+.rotulo-curto { display: none; }
+
+.seletor-contador {
+  min-width: 1.35rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--led-idle);
+  color: var(--bay-inset);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.seletor-led {
+  --led: var(--muted);
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 50%;
+  background: var(--led);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35), 0 0 10px 0 var(--led);
+}
+.seletor-led[data-estado="ok"]      { --led: var(--led-run); }
+.seletor-led[data-estado="atencao"] { --led: var(--led-warn); }
+.seletor-led[data-estado="falha"]   { --led: var(--led-fault); animation: breathe 1.5s ease-in-out infinite; }
+
+/* Atalho no título de um bay (ex.: "Ver arquitetura") */
+.bay-atalho {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 32px;
+  padding: 0.2rem 0.6rem;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--led-idle);
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--led-idle) 35%, var(--etch));
+  border-radius: var(--radius-sm);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.bay-atalho:hover {
+  background: color-mix(in srgb, var(--led-idle) 10%, transparent);
+  border-color: var(--led-idle);
+}
+.bay-atalho .ico { width: 0.9rem; height: 0.9rem; }
+
+/* Atalho discreto dentro de uma célula da faixa */
+.annun-atalho {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 0.25rem;
+  color: var(--legend);
+  border-radius: 4px;
+  transition: color 160ms ease, background 160ms ease;
+}
+.annun-atalho:hover {
+  color: var(--readout);
+  background: rgba(255, 255, 255, 0.06);
+}
+.annun-atalho .ico { width: 0.9rem; height: 0.9rem; }
+```
+
+/* ============================================================
    PAINEL — grade de instrumentos
    ============================================================ */
 /* Uma única faixa: Estado/Estoque à esquerda, Diagrama ao centro (o
@@ -327,13 +490,11 @@ body {
   gap: clamp(0.6rem, 1.4vw, 1rem);
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
-    "voltar    voltar"
     "esteiras  sensores"
     "historico historico";
   align-content: start;
 }
 
-.painel-status .voltar { grid-area: voltar; }
 .bay-esteiras  { grid-area: esteiras; }
 .bay-sensores  { grid-area: sensores; }
 .bay-historico { grid-area: historico; }
@@ -370,44 +531,6 @@ body {
   background: var(--panel);
   box-shadow: var(--shadow-sm), var(--bevel);
   overflow: hidden;
-}
-
-.voltar {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--readout-dim);
-  text-decoration: none;
-  padding: 0.4rem 0.75rem;
-  border: 1px solid var(--etch);
-  border-radius: var(--radius-sm);
-  background: var(--bay-raised);
-  box-shadow: var(--bevel);
-  transition: border-color var(--transition), color var(--transition);
-}
-
-.voltar:hover {
-  color: var(--readout);
-  border-color: var(--etch-strong);
-}
-
-/* Atalho para #/status no rodapé (a página inicial não tem card de nav) */
-.footer-link {
-  color: var(--readout-dim);
-  text-decoration: none;
-  font-weight: 600;
-  border-bottom: 1px solid transparent;
-  transition: color var(--transition), border-color var(--transition);
-}
-
-.footer-link:hover {
-  color: var(--readout);
-  border-bottom-color: currentColor;
 }
 
 /* ============================================================
@@ -1064,7 +1187,6 @@ body {
   .painel-status {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "voltar"
       "esteiras"
       "sensores"
       "historico";
@@ -1097,6 +1219,42 @@ body {
     flex-basis: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+  /* Seletor vira barra inferior fixa (3 itens, ícone + rótulo curto) */
+  .seletor {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    justify-content: space-around;
+    padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--etch-strong);
+    border-bottom: 0;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .seletor-tecla {
+    flex: 1;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.3rem 0.25rem;
+    font-size: 0.7rem;
+  }
+  .seletor-k,
+  .rotulo-longo { display: none; }
+  .rotulo-curto { display: inline; }
+  .seletor-contador,
+  .seletor-led {
+    position: absolute;
+    top: 0.3rem;
+    right: calc(50% - 1.4rem);
+  }
+  body {
+    padding-bottom: calc(4.2rem + env(safe-area-inset-bottom));
+  }
+  html {
+    scroll-padding-top: 7rem;
+    scroll-padding-bottom: 5rem;
   }
 }
 
