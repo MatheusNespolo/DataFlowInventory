@@ -1,0 +1,14 @@
+{
+  "name": "dataflow-frontend-smoke",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Testes E2E de fumaça do dashboard (Playwright) — protegem os botões de controle e a navegação",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:simulador": "playwright test --project=simulador"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}
