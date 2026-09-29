@@ -17,3 +17,8 @@ test('cenário 2 — contrato de IDs preservado', async ({ page }) => {
     expect(await page.locator(`#${id}`).evaluate((el) => el.tagName)).toBe('BUTTON');
   }
 });
+
+test('layout do painel principal intacto (grade do .cluster aplicada)', async ({ page }) => {
+  await page.goto('/');
+  expect(await page.locator('#view-principal').evaluate((el) => getComputedStyle(el).display)).toBe('grid');
+});
