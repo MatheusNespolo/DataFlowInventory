@@ -207,7 +207,7 @@ ESP32 publica confirmação em 'dataflow/comandos/pub'
 
 > Os nomes dos tópicos são configuráveis no `server/.env` e nas constantes `TOPICO_*` do `gateway_mqtt.ino`. Arduino/ESP32 e servidor devem usar os **mesmos** nomes.
 >
-> ⚠️ **Importante — separação de status:** `dataflow/status` é **exclusivo do gateway ESP32**; o servidor Node publica seu próprio status em `dataflow/status/server`. Ambos são retained. Publicar o status do server no mesmo tópico do gateway sobrescreveria o retained e travaria o Dashboard em "ESP32 Offline" (regressão histórica — ver [`CHANGELOG`](../CHANGELOG.md)).
+> ⚠️ **Importante — separação de status:** `dataflow/status` é **exclusivo do gateway ESP32**; o servidor Node publica seu próprio status em `dataflow/status/server`. Ambos são retained. Publicar o status do server no mesmo tópico do gateway sobrescreveria o retained e travaria o Dashboard em "ESP32 Offline" (regressão histórica — ver [`CHANGELOG`](CHANGELOG.md)).
 
 ---
 
