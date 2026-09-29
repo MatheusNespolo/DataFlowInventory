@@ -1,4 +1,3 @@
-@ -0,0 +1,83 @@
 # Card: Firmware Versioning — Tags Git e Versão em Sketches
 
 **Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🟡 Média
