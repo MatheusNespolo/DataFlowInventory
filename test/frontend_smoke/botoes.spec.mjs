@@ -52,3 +52,15 @@ test('--muted atinge contraste 4,5:1 sobre --bay-raised', async ({ page }) => {
   });
   expect(razao).toBeGreaterThanOrEqual(4.5);
 });
+
+test('ajuda de desabilitado aparece só com botão desabilitado (regra CSS :has)', async ({ page }) => {
+  // Determinístico: não depende da janela de ~2 s em que o pedido está em processamento.
+  await page.goto('/');
+  const ajuda = page.locator('#ajuda-controle');
+  await expect(page.locator('#estado-atual')).toHaveText('AGUARDANDO_PEDIDO');
+  await expect(ajuda).toBeHidden();
+  await page.locator('#btn-solicitar-a').evaluate((b) => { b.disabled = true; });
+  await expect(ajuda).toBeVisible();
+  await page.locator('#btn-solicitar-a').evaluate((b) => { b.disabled = false; });
+  await expect(ajuda).toBeHidden();
+});
