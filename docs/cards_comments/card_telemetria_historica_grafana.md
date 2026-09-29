@@ -1,4 +1,3 @@
-@ -0,0 +1,88 @@
 # Card: Telemetria Histórica — Grafana/InfluxDB (Métricas de Performance)
 
 **Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🟢 Baixa
