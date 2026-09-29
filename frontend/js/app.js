@@ -12,6 +12,9 @@
 // CONEXÃO SOCKET.IO
 // ============================================================
 const socket = io();
+// Compartilhado com os módulos da vista de arquitetura (js/arquitetura-sinais.js),
+// que registram os próprios listeners sem tocar nos handlers abaixo.
+window.dfiSocket = socket;
 
 // ============================================================
 // REFERÊNCIAS DOS ELEMENTOS DO DOM
@@ -82,6 +85,7 @@ const els = {
   // Vistas (roteamento por hash)
   viewPrincipal: document.getElementById('view-principal'),
   viewStatus: document.getElementById('view-status'),
+  viewArquitetura: document.getElementById('view-arquitetura'),
 };
 
 // ============================================================
@@ -641,10 +645,20 @@ function resetSistema() {
 
 // Ligação dos botões via JS (sem onclick inline — a CSP do helmet bloqueia
 // handlers inline: script-src-attr 'none'). O script roda após o DOM.
-els.btnSolicitarA.addEventListener('click', () => solicitarPeca('A'));
-els.btnSolicitarB.addEventListener('click', () => solicitarPeca('B'));
-els.btnSolicitarC.addEventListener('click', () => solicitarPeca('C'));
-els.btnReset.addEventListener('click', () => resetSistema());
+// ligar() nunca lança: um id ausente registra erro no console em vez de
+// derrubar o restante do script (roteador, relógio, histórico).
+function ligar(el, nome, fn) {
+  if (!el) {
+    console.error(`[UI] Elemento ausente: ${nome} — ação indisponível`);
+    return;
+  }
+  el.addEventListener('click', fn);
+}
+
+ligar(els.btnSolicitarA, '#btn-solicitar-a', () => solicitarPeca('A'));
+ligar(els.btnSolicitarB, '#btn-solicitar-b', () => solicitarPeca('B'));
+ligar(els.btnSolicitarC, '#btn-solicitar-c', () => solicitarPeca('C'));
+ligar(els.btnReset, '#btn-reset', () => resetSistema());
 
 // ============================================================
 // FUNÇÕES AUXILIARES
@@ -710,12 +724,21 @@ setInterval(() => {
 els.serverTime.textContent = new Date().toLocaleTimeString('pt-BR');
 
 // ============================================================
-// ROTEAMENTO POR HASH — principal (#/) e equipamentos+histórico (#/status)
+// ROTEAMENTO POR HASH — painel (#/), equipamentos+histórico (#/status)
+// e arquitetura (#/arquitetura)
 // ============================================================
-// Uma única conexão Socket.IO alimenta as duas vistas; alternar é só
-// mostrar/ocultar. A faixa anunciadora fica fora das duas (sempre visível).
-const TITULO_BASE = 'Data Flow Inventory — Painel';
-const TITULO_STATUS = 'Equipamentos & histórico — Data Flow Inventory';
+// Uma única conexão Socket.IO alimenta as três vistas; alternar é só
+// mostrar/ocultar. A faixa anunciadora fica fora delas (sempre visível).
+// Hash vazio ou desconhecido cai no painel principal.
+const ROTAS = {
+  '#/':            { vista: () => els.viewPrincipal,   titulo: 'Data Flow Inventory — Painel' },
+  '#/status':      { vista: () => els.viewStatus,      titulo: 'Equipamentos & histórico — Data Flow Inventory' },
+  '#/arquitetura': { vista: () => els.viewArquitetura, titulo: 'Arquitetura do sistema — Data Flow Inventory' },
+};
+
+function rotaAtual() {
+  return Object.prototype.hasOwnProperty.call(ROTAS, location.hash) ? location.hash : '#/';
+}
 
 function definirLive(container, valor) {
   if (!container) return;
@@ -723,22 +746,30 @@ function definirLive(container, valor) {
 }
 
 function roteador(mudarFoco) {
-  const status = location.hash === '#/status';
-  const ativa = status ? els.viewStatus : els.viewPrincipal;
-  const inativa = status ? els.viewPrincipal : els.viewStatus;
-  if (!ativa || !inativa) return;
+  const rota = rotaAtual();
+  const ativa = ROTAS[rota].vista();
+  if (!ativa) return;
 
-  inativa.hidden = true;
+  Object.values(ROTAS).forEach(({ vista }) => {
+    const v = vista();
+    if (!v || v === ativa) return;
+    v.hidden = true;
+    // A vista oculta não deve anunciar atualizações para leitores de tela.
+    definirLive(v, 'off');
+  });
   ativa.hidden = false;
-  document.title = status ? TITULO_STATUS : TITULO_BASE;
+  definirLive(ativa, 'polite');
+  document.title = ROTAS[rota].titulo;
+
+  // Seletor de vistas: marca a tecla da rota ativa.
+  document.querySelectorAll('a.seletor-tecla').forEach((a) => {
+    if (a.getAttribute('href') === rota) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  });
 
   // O atalho no rodapé só faz sentido na página inicial.
   const footerNav = document.getElementById('footer-nav');
-  if (footerNav) footerNav.hidden = status;
-
-  // A vista oculta não deve anunciar atualizações para leitores de tela.
-  definirLive(inativa, 'off');
-  definirLive(ativa, 'polite');
+  if (footerNav) footerNav.hidden = rota !== '#/';
 
   // Só move o foco quando o usuário navega (não no carregamento inicial).
   if (mudarFoco) {

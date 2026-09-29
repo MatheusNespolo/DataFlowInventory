@@ -245,12 +245,16 @@ function init() {
   // --- Ativa a cena 3D (o CSS esconde o SVG) ---
   mimic.classList.add('diag-3d-ativo');
 
-  // Pausa a cena ao ir para #/status; retoma ao voltar
-  window.addEventListener('hashchange', () => {
-    const ativo = location.hash !== '#/status';
+  // A cena só roda na rota principal; pausa em #/status e #/arquitetura
+  // (e em qualquer outra vista futura), retomando ao voltar.
+  const VISTAS_SECUNDARIAS = ['#/status', '#/arquitetura'];
+  function aplicarRota() {
+    const ativo = !VISTAS_SECUNDARIAS.includes(location.hash);
     mount.style.display = ativo ? '' : 'none';
     if (ativo) marcarSujo();
-  });
+  }
+  window.addEventListener('hashchange', aplicarRota);
+  aplicarRota();
 }
 
 // Esfera com gradiente vertical, pré-filtrada como mapa de ambiente (IBL).

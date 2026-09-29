@@ -338,6 +338,40 @@ body {
 .bay-sensores  { grid-area: sensores; }
 .bay-historico { grid-area: historico; }
 
+/* Arquitetura do sistema (#/arquitetura): barra + palco da cena 3D */
+.painel-arquitetura {
+  flex: 1;
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.6rem, 1.4vw, 1rem);
+}
+
+.arq-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.arq-titulo {
+  margin-bottom: 0;
+}
+
+.arq-palco {
+  position: relative;
+  flex: 1;
+  min-height: 420px;
+  border: 1px solid var(--etch);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-sm), var(--bevel);
+  overflow: hidden;
+}
+
 .voltar {
   justify-self: start;
   display: inline-flex;
