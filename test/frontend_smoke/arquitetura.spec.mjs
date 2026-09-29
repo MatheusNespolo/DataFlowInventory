@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { coletarErros, esperarSemErros } from './helpers.mjs';
 
+// WebGL por software (SwiftShader) é lento: até ~66 s medidos no cenário 5a.
+test.describe.configure({ timeout: 180_000 });
+
 test('cenário 5a — cena 3D pronta no modo simulador', async ({ page }) => {
   const erros = coletarErros(page);
   await page.goto('/#/arquitetura');
@@ -34,6 +37,10 @@ test('cenário 5a — cena 3D pronta no modo simulador', async ({ page }) => {
 });
 
 test('a cena não é construída fora da rota', async ({ page }) => {
+  const urls = [];
+  page.on('request', (r) => urls.push(r.url()));
   await page.goto('/');
+  await page.waitForLoadState('networkidle');
+  expect(urls.filter((u) => /arquitetura3d\.js/.test(u))).toEqual([]);
   await expect(page.locator('#arq-palco canvas')).toHaveCount(0);
 });

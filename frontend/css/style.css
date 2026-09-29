@@ -570,6 +570,7 @@ html {
 }
 
 .arq-camada-rotulos {
+  z-index: 1; /* contexto próprio: as placas ficam abaixo dos controles (z-index 2) */
   pointer-events: none;
 }
 

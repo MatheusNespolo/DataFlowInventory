@@ -12,6 +12,7 @@ test('todo nó da topologia tem modelo completo', () => {
   for (const [id, n] of Object.entries(NOS_ARQ)) {
     assert.match(n.codigo, /^[A-Z]{3}$/, id);
     assert.ok(n.nome && n.camada && n.funcao, id);
+    assert.ok(n.curto && n.curto.length <= 16, id);
     assert.equal(n.posicao.length, 3, id);
     assert.ok(['placa', 'torre', 'monitor', 'rack'].includes(n.forma), id);
     assert.ok(n.secoes.length >= 1, id);

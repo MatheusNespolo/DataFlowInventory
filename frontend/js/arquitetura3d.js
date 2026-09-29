@@ -22,8 +22,8 @@ export const COR_ESTADO = {
   'atencao':        0xffb020, // --led-warn
   'falha':          0xff4d4f, // --led-fault
   'desconhecido':   0x4aa3ff, // --led-idle
-  'sem-dados':      0x858ca3, // --muted
-  'sem-telemetria': 0x6b7189,
+  'sem-dados':      0x8b93a7, // --legend
+  'sem-telemetria': 0x858ca3, // --muted
   'fora-do-modo':   0x3a3f4d, // --etch-strong
 };
 
@@ -170,7 +170,7 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
 
   const c = {
     renderer, rotulos, cena, camera, controles,
-    nos: {}, enlaces: {},
+    nos: {}, enlaces: {}, etiquetasHw: [],
     sujo: true, voo: null, w: 0, h: 0,
     particulasLigadas: !semMovimento,
   };
@@ -217,6 +217,7 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     const obj = new CSS2DObject(et);
     obj.position.set(0, 0.5, 0);
     m.add(obj);
+    c.etiquetasHw.push(obj);
   }
 
   // --- Enlaces: tubo sobre curva + partículas no sentido do fluxo ---
@@ -341,6 +342,12 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
         }
         animando = true;
       }
+    }
+
+    // Etiquetas do hardware de campo só aparecem com a câmera perto do Arduino.
+    const perto = camera.position.distanceTo(origem) < 9;
+    for (const obj of c.etiquetasHw) {
+      if (obj.visible !== perto) { obj.visible = perto; c.sujo = true; }
     }
 
     if (c.sujo || animando) {

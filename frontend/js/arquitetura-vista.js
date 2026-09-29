@@ -32,11 +32,12 @@ function criarRotulo(id) {
   rotulo.type = 'button';
   rotulo.className = 'arq-rotulo';
   rotulo.dataset.no = id;
+  rotulo.title = n.nome;
   rotulo.dataset.estado = 'desconhecido';
   rotulo.setAttribute('aria-pressed', 'false');
   rotulo.innerHTML = `<span class="arq-rotulo-led" aria-hidden="true"></span>`
     + `<span class="arq-rotulo-k" aria-hidden="true">${n.codigo}</span>`
-    + `<span class="arq-rotulo-nome">${n.nome}</span>`;
+    + `<span class="arq-rotulo-nome">${n.curto}</span>`;
   rotulo.addEventListener('click', () => {
     palco.dispatchEvent(new CustomEvent('arq:selecionar', { detail: { tipo: 'no', id } }));
   });

@@ -9,7 +9,7 @@
 
 export const NOS_ARQ = {
   arduino: {
-    codigo: 'FLD', nome: 'Arduino Uno — FSM', camada: 'Campo', forma: 'placa', posicao: [-8, 0, 0],
+    codigo: 'FLD', nome: 'Arduino Uno — FSM', curto: 'Arduino Uno', camada: 'Campo', forma: 'placa', posicao: [-8, 0, 0],
     funcao: 'Controla esteiras, sensores, LCD e separador; executa a máquina de estados e fala com o gateway pela serial.',
     secoes: [
       {
@@ -39,7 +39,7 @@ export const NOS_ARQ = {
     ],
   },
   esp32: {
-    codigo: 'EDG', nome: 'ESP32 — Gateway MQTT', camada: 'Borda', forma: 'placa', posicao: [-4, 0, 0],
+    codigo: 'EDG', nome: 'ESP32 — Gateway MQTT', curto: 'ESP32', camada: 'Borda', forma: 'placa', posicao: [-4, 0, 0],
     funcao: 'Ponte Serial ↔ MQTT: publica telemetria do Arduino e encaminha comandos do dashboard.',
     secoes: [
       {
@@ -49,7 +49,7 @@ export const NOS_ARQ = {
     ],
   },
   broker: {
-    codigo: 'MSG', nome: 'Broker MQTT', camada: 'Mensageria', forma: 'torre', posicao: [0, 0, 0],
+    codigo: 'MSG', nome: 'Broker MQTT', curto: 'Broker MQTT', camada: 'Mensageria', forma: 'torre', posicao: [0, 0, 0],
     funcao: 'Barramento de mensagens entre campo, aplicação e historiador.',
     secoes: [
       {
@@ -74,7 +74,7 @@ export const NOS_ARQ = {
     ],
   },
   servidor: {
-    codigo: 'APP', nome: 'Servidor Node.js', camada: 'Aplicação', forma: 'torre', posicao: [4, 0, -1.5],
+    codigo: 'APP', nome: 'Servidor Node.js', curto: 'Servidor', camada: 'Aplicação', forma: 'torre', posicao: [4, 0, -1.5],
     funcao: 'Assina os tópicos MQTT, repassa ao dashboard por Socket.IO e publica os comandos.',
     secoes: [
       {
@@ -88,7 +88,7 @@ export const NOS_ARQ = {
     ],
   },
   simulador: {
-    codigo: 'SIM', nome: 'Simulador (Modo 3)', camada: 'Aplicação', forma: 'torre', posicao: [4, 0, 2.5],
+    codigo: 'SIM', nome: 'Simulador (Modo 3)', curto: 'Simulador', camada: 'Aplicação', forma: 'torre', posicao: [4, 0, 2.5],
     funcao: 'Simula a FSM do Arduino sem hardware nem broker, emitindo os mesmos eventos Socket.IO do servidor.',
     secoes: [
       {
@@ -98,7 +98,7 @@ export const NOS_ARQ = {
     ],
   },
   dashboard: {
-    codigo: 'HMI', nome: 'Dashboard web', camada: 'Apresentação', forma: 'monitor', posicao: [8, 0, 0.5],
+    codigo: 'HMI', nome: 'Dashboard web', curto: 'Dashboard', camada: 'Apresentação', forma: 'monitor', posicao: [8, 0, 0.5],
     funcao: 'Painel de operação, equipamentos e histórico, e esta vista de arquitetura.',
     secoes: [
       {
@@ -108,7 +108,7 @@ export const NOS_ARQ = {
     ],
   },
   beckhoff: {
-    codigo: 'HST', nome: 'Beckhoff CX9240 — Historiador', camada: 'Historiador', forma: 'rack', posicao: [0, 0, -5],
+    codigo: 'HST', nome: 'Beckhoff CX9240 — Historiador', curto: 'Beckhoff CX9240', camada: 'Historiador', forma: 'rack', posicao: [0, 0, -5],
     funcao: 'Grava estoque e eventos em SQLite local (TwinCAT 3, RT Linux ARM64).',
     secoes: [
       {
@@ -147,8 +147,8 @@ export const HARDWARE = [
 ];
 
 export const CAMERAS = {
-  geral:     { rotulo: 'Visão geral', posicao: [0, 11, 15], alvo: [0, 0, -0.5] },
-  campo:     { rotulo: 'Campo',       posicao: [-6.5, 5, 7.5], alvo: [-6.5, 0, 0.5] },
+  geral:     { rotulo: 'Visão geral', posicao: [0, 8, 10.5], alvo: [0, 0, -0.5] },
+  campo:     { rotulo: 'Campo',       posicao: [-6.5, 4.5, 6], alvo: [-6.5, 0, 0.5] },
   nuvem:     { rotulo: 'Nuvem',       posicao: [0, 6.5, 6.5],  alvo: [0, 0, -2] },
   aplicacao: { rotulo: 'Aplicação',   posicao: [6.5, 5, 8],    alvo: [6, 0, 0.5] },
 };
