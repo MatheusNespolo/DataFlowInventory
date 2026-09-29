@@ -24,7 +24,7 @@
 - Toda tarefa termina com `npm test` em `test/frontend_smoke` **passando** (inclui o cenário dos botões) antes do commit.
 - Node **≥ 22.7** (os módulos de `frontend/js/` são ESM sem `package.json`; os testes unitários dependem da detecção automática de módulo). Verificar com `node -v` antes da Task 2.
 - Testes unitários sempre com o glob entre aspas: `node --test "test/frontend/*.test.mjs"`.
-- O Playwright usa as portas 3000 (simulador) e 3001 (servidor): nada mais pode estar escutando nelas durante os testes.
+- O Playwright usa as portas 3100 (simulador) e 3101 (servidor) — dedicadas aos testes, porque a 3000 costuma estar em uso pelo simulador/servidor do usuário: nada mais pode estar escutando nelas durante os testes.
 - Commits terminam com a linha `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
 ## Mapa de arquivos
@@ -32,7 +32,7 @@
 | Arquivo | Ação | Responsabilidade |
 |---|---|---|
 | `test/frontend_smoke/package.json`, `package-lock.json` | Criar | Pacote Playwright |
-| `test/frontend_smoke/playwright.config.mjs` | Criar | 2 projetos: `simulador` (porta 3000) e `servidor-sem-broker` (porta 3001) |
+| `test/frontend_smoke/playwright.config.mjs` | Criar | 2 projetos: `simulador` (porta 3100) e `servidor-sem-broker` (porta 3101) |
 | `test/frontend_smoke/helpers.mjs` | Criar | Coleta de erros de console, roteiro dos botões |
 | `test/frontend_smoke/botoes.spec.mjs` | Criar | Cenários 1 e 2 |
 | `test/frontend_smoke/navegacao.spec.mjs` | Criar | Cenário 3 |
@@ -70,7 +70,7 @@ Cria o pacote Playwright e os cenários 1 e 2 (§7.2), e roda **contra o código
 - Modify: `.gitignore` (raiz) — acrescentar saídas do Playwright
 
 **Interfaces:**
-- Produces (em `helpers.mjs`): `coletarErros(page) → string[]` (array vivo), `esperarSemErros(erros)`, `roteiroBotoes(page)` (clica A, B, C e Reiniciar e verifica o efeito de cada um), `IDS_CONTRATO: string[]`. Projetos Playwright `simulador` (baseURL `http://localhost:3000`) e `servidor-sem-broker` (baseURL `http://localhost:3001`).
+- Produces (em `helpers.mjs`): `coletarErros(page) → string[]` (array vivo), `esperarSemErros(erros)`, `roteiroBotoes(page)` (clica A, B, C e Reiniciar e verifica o efeito de cada um), `IDS_CONTRATO: string[]`. Projetos Playwright `simulador` (baseURL `http://localhost:3100`) e `servidor-sem-broker` (baseURL `http://localhost:3101`).
 
 - [ ] **Step 1: Instalar dependências dos servidores (usadas pelo `webServer`)**
 
@@ -110,8 +110,8 @@ Expected: `package-lock.json` criado; Chromium baixado (~150 MB, download autori
 // ============================================================
 // DATA FLOW INVENTORY — Configuração dos testes E2E (Playwright)
 // ------------------------------------------------------------
-// Projeto "simulador": sobe ../../simulator na porta 3000 (sem helmet).
-// Projeto "servidor-sem-broker": sobe ../../server na porta 3001 com um
+// Projeto "simulador": sobe ../../simulator na porta 3100 (sem helmet).
+// Projeto "servidor-sem-broker": sobe ../../server na porta 3101 com um
 // broker inalcançável, para exercitar a CSP real do helmet e o 503 de
 // /api/status. O dotenv não sobrescreve variáveis já definidas aqui.
 // ============================================================
@@ -134,23 +134,23 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'simulador', testIgnore: /csp\.spec\.mjs/, use: { baseURL: 'http://localhost:3000' } },
-    { name: 'servidor-sem-broker', testMatch: /csp\.spec\.mjs/, use: { baseURL: 'http://localhost:3001' } },
+    { name: 'simulador', testIgnore: /csp\.spec\.mjs/, use: { baseURL: 'http://localhost:3100' } },
+    { name: 'servidor-sem-broker', testMatch: /csp\.spec\.mjs/, use: { baseURL: 'http://localhost:3101' } },
   ],
   webServer: [
     {
       command: 'node ../../simulator/server.js',
-      url: 'http://localhost:3000',
-      env: { PORT: '3000' },
+      url: 'http://localhost:3100',
+      env: { PORT: '3100' },
       reuseExistingServer: false,
       timeout: 30_000,
     },
     {
       command: 'node ../../server/server.js',
-      url: 'http://localhost:3001',
+      url: 'http://localhost:3101',
       env: {
-        PORT: '3001',
-        ALLOWED_ORIGIN: 'http://localhost:3001',
+        PORT: '3101',
+        ALLOWED_ORIGIN: 'http://localhost:3101',
         MQTT_BROKER_URL: 'mqtt://127.0.0.1',
         MQTT_PORT: '1',          // porta fechada → broker sempre inalcançável
         MQTT_USERNAME: '',
@@ -277,14 +277,14 @@ test/frontend_smoke/capturas/
 Run: `cd test/frontend_smoke && npx playwright test --project=simulador`
 Expected: `2 passed`. Se o cenário 1 falhar contra o código atual, **pare e reporte**: o teste precisa enxergar o comportamento de hoje antes de proteger qualquer mudança.
 
-- [ ] **Step 7b: Capturas "antes" (linha de base visual)** — com o simulador rodando em outro terminal (`cd simulator && npm start`):
+- [ ] **Step 7b: Capturas "antes" (linha de base visual)** — com o simulador rodando em outro terminal (`cd simulator && PORT=3100 npm start`):
 
 ```bash
 cd test/frontend_smoke
 for tam in 1920,1080 1366,768 375,812; do
   for rota in "" "#/status"; do
     nome=$(echo "${rota:-principal}" | tr -d '#/')
-    npx playwright screenshot --wait-for-timeout=2500 --viewport-size=$tam "http://localhost:3000/$rota" "capturas/antes/${nome:-principal}-${tam/,/x}.png"
+    npx playwright screenshot --wait-for-timeout=2500 --viewport-size=$tam "http://localhost:3100/$rota" "capturas/antes/${nome:-principal}-${tam/,/x}.png"
   done
 done
 ```
@@ -2929,7 +2929,7 @@ aoMudarRota();
 Run: `cd test/frontend_smoke && npx playwright test --project=simulador`
 Expected: todos passam (cenário 5a incluído; botões intactos).
 
-- [ ] **Step 9: Verificação visual rápida** — com o simulador rodando (`cd simulator && npm start`), abrir `http://localhost:3000/#/arquitetura` no navegador embutido e conferir: grade sumindo na névoa, 7 placas, enlaces do ramo real esmaecidos, partículas no enlace Simulador ↔ Dashboard, órbita/zoom/pan funcionando.
+- [ ] **Step 9: Verificação visual rápida** — com o simulador rodando (`cd simulator && PORT=3100 npm start`), abrir `http://localhost:3100/#/arquitetura` no navegador embutido e conferir: grade sumindo na névoa, 7 placas, enlaces do ramo real esmaecidos, partículas no enlace Simulador ↔ Dashboard, órbita/zoom/pan funcionando.
 
 - [ ] **Step 10: Commit**
 
@@ -3899,21 +3899,21 @@ cd test/frontend_smoke && npx playwright test
 
 Expected: 0 falhas. Colar a saída no relatório final.
 
-- [ ] **Step 2: Capturas "depois"** — com o simulador rodando (`cd simulator && npm start`, porta 3000):
+- [ ] **Step 2: Capturas "depois"** — com o simulador rodando (`cd simulator && PORT=3100 npm start`, porta 3100):
 
 ```bash
 cd test/frontend_smoke
 for tam in 1920,1080 1366,768 375,812; do
   for rota in "" "#/status" "#/arquitetura"; do
     nome=$(echo "${rota:-principal}" | tr -d '#/')
-    npx playwright screenshot --wait-for-timeout=2500 --viewport-size=$tam "http://localhost:3000/$rota" "capturas/depois/${nome:-principal}-${tam/,/x}.png"
+    npx playwright screenshot --wait-for-timeout=2500 --viewport-size=$tam "http://localhost:3100/$rota" "capturas/depois/${nome:-principal}-${tam/,/x}.png"
   done
 done
 ```
 
 Abrir lado a lado com `capturas/antes/` (Task 1, Step 7b) e conferir: tema preservado (cores, fontes, bays), seletor em destaque, botões com ícones SVG.
 
-- [ ] **Step 3: Verificação manual no navegador embutido** — `http://localhost:3000/#/arquitetura`: órbita, zoom e pan; presets de câmera; clique num tubo abre o detalhe do enlace; Tab/Enter/Esc; alternar Partículas e Rótulos. Depois `http://localhost:3000/`: clicar A, B, C e Reiniciar e ver o histórico em `#/status`.
+- [ ] **Step 3: Verificação manual no navegador embutido** — `http://localhost:3100/#/arquitetura`: órbita, zoom e pan; presets de câmera; clique num tubo abre o detalhe do enlace; Tab/Enter/Esc; alternar Partículas e Rótulos. Depois `http://localhost:3100/`: clicar A, B, C e Reiniciar e ver o histórico em `#/status`.
 
 - [ ] **Step 4: Texto para a documentação (não editar `docs/`)** — preparar, para a descrição do PR, este bloco para o responsável pela documentação incorporar em `docs/CHANGELOG.md` e `frontend/README.md`:
 
