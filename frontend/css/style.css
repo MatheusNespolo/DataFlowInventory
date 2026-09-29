@@ -546,6 +546,178 @@ html {
   overflow: hidden;
 }
 
+.arq-selo {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--led-idle);
+  border: 1px solid color-mix(in srgb, var(--led-idle) 40%, var(--etch));
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+}
+
+.arq-atualizado {
+  font-size: var(--step--1);
+  color: var(--legend);
+}
+
+.arq-palco > canvas,
+.arq-camada-rotulos {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.arq-camada-rotulos {
+  pointer-events: none;
+}
+
+/* Placa de identificação de cada nó (CSS2D) */
+.arq-rotulo {
+  --led: var(--muted);
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 32px;
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--readout);
+  background: color-mix(in srgb, var(--bay-raised) 88%, transparent);
+  border: 1px solid var(--etch-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 160ms ease, opacity 160ms ease, background 160ms ease;
+}
+.arq-rotulo:hover { border-color: var(--led); }
+.arq-rotulo[aria-pressed="true"] { border-color: var(--led-idle); background: var(--bay-inset); }
+.arq-rotulo-k {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: var(--legend);
+}
+.arq-rotulo-led {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--led);
+  box-shadow: 0 0 8px var(--led);
+}
+.arq-rotulo[data-estado="ok"]           { --led: var(--led-run); }
+.arq-rotulo[data-estado="atencao"]      { --led: var(--led-warn); }
+.arq-rotulo[data-estado="falha"]        { --led: var(--led-fault); }
+.arq-rotulo[data-estado="desconhecido"] { --led: var(--led-idle); }
+.arq-rotulo[data-estado="fora-do-modo"] { opacity: 0.45; }
+
+/* Etiqueta do hardware de campo (informativa, sem interação) */
+.arq-hw {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--legend);
+  text-align: center;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.arq-controles {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  max-width: 15rem;
+  padding: 0.6rem;
+  background: color-mix(in srgb, var(--bay) 92%, transparent);
+  border: 1px solid var(--etch);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm), var(--bevel);
+}
+.arq-controles-abrir { display: none; }
+.arq-controles-corpo { display: grid; gap: 0.5rem; }
+.arq-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.arq-grupo #arq-enquadrar { grid-column: 1 / -1; }
+
+.arq-btn {
+  min-height: 36px;
+  padding: 0.35rem 0.6rem;
+  font: 600 var(--step--1) var(--font-ui);
+  color: var(--readout);
+  background: var(--bay-inset);
+  border: 1px solid var(--etch);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.arq-btn:hover:not(:disabled) { border-color: var(--led-idle); }
+.arq-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.arq-check {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 32px;
+  font-size: var(--step--1);
+  color: var(--readout-dim);
+  cursor: pointer;
+}
+.arq-check input { width: 1rem; height: 1rem; accent-color: var(--led-idle); }
+
+.arq-legenda {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  max-width: min(34rem, calc(100% - 1.5rem));
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  list-style: none;
+  font-size: 0.7rem;
+  color: var(--readout-dim);
+  background: color-mix(in srgb, var(--bay) 92%, transparent);
+  border: 1px solid var(--etch);
+  border-radius: var(--radius-sm);
+}
+.arq-legenda li { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+.arq-amostra {
+  --led: var(--muted);
+  width: 1.3rem;
+  height: 0.3rem;
+  border-radius: 2px;
+  background: var(--led);
+}
+.arq-amostra[data-estado="ok"]             { --led: var(--led-run); }
+.arq-amostra[data-estado="atencao"]        { --led: var(--led-warn); }
+.arq-amostra[data-estado="falha"]          { --led: var(--led-fault); }
+.arq-amostra[data-estado="desconhecido"]   { --led: var(--led-idle); }
+.arq-amostra[data-estado="sem-telemetria"] { --led: var(--muted); }
+.arq-amostra[data-estado="fora-do-modo"]   { --led: var(--etch-strong); opacity: 0.6; }
+.arq-amostra--tracejada {
+  background: repeating-linear-gradient(90deg, var(--led) 0 4px, transparent 4px 7px);
+}
+
+.arq-aviso {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  max-width: 22rem;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--step--1);
+  color: var(--readout);
+  background: color-mix(in srgb, var(--led-fault) 14%, var(--bay-inset));
+  border: 1px solid color-mix(in srgb, var(--led-fault) 45%, var(--etch));
+  border-radius: var(--radius-sm);
+}
+
 /* ============================================================
    JANELA (bay) — contêiner base
    ============================================================ */
@@ -1220,6 +1392,12 @@ html {
 }
 
 @media (max-width: 720px) {
+  .arq-palco { min-height: 65vh; }
+  .arq-controles { max-width: calc(100% - 1.5rem); }
+  .arq-controles-abrir { display: block; width: 100%; }
+  .arq-controles-corpo { display: none; margin-top: 0.5rem; }
+  .arq-controles[data-aberto] .arq-controles-corpo { display: grid; }
+  .arq-legenda { font-size: 0.64rem; }
   .cluster {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:

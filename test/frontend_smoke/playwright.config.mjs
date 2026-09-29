@@ -24,6 +24,8 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
     viewport: { width: 1366, height: 768 },
     trace: 'retain-on-failure',
+    // Headless sem GPU: força o WebGL por software (SwiftShader) para a cena 3D.
+    launchOptions: { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
   },
   projects: [
     { name: 'simulador', testIgnore: /csp\.spec\.mjs/, use: { baseURL: 'http://localhost:3100' } },
