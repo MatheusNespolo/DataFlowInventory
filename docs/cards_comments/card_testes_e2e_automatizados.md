@@ -1,4 +1,3 @@
-@ -0,0 +1,93 @@
 # Card: Testes E2E Automatizados — Dashboard + API
 
 **Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🟡 Média
