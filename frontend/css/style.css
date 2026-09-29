@@ -33,7 +33,7 @@
   --legend:       #8b93a7;   /* legenda serigrafada */
   --readout:      #eef2f6;   /* leitura principal */
   --readout-dim:  #b8bfce;
-  --muted:        #6b7189;
+  --muted:        #858ca3;   /* ~5,0:1 sobre --bay-raised; ~4,6:1 sobre --bg-card-hover (era #6b7189, ~3,4:1) */
 
   /* --- luzes de sinalização (IEC 60073) --- */
   --led-run:   #3ddc84;
@@ -1038,7 +1038,7 @@ html {
    ============================================================ */
 .botoes-controle {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 
 @container (min-width: 20rem) {
@@ -1056,6 +1056,7 @@ html {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  min-height: 44px;
   padding: 0.7rem 1rem;
   border: 1px solid color-mix(in srgb, var(--btn) 40%, var(--etch));
   border-radius: var(--radius-sm);
@@ -1069,7 +1070,7 @@ html {
   letter-spacing: 0.01em;
   cursor: pointer;
   box-shadow: var(--bevel);
-  transition: transform var(--transition), border-color var(--transition), background var(--transition);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, opacity 160ms ease;
 }
 
 .btn:hover:not(:disabled) {
@@ -1082,13 +1083,25 @@ html {
 }
 
 .btn:disabled {
-  opacity: 0.42;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.btn-icon {
-  font-size: 1rem;
-  line-height: 1;
+/* Chip da peça: quadrado preenchido com a cor da peça (substitui o emoji) */
+.btn-chip {
+  fill: var(--btn);
+  stroke: none;
+}
+
+/* Explica por que os comandos estão desabilitados (só aparece nesse caso) */
+.ajuda-controle {
+  display: none;
+  margin-top: 0.7rem;
+  font-size: var(--step--1);
+  color: var(--legend);
+}
+.bay-controle:has(.btn:disabled) .ajuda-controle {
+  display: block;
 }
 
 .btn-a { --btn: var(--peca-a); }

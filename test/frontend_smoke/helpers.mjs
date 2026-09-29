@@ -42,10 +42,16 @@ export async function roteiroBotoes(page) {
     await expect(botao).toBeEnabled();
     const antes = await linhas(page, `Peça ${peca} entregue`).count();
     await botao.click();
+    if (peca === 'A') {
+      // Enquanto o pedido é processado, os botões ficam desabilitados e a ajuda explica o motivo.
+      await expect(page.locator('#ajuda-controle')).toBeVisible();
+    }
     await expect(linhas(page, `Peça ${peca} entregue`)).toHaveCount(antes + 1);
     await expect(estado).toHaveText('AGUARDANDO_PEDIDO');
     await expect(botao).toBeEnabled();
   }
+
+  await expect(page.locator('#ajuda-controle')).toBeHidden();
 
   const antesReset = await linhas(page, 'Comando enviado: reset').count();
   await page.locator('#btn-reset').click();

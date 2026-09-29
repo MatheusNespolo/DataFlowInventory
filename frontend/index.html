@@ -199,23 +199,24 @@
       <h2 class="bay-title" id="t-controle"><span class="bay-title-k">CMD</span> Controle remoto</h2>
       <p class="bay-desc">Envie comandos ao sistema pela nuvem.</p>
       <div class="botoes-controle">
-        <button id="btn-solicitar-a" class="btn btn-peca btn-a">
-          <span class="btn-icon" aria-hidden="true">🟥</span>
+        <button id="btn-solicitar-a" class="btn btn-peca btn-a" aria-describedby="ajuda-controle">
+          <svg class="ico btn-chip" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
           Solicitar A
         </button>
-        <button id="btn-solicitar-b" class="btn btn-peca btn-b">
-          <span class="btn-icon" aria-hidden="true">🟩</span>
+        <button id="btn-solicitar-b" class="btn btn-peca btn-b" aria-describedby="ajuda-controle">
+          <svg class="ico btn-chip" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
           Solicitar B
         </button>
-        <button id="btn-solicitar-c" class="btn btn-peca btn-c">
-          <span class="btn-icon" aria-hidden="true">🟦</span>
+        <button id="btn-solicitar-c" class="btn btn-peca btn-c" aria-describedby="ajuda-controle">
+          <svg class="ico btn-chip" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
           Solicitar C
         </button>
         <button id="btn-reset" class="btn btn-reset">
-          <span class="btn-icon" aria-hidden="true">🔄</span>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           Reiniciar
         </button>
       </div>
+      <p id="ajuda-controle" class="ajuda-controle">Comandos liberados quando o sistema voltar a <span class="mono">AGUARDANDO_PEDIDO</span>.</p>
     </section>
   </main>
 
