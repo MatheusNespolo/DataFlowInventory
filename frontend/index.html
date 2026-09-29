@@ -348,7 +348,9 @@
   <!-- ============================================================ -->
   <!-- SCRIPTS -->
   <!-- ============================================================ -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <!-- Cliente Socket.IO servido pelo próprio servidor/simulador (mesma origem e
+       mesma versão do servidor; funciona sem internet na bancada). -->
+  <script src="/socket.io/socket.io.js"></script>
   <script src="js/app.js"></script>
   <!-- LED da tecla ARC + polling de /api/status (módulo independente de app.js) -->
   <script type="module" src="js/seletor.js"></script>

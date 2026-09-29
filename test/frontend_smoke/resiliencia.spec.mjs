@@ -38,3 +38,12 @@ test('cenário 4c — three.module.min.js bloqueado: mímico SVG, arquitetura 2D
   await expect(page.locator('#arq-palco')).toHaveAttribute('data-pronto', 'fallback');
   esperarSemErros(erros);
 });
+
+test('cenário 4d — CDN do Socket.IO inacessível: botões funcionam (cliente servido localmente)', async ({ page }) => {
+  await page.route('https://cdn.socket.io/**', (r) => r.abort());
+  const erros = coletarErros(page, /cdn\.socket\.io/);
+  await page.goto('/');
+  await expect(page.locator('script[src="/socket.io/socket.io.js"]')).toHaveCount(1);
+  await roteiroBotoes(page);
+  esperarSemErros(erros);
+});
