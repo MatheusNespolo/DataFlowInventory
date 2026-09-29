@@ -51,12 +51,15 @@
 | `frontend/js/arquitetura-dados.js` | Modelo estático: nós, enlaces, câmeras-preset, conteúdo dos detalhes (snapshot da documentação com citação da fonte) | — |
 | `frontend/js/arquitetura-status.js` | Função pura `derivarStatus(sinais, agora)` → `{ modo, nos, enlaces, resumo }` | — |
 | `frontend/js/arquitetura-sinais.js` | Coleta de sinais: listeners no socket compartilhado + polling de `/api/status`; expõe `iniciar()`, `parar()`, `obter()` e `aoMudar(cb)` | `window.dfiSocket` |
-| `frontend/js/arquitetura3d.js` | Cena three.js, navegação, rótulos CSS2D, painel de detalhes, fallback SVG, integração com a rota | os três acima + vendor |
-| `frontend/js/arquitetura-fallback.js` | Diagrama SVG 2D gerado a partir de `arquitetura-dados.js` quando não há WebGL | `arquitetura-dados.js` |
+| `frontend/js/arquitetura-vista.js` | Entrada da vista (**sem three.js**): ciclo de vida da rota, status, barra, anúncios, rótulos, seleção e painel de detalhes; carrega a cena 3D por `import()` e cai no fallback se ela falhar | dados, status, sinais, fallback |
+| `frontend/js/arquitetura3d.js` | Cena three.js, navegação, rótulos CSS2D, raycast (`construir3d`) | dados + vendor |
+| `frontend/js/arquitetura-fallback.js` | Diagrama SVG 2D gerado a partir de `arquitetura-dados.js` quando não há WebGL ou three.js | `arquitetura-dados.js` |
+| `frontend/js/seletor.js` | LED da tecla ARC e dono do ritmo de polling de `/api/status` | sinais, status, dados |
+| `frontend/js/ambiente3d.js` | Ambiente IBL compartilhado pelo mímico e pela arquitetura | vendor three |
 | `frontend/vendor/OrbitControls.js` | Addon three.js **0.169.0**, import reescrito para `/vendor/three.module.min.js` | vendor three |
 | `frontend/vendor/CSS2DRenderer.js` | Idem | vendor three |
 
-Todos os módulos novos são ES modules, carregados por `<script type="module">`, independentes de `app.js`. Uma falha em qualquer um deles não afeta o painel principal nem os botões.
+Todos os módulos novos são ES modules, carregados por `<script type="module">`, independentes de `app.js`. Uma falha em qualquer um deles não afeta o painel principal nem os botões. A separação entre `arquitetura-vista.js` (sem three.js) e `arquitetura3d.js` (carregado por `import()`) garante que, se o three.js não carregar, a vista ainda funcione em 2D.
 
 ### 3.2 Mudanças em arquivos existentes (cirúrgicas)
 
@@ -64,7 +67,7 @@ Todos os módulos novos são ES modules, carregados por `<script type="module">`
   - `window.dfiSocket = socket;` logo após `const socket = io();` (aditivo).
   - Roteador passa de binário a mapa de rotas: `{ '#/': principal, '#/status': status, '#/arquitetura': arquitetura }`; hash vazio ou desconhecido → principal. Mantém a lógica atual de foco, título, `aria-live` e scroll. Atualiza `aria-current` no seletor de vistas.
   - Contador de eventos não vistos para a tecla LOG: incrementado em `adicionarHistorico`, zerado ao entrar em `#/status`.
-  - Ligação dos botões protegida: cada `addEventListener` passa por um helper `ligar(el, fn)` que registra `console.error` se o elemento não existir, em vez de lançar exceção. Os `id` não mudam.
+  - Ligação dos botões protegida: cada `addEventListener` passa por um helper `ligar(el, nome, fn)` que registra `console.error` se o elemento não existir, em vez de lançar exceção. Os `id` não mudam.
 - `frontend/js/diagrama3d.js`: a pausa passa a testar "rota principal ativa" (`hash` vazio, `#` ou `#/`) em vez de `!== '#/status'`.
 - `frontend/index.html`: nova `<main id="view-arquitetura">`, seletor de vistas, ícones SVG nos botões, linha de ajuda de botões desabilitados, atalhos nas células Enlace/Gateway e no card do mímico, scripts de módulo novos. Remove o link `#footer-nav` e o `.voltar` da vista de status (substituídos pelo seletor).
 - `frontend/css/style.css`: estilos do seletor, da vista de arquitetura e do polimento (Seção 6). Nenhum token existente é renomeado.
