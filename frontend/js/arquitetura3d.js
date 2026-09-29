@@ -15,6 +15,11 @@ import { ambienteGradiente } from './ambiente3d.js';
 import { NOS_ARQ, ENLACES_ARQ, HARDWARE, CAMERAS } from './arquitetura-dados.js';
 
 const FUNDO = 0x14161c; // --panel
+// Visão geral: elevação da câmera (acima dos ~36° de CAMERAS.geral, para
+// separar na tela as placas de nós alinhados em profundidade).
+const ELEVACAO_GERAL = THREE.MathUtils.degToRad(50);
+const FOLGA_PX = 8;                        // folga das placas até bordas e painéis
+const ROTULO_ESTIMADO = { w: 150, h: 34 }; // antes da primeira medição
 
 // Espelha os tokens IEC 60073 de style.css (:root).
 export const COR_ESTADO = {
@@ -128,6 +133,7 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
   cena.environment = ambienteGradiente(renderer);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 200);
+  // Pose provisória: o primeiro quadro (ajustarTamanho) enquadra a cena no palco.
   camera.position.fromArray(CAMERAS.geral.posicao);
 
   // --- Luzes (mesmas do mímico) ---
@@ -173,10 +179,14 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     nos: {}, enlaces: {}, etiquetasHw: [],
     sujo: true, voo: null, w: 0, h: 0,
     particulasLigadas: !semMovimento,
+    emVisaoGeral: true, // reenquadra sozinha ao redimensionar o palco
   };
   c.marcarSujo = () => { c.sujo = true; };
   controles.addEventListener('change', c.marcarSujo);
-  controles.addEventListener('start', () => { c.voo = null; }); // o usuário assume a câmera
+  controles.addEventListener('start', () => { // o usuário assume a câmera
+    c.voo = null;
+    c.emVisaoGeral = false;
+  });
 
   // --- Nós ---
   for (const [id, n] of Object.entries(NOS_ARQ)) {
@@ -193,6 +203,7 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     grupo.add(anel);
 
     const rotulo = criarRotulo(id);
+    rotulos.domElement.append(rotulo); // já no DOM: mede o tamanho antes do 1º quadro
     const obj = new CSS2DObject(rotulo);
     obj.position.set(0, altura + 0.55, 0);
     grupo.add(obj);
@@ -271,6 +282,125 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     c.marcarSujo();
   };
 
+  // --- Visão geral: enquadra a cena inteira na proporção do palco ---
+  // Caixa com corpos, anéis, hardware e as âncoras das placas; o alvo é o centro.
+  const caixaCena = new THREE.Box3();
+  for (const [id, n] of Object.entries(NOS_ARQ)) {
+    const [x, , z] = n.posicao;
+    caixaCena.expandByPoint(new THREE.Vector3(x - 1.45, 0, z - 1.45)); // raio do anel
+    caixaCena.expandByPoint(new THREE.Vector3(x + 1.45, c.nos[id].altura + 0.55, z + 1.45));
+  }
+  for (const h of HARDWARE) {
+    caixaCena.expandByPoint(new THREE.Vector3(h.posicao[0] - 0.45, 0, h.posicao[2] - 0.3));
+    caixaCena.expandByPoint(new THREE.Vector3(h.posicao[0] + 0.45, 0.3, h.posicao[2] + 0.3));
+  }
+  const centroCena = caixaCena.getCenter(new THREE.Vector3());
+  const cantos = [];
+  for (const x of [caixaCena.min.x, caixaCena.max.x]) {
+    for (const y of [caixaCena.min.y, caixaCena.max.y]) {
+      for (const z of [caixaCena.min.z, caixaCena.max.z]) cantos.push(new THREE.Vector3(x, y, z));
+    }
+  }
+  const ancoras = Object.entries(c.nos).map(([id, n]) => ({
+    id, rotulo: n.rotulo, p: n.grupo.position.clone().setY(n.altura + 0.55),
+  }));
+  const medidas = {};
+  const tamanhoRotulo = ({ id, rotulo }) => {
+    if (rotulo.offsetWidth) medidas[id] = { w: rotulo.offsetWidth, h: rotulo.offsetHeight };
+    return medidas[id] || ROTULO_ESTIMADO;
+  };
+
+  // Direção da visão geral: azimute de CAMERAS.geral (ou +90° no retrato,
+  // câmera do lado +x: fluxo campo → apresentação de cima para baixo).
+  function direcaoGeral(girar) {
+    const d = new THREE.Vector3().fromArray(CAMERAS.geral.posicao)
+      .sub(new THREE.Vector3().fromArray(CAMERAS.geral.alvo));
+    const az = Math.atan2(d.x, d.z) + (girar ? Math.PI / 2 : 0);
+    const cosE = Math.cos(ELEVACAO_GERAL);
+    return new THREE.Vector3(Math.sin(az) * cosE, Math.sin(ELEVACAO_GERAL), Math.cos(az) * cosE);
+  }
+
+  // Área útil do palco em px, com os painéis sobrepostos (controles, legenda) como obstáculos.
+  function areaUtil() {
+    const base = canvas.getBoundingClientRect();
+    if (!base.width || !base.height) return null;
+    const obstaculos = [];
+    for (const seletor of ['.arq-controles', '.arq-legenda']) {
+      const e = palco.querySelector(seletor);
+      if (!e || !e.offsetWidth) continue;
+      const r = e.getBoundingClientRect();
+      obstaculos.push({
+        x0: r.left - base.left - FOLGA_PX, y0: r.top - base.top - FOLGA_PX,
+        x1: r.right - base.left + FOLGA_PX, y1: r.bottom - base.top + FOLGA_PX,
+      });
+    }
+    return { w: base.width, h: base.height, obstaculos };
+  }
+
+  const v = new THREE.Vector3();
+  function cabe(dir, dist, area) {
+    camera.position.copy(centroCena).addScaledVector(dir, dist);
+    camera.lookAt(centroCena);
+    camera.updateMatrixWorld();
+    const mx = 1 - (2 * FOLGA_PX) / area.w;
+    const my = 1 - (2 * FOLGA_PX) / area.h;
+    for (const p of cantos) {
+      v.copy(p).project(camera);
+      if (v.z > 1 || Math.abs(v.x) > mx || Math.abs(v.y) > my) return false;
+    }
+    for (const a of ancoras) {
+      v.copy(a.p).project(camera);
+      const { w, h } = tamanhoRotulo(a);
+      const x0 = ((v.x + 1) / 2) * area.w - w / 2;
+      const y0 = ((1 - v.y) / 2) * area.h - h / 2;
+      const x1 = x0 + w;
+      const y1 = y0 + h;
+      if (x0 < FOLGA_PX || y0 < FOLGA_PX || x1 > area.w - FOLGA_PX || y1 > area.h - FOLGA_PX) return false;
+      for (const o of area.obstaculos) {
+        if (x0 < o.x1 && o.x0 < x1 && y0 < o.y1 && o.y0 < y1) return false;
+      }
+    }
+    return true;
+  }
+
+  // Menor distância em que tudo cabe (busca binária; afastar só encolhe a cena na tela).
+  function distanciaGeral(dir, area) {
+    let perto = controles.minDistance;
+    let longe = 90;
+    if (!cabe(dir, longe, area)) return longe;
+    for (let i = 0; i < 20; i++) {
+      const meio = (perto + longe) / 2;
+      if (cabe(dir, meio, area)) longe = meio;
+      else perto = meio;
+    }
+    return longe;
+  }
+
+  c.enquadrarGeral = (instantaneo = semMovimento) => {
+    c.emVisaoGeral = true;
+    const area = areaUtil();
+    let dir = direcaoGeral(false);
+    let dist = 14;
+    if (area) {
+      const pos0 = camera.position.clone();
+      const quat0 = camera.quaternion.clone();
+      dist = distanciaGeral(dir, area);
+      if (area.w / area.h < 0.9) {
+        const dirRetrato = direcaoGeral(true);
+        const distRetrato = distanciaGeral(dirRetrato, area);
+        if (distRetrato < dist * 0.85) { dir = dirRetrato; dist = distRetrato; }
+      }
+      camera.position.copy(pos0);
+      camera.quaternion.copy(quat0);
+      camera.updateMatrixWorld();
+    }
+    controles.maxDistance = Math.max(38, dist * 1.25);
+    cena.fog.near = dist * 0.9; // sem isso o retrato (câmera longe) some na névoa
+    cena.fog.far = dist + 30;
+    const pos = centroCena.clone().addScaledVector(dir, dist);
+    c.voarPara({ posicao: pos.toArray(), alvo: centroCena.toArray() }, instantaneo);
+  };
+
   // --- Status → cena ---
   c.atualizarParticulas = () => {
     for (const e of Object.values(c.enlaces)) {
@@ -315,6 +445,7 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     rotulos.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (c.emVisaoGeral && !c.voo) c.enquadrarGeral(true); // inclui o 1º quadro
     c.sujo = true;
   }
 
@@ -375,8 +506,16 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     }
     c.marcarSujo();
   };
-  c.enquadrar = (sel) => c.voarPara(enquadramento(c, sel));
-  c.visaoGeral = () => c.voarPara(CAMERAS.geral);
+  c.enquadrar = (sel) => {
+    c.emVisaoGeral = false;
+    c.voarPara(enquadramento(c, sel));
+  };
+  c.visaoGeral = () => c.enquadrarGeral();
+
+  // A fonte da interface pode chegar depois: remede as placas e reenquadra.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { if (c.emVisaoGeral && !c.voo && c.w) c.enquadrarGeral(true); });
+  }
 
   ligarControles(c, palco, semMovimento);
   ligarRaycast(c, palco);
@@ -385,7 +524,15 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
 
 function ligarControles(c, palco, semMovimento) {
   palco.querySelectorAll('[data-camera]').forEach((b) => {
-    b.addEventListener('click', () => c.voarPara(CAMERAS[b.dataset.camera]));
+    b.addEventListener('click', () => {
+      // CAMERAS.geral só dá a direção: a visão geral é enquadrada no palco.
+      if (b.dataset.camera === 'geral') {
+        c.enquadrarGeral();
+        return;
+      }
+      c.emVisaoGeral = false;
+      c.voarPara(CAMERAS[b.dataset.camera]);
+    });
   });
 
   const particulas = document.getElementById('arq-particulas');
