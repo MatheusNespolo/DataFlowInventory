@@ -17,11 +17,12 @@ export function criarColetor({
   intervaloAtivoMs = 5000,
   intervaloFundoMs = 30000,
   timeoutMs = 3000,
+  gatewayInicial = null, // último status já recebido por app.js antes deste coletor existir
 }) {
   const sinais = {
     socketConectado: !!(socket && socket.connected),
     api: { tipo: 'pendente' },
-    gateway: null,
+    gateway: gatewayInicial || null,
     ultimoDadoCampoEm: null,
     apiEm: null,
   };
@@ -102,6 +103,8 @@ export function coletorCompartilhado() {
     unico = criarColetor({
       socket: window.dfiSocket || null,
       fetchFn: (url, opts) => fetch(url, opts),
+      // O estado_inicial pode ter chegado antes deste módulo carregar.
+      gatewayInicial: window.dfiUltimoGateway || null,
     });
   }
   return unico;

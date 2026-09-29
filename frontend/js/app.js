@@ -223,6 +223,7 @@ socket.on('estado_inicial', (data) => {
 
   if (data.gateway && data.gateway.status) {
     ultimoGatewayStatus = data.gateway.status;
+    window.dfiUltimoGateway = data.gateway.status; // semente do coletor da arquitetura
     atualizarGateway(data.gateway);
   }
 });
@@ -230,6 +231,7 @@ socket.on('estado_inicial', (data) => {
 // Status do gateway ESP32 (online/offline via MQTT LWT)
 // O broker publica "offline" automaticamente se o ESP32 cair.
 socket.on('gateway', (data) => {
+  if (data && data.status) window.dfiUltimoGateway = data.status; // semente do coletor da arquitetura
   atualizarGateway(data);
   if (data.status !== ultimoGatewayStatus) {
     ultimoGatewayStatus = data.status;

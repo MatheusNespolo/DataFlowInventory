@@ -108,3 +108,12 @@ test('definirRitmo: ativo 5 s, fundo 30 s, parado cancela; repetir o mesmo ritmo
   coletor.definirRitmo('parado');
   assert.deepEqual(cancelados, [1, 2]);
 });
+
+test('gatewayInicial semeia o gateway (estado_inicial chegou antes do coletor)', () => {
+  const socket = socketFalso();
+  const coletor = criarColetor({ socket, fetchFn: resposta(404, null), gatewayInicial: 'online' });
+  assert.equal(coletor.obter().gateway, 'online');
+  socket.emitir('gateway', { status: 'offline' });
+  assert.equal(coletor.obter().gateway, 'offline');
+  assert.equal(criarColetor({ socket: null, fetchFn: resposta(404, null) }).obter().gateway, null);
+});
