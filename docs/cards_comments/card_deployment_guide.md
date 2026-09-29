@@ -1,4 +1,3 @@
-@ -0,0 +1,90 @@
 # Card: Deployment Guide — Guia de Implantação Completa
 
 **Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🟡 Média
