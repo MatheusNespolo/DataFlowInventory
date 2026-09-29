@@ -15,38 +15,66 @@
   <!-- ============================================================ -->
   <!-- FAIXA ANUNCIADORA — estado do sistema em janelas gravadas    -->
   <!-- ============================================================ -->
-  <header class="annun" role="status" aria-live="polite" aria-label="Estado do sistema">
-    <div class="annun-brand">
-      <span class="annun-brand-mark" aria-hidden="true">▚</span>
-      <span class="annun-brand-name">Data Flow Inventory</span>
-      <span id="driver-info" class="annun-fw">v2.1 · IRF520</span>
-    </div>
+  <div class="topo">
+    <header class="annun" role="status" aria-live="polite" aria-label="Estado do sistema">
+      <div class="annun-brand">
+        <span class="annun-brand-mark" aria-hidden="true">▚</span>
+        <span class="annun-brand-name">Data Flow Inventory</span>
+        <span id="driver-info" class="annun-fw">v2.1 · IRF520</span>
+      </div>
 
-    <div class="annun-cells">
-      <div class="annun-cell" id="mqtt-status" data-state="off">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Enlace</span>
-        <span class="annun-v">Desconectado</span>
+      <div class="annun-cells">
+        <div class="annun-cell" id="mqtt-status" data-state="off">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Enlace</span>
+          <span class="annun-v">Desconectado</span>
+          <a class="annun-atalho" href="#/arquitetura" aria-label="Ver enlace do servidor na arquitetura"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        </div>
+        <div class="annun-cell" id="gateway-status" data-state="off" title="Estado do hardware (ESP32) via MQTT LWT">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Gateway</span>
+          <span class="annun-v">ESP32 offline</span>
+          <a class="annun-atalho" href="#/arquitetura" aria-label="Ver gateway ESP32 na arquitetura"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+        </div>
+        <div class="annun-cell" id="annun-estado" data-state="idle">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Estado</span>
+          <span class="annun-v" id="annun-estado-v">—</span>
+        </div>
+        <div class="annun-cell" id="annun-estoque" data-state="run">
+          <span class="annun-led" aria-hidden="true"></span>
+          <span class="annun-k">Estoque</span>
+          <span class="annun-v" id="annun-estoque-v">Normal</span>
+        </div>
       </div>
-      <div class="annun-cell" id="gateway-status" data-state="off" title="Estado do hardware (ESP32) via MQTT LWT">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Gateway</span>
-        <span class="annun-v">ESP32 offline</span>
-      </div>
-      <div class="annun-cell" id="annun-estado" data-state="idle">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Estado</span>
-        <span class="annun-v" id="annun-estado-v">—</span>
-      </div>
-      <div class="annun-cell" id="annun-estoque" data-state="run">
-        <span class="annun-led" aria-hidden="true"></span>
-        <span class="annun-k">Estoque</span>
-        <span class="annun-v" id="annun-estoque-v">Normal</span>
-      </div>
-    </div>
 
-    <time id="server-time" class="annun-clock">--:--:--</time>
-  </header>
+      <time id="server-time" class="annun-clock">--:--:--</time>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- SELETOR DE VISTAS — teclas de painel (barra inferior no celular) -->
+    <!-- ============================================================ -->
+    <nav class="seletor" aria-label="Vistas do painel">
+      <a class="seletor-tecla" href="#/">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <span class="seletor-k" aria-hidden="true">PNL</span>
+        <span class="seletor-rotulo">Painel</span>
+      </a>
+      <a class="seletor-tecla" href="#/status">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg>
+        <span class="seletor-k" aria-hidden="true">LOG</span>
+        <span class="seletor-rotulo"><span class="rotulo-longo">Equipamentos &amp; histórico</span><span class="rotulo-curto">Eventos</span></span>
+        <span id="log-contador" class="seletor-contador" hidden><span class="seletor-contador-n">0</span><span class="sr-only"> eventos novos</span></span>
+      </a>
+      <a class="seletor-tecla" href="#/arquitetura">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
+        <span class="seletor-k" aria-hidden="true">ARC</span>
+        <span class="seletor-rotulo">Arquitetura</span>
+        <span id="arc-led" class="seletor-led" data-estado="desconhecido" aria-hidden="true"></span>
+        <span id="arc-led-texto" class="sr-only">, conexões: status desconhecido</span>
+      </a>
+    </nav>
+  </div>
 
   <!-- ============================================================ -->
   <!-- PAINEL PRINCIPAL                                             -->
@@ -55,7 +83,7 @@
 
     <!-- HERO: diagrama mímico do sistema -->
     <section class="bay bay-mimic" aria-labelledby="t-mimic">
-      <h2 class="bay-title" id="t-mimic"><span class="bay-title-k">SYN</span> Diagrama do sistema</h2>
+      <h2 class="bay-title" id="t-mimic"><span class="bay-title-k">SYN</span> Diagrama do sistema<a class="bay-atalho" href="#/arquitetura">Ver arquitetura<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a></h2>
       <div class="mimic">
         <div id="mimic-3d" class="mimic-3d" aria-hidden="true"></div>
         <div class="mimic-stage">
@@ -171,23 +199,24 @@
       <h2 class="bay-title" id="t-controle"><span class="bay-title-k">CMD</span> Controle remoto</h2>
       <p class="bay-desc">Envie comandos ao sistema pela nuvem.</p>
       <div class="botoes-controle">
-        <button id="btn-solicitar-a" class="btn btn-peca btn-a">
-          <span class="btn-icon" aria-hidden="true">🟥</span>
+        <button id="btn-solicitar-a" class="btn btn-peca btn-a" aria-describedby="ajuda-controle">
+          <svg class="ico btn-chip" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
           Solicitar A
         </button>
-        <button id="btn-solicitar-b" class="btn btn-peca btn-b">
-          <span class="btn-icon" aria-hidden="true">🟩</span>
+        <button id="btn-solicitar-b" class="btn btn-peca btn-b" aria-describedby="ajuda-controle">
+          <svg class="ico btn-chip" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
           Solicitar B
         </button>
-        <button id="btn-solicitar-c" class="btn btn-peca btn-c">
-          <span class="btn-icon" aria-hidden="true">🟦</span>
+        <button id="btn-solicitar-c" class="btn btn-peca btn-c" aria-describedby="ajuda-controle">
+          <svg class="ico btn-chip" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
           Solicitar C
         </button>
         <button id="btn-reset" class="btn btn-reset">
-          <span class="btn-icon" aria-hidden="true">🔄</span>
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           Reiniciar
         </button>
       </div>
+      <p id="ajuda-controle" class="ajuda-controle">Comandos liberados quando o sistema voltar a <span class="mono">AGUARDANDO_PEDIDO</span>.</p>
     </section>
   </main>
 
@@ -195,8 +224,6 @@
   <!-- PAINEL DE EQUIPAMENTOS & HISTÓRICO                           -->
   <!-- ============================================================ -->
   <main class="painel-status view" id="view-status" aria-label="Equipamentos e histórico" tabindex="-1" hidden>
-
-    <a class="voltar" href="#/">←&nbsp;Painel principal</a>
 
     <!-- Esteiras -->
     <section class="bay bay-esteiras" aria-labelledby="t-esteiras">
@@ -262,21 +289,77 @@
   </main>
 
   <!-- ============================================================ -->
+  <!-- ARQUITETURA DO SISTEMA (#/arquitetura)                         -->
+  <!-- js/arquitetura-vista.js (entrada) + js/arquitetura3d.js (sob demanda) -->
+  <!-- ============================================================ -->
+  <main class="painel-arquitetura view" id="view-arquitetura" aria-label="Arquitetura do sistema" tabindex="-1" hidden>
+    <div class="arq-barra">
+      <h2 class="bay-title arq-titulo"><span class="bay-title-k">ARC</span> Arquitetura do sistema</h2>
+      <span id="arq-modo" class="arq-selo">Modo desconhecido</span>
+      <span id="arq-atualizado" class="arq-atualizado mono">aguardando dados…</span>
+    </div>
+
+    <div id="arq-palco" class="arq-palco">
+      <!-- Controles da cena (padrão do exemplo three.js misc_exporter_stl: painel no canto superior direito) -->
+      <div class="arq-controles" id="arq-controles">
+        <button type="button" class="arq-btn arq-controles-abrir" aria-expanded="false" aria-controls="arq-controles-corpo">Controles</button>
+        <div id="arq-controles-corpo" class="arq-controles-corpo">
+          <div class="arq-grupo" role="group" aria-label="Câmera">
+            <button type="button" class="arq-btn" data-camera="geral">Visão geral</button>
+            <button type="button" class="arq-btn" data-camera="campo">Campo</button>
+            <button type="button" class="arq-btn" data-camera="nuvem">Nuvem</button>
+            <button type="button" class="arq-btn" data-camera="aplicacao">Aplicação</button>
+            <button type="button" class="arq-btn" id="arq-enquadrar" disabled>Enquadrar seleção</button>
+          </div>
+          <label class="arq-check"><input type="checkbox" id="arq-particulas" checked> Partículas</label>
+          <label class="arq-check"><input type="checkbox" id="arq-rotulos" checked> Rótulos</label>
+        </div>
+      </div>
+
+      <ul class="arq-legenda" aria-label="Legenda dos estados">
+        <li><span class="arq-amostra" data-estado="ok"></span>OK</li>
+        <li><span class="arq-amostra" data-estado="atencao"></span>Atenção</li>
+        <li><span class="arq-amostra" data-estado="falha"></span>Falha</li>
+        <li><span class="arq-amostra" data-estado="desconhecido"></span>Desconhecido</li>
+        <li><span class="arq-amostra arq-amostra--tracejada" data-estado="ok"></span>Inferido</li>
+        <li><span class="arq-amostra arq-amostra--tracejada" data-estado="sem-telemetria"></span>Não monitorado</li>
+        <li><span class="arq-amostra" data-estado="fora-do-modo"></span>Fora deste modo</li>
+      </ul>
+
+      <p id="arq-aviso" class="arq-aviso" role="status" hidden></p>
+      <div id="arq-anuncio" class="sr-only" aria-live="polite"></div>
+      <aside id="arq-detalhes" class="arq-detalhes" aria-labelledby="arq-detalhes-titulo" hidden>
+        <div class="arq-detalhes-topo">
+          <h3 id="arq-detalhes-titulo" class="arq-detalhes-titulo" tabindex="-1"></h3>
+          <button type="button" class="arq-btn" id="arq-fechar">Fechar</button>
+        </div>
+        <div id="arq-detalhes-corpo" class="arq-detalhes-corpo"></div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ============================================================ -->
   <!-- RODAPÉ -->
   <!-- ============================================================ -->
   <footer class="footer">
     <span>Data Flow Inventory — SENAI São Caetano do Sul — Engenharia de Controle e Automação</span>
-    <a id="footer-nav" class="footer-link" href="#/status">Equipamentos &amp; histórico&nbsp;→</a>
     <span>2026</span>
   </footer>
 
   <!-- ============================================================ -->
   <!-- SCRIPTS -->
   <!-- ============================================================ -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <!-- Cliente Socket.IO servido pelo próprio servidor/simulador (mesma origem e
+       mesma versão do servidor; funciona sem internet na bancada). -->
+  <script src="/socket.io/socket.io.js"></script>
   <script src="js/app.js"></script>
+  <!-- LED da tecla ARC + polling de /api/status (módulo independente de app.js) -->
+  <script type="module" src="js/seletor.js"></script>
   <!-- Aprimoramento progressivo: cena 3D do diagrama (three.js local).
        Se falhar, o SVG acima continua valendo. -->
   <script type="module" src="js/diagrama3d.js"></script>
+  <!-- Vista #/arquitetura: a cena só é construída na primeira visita à rota
+       (arquitetura-vista.js carrega arquitetura3d.js sob demanda). -->
+  <script type="module" src="js/arquitetura-vista.js"></script>
 </body>
 </html>

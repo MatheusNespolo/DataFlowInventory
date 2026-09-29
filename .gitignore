@@ -42,3 +42,8 @@ Desktop.ini
 *.log
 logs/
 esp32/test_mqtt_cloud/secrets.h.example
+
+# Playwright (test/frontend_smoke)
+test/frontend_smoke/test-results/
+test/frontend_smoke/playwright-report/
+test/frontend_smoke/capturas/

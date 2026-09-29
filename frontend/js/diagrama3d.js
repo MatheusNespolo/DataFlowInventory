@@ -8,6 +8,7 @@
 // CSP scriptSrc 'self' já cobre este módulo e o import.
 // ============================================================
 import * as THREE from '/vendor/three.module.min.js';
+import { ambienteGradiente } from './ambiente3d.js';
 
 const mount = document.getElementById('mimic-3d');
 const mimic = document.querySelector('.mimic');
@@ -245,37 +246,15 @@ function init() {
   // --- Ativa a cena 3D (o CSS esconde o SVG) ---
   mimic.classList.add('diag-3d-ativo');
 
-  // Pausa a cena ao ir para #/status; retoma ao voltar
-  window.addEventListener('hashchange', () => {
-    const ativo = location.hash !== '#/status';
+  // A cena só roda na rota principal; pausa nas vistas listadas abaixo
+  // (#/status e #/arquitetura), retomando ao voltar. Uma vista nova
+  // precisa ser incluída na lista.
+  const VISTAS_SECUNDARIAS = ['#/status', '#/arquitetura'];
+  function aplicarRota() {
+    const ativo = !VISTAS_SECUNDARIAS.includes(location.hash);
     mount.style.display = ativo ? '' : 'none';
     if (ativo) marcarSujo();
-  });
-}
-
-// Esfera com gradiente vertical, pré-filtrada como mapa de ambiente (IBL).
-function ambienteGradiente(renderer) {
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const cena = new THREE.Scene();
-  const geo = new THREE.SphereGeometry(60, 40, 24);
-  const mat = new THREE.MeshBasicMaterial({ side: THREE.BackSide, vertexColors: true });
-  const pos = geo.attributes.position;
-  const cores = [];
-  const topo = new THREE.Color(0x93bcff);
-  const meio = new THREE.Color(0x2a2f3a);
-  const chao = new THREE.Color(0x0b0a08);
-  const c = new THREE.Color();
-  for (let i = 0; i < pos.count; i++) {
-    const y = pos.getY(i) / 60; // -1..1
-    if (y >= 0) c.copy(meio).lerp(topo, y);
-    else c.copy(meio).lerp(chao, -y);
-    cores.push(c.r, c.g, c.b);
   }
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(cores, 3));
-  cena.add(new THREE.Mesh(geo, mat));
-  const tex = pmrem.fromScene(cena, 0.04).texture;
-  pmrem.dispose();
-  geo.dispose();
-  mat.dispose();
-  return tex;
+  window.addEventListener('hashchange', aplicarRota);
+  aplicarRota();
 }
