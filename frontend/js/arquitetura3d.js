@@ -519,6 +519,7 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
 
   ligarControles(c, palco, semMovimento);
   ligarRaycast(c, palco);
+  ligarFoco(c, palco);
   return c;
 }
 
@@ -562,6 +563,30 @@ function ligarControles(c, palco, semMovimento) {
       caixa.toggleAttribute('data-aberto', aberto);
     });
   }
+}
+
+// Tab até uma placa fora da tela: o navegador rolaria a camada de rótulos
+// (overflow:hidden) e o palco, desalinhando as placas da cena. Desfaz a
+// rolagem e leva a câmera até o nó (sem abrir o painel).
+function ligarFoco(c, palco) {
+  const camada = c.rotulos.domElement;
+  const zerar = (e) => {
+    if (e.scrollLeft || e.scrollTop) { e.scrollLeft = 0; e.scrollTop = 0; }
+  };
+  camada.addEventListener('scroll', () => zerar(camada));
+  palco.addEventListener('scroll', () => zerar(palco));
+  camada.addEventListener('focusin', (ev) => {
+    const rotulo = ev.target.closest && ev.target.closest('.arq-rotulo');
+    if (!rotulo || !rotulo.dataset.no) return;
+    zerar(camada);
+    zerar(palco);
+    const r = rotulo.getBoundingClientRect();
+    const b = c.renderer.domElement.getBoundingClientRect();
+    const dentro = r.left >= b.left && r.top >= b.top && r.right <= b.right && r.bottom <= b.bottom;
+    if (dentro) return;
+    c.emVisaoGeral = false;
+    c.voarPara(enquadramento(c, { tipo: 'no', id: rotulo.dataset.no }));
+  });
 }
 
 function enquadramento(c, sel) {

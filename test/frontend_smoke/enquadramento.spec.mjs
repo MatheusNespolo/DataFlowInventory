@@ -61,3 +61,24 @@ for (const t of TAMANHOS) {
     });
   });
 }
+
+// I2: Tab até uma placa fora da tela não pode rolar a camada de rótulos
+// (overflow:hidden do CSS2DRenderer), senão as placas ficam desalinhadas.
+test('foco numa placa fora da tela não rola o palco nem a camada de rótulos', async ({ page }) => {
+  const erros = coletarErros(page);
+  await page.goto('/#/arquitetura');
+  await expect(page.locator('#arq-palco')).toHaveAttribute('data-pronto', '3d');
+  await page.locator('[data-camera="campo"]').click();
+  await page.waitForTimeout(1500);
+  await page.locator('button.arq-rotulo[data-no="dashboard"]').focus();
+  await page.waitForTimeout(1500);
+  const rolagem = await page.evaluate(() => ['#arq-palco', '.arq-camada-rotulos'].map((s) => {
+    const e = document.querySelector(s);
+    return { s, left: e.scrollLeft, top: e.scrollTop };
+  }));
+  for (const r of rolagem) {
+    expect(r.left, `${r.s} scrollLeft`).toBe(0);
+    expect(r.top, `${r.s} scrollTop`).toBe(0);
+  }
+  esperarSemErros(erros);
+});
