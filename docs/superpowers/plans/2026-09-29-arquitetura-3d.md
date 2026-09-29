@@ -3819,7 +3819,69 @@ git commit -m "ci: testes do frontend (unitários + E2E Playwright) em todo push
 
 ---
 
+### Task 13: Cliente Socket.IO servido pelo próprio servidor (sem dependência de CDN)
+
+> Adicionada após a aprovação do plano, a pedido do usuário. **Ordem de execução:** Tasks 1–11 → **Task 13** → Task 12 (a verificação final vem por último).
+
+Hoje `index.html` carrega `https://cdn.socket.io/4.7.5/socket.io.min.js`. Se o CDN falhar (bancada sem internet, CDN fora), `io` fica indefinido, `app.js` lança na primeira linha e **todos os botões param**. O `socket.io` do servidor e do simulador já serve o cliente em `/socket.io/socket.io.js` (opção `serveClient`, ligada por padrão), na mesma origem. A CSP `scriptSrc 'self'` já cobre isso; `server/` não muda.
+
+**Files:**
+- Modify: `frontend/index.html` (tag do Socket.IO)
+- Modify: `test/frontend_smoke/resiliencia.spec.mjs`
+
+**Interfaces:**
+- Consumes: `roteiroBotoes`, `coletarErros` (Tasks 1 e 10).
+- Produces: nenhuma interface nova; `window.io` continua global (script clássico).
+
+- [ ] **Step 1: Teste (falhando)** — acrescentar a `resiliencia.spec.mjs`:
+
+```js
+test('cenário 4d — CDN do Socket.IO inacessível: botões funcionam (cliente servido localmente)', async ({ page }) => {
+  await page.route('https://cdn.socket.io/**', (r) => r.abort());
+  const erros = coletarErros(page, /cdn\.socket\.io/);
+  await page.goto('/');
+  await expect(page.locator('script[src="/socket.io/socket.io.js"]')).toHaveCount(1);
+  await roteiroBotoes(page);
+  esperarSemErros(erros);
+});
+```
+
+Estoque do simulador: este teste consome 1 peça de cada tipo, somando 5 de 5 (botões 1 + 4a/4b/4c 3 + 4d 1). Nenhum outro teste pode solicitar peças depois disso.
+
+Run: `cd test/frontend_smoke && npx playwright test --project=simulador resiliencia`
+Expected: 4d FALHA (`io is not defined` / script ausente).
+
+- [ ] **Step 2: Trocar a tag** — em `index.html`, substituir:
+
+```html
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+```
+
+por:
+
+```html
+  <!-- Cliente Socket.IO servido pelo próprio servidor/simulador (mesma origem e
+       mesma versão do servidor; funciona sem internet na bancada). -->
+  <script src="/socket.io/socket.io.js"></script>
+```
+
+- [ ] **Step 3: Rodar tudo (os dois projetos)**
+
+Run: `cd test/frontend_smoke && npx playwright test`
+Expected: todos passam, inclusive o cenário 7 (CSP do helmet com o script em `'self'`).
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add frontend/index.html test/frontend_smoke/resiliencia.spec.mjs
+git commit -m "fix(frontend): cliente Socket.IO servido localmente (botões não dependem do CDN)" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
 ### Task 12: Verificação final, capturas e texto para a documentação
+
+> Executar **por último**, depois da Task 13.
 
 **Files:**
 - Nenhum arquivo versionado novo (capturas ficam em `test/frontend_smoke/capturas/`, ignorado pelo git).
@@ -3871,6 +3933,8 @@ Abrir lado a lado com `capturas/antes/` (Task 1, Step 7b) e conferir: tema prese
 ### Alterado
 - Botões de controle com ícones SVG (sem emoji) e aviso quando estão desabilitados.
 - `--muted` com contraste 4,5:1; ligação dos botões protegida contra elementos ausentes.
+- Cliente Socket.IO passa a vir do próprio servidor (`/socket.io/socket.io.js`) em vez do CDN:
+  o dashboard e os botões funcionam sem internet na bancada.
 
 ### Removido
 - Link de rodapé "Equipamentos & histórico" e botão "← Painel principal" (substituídos pelo seletor).
