@@ -575,8 +575,12 @@ html {
 }
 
 /* Placa de identificação de cada nó (CSS2D) */
+/* Área de toque ≥ 44 px sem aumentar o visual */
 .arq-rotulo {
   --led: var(--muted);
+  /* relative só dá base ao ::after: o CSS2DRenderer põe position:absolute
+     inline e o fallback usa .arq-fb-rotulos .arq-rotulo (mais específico). */
+  position: relative;
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
@@ -594,6 +598,11 @@ html {
   cursor: pointer;
   white-space: nowrap;
   transition: border-color 160ms ease, opacity 160ms ease, background 160ms ease;
+}
+.arq-rotulo::after {
+  content: '';
+  position: absolute;
+  inset: -7px -4px; /* 32 px + 2 × 7 px = 46 px de altura de toque */
 }
 .arq-rotulo:hover { border-color: var(--led); }
 .arq-rotulo[aria-pressed="true"] { border-color: var(--led-idle); background: var(--bay-inset); }
@@ -640,11 +649,11 @@ html {
 }
 .arq-controles-abrir { display: none; }
 .arq-controles-corpo { display: grid; gap: 0.5rem; }
-.arq-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.arq-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; } /* 8 px entre alvos */
 .arq-grupo #arq-enquadrar { grid-column: 1 / -1; }
 
 .arq-btn {
-  min-height: 36px;
+  min-height: 44px; /* alvo de toque (restrição global) */
   padding: 0.35rem 0.6rem;
   font: 600 var(--step--1) var(--font-ui);
   color: var(--readout);
@@ -661,7 +670,7 @@ html {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  min-height: 32px;
+  min-height: 44px;
   font-size: var(--step--1);
   color: var(--readout-dim);
   cursor: pointer;
@@ -843,7 +852,7 @@ html {
 
 .arq-link-enlace {
   width: 100%;
-  min-height: 36px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -859,6 +868,7 @@ html {
 }
 .arq-link-enlace:hover { border-color: var(--led-idle); }
 .arq-lista-enlaces { list-style: none; padding: 0 !important; }
+.arq-detalhes-corpo .arq-lista-enlaces { gap: 0.5rem; } /* 8 px entre alvos */
 
 /* ============================================================
    JANELA (bay) — contêiner base

@@ -35,5 +35,11 @@ test('cenário 6 — sem rolagem horizontal, seletor como barra inferior, alvos 
   await abrir.click();
   await expect(page.locator('#arq-controles-corpo')).toBeVisible();
   await expect(abrir).toHaveAttribute('aria-expanded', 'true');
+  // Alvos de toque da vista de arquitetura também ≥ 44 px.
+  for (const alvo of await page.locator('#arq-controles .arq-btn, #arq-controles .arq-check').all()) {
+    if (!(await alvo.isVisible())) continue;
+    const altura = (await alvo.boundingBox()).height;
+    expect(altura, `"${(await alvo.textContent()).trim()}" com ${altura} px`).toBeGreaterThanOrEqual(44);
+  }
   esperarSemErros(erros);
 });
