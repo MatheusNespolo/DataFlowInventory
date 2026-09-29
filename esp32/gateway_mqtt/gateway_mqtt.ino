@@ -57,7 +57,7 @@ const char* SENHA = SECRET_WIFI_PASS;
 //   Deixe MQTT_USER/MQTT_PASS vazios se allow_anonymous true.
 // Broker nuvem: MQTT_SERVER = URL do cluster HiveMQ Cloud.
 // ============================================================
-#define USE_TLS false   // ← false = Mosquitto local | true = HiveMQ Cloud
+#define USE_TLS true   // ← false = Mosquitto local | true = HiveMQ Cloud
 
 // Endpoints e credenciais vêm de secrets.h (fora do controle de versão).
 #if USE_TLS

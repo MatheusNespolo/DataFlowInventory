@@ -41,3 +41,4 @@ Desktop.ini
 # Logs
 *.log
 logs/
+esp32/test_mqtt_cloud/secrets.h.example

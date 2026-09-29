@@ -28,7 +28,7 @@
 // CONFIGURAÇÃO DO TESTE
 // ============================================================
 // ALTERE AQUI para escolher o broker:
-#define USE_TLS false   // <- false = Mosquitto local | true = HiveMQ Cloud
+#define USE_TLS true   // <- false = Mosquitto local | true = HiveMQ Cloud
 
 // Configurações fixas
 const char* SSID  = SECRET_WIFI_SSID;

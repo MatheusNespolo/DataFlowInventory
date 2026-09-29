@@ -10,7 +10,7 @@
 ```
 ## 🧪 Rodada de bancada — 28/09/2026
 
-**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` §7
+**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` §7
 **Status atual:** Backlog → **Todo** (prioridade P1 confirmada)
 
 | Etapa | Resultado | Observações |
@@ -27,7 +27,7 @@
 - **Pendente:** Fases 2–4 → 03/10 / Semana 8
 
 ### 📝 Sincronização
-- [ ] Transferir resultados para `semana_07_28_setembro_a_02_outubro.md` §10
+- [ ] Transferir resultados para `semana_07_28_setembro-3_outubro.md` §10
 - [ ] `CHANGELOG.md` atualizado quando `BILL_OF_MATERIALS.md` for criado
 - [ ] Card movido para `In Progress` ao iniciar Fase 1
 ```
@@ -39,7 +39,7 @@
 ```
 ## 🧪 Rodada de bancada — 28/09/2026
 
-**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` §7
+**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` §7
 **Status atual:** Backlog → **Todo** (prioridade P2, dependência desbloqueada)
 
 | Etapa | Resultado | Observações |
@@ -58,7 +58,7 @@
 - **Pendente:** Fases 2–4 → 03/10 / Semana 8
 
 ### 📝 Sincronização
-- [ ] Transferir resultados para `semana_07_28_setembro_a_02_outubro.md` §10
+- [ ] Transferir resultados para `semana_07_28_setembro-3_outubro.md` §10
 - [ ] Card movido para `In Progress` ao iniciar Fase 1
 ```
 
@@ -69,7 +69,7 @@
 ```
 ## 🧪 Rodada de bancada — 28/09/2026
 
-**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` §7
+**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` §7
 **Status atual:** Backlog (mantém — prioridade P2, não-bloqueante)
 
 | Etapa | Resultado | Observações |
@@ -98,7 +98,7 @@
 ```
 ## 🧪 Rodada de bancada — 28/09/2026
 
-**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` §7
+**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` §7
 **Status atual:** Backlog → **Todo** (prioridade P2, não-bloqueante)
 
 | Etapa | Resultado | Observações |
@@ -127,7 +127,7 @@
 ```
 ## 🧪 Rodada de bancada — 28/09/2026
 
-**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` §7
+**Roteiro:** `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` §7
 **Status atual:** Backlog (mantém — prioridade P3, bloqueado por #22)
 
 | Etapa | Resultado | Observações |
@@ -151,7 +151,7 @@
 ---
 
 **Arquivo gerado em:** 28/09/2026
-**Referência:** `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` §7
+**Referência:** `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` §7
 **Movimentações manuais no board:**
 - Card #21: `Backlog` → `Todo`
 - Card #22: `Backlog` → `Todo`

@@ -20,7 +20,7 @@
 | Diagrama elétrico consolidado | 23/09 | ✅ **CONCLUÍDO** — `docs/fluxogramas/Diagrama elétrico.png` |
 | Base MDF — montagem principal | 22/09 | ✅ **CONCLUÍDO** — resta acabamento |
 | Sketch isolado `test_mqtt_cloud.ino` | 24–25/09 | ✅ **CONCLUÍDO** — diagnóstico modular MQTT/TLS |
-| **[PENDENTE] Validação HiveMQ Cloud via hotspot 4G** | 28/09 | 🔄 Em progresso hoje |
+| **[CONCLUÍDO] Validação HiveMQ Cloud via Beckhoff_Guest + hotspot 4G** | 28/09 | ✅ Ambas as redes funcionais; falha inicial do hotspot foi configuração (SSID incorreto + “Maximizar compatibilidade” desativada) |
 | **[PENDENTE] Testes funcionais IRF520 B/C (potência)** | 29/09 | ⬜ Agendado |
 | **[PENDENTE] Burn-in test completo (S1–S7)** | 30/09–02/10 | ⬜ Agendado |
 | **[PENDENTE] Acabamento MDF + Desbaste esteiras** | 01/10 | ⏳ Reagendado 25–27/09 → 01/10 |
@@ -72,7 +72,7 @@
 
 | Cenário | rc/Resultado | Interpretação | Ação |
 |---------|-------------|---------------|------|
-| **Sucesso** | `[MQTT] Conectado!` | Problema era o firewall corporativo | ✅ Documentar; solicitar liberação 8883 com TI SENAI |
+| **Sucesso** | `[MQTT] Conectado!` | ESP32, sketch e HiveMQ Cloud operacionais na rede testada | ✅ Documentar a rede e as condições de configuração |
 | **Cluster hibernado** | `rc=-2` mesmo no 4G | HiveMQ Free hibernou | Acessar `cloud.hivemq.com` e "wake up" o cluster |
 | **TLS timeout** | `rc=-2` com delay ~30s | Handshake TLS lento | Aumentar timeout no sketch |
 | **Credenciais erradas** | `rc=5` | User/pass incorretos no `secrets.h` | Conferir credenciais HiveMQ Cloud |
@@ -87,10 +87,10 @@ Test-NetConnection -ComputerName "<cluster>.s1.eu.hivemq.com" -Port 8883
 
 ### 3.4 — Critérios de Sucesso do Bloco 1
 
-- [ ] Teste executado com hotspot 4G ativo
-- [ ] Resultado documentado (rc code ou `Conectado!`)
-- [ ] Causa raiz confirmada (firewall vs. cluster vs. credenciais)
-- [ ] `troubleshooting_bancada_22-23_09.md` atualizado com resultado
+- [x] Teste executado com hotspot 4G ativo após corrigir o SSID e ativar “Maximizar compatibilidade”
+- [x] Resultado documentado: `[MQTT] Conectado!`
+- [x] Beckhoff_Guest e hotspot 4G validados como redes funcionais
+- [x] `troubleshooting_bancada_22-23_09.md` atualizado com o resultado e a causa da falha inicial do hotspot
 
 ---
 
@@ -229,7 +229,7 @@ O simulador permite validar os cenários de FSM e a integração Dashboard/API s
 | Etapa | Resultado | Observações |
 |-------|-----------|-------------|
 | 0 — Pré-voo | ⬜ | — |
-| 1 — HiveMQ via hotspot 4G | ⬜ | Executar em 28/09 |
+| 1 — HiveMQ via Beckhoff_Guest + hotspot 4G | ✅ CONCLUÍDO | HiveMQ conectou nas duas redes; falha inicial do hotspot foi SSID incorreto e “Maximizar compatibilidade” desativada. Não atribuir o resultado exclusivamente ao firewall do SENAI. |
 | 2 — Diagnóstico IRF520 B/C | ⬜ | Executar em 29/09 |
 | 3 — Burn-in S1–S6 | ⬜ | Executar em 30/09–01/10 |
 | 4 — Acabamento MDF/esteiras | ⬜ | Executar em 01/10 |

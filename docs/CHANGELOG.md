@@ -15,8 +15,8 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 ### Adicionado
 
 - **Roteiro de Testes — Semana 7 (28/09–02/10/2026)**
-  - Documento completo em `docs/testes/roteiros/semana_07_28_setembro_a_02_outubro.md` com 5 blocos de trabalho:
-    - **Bloco 1:** Validação HiveMQ Cloud via hotspot 4G (28/09) — diagnóstico definitivo do `rc=-2` isolando a variável de rede corporativa
+  - Documento completo em `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` com 5 blocos de trabalho:
+    - **Bloco 1:** Validação HiveMQ Cloud via Beckhoff_Guest e hotspot 4G (28/09) — ambas as redes funcionaram; a falha inicial do hotspot foi causada por SSID incorreto e “Maximizar compatibilidade” desativada
     - **Bloco 2:** Diagnóstico de potência IRF520 B/C (29/09) — roteiro de 4 fases com multímetro (jumper curto, tensão sob carga, resistência de soldas, teste de MOSFET)
     - **Bloco 3:** Burn-in test completo (30/09–01/10) — 7 cenários de stress (S1–S7) cobrindo sequência simples, concorrência, estoque vazio, reset, reconexão, alta frequência e telemetria remota HiveMQ+CX9240
     - **Bloco 4:** Acabamento mecânico (01/10) — finalização da base MDF (lixamento, fixação, organização de fiação) e desbaste da costura das esteiras para eliminar ponto de atrito
@@ -24,6 +24,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Cronograma ajustado: Semana 7 inicia **segunda-feira 28/09** (não 29/09), 5 dias úteis até 02/10
   - Herda contexto da Semana 6: soldagem IRF520 concluída, diagrama elétrico publicado, base MDF montada, sketch `test_mqtt_cloud.ino` criado
   - Foco em **resolução dos dois problemas abertos** (rc=-2 HiveMQ e queda de potência B/C) antes do burn-in test integrado
+  - **Resultado do Bloco 1:** conexão HiveMQ Cloud validada com sucesso via Beckhoff_Guest e hotspot 4G; o hotspot só funcionou após corrigir o SSID e ativar “Maximizar compatibilidade”. Não há base para atribuir a falha inicial exclusivamente ao firewall do SENAI
   - Templates de comentário preparados para os 5 cards de documentação/processo (#21 BOM, #22 Deployment Guide, #23 E2E Tests, #24 Firmware Versioning, #25 Telemetria)
 
 - **Diagrama Elétrico Consolidado — Publicação Formal (23/09/2026)**
@@ -63,11 +64,11 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Problemas Conhecidos
 
-- **Firewall Corporativo Bloqueando MQTT Cloud/8883 — Recorrência (22–23/09/2026)**
-  - **Sintoma:** ESP32 conecta ao WiFi mas falha no broker HiveMQ Cloud com `rc=-2` (falha TCP/TLS)
-  - **Histórico:** 4ª recorrência em 02/09, 03/09, 15/09, agora 22-23/09 — indicador forte de bloqueio de rede corporativa
-  - **Mitigação curta prazo:** usar hotspot 4G do celular (rede alternativa) para validar se a causa é firewall
-  - **Mitigação longa prazo:** solicitar liberação da porta 8883 com TI da SENAI ou usar VPN corporativa
+- **Falha de conexão MQTT Cloud com `rc=-2` — investigação por rede (22–28/09/2026)**
+  - **Sintoma:** ESP32 conecta ao WiFi, mas em determinada tentativa falha no broker HiveMQ Cloud com `rc=-2` (falha TCP/TLS)
+  - **Resultado da validação em 28/09:** conexão HiveMQ Cloud bem-sucedida via `Beckhoff_Guest` e via hotspot 4G
+  - **Causa da falha inicial do hotspot:** SSID incorreto e opção “Maximizar compatibilidade” desativada
+  - **Conclusão:** ESP32, sketch e HiveMQ Cloud estão operacionais; não atribuir a falha inicial exclusivamente ao firewall do SENAI. Se o `rc=-2` voltar a ocorrer, investigar a rede específica e suas regras para a porta 8883
   - **Referência técnica:** `docs/testes/validações/troubleshooting_bancada_22-23_09.md` §Problema 1
 
 - **Perda de Potência em Esteiras B/C Após Soldagem de Placas de Passagem (22–23/09/2026)**
