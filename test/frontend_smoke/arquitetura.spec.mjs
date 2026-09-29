@@ -44,3 +44,41 @@ test('a cena não é construída fora da rota', async ({ page }) => {
   expect(urls.filter((u) => /arquitetura3d\.js/.test(u))).toEqual([]);
   await expect(page.locator('#arq-palco canvas')).toHaveCount(0);
 });
+
+test('cenário 5b — teclado abre detalhes de nó e de enlace; Esc fecha e devolve o foco', async ({ page }) => {
+  const erros = coletarErros(page);
+  await page.goto('/#/arquitetura');
+  await expect(page.locator('#arq-palco')).toHaveAttribute('data-pronto', '3d');
+
+  const broker = page.locator('button.arq-rotulo[data-no="broker"]');
+  await broker.focus();
+  await page.keyboard.press('Enter');
+  const painel = page.locator('#arq-detalhes');
+  await expect(painel).toBeVisible();
+  await expect(page.locator('#arq-detalhes-titulo')).toHaveText('Broker MQTT');
+  await expect(painel).toContainText('dataflow/status/server');
+  await expect(painel).toContainText('ARCHITECTURE.md §2.2');
+  await expect(broker).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#arq-enquadrar')).toBeEnabled();
+
+  await painel.locator('button.arq-link-enlace[data-enlace="mqtt-beckhoff"]').click();
+  await expect(page.locator('#arq-detalhes-titulo')).toHaveText('Broker → Beckhoff');
+  await expect(painel.locator('.arq-estado')).toHaveAttribute('data-estado', 'sem-telemetria');
+  await expect(painel).toContainText('Não monitorado');
+
+  await page.keyboard.press('Escape');
+  await expect(painel).toBeHidden();
+  await expect(broker).toBeFocused();
+  await expect(page.locator('#arq-enquadrar')).toBeDisabled();
+  esperarSemErros(erros);
+});
+
+test('cenário 5c — detalhe do Arduino mostra FSM e pinagem', async ({ page }) => {
+  await page.goto('/#/arquitetura');
+  await page.locator('button.arq-rotulo[data-no="arduino"]').click();
+  const painel = page.locator('#arq-detalhes');
+  await expect(painel).toContainText('AGUARDANDO_PEDIDO');
+  await expect(painel.locator('table')).toContainText('PWM 9, 10, 11');
+  await page.locator('#arq-fechar').click();
+  await expect(painel).toBeHidden();
+});

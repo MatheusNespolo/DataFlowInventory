@@ -368,7 +368,18 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     }
   };
 
+  // --- Seleção: realce do enlace e enquadramento de câmera ---
+  c.destacar = (sel) => {
+    for (const [id, e] of Object.entries(c.enlaces)) {
+      e.material.emissiveIntensity = sel && sel.tipo === 'enlace' && sel.id === id ? 2.4 : 1.1;
+    }
+    c.marcarSujo();
+  };
+  c.enquadrar = (sel) => c.voarPara(enquadramento(c, sel));
+  c.visaoGeral = () => c.voarPara(CAMERAS.geral);
+
   ligarControles(c, palco, semMovimento);
+  ligarRaycast(c, palco);
   return c;
 }
 
@@ -404,4 +415,47 @@ function ligarControles(c, palco, semMovimento) {
       caixa.toggleAttribute('data-aberto', aberto);
     });
   }
+}
+
+function enquadramento(c, sel) {
+  const p = sel.tipo === 'no'
+    ? new THREE.Vector3().fromArray(NOS_ARQ[sel.id].posicao)
+    : c.enlaces[sel.id].curva.getPointAt(0.5);
+  return { alvo: [p.x, 0.5, p.z], posicao: [p.x + 2.5, 5.5, p.z + 7] };
+}
+
+// Clique curto (sem arrastar) no canvas: raycast em nós e enlaces.
+// Não conhece o painel: só dispara "arq:selecionar" no palco.
+function ligarRaycast(c, palco) {
+  // Alvos de clique mais grossos (invisíveis) para os tubos finos.
+  const alvos = [];
+  for (const [id, e] of Object.entries(c.enlaces)) {
+    const alvo = new THREE.Mesh(
+      new THREE.TubeGeometry(e.curva, 32, 0.28, 6, false),
+      new THREE.MeshBasicMaterial({ visible: false })
+    );
+    alvo.userData.enlace = id;
+    c.cena.add(alvo);
+    alvos.push(alvo);
+  }
+  Object.values(c.nos).forEach((n) => n.grupo.traverse((o) => { if (o.isMesh) alvos.push(o); }));
+
+  const canvas = c.renderer.domElement;
+  const raio = new THREE.Raycaster();
+  let inicio = null;
+  canvas.addEventListener('pointerdown', (ev) => { inicio = { x: ev.clientX, y: ev.clientY }; });
+  canvas.addEventListener('pointerup', (ev) => {
+    if (!inicio || Math.hypot(ev.clientX - inicio.x, ev.clientY - inicio.y) > 5) return;
+    const r = canvas.getBoundingClientRect();
+    const ponto = new THREE.Vector2(
+      ((ev.clientX - r.left) / r.width) * 2 - 1,
+      -((ev.clientY - r.top) / r.height) * 2 + 1
+    );
+    raio.setFromCamera(ponto, c.camera);
+    const [acerto] = raio.intersectObjects(alvos, false);
+    if (!acerto) return;
+    const { enlace, no } = acerto.object.userData;
+    const detail = enlace ? { tipo: 'enlace', id: enlace } : no ? { tipo: 'no', id: no } : null;
+    if (detail) palco.dispatchEvent(new CustomEvent('arq:selecionar', { detail }));
+  });
 }

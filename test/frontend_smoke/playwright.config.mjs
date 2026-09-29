@@ -18,7 +18,8 @@ export default defineConfig({
   retries: 0,
   // Carga da página (~9 s) + roteiro dos botões (~30 s) + navegação: margem para CI.
   timeout: 90_000,
-  expect: { timeout: 10_000 },
+  // Máquina de bancada sob carga: asserções com folga (carga ~9 s).
+  expect: { timeout: 20_000 },
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     ...devices['Desktop Chrome'],
