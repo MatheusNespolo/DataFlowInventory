@@ -3,15 +3,15 @@
 // ------------------------------------------------------------
 // Ciclo de vida da rota, status (coletor → derivarStatus), barra,
 // anúncios e rótulos. NÃO importa three.js: a cena 3D é carregada
-// sob demanda com import(); se falhar, a vista segue em 2D
-// (Task 10). Independente de app.js: se este módulo falhar, o
-// painel e os botões seguem funcionando.
+// sob demanda com import(); se falhar, a vista segue na planta 2D
+// (arquitetura-fallback.js). Independente de app.js: se este módulo
+// falhar, o painel e os botões seguem funcionando.
 //
 // Contexto de representação (c), comum à cena 3D e ao SVG:
 //   c.nos[id].rotulo       botão .arq-rotulo do nó
 //   c.aplicar(r)           pinta o status na representação
 //   c.definirAtiva(bool)   (opcional) liga/desliga o render
-//   c.destacar(sel), c.enquadrar(sel), c.visaoGeral()  (Task 9, opcionais)
+//   c.destacar(sel), c.enquadrar(sel), c.visaoGeral()  (opcionais: só no 3D)
 // ============================================================
 import { NOS_ARQ, ENLACES_ARQ, ROTULO_MODO, ROTULO_ESTADO } from './arquitetura-dados.js';
 import { derivarStatus } from './arquitetura-status.js';
@@ -36,9 +36,17 @@ function criarRotulo(id) {
   rotulo.title = n.nome;
   rotulo.dataset.estado = 'desconhecido';
   rotulo.setAttribute('aria-pressed', 'false');
-  rotulo.innerHTML = `<span class="arq-rotulo-led" aria-hidden="true"></span>`
-    + `<span class="arq-rotulo-k" aria-hidden="true">${n.codigo}</span>`
-    + `<span class="arq-rotulo-nome">${n.curto}</span>`;
+  const led = document.createElement('span');
+  led.className = 'arq-rotulo-led';
+  led.setAttribute('aria-hidden', 'true');
+  const codigo = document.createElement('span');
+  codigo.className = 'arq-rotulo-k';
+  codigo.setAttribute('aria-hidden', 'true');
+  codigo.textContent = n.codigo;
+  const nome = document.createElement('span');
+  nome.className = 'arq-rotulo-nome';
+  nome.textContent = n.curto;
+  rotulo.append(led, codigo, nome);
   rotulo.addEventListener('click', () => {
     palco.dispatchEvent(new CustomEvent('arq:selecionar', { detail: { tipo: 'no', id } }));
   });

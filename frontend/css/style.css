@@ -634,6 +634,7 @@ html {
   line-height: 1.3;
   white-space: nowrap;
 }
+.arq-hw span { display: block; }
 
 .arq-controles {
   position: absolute;

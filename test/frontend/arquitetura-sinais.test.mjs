@@ -117,3 +117,15 @@ test('gatewayInicial semeia o gateway (estado_inicial chegou antes do coletor)',
   assert.equal(coletor.obter().gateway, 'offline');
   assert.equal(criarColetor({ socket: null, fetchFn: resposta(404, null) }).obter().gateway, null);
 });
+
+test('consultarApi: depois de um 404 (simulador) não consulta de novo', async () => {
+  let chamadas = 0;
+  const fetchFn = async () => { chamadas++; return { status: 404, json: async () => null }; };
+  const { coletor, avancar } = montar({ fetchFn });
+  await coletor.consultarApi();
+  avancar(5000);
+  await coletor.consultarApi();
+  assert.equal(chamadas, 1);
+  assert.deepEqual(coletor.obter().api, { tipo: 'ausente' });
+  assert.equal(coletor.obter().apiEm, 6000); // a reavaliação segue "atualizada"
+});

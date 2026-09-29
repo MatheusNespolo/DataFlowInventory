@@ -74,6 +74,7 @@ test('cenário 5b — teclado abre detalhes de nó e de enlace; Esc fecha e devo
 });
 
 test('cenário 5c — detalhe do Arduino mostra FSM e pinagem', async ({ page }) => {
+  const erros = coletarErros(page);
   await page.goto('/#/arquitetura');
   await page.locator('button.arq-rotulo[data-no="arduino"]').click();
   const painel = page.locator('#arq-detalhes');
@@ -81,4 +82,5 @@ test('cenário 5c — detalhe do Arduino mostra FSM e pinagem', async ({ page })
   await expect(painel.locator('table')).toContainText('PWM 9, 10, 11');
   await page.locator('#arq-fechar').click();
   await expect(painel).toBeHidden();
+  esperarSemErros(erros);
 });

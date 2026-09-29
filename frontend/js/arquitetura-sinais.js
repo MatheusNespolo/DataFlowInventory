@@ -62,6 +62,13 @@ export function criarColetor({
   }
 
   async function consultarApi() {
+    // 404 = simulador, que não ganha o endpoint no meio da sessão: não
+    // consulta de novo (evita um erro 404 no console a cada ciclo).
+    if (sinais.api.tipo === 'ausente') {
+      sinais.apiEm = relogio();
+      emitir();
+      return;
+    }
     const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
     const limite = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
     try {

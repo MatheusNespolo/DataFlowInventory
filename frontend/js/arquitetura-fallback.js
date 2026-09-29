@@ -20,7 +20,7 @@ export function desenharFallback(palco, criarRotulo) {
   svg.setAttribute('preserveAspectRatio', 'none');
   svg.setAttribute('class', 'arq-fallback');
   svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', 'Diagrama 2D da arquitetura (WebGL indisponível). Use Tab para percorrer os componentes.');
+  svg.setAttribute('aria-label', 'Diagrama 2D da arquitetura. Use Tab para percorrer os componentes.');
 
   const enlaces = {};
   for (const [id, e] of Object.entries(ENLACES_ARQ)) {

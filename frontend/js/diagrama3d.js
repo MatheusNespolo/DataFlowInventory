@@ -246,8 +246,9 @@ function init() {
   // --- Ativa a cena 3D (o CSS esconde o SVG) ---
   mimic.classList.add('diag-3d-ativo');
 
-  // A cena só roda na rota principal; pausa em #/status e #/arquitetura
-  // (e em qualquer outra vista futura), retomando ao voltar.
+  // A cena só roda na rota principal; pausa nas vistas listadas abaixo
+  // (#/status e #/arquitetura), retomando ao voltar. Uma vista nova
+  // precisa ser incluída na lista.
   const VISTAS_SECUNDARIAS = ['#/status', '#/arquitetura'];
   function aplicarRota() {
     const ativo = !VISTAS_SECUNDARIAS.includes(location.hash);

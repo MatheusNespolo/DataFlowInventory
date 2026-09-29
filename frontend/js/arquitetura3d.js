@@ -224,7 +224,11 @@ export function construir3d({ palco, criarRotulo, semMovimento }) {
     cena.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([origem, m.position.clone()]), matFio));
     const et = document.createElement('div');
     et.className = 'arq-hw';
-    et.innerHTML = `${h.nome}<br>${h.detalhe}`;
+    for (const linha of [h.nome, h.detalhe]) { // duas linhas (.arq-hw span: display block)
+      const s = document.createElement('span');
+      s.textContent = linha;
+      et.append(s);
+    }
     const obj = new CSS2DObject(et);
     obj.position.set(0, 0.5, 0);
     m.add(obj);
