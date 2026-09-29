@@ -123,3 +123,42 @@ jobs:
 
       - name: Compilar ESP32 (teste AB)
         run: arduino-cli compile --fqbn esp32:esp32:esp32 --warnings all test/esteira_peca_b/esp32_esteiras_ab/esp32_esteiras_ab.ino
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            server/package-lock.json
+            simulator/package-lock.json
+            test/frontend_smoke/package-lock.json
+
+      - name: Instalar dependências (server, simulator, testes E2E)
+        run: |
+          cd server && npm ci
+          cd ../simulator && npm ci
+          cd ../test/frontend_smoke && npm ci
+
+      - name: Testes unitários do frontend (node --test)
+        run: node --test "test/frontend/*.test.mjs"
+
+      - name: Instalar Chromium (Playwright)
+        run: cd test/frontend_smoke && npx playwright install --with-deps chromium
+
+      - name: Testes E2E — botões, navegação, arquitetura, resiliência, celular e CSP
+        run: cd test/frontend_smoke && npx playwright test
+
+      - name: Publicar relatório do Playwright
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: test/frontend_smoke/playwright-report/
+          retention-days: 7
