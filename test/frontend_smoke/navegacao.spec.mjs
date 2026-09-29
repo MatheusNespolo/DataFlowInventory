@@ -75,3 +75,11 @@ test('teclas do seletor têm ≥ 44 px de altura', async ({ page }) => {
     expect((await t.boundingBox()).height).toBeGreaterThanOrEqual(44);
   }
 });
+
+test('LED da tecla ARC reflete o simulador (1 de 1 enlace OK)', async ({ page }) => {
+  const erros = coletarErros(page);
+  await page.goto('/');
+  await expect(page.locator('#arc-led')).toHaveAttribute('data-estado', 'ok');
+  await expect(page.locator('#arc-led-texto')).toContainText('1 de 1 OK');
+  esperarSemErros(erros);
+});

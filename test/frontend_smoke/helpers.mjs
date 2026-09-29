@@ -3,8 +3,9 @@
 // ============================================================
 import { expect } from '@playwright/test';
 
-// Recursos externos cuja falha de rede não indica defeito do dashboard.
-const IGNORAR = /fonts\.(googleapis|gstatic)\.com|favicon\.ico/;
+// Recursos externos cuja falha de rede não indica defeito do dashboard,
+// e /api/status, cujo 404 (simulador) e 503 (broker fora) são respostas esperadas.
+const IGNORAR = /fonts\.(googleapis|gstatic)\.com|favicon\.ico|\/api\/status/;
 
 /** Registra erros de página/console. Retorna um array preenchido ao longo do teste. */
 export function coletarErros(page) {
