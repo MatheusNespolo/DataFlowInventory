@@ -117,7 +117,7 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 
 ### 7.2 Catálogo de métricas (prefixo `dfi_`)
 
-Os rótulos só recebem valores de listas permitidas; qualquer outro valor vira `outro`.
+Os rótulos de evento, tópico, tipo de erro, resultado, peça e esteira só recebem valores de listas permitidas (qualquer outro vira `outro`); `rota` usa o caminho registrado no Express (ou `estatico`/`nao_encontrada`), sempre um conjunto finito.
 
 | Métrica | Tipo | Rótulos | O que mede |
 |---|---|---|---|
@@ -146,7 +146,7 @@ Também são expostas as métricas padrão do `prom-client` (`process_*` e `node
 - **Publish → ack:** cronometra o callback do `publish` QoS 1 do comando.
 - **Comando → confirmação:** o firmware do ESP32 confirma em `dataflow/comandos/pub` com `acao`, `peca` e `status` (`encaminhado`/`rejeitado`), **sem id de correlação** (e a rejeição nem ecoa a peça). O servidor casa por ordem de chegada (fila FIFO por `acao|peca`; sem peça, com o pendente mais antigo da ação). Comandos sem resposta em `METRICS_CONFIRMACAO_TIMEOUT_MS` (padrão 10000) contam em `dfi_command_unconfirmed_total`; confirmações sem pendente, em `dfi_command_confirmation_orphan_total`.
 - **Gateway offline:** só a transição online → offline conta. O LWT retido que o servidor recebe ao reconectar não é uma queda nova.
-- **Estoque:** gauge amostrado a cada scrape (5 s). A variação exata por evento fica no SQLite do CX9240.
+- **Estoque:** gauge atualizado a cada mensagem MQTT de estoque (o Prometheus lê o último valor a cada scrape de 5 s). A variação exata por evento fica no SQLite do CX9240.
 
 ### 7.4 Stack e dashboards
 
@@ -158,7 +158,7 @@ Também são expostas as métricas padrão do `prom-client` (`process_*` e `node
 
 - O casamento comando → confirmação é aproximado enquanto o firmware não devolver um id de correlação.
 - Percentis só existem quando há amostras na janela (sem comandos, os painéis de latência ficam vazios).
-- A execução real do stack e a renderização dos painéis são validadas com `scripts/observability-smoke.*`; os testes automatizados (`test/server_metrics`) não usam Docker.
+- A execução real do stack e a renderização dos painéis ainda não foram validadas (dependem de Docker); o roteiro de verificação é `scripts/observability-smoke.*`; os testes automatizados (`test/server_metrics`) não usam Docker.
 
 ## 8. Documentação Correlata
 
