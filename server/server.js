@@ -353,6 +353,8 @@ mqttClient.on('message', (topic, message) => {
       break;
 
     case TOPICS.cmdPub:
+      // Tempo entre o comando aceito e esta confirmação do gateway (dfi_command_confirmation_seconds)
+      prom.confirmacaoGateway({ acao: msgJson.acao, peca: msgJson.peca, status: msgJson.status });
       // Rejeições vindas do ESP32 (ex.: peca_invalida, comando_desconhecido)
       // são reencaminhadas como 'comando_erro' para que o frontend as exiba
       // como erro em vez de "comando enviado".
@@ -385,18 +387,26 @@ mqttClient.on('message', (topic, message) => {
 function publicarComando(socket, comando, descricao) {
   if (!mqttClient || !mqttClient.connected) {
     metricas.comandosRejeitados++;
+    prom.comandoRecusado('broker_offline');
     socket.emit('comando_erro', { erro: 'Broker MQTT offline', acao: comando.acao });
     console.warn(`[MQTT] ${descricao} rejeitado — broker offline`);
     return;
   }
 
+  // O t0 do comando é registrado ANTES do publish (a confirmação do gateway poderia chegar antes
+  // do PUBACK); o ack do publish é medido à parte, em dfi_mqtt_publish_ack_seconds.
+  const tokenMetricas = prom.comandoAceito(comando.acao, comando.peca);
+  const inicioPublish = performance.now();
   mqttClient.publish(TOPICS.cmdSub, JSON.stringify(comando), { qos: 1 }, (err) => {
     if (err) {
       metricas.comandosRejeitados++;
+      prom.comandoFalhou(tokenMetricas);
+      prom.mqttErro('publicacao');
       console.error('[MQTT] Erro ao publicar comando:', err.message);
       socket.emit('comando_erro', { erro: 'Falha ao enviar comando', acao: comando.acao });
     } else {
       metricas.comandosPublicados++;
+      prom.publishAck(TOPICS.cmdSub, (performance.now() - inicioPublish) / 1000, true);
       console.log(`[MQTT] Comando publicado: ${descricao}`);
     }
   });
@@ -417,6 +427,7 @@ io.on('connection', (socket) => {
     const agora = Date.now();
     if (agora - socket.data.ultimoComandoMs < COMANDO_INTERVALO_MS) {
       metricas.comandosRejeitados++;
+      prom.comandoRecusado('rate_limit');
       socket.emit('comando_erro', {
         erro: `Muitos comandos — aguarde ${COMANDO_INTERVALO_MS}ms entre envios`,
         acao,
@@ -437,6 +448,7 @@ io.on('connection', (socket) => {
     const peca = data && typeof data.peca === 'string' ? data.peca.toUpperCase() : null;
     if (!PECAS_VALIDAS.includes(peca)) {
       metricas.comandosRejeitados++;
+      prom.comandoRecusado('peca_invalida');
       socket.emit('comando_erro', { erro: `Peça inválida: ${data?.peca}`, acao: 'solicitar_peca' });
       console.warn(`[WS ←] Peça inválida recebida de ${socket.id}:`, data?.peca);
       return;
@@ -471,6 +483,10 @@ io.on('connection', (socket) => {
 // ============================================================
 // INICIALIZAÇÃO DO SERVIDOR
 // ============================================================
+// Expira os comandos que o gateway não confirmou a tempo (dfi_command_unconfirmed_total).
+// unref(): o timer não impede o processo de encerrar.
+setInterval(() => prom.varrerPendentes(), 1000).unref();
+
 server.listen(PORT, () => {
   console.log('');
   console.log('============================================================');
