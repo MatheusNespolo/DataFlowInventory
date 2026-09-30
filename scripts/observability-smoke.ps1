@@ -72,6 +72,8 @@ Write-Host 'Docker esta em execucao'.PadRight(66) -NoNewline
 Write-Host 'PASS' -ForegroundColor Green
 
 $senha = LerEnv 'GRAFANA_ADMIN_PASSWORD'
+# o Compose le '$$' do .env como '$' literal; usa a senha efetiva
+$senha = $senha.Replace('$$', '$')
 if (-not $senha) {
     Write-Host 'observability\.env existe e tem GRAFANA_ADMIN_PASSWORD'.PadRight(66) -NoNewline
     Write-Host 'FAIL' -ForegroundColor Red
