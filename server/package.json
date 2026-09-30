@@ -7,7 +7,13 @@
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "keywords": ["iot", "mqtt", "websocket", "intralogistica", "arduino"],
+  "keywords": [
+    "iot",
+    "mqtt",
+    "websocket",
+    "intralogistica",
+    "arduino"
+  ],
   "author": "Henrique Moni, Matheus Nespolo, Murilo Tolardo, Vitor Marcolongo",
   "license": "MIT",
   "dependencies": {
@@ -15,6 +21,7 @@
     "express": "^4.21.0",
     "helmet": "^7.1.0",
     "mqtt": "^5.9.1",
+    "prom-client": "^15.1.3",
     "socket.io": "^4.7.5"
   }
 }
