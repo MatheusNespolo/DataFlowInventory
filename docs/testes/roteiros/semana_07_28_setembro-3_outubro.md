@@ -48,7 +48,7 @@
 - [x] Soldagem módulos IRF520 (B/C) — continuidade aprovada
 - [ ] Diagnóstico queda de potência B/C concluído
 - [ ] Base MDF — acabamento visual finalizado
-- [ ] Desbaste costura fita esteiras concluído
+- [x] Desbaste costura fita esteiras concluído (29/09)
 
 ---
 
@@ -95,18 +95,58 @@ Test-NetConnection -ComputerName "<cluster>.s1.eu.hivemq.com" -Port 8883
 ---
 
 
-## 4. Bloco 2 — Testes Funcionais IRF520 B/C — Diagnóstico de Potência (29/09)
+## 4. Bloco 2 — Testes Funcionais IRF520 B/C — Diagnóstico de Potência (29-30/09)
 
-Roteiro de 4 fases para isolar queda de potência nos motores B/C.
+Roteiro de 5 fases para isolar falha de acionamento nos motores B/C.
 
-### 4.1 — Fase 1: Teste com Jumper Curto
+### 4.1 — Progresso 29/09 — Desbaste Mecânico Concluído
 
-| Teste | Método | Esperado | Status |
-|-------|--------|----------|--------|
-| Motor B com jumper 5–10 cm | Usar jumper curto em vez do cabo | Força normal = problema no cabo | ⬜ |
-| Motor C com jumper 5–10 cm | Usar jumper curto em vez do cabo | Força normal = problema no cabo | ⬜ |
+**Data:** 29/09/2026
 
-### 4.2 — Fase 2: Medição de Tensão Sob Carga
+| Item | Status | Observações |
+|------|--------|-------------|
+| Desbaste da costura da fita — Esteira A | ✅ | Atrito eliminado |
+| Desbaste da costura da fita — Esteira B | ✅ | Atrito eliminado |
+| Desbaste da costura da fita — Esteira C | ✅ | Atrito eliminado |
+| Teste manual de ciclo | ✅ | Três esteiras giram suavemente |
+
+**Resultado:** Três esteiras prontas para teste funcional dos motores.
+
+**⚠️ Problema Detectado:** Após desbaste, esteiras B e C **não respondem ao acionamento elétrico**. Esteira A continua funcional.
+
+**Hipóteses:**
+1. Falha de solda nos módulos IRF520 #2 e #3 (causada por ciclos térmicos durante desbaste)
+2. MOSFET danificado (ESD, sobreaquecimento na soldagem original, ou vibração)
+3. Cabo/jumper solto ou danificado
+4. Sinal PWM não chegando aos módulos
+
+**Plano:** Diagnóstico simplificado em 30/09 (Fases 0-5 abaixo).
+
+---
+
+### 4.2 — Diagnóstico Simplificado IRF520 B/C (30/09)
+
+> **Contexto:** MOSFETs IRF520 são sensíveis a ESD e calor excessivo. Soldagem manual + vibração mecânica (desbaste) são fatores de risco conhecidos para falha prematura.
+
+#### ⏱️ Fase 0 — Verificação Rápida (15 min)
+
+| Teste | Como fazer | Esperado | Resultado |
+|-------|-----------|----------|-----------|
+| Motor B funciona no driver A? | Trocar conexões fisicamente | Gira = driver A OK, problema no driver B | ⬜ |
+| Motor C funciona no driver A? | Trocar conexões fisicamente | Gira = driver A OK, problema no driver C | ⬜ |
+| PWM chega em B? | Multímetro DC no pino SIG do IRF520 B com motor acionando | ~5 V HIGH | ⬜ |
+| PWM chega em C? | Multímetro DC no pino SIG do IRF520 C com motor acionando | ~5 V HIGH | ⬜ |
+
+#### ⏱️ Fase 1 — Teste de Cabos (15 min)
+
+- [ ] Trocar jumpers de B por cabos curtos (5-10 cm)
+- [ ] Trocar jumpers de C por cabos curtos (5-10 cm)
+- [ ] Testar acionamento
+
+**Se funcionar:** problema nos cabos existentes (solda fria, ruptura interna).  
+**Se continuar falhando:** problema no driver ou solda.
+
+#### ⏱️ Fase 2 — Medição de Tensões (30 min)
 
 | Ponto de medição | Tolerância | Motor B | Motor C |
 |-----------------|-----------|---------|---------|
@@ -201,11 +241,11 @@ mosquitto_sub -h localhost -t "dataflow/#" -v
 
 | Dia | Manhã | Tarde |
 |-----|-------|-------|
-| **28/09 (Seg)** | Pré-voo + HiveMQ via hotspot 4G | Análise do resultado e troubleshooting |
-| **29/09 (Ter)** | Jumper + tensão sob carga | Soldas, MOSFET e testes funcionais B/C |
-| **30/09 (Qua)** | Burn-in S1–S4 | Burn-in S5–S6 |
-| **01/10 (Qui)** | Acabamento MDF + desbaste | Burn-in S7, se Cloud validado |
-| **02/10 (Sex)** | CHANGELOG + comentários dos cards | Revisão e atualização do board |
+| **28/09 (Seg)** | Pré-voo + HiveMQ via hotspot 4G | ✅ Análise do resultado e troubleshooting |
+| **29/09 (Ter)** | ✅ Desbaste final das esteiras A/B/C | ⚠️ Detecção de falha B/C |
+| **30/09 (Qua)** | Diagnóstico IRF520 (Fase 0-5) | Burn-in S1–S4 (se diagnóstico OK) |
+| **01/10 (Qui)** | Acabamento MDF | Burn-in S5–S6 |
+| **02/10 (Sex)** | Burn-in S7 (se Cloud validado) | CHANGELOG + comentários dos cards |
 
 ---
 
