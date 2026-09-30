@@ -17,6 +17,7 @@
 //     de métrica NUNCA pode chegar ao chamador.
 // ============================================================
 const client = require('prom-client');
+const { CorrelacaoComandos } = require('./metrics-correlacao');
 
 const EVENTOS = ['pedido', 'entrega', 'erro', 'inicio'];
 const ERROS_MQTT = ['conexao', 'json_invalido', 'publicacao', 'inscricao'];
@@ -24,6 +25,11 @@ const PECAS = ['A', 'B', 'C'];
 const ESTEIRAS = ['principal', 'secA', 'secB', 'secC'];
 
 const permitido = (valor, lista) => (lista.includes(valor) ? valor : 'outro');
+
+const ACOES = ['solicitar_peca', 'reset'];
+const STATUS_CONFIRMACAO = ['encaminhado', 'rejeitado'];
+const RESULTADOS_RECUSA = ['peca_invalida', 'rate_limit', 'broker_offline'];
+const BUCKETS_MQTT = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 
 /**
  * @param {object}   [opcoes]
@@ -50,6 +56,8 @@ function criarMetricas({
   let jaConectou = false;
   // Último status do gateway ('online' | 'offline'); null enquanto desconhecido.
   let gatewayAtual = null;
+  // Comandos aguardando a confirmação do gateway (fila FIFO por ação|peça).
+  const correlacao = new CorrelacaoComandos();
   const avisados = new Set();
   function avisar(nome, err) {
     if (avisados.has(nome)) return; // um aviso por método, para não inundar o log
@@ -137,6 +145,37 @@ function criarMetricas({
     },
   });
 
+  const publishAckHist = new client.Histogram({
+    name: 'dfi_mqtt_publish_ack_seconds',
+    help: 'Tempo entre o publish e o PUBACK do broker (QoS 1)',
+    labelNames: ['topic'],
+    buckets: BUCKETS_MQTT,
+    registers: [registry],
+  });
+  const confirmacaoHist = new client.Histogram({
+    name: 'dfi_command_confirmation_seconds',
+    help: 'Tempo entre o comando ser aceito e a confirmação do gateway ESP32',
+    labelNames: ['acao', 'status'],
+    buckets: BUCKETS_MQTT,
+    registers: [registry],
+  });
+  const comandos = new client.Counter({
+    name: 'dfi_commands_total',
+    help: 'Comandos do dashboard, por resultado',
+    labelNames: ['resultado'],
+    registers: [registry],
+  });
+  const semResposta = new client.Counter({
+    name: 'dfi_command_unconfirmed_total',
+    help: 'Comandos sem confirmação do gateway dentro do timeout',
+    registers: [registry],
+  });
+  const orfas = new client.Counter({
+    name: 'dfi_command_confirmation_orphan_total',
+    help: 'Confirmações do gateway sem comando pendente',
+    registers: [registry],
+  });
+
   // ---- Operações ----
   function mensagemMqtt(topic) {
     mensagens.inc({ topic: permitido(topic, topicosPermitidos) });
@@ -189,8 +228,55 @@ function criarMetricas({
     }
   }
 
+  const normalizarPeca = (peca) => (PECAS.includes(peca) ? peca : '');
+
+  // O t0 é registrado ANTES do publish: a confirmação do gateway poderia, em tese, chegar antes do PUBACK.
+  function comandoAceito(acao, peca) {
+    const { token, descartados } = correlacao.registrar(permitido(acao, ACOES), normalizarPeca(peca), relogio());
+    if (descartados) semResposta.inc(descartados);
+    return token;
+  }
+
+  function comandoFalhou(token) {
+    correlacao.cancelar(token);
+    comandos.inc({ resultado: 'falha_publicacao' });
+  }
+
+  function publishAck(topic, segundos, ehComando = false) {
+    if (Number.isFinite(segundos)) {
+      publishAckHist.observe({ topic: permitido(topic, topicosPermitidos) }, segundos);
+    }
+    if (ehComando) comandos.inc({ resultado: 'publicado' });
+  }
+
+  function comandoRecusado(motivo) {
+    comandos.inc({ resultado: permitido(motivo, RESULTADOS_RECUSA) });
+  }
+
+  function confirmacaoGateway({ acao, peca, status } = {}) {
+    const acaoOk = permitido(acao, ACOES);
+    const casado = correlacao.confirmar(acaoOk, normalizarPeca(peca));
+    if (!casado) {
+      orfas.inc();
+      return;
+    }
+    const segundos = (relogio() - casado.t0) / 1000;
+    confirmacaoHist.observe({ acao: acaoOk, status: permitido(status, STATUS_CONFIRMACAO) }, segundos);
+  }
+
+  function varrerPendentes() {
+    const expirados = correlacao.expirar(relogio(), timeoutConfirmacaoMs);
+    if (expirados) semResposta.inc(expirados);
+  }
+
   // ---- API pública ----
   const publico = {
+    comandoAceito,
+    comandoFalhou,
+    publishAck,
+    comandoRecusado,
+    confirmacaoGateway,
+    varrerPendentes,
     mensagemMqtt,
     mqttConectou,
     mqttCaiu,
