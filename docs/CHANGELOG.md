@@ -14,6 +14,17 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Telemetria Histórica de Performance — Prometheus + Grafana (30/09/2026)**
+  - `GET /metrics` no `server/server.js` (mesma porta 3000 e mesmo padrão aberto do `/api/status`) com 17 métricas `dfi_*` mais as métricas padrão do processo: publish → ack do broker, tempo de confirmação do gateway por comando, tempo de resposta da API por rota, throughput de mensagens e eventos, reconexões MQTT, erros, quedas do gateway (LWT), comandos por resultado, sem resposta e órfãos, estoque e esteiras
+  - Lógica isolada em `server/metrics.js` (+ `server/metrics-correlacao.js`, fila FIFO comando → confirmação); todo método é à prova de falha para nunca derrubar o servidor; rótulos só aceitam valores de listas permitidas
+  - Variável nova `METRICS_CONFIRMACAO_TIMEOUT_MS` (padrão 10000) em `server/.env.example`; dependência nova `prom-client`
+  - Stack Docker de desenvolvimento em `docker-compose.yml` (Prometheus `v3.15.0` + Grafana `12.4.3`, portas presas ao localhost, senha obrigatória) com provisionamento em `observability/`
+  - Três dashboards versionados em `docs/grafana/`: Visão Geral, Performance (p50/p95/p99) e Confiabilidade
+  - Passo a passo, smoke test e problemas comuns em `observability/README.md`; nova seção "Observabilidade" em `docs/ARCHITECTURE.md`
+  - Testes sem Docker em `test/server_metrics/` (unitários, integração com broker MQTT em processo e verificações estáticas do stack) e job `server-metrics-tests` no CI
+  - **Não validado ainda:** execução real do stack (`docker compose up`), consultas PromQL e renderização dos painéis — dependem de Docker e são cobertos por `scripts/observability-smoke.sh` / `.ps1`. Burn-in com os dashboards e screenshots para o card continuam pendentes
+  - Complementa (não substitui) o historiador SQLite do CX9240, que guarda os dados de negócio
+
 - **Roteiro de Testes — Semana 7 (28/09–02/10/2026)**
   - Documento completo em `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` com 5 blocos de trabalho:
     - **Bloco 1:** Validação HiveMQ Cloud via Beckhoff_Guest e hotspot 4G (28/09) — ambas as redes funcionaram; a falha inicial do hotspot foi causada por SSID incorreto e “Maximizar compatibilidade” desativada
