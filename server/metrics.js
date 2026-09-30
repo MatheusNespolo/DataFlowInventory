@@ -26,6 +26,9 @@ const ESTEIRAS = ['principal', 'secA', 'secB', 'secC'];
 
 const permitido = (valor, lista) => (lista.includes(valor) ? valor : 'outro');
 
+const METODOS_HTTP = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+const BUCKETS_HTTP = [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5];
+
 const ACOES = ['solicitar_peca', 'reset'];
 const STATUS_CONFIRMACAO = ['encaminhado', 'rejeitado'];
 const RESULTADOS_RECUSA = ['peca_invalida', 'rate_limit', 'broker_offline'];
@@ -176,6 +179,14 @@ function criarMetricas({
     registers: [registry],
   });
 
+  const httpHist = new client.Histogram({
+    name: 'dfi_http_request_duration_seconds',
+    help: 'Tempo de resposta da API HTTP, por rota',
+    labelNames: ['rota', 'metodo', 'codigo'],
+    buckets: BUCKETS_HTTP,
+    registers: [registry],
+  });
+
   // ---- Operações ----
   function mensagemMqtt(topic) {
     mensagens.inc({ topic: permitido(topic, topicosPermitidos) });
@@ -269,8 +280,36 @@ function criarMetricas({
     if (expirados) semResposta.inc(expirados);
   }
 
+  // Middleware do Express: mede no evento "finish" da resposta. O rótulo "rota" vem da rota
+  // registrada (nunca da URL), então requisições arbitrárias não criam séries novas.
+  function middlewareHttp() {
+    return (req, res, next) => {
+      try {
+        const t0 = relogio();
+        res.on('finish', () => {
+          try {
+            if (req.path === '/metrics') return; // o scrape não entra nos percentis da API
+            const rota = req.route && typeof req.route.path === 'string'
+              ? req.route.path
+              : (res.statusCode === 404 ? 'nao_encontrada' : 'estatico');
+            httpHist.observe(
+              { rota, metodo: permitido(req.method, METODOS_HTTP), codigo: String(res.statusCode) },
+              (relogio() - t0) / 1000,
+            );
+          } catch (err) {
+            avisar('middlewareHttp', err);
+          }
+        });
+      } catch (err) {
+        avisar('middlewareHttp', err);
+      }
+      next();
+    };
+  }
+
   // ---- API pública ----
   const publico = {
+    middlewareHttp,
     comandoAceito,
     comandoFalhou,
     publishAck,
