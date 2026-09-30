@@ -18,6 +18,7 @@ const { Server } = require('socket.io');
 const mqtt = require('mqtt');
 const helmet = require('helmet');
 const path = require('path');
+const { criarMetricas } = require('./metrics');
 
 // ============================================================
 // CONFIGURAÇÕES
@@ -38,6 +39,10 @@ const PECAS_VALIDAS = ['A', 'B', 'C'];
 
 // Intervalo mínimo (ms) entre comandos de um mesmo cliente (anti-flood)
 const COMANDO_INTERVALO_MS = parseInt(process.env.COMANDO_INTERVALO_MS, 10) || 500;
+
+// Tempo máximo (ms) para o gateway confirmar um comando; passado disso o comando
+// conta em dfi_command_unconfirmed_total (métricas Prometheus).
+const METRICS_CONFIRMACAO_TIMEOUT_MS = parseInt(process.env.METRICS_CONFIRMACAO_TIMEOUT_MS, 10) || 10000;
 
 const MQTT_CONFIG = {
   // Configuração do broker MQTT (padrão: 127.0.0.1 para evitar resolução IPv6 no Windows)
@@ -114,6 +119,15 @@ const metricas = {
   comandosRejeitados: 0,
 };
 
+// Métricas de performance para o Prometheus (GET /metrics). Módulo isolado: todo método
+// é à prova de falha, então um bug de métrica nunca derruba o servidor.
+// (O objeto "metricas" acima é o contador simples do /api/status e continua como está.)
+const prom = criarMetricas({
+  timeoutConfirmacaoMs: METRICS_CONFIRMACAO_TIMEOUT_MS,
+  clientesWs: () => io.engine.clientsCount,
+  topicos: TOPICS,
+});
+
 // Headers de segurança (CSP liberada para o CDN do Socket.IO e Google Fonts,
 // que são carregados pelo frontend/index.html)
 app.use(helmet({
@@ -130,6 +144,9 @@ app.use(helmet({
   // O dashboard é servido em HTTP na bancada local; HSTS atrapalharia.
   hsts: false,
 }));
+
+// Tempo de resposta da API por rota (registrado antes das rotas para medir todas)
+app.use(prom.middlewareHttp());
 
 // Serve arquivos estáticos do frontend
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
@@ -160,6 +177,18 @@ app.get('/api/status', (req, res) => {
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
+});
+
+// Métricas Prometheus (mesmo padrão aberto do /api/status; sem brokerUrl/usuário/senha nos
+// rótulos). Nunca lança: em caso de erro responde 500 e o servidor segue de pé.
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', prom.contentType);
+    res.end(await prom.texto());
+  } catch (err) {
+    console.error('[METRICS] Falha ao gerar as métricas:', err.message);
+    res.status(500).end('erro ao gerar as métricas');
+  }
 });
 
 // ============================================================
@@ -204,6 +233,7 @@ mqttClient = mqtt.connect(MQTT_CONFIG.brokerUrl, mqttOptions);
 // EVENTOS MQTT
 // ============================================================
 mqttClient.on('connect', () => {
+  prom.mqttConectou();
   console.log(`[MQTT] Conectado ao broker: ${MQTT_CONFIG.brokerUrl}`);
 
   // Anuncia que o servidor está online (retida, para novos assinantes).
@@ -228,6 +258,7 @@ mqttClient.on('connect', () => {
   topicosInscrever.forEach(topic => {
     // QoS 1: garante entrega ao menos uma vez mesmo com oscilação de rede
     mqttClient.subscribe(topic, { qos: 1 }, (err) => {
+      if (err) prom.mqttErro('inscricao');
       if (err) {
         console.error(`[MQTT] Erro ao inscrever no tópico ${topic}:`, err.message);
       } else {
@@ -238,10 +269,12 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('error', (err) => {
+  prom.mqttErro('conexao');
   console.error('[MQTT] Erro de conexão:', err.message);
 });
 
 mqttClient.on('offline', () => {
+  prom.mqttCaiu();
   console.warn('[MQTT] Offline — aguardando reconexão...');
 });
 
@@ -251,12 +284,14 @@ mqttClient.on('reconnect', () => {
 
 // Recebe mensagens MQTT e retransmite via Socket.IO
 mqttClient.on('message', (topic, message) => {
+  prom.mensagemMqtt(topic);
   const msgStr = message.toString();
   let msgJson;
 
   try {
     msgJson = JSON.parse(msgStr);
   } catch (e) {
+    prom.mqttErro('json_invalido');
     console.warn(`[MQTT] Mensagem não-JSON no tópico ${topic}:`, msgStr);
     return;
   }
@@ -278,6 +313,7 @@ mqttClient.on('message', (topic, message) => {
       // dashboard sinalizar "hardware offline" em tempo real.
       if (msgJson.type === 'gateway') {
         estadoAtual.gateway = msgJson;
+        prom.gateway(msgJson.status);
         io.emit('gateway', msgJson);
         console.log(`[WS →] Gateway ESP32: ${msgJson.status}`);
       } else {
@@ -289,6 +325,7 @@ mqttClient.on('message', (topic, message) => {
 
     case TOPICS.estoque:
       estadoAtual.estoque = msgJson;
+      prom.estoque(msgJson);
       io.emit('estoque', msgJson);
       console.log(`[WS →] Estoque: A=${msgJson.pecaA} B=${msgJson.pecaB} C=${msgJson.pecaC}`);
       break;
@@ -299,6 +336,7 @@ mqttClient.on('message', (topic, message) => {
       if (estadoAtual.eventos.length > 50) {
         estadoAtual.eventos = estadoAtual.eventos.slice(0, 50);
       }
+      prom.evento(msgJson.evento);
       io.emit('evento', msgJson);
       console.log(`[WS →] Evento: ${msgJson.evento} ${msgJson.peca || ''}`);
       break;
@@ -310,6 +348,7 @@ mqttClient.on('message', (topic, message) => {
 
     case TOPICS.esteiras:
       estadoAtual.esteiras = msgJson;
+      prom.esteiras(msgJson);
       io.emit('esteiras', msgJson);
       break;
 
