@@ -162,3 +162,26 @@ jobs:
           name: playwright-report
           path: test/frontend_smoke/playwright-report/
           retention-days: 7
+
+  server-metrics-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            server/package-lock.json
+            test/server_metrics/package-lock.json
+
+      - name: Instalar dependências (server e testes de métricas)
+        run: |
+          cd server && npm ci
+          cd ../test/server_metrics && npm ci
+
+      - name: Testes das métricas e da infraestrutura de observabilidade (sem Docker)
+        run: cd test/server_metrics && npm test

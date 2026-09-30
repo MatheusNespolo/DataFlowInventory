@@ -1,0 +1,20 @@
+# ============================================================
+# DATA FLOW INVENTORY — Prometheus (desenvolvimento)
+# ------------------------------------------------------------
+# O servidor Node roda no HOST (npm start, porta 3000); o container o
+# alcança por host.docker.internal (ver extra_hosts no docker-compose.yml).
+# Se o servidor estiver fora do ar, o alvo aparece como "down" — o
+# servidor nunca depende do Prometheus (a coleta é por consulta).
+# ============================================================
+global:
+  scrape_interval: 5s
+  scrape_timeout: 3s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: dfi-server
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["host.docker.internal:3000"]
+        labels:
+          app: data-flow-inventory

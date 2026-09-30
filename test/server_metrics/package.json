@@ -1,0 +1,16 @@
+{
+  "name": "dataflow-server-metrics-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Testes das métricas de performance do servidor: unitários, integração com broker MQTT em processo (aedes) e verificações estáticas da infraestrutura de observabilidade. Não exigem Docker.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-concurrency=2 \"unit/*.test.mjs\" \"integracao/*.test.mjs\" \"infra/*.test.mjs\""
+  },
+  "devDependencies": {
+    "aedes": "^1.2.0",
+    "mqtt": "^5.16.0",
+    "socket.io-client": "^4.8.4",
+    "yaml": "^2.9.1"
+  }
+}
