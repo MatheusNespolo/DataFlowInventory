@@ -1,0 +1,72 @@
+# ============================================================
+# DATA FLOW INVENTORY — Stack de observabilidade (DESENVOLVIMENTO)
+# ------------------------------------------------------------
+# Prometheus (coleta) + Grafana (dashboards). O servidor Node NÃO
+# roda aqui: continua no host (npm start, porta 3000) e o Prometheus
+# o consulta em host.docker.internal:3000/metrics.
+#
+# Uso (a senha vem de observability/.env — copie o .env.example):
+#   docker compose --env-file observability/.env up -d
+#   docker compose --env-file observability/.env down        # mantém os dados
+#   docker compose --env-file observability/.env down -v     # APAGA os dados
+# Guia completo: observability/README.md
+# ============================================================
+name: dataflow-observability
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.15.0
+    container_name: dfi-prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    extra_hosts:
+      # No Docker Desktop (Windows/Mac) o nome já existe; no Linux precisa deste mapeamento.
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9090/-/ready || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana-oss:12.4.3
+    container_name: dfi-grafana
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      # Obrigatória: sem ela o "docker compose up" recusa iniciar (não existe senha padrão).
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:?Defina GRAFANA_ADMIN_PASSWORD em observability/.env (copie o observability/.env.example)}"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      # Dashboards versionados no repositório (fonte da verdade); somente leitura.
+      - ./docs/grafana:/var/lib/grafana/dashboards:ro
+    ports:
+      # 3030 no host porque a 3000 é do servidor Node.
+      - "127.0.0.1:${GRAFANA_PORT:-3030}:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  prometheus-data:
+    name: dfi-prometheus-data
+  grafana-data:
+    name: dfi-grafana-data

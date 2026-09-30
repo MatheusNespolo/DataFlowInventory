@@ -1,0 +1,13 @@
+# Dashboards como código: os JSON vivem em docs/grafana/ (montado em /var/lib/grafana/dashboards).
+# Para alterar um painel: edite na interface, use "Export → JSON" e sobrescreva o arquivo do repositório.
+apiVersion: 1
+providers:
+  - name: dataflow-inventory
+    orgId: 1
+    folder: Data Flow Inventory
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
