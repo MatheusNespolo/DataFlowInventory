@@ -30,11 +30,17 @@ export async function criarGateway(brokerPorta, { modo = 'confirmar', anunciarOn
     cliente.once('connect', resolve);
     cliente.once('error', reject);
   });
+  cliente.on('error', () => {}); // erros tardios (ex.: após cair()) não podem derrubar o runner
   await cliente.subscribeAsync(T.cmdSub, { qos: 1 });
 
   cliente.on('message', (topico, payload) => {
     if (topico !== T.cmdSub) return;
-    const comando = JSON.parse(payload.toString());
+    let comando;
+    try {
+      comando = JSON.parse(payload.toString());
+    } catch {
+      return; // payload que não é JSON
+    }
     recebidos.push(comando);
     if (modo === 'mudo') return;
     const resposta = modo === 'rejeitar'
