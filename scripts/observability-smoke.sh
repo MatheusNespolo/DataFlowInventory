@@ -31,7 +31,7 @@ falhas=0
 etapa()   { printf '%-66s' "$1"; }
 passou()  { echo "PASS"; }
 falhou()  { echo "FAIL"; [ -n "${1:-}" ] && echo "     -> $1"; falhas=$((falhas + 1)); }
-ler_env() { grep -E "^$1=" "$ARQ_ENV" 2>/dev/null | head -n1 | cut -d= -f2- | tr -d ''; }
+ler_env() { grep -E "^$1=" "$ARQ_ENV" 2>/dev/null | head -n1 | cut -d= -f2- | tr -d '\r'; }
 
 # esperar <segundos> <comando...>: repete o comando ate passar ou estourar o tempo
 esperar() {
@@ -69,7 +69,7 @@ etapa "docker compose config (YAML e variaveis validos)"
 if "${COMPOSE[@]}" config -q >/dev/null 2>&1; then passou; else falhou "Rode: ${COMPOSE[*]} config"; fi
 
 etapa "promtool check config (prometheus.yml)"
-IMAGEM_PROM="$(grep -E '^[[:space:]]+image:[[:space:]]+prom/prometheus:' "$ARQ_COMPOSE" | awk '{print $2}' | tr -d '' | head -n1)"
+IMAGEM_PROM="$(grep -E '^[[:space:]]+image:[[:space:]]+prom/prometheus:' "$ARQ_COMPOSE" | awk '{print $2}' | tr -d '\r' | head -n1)"
 if MSYS_NO_PATHCONV=1 docker run --rm --entrypoint promtool \
      -v "$RAIZ/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
      "$IMAGEM_PROM" check config /etc/prometheus/prometheus.yml >/dev/null 2>&1; then

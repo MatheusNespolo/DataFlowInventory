@@ -307,6 +307,11 @@ function criarMetricas({
     };
   }
 
+  // Séries com rótulo nascem em 0: o increase() do Prometheus ignora o primeiro incremento de uma série nova
+  for (const t of ERROS_MQTT) errosMqtt.inc({ tipo: t }, 0);
+  for (const e of EVENTOS) eventos.inc({ evento: e }, 0);
+  for (const r of [...RESULTADOS_RECUSA, 'publicado', 'falha_publicacao']) comandos.inc({ resultado: r }, 0);
+
   // ---- API pública ----
   const publico = {
     middlewareHttp,
