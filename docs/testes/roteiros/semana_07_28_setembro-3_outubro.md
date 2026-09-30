@@ -154,7 +154,16 @@ Roteiro de 5 fases para isolar falha de acionamento nos motores B/C.
 | IRF520 → Motor (saída) | < 0,2 V | ⬜ | ⬜ |
 | Tensão motor sob carga | > 10,5 V | ⬜ | ⬜ |
 
-### 4.3 — Fase 3: Resistência das Soldas
+#### ⏱️ Fase 3 — Teste do MOSFET IRF520 (15 min, alimentação desligada)
+
+| Teste | Método | Esperado | Motor B | Motor C |
+|-------|--------|----------|---------|---------|
+| MOSFET G→S | Multímetro em modo diodo | 0,4–0,7 V | ⬜ | ⬜ |
+| MOSFET D→S | Multímetro em modo diodo | OL | ⬜ | ⬜ |
+
+**Interpretação:** G→S em curto (~0 V) ou D→S com continuidade indica MOSFET danificado → trocar o módulo.
+
+#### ⏱️ Fase 4 — Continuidade das Soldas + Inspeção com Lupa (20 min, alimentação desligada)
 
 | Ponto de solda | Tolerância | Motor B | Motor C |
 |---------------|-----------|---------|---------|
@@ -162,24 +171,21 @@ Roteiro de 5 fases para isolar falha de acionamento nos motores B/C.
 | Pad GND | < 0,1 Ω OK | ⬜ | ⬜ |
 | Pad SIG | < 0,1 Ω OK | ⬜ | ⬜ |
 
-### 4.4 — Fase 4: Teste do MOSFET (IRF520)
+- [ ] Inspeção visual com lupa: solda fosca, rachada ou com "pescoço" (solda fria) nos pads dos módulos B e C
+- [ ] Refazer qualquer solda suspeita e repetir a medição
 
-| Teste | Método | Esperado | Motor B | Motor C |
-|-------|--------|----------|---------|---------|
-| MOSFET G→S | Multímetro diodo | 0,4–0,7 V | ⬜ | ⬜ |
-| MOSFET D→S | Multímetro diodo | OL | ⬜ | ⬜ |
-
-### 4.5 — Testes Funcionais
+#### ⏱️ Fase 5 — Teste Funcional via MQTT (15 min)
 
 | Teste | Método | Esperado | Status |
 |-------|--------|----------|--------|
 | Motor B liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"B"}'` | Gira com força normal | ⬜ |
 | Motor C liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"C"}'` | Gira com força normal | ⬜ |
 
-### 4.6 — Critérios de Sucesso
+### 4.3 — Critérios de Sucesso
 
-- [ ] Causa identificada (cabo / solda fria / MOSFET / fonte)
+- [ ] Causa identificada (cabo / solda fria / MOSFET / PWM ausente / fonte)
 - [ ] Motores B e C com força equivalente ao motor A
+- [ ] Se o módulo estiver danificado: solda retrabalhada ou módulo trocado e Fases 0–5 repetidas
 - [ ] Documentado na Seção 10
 
 ---
@@ -233,7 +239,7 @@ mosquitto_sub -h localhost -t "dataflow/#" -v
 - **#22 Deployment Guide:** mapear setup local, HiveMQ e simulador; redação inicial em 02/10.
 - **#23 E2E:** manter em Backlog e iniciar na Semana 8.
 - **#24 Firmware Versioning:** definir SemVer e planejar tags retroativas.
-- **#25 Telemetria:** manter em Backlog; depende do Deployment Guide.
+- **#25 Telemetria:** código, stack e dashboards entregues (PR #29); resta validar com Docker (smoke + conferência visual no Grafana) e rodar o burn-in observando os painéis. O `docs/DEPLOYMENT.md` já existe (versão inicial).
 
 ---
 
@@ -264,15 +270,15 @@ O simulador permite validar os cenários de FSM e a integração Dashboard/API s
 
 ## 10. Resultados Consolidados da Semana
 
-> Preencher progressivamente. Última atualização: 28/09/2026.
+> Preencher progressivamente. Última atualização: 30/09/2026.
 
 | Etapa | Resultado | Observações |
 |-------|-----------|-------------|
 | 0 — Pré-voo | ⬜ | — |
 | 1 — HiveMQ via Beckhoff_Guest + hotspot 4G | ✅ CONCLUÍDO | HiveMQ conectou nas duas redes; falha inicial do hotspot foi SSID incorreto e “Maximizar compatibilidade” desativada. Não atribuir o resultado exclusivamente ao firewall do SENAI. |
-| 2 — Diagnóstico IRF520 B/C | ⬜ | Executar em 29/09 |
+| 2 — Diagnóstico IRF520 B/C | 🔄 Em andamento | Desbaste A/B/C concluído em 29/09 (ciclo manual suave); B/C não acionam eletricamente. Fases 0–5 (seção 4.2) a executar em 30/09; nenhum resultado registrado ainda |
 | 3 — Burn-in S1–S6 | ⬜ | Executar em 30/09–01/10 |
-| 4 — Acabamento MDF/esteiras | ⬜ | Executar em 01/10 |
+| 4 — Acabamento MDF/esteiras | 🔄 Parcial | Desbaste das esteiras concluído em 29/09; acabamento MDF em 01/10 |
 | 5 — Documentação/cards | ⬜ | Executar em 02/10 |
 
 ---

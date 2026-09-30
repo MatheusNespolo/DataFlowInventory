@@ -88,4 +88,4 @@ docker compose --env-file observability/.env down -v     # para e APAGA os dados
 
 ## Relação com o Deployment Guide
 
-O `docs/DEPLOYMENT.md` ainda não existe (é um card à parte). Quando for escrito, ele deve **referenciar este README** (ou absorver estes passos) na etapa de observabilidade.
+O [`docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md) (versão inicial, 30/09/2026) referencia este README na seção 8 (Observabilidade). Este README continua sendo a fonte dos passos detalhados do stack.

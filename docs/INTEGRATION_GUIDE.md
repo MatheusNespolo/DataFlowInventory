@@ -175,10 +175,23 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 
 ---
 
-## 3. Checklist Final
+## 3. Observabilidade de Performance (Prometheus + Grafana)
+
+Camada **complementar** ao historiador do CX9240: o SQLite guarda dado de **negócio** (estoque e eventos com precisão por evento); o Prometheus guarda dado de **performance** do servidor Node (latência de comando, PUBACK do broker, API, reconexões, quedas do gateway).
+
+- O servidor expõe `GET /metrics` (porta 3000). O Prometheus consulta a cada 5 s; se o stack estiver desligado, nada muda no servidor nem na integração com o CX9240.
+- Contrato MQTT do CX9240 (seção 1.1) **não muda**: nenhum tópico novo e nenhuma alteração de firmware.
+- Dashboards em `docs/grafana/` (Visão Geral, Performance, Confiabilidade). Setup em [`observability/README.md`](../observability/README.md); catálogo de métricas em `docs/ARCHITECTURE.md` (seção 7).
+- **Pendente:** validar o stack com Docker (`scripts/observability-smoke.ps1`) e conferir os painéis no Grafana.
+- Implantação completa do sistema: [`docs/DEPLOYMENT.md`](DEPLOYMENT.md).
+
+---
+
+## 4. Checklist Final
 
 - [ ] Beckhoff: contrato validado, subscriber implementado, DB persistindo
 - [ ] Separador: código ativo, testes T7.1–T7.6 passando
 - [ ] Documentação: plano_de_testes.md + CHANGELOG.md + cards Done
+- [ ] Observabilidade: smoke test com Docker e painéis do Grafana conferidos
 - [ ] Referência: ver `docs/testes/roteiros/semana_05_15-19_setembro.md` para execução
 

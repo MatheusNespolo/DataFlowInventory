@@ -1,6 +1,8 @@
 # Card: Deployment Guide — Guia de Implantação Completa
 
-**Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🟡 Média
+**Template:** A (Definition of Done) — **Status:** 🔄 In Progress · **Prioridade:** 🟡 Média
+
+> **Atualização 30/09/2026:** versão inicial de docs/DEPLOYMENT.md redigida (seções 1–10, cenários A–D, inclui a observabilidade Prometheus/Grafana). **Pendente:** Fase 3 (executar do zero em máquina limpa, cronometrar e corrigir atritos) e linkar no CHANGELOG. Nenhum comando foi testado em máquina limpa ainda.
 
 ---
 
@@ -20,7 +22,7 @@ Criar documento (`docs/DEPLOYMENT.md`) com passo a passo completo para implantar
 ## ✅ Critério de Aceite
 
 ### Estrutura do Documento
-- [ ] Arquivo `docs/DEPLOYMENT.md` criado com seções:
+- [x] Arquivo `docs/DEPLOYMENT.md` criado com seções:
   - **1. Pré-requisitos** (Node.js v22, Arduino IDE, mosquitto, hardware físico)
   - **2. Setup de Hardware** (montagem, fiação — cross-ref `BILL_OF_MATERIALS.md` e diagrama elétrico)
   - **3. Setup de Firmware** (upload Arduino Uno + ESP32, `secrets.h`)
@@ -49,13 +51,13 @@ Criar documento (`docs/DEPLOYMENT.md`) com passo a passo completo para implantar
 ## 📋 Checklist de Execução
 
 ### Fase 1 — Levantamento
-- [ ] Mapear todos os passos manuais realizados desde clone até dashboard funcional
-- [ ] Identificar dependências ocultas (variáveis de ambiente, portas, drivers)
+- [x] Mapear todos os passos manuais realizados desde clone até dashboard funcional
+- [x] Identificar dependências ocultas (variáveis de ambiente, portas, drivers)
 
 ### Fase 2 — Redação
-- [ ] Escrever seções 1–8 do `DEPLOYMENT.md`
+- [x] Escrever seções 1–8 do `DEPLOYMENT.md`
 - [ ] Incluir comandos copy-paste testados (bash e PowerShell)
-- [ ] Adicionar troubleshooting dos problemas já documentados no `CHANGELOG.md`
+- [x] Adicionar troubleshooting dos problemas já documentados no `CHANGELOG.md`
 
 ### Fase 3 — Validação
 - [ ] Executar o guia do zero em máquina limpa (ou VM)
@@ -63,7 +65,7 @@ Criar documento (`docs/DEPLOYMENT.md`) com passo a passo completo para implantar
 - [ ] Corrigir pontos de fricção identificados
 
 ### Fase 4 — Documentação
-- [ ] `README.md` linka para `DEPLOYMENT.md`
+- [x] `README.md` linka para `DEPLOYMENT.md`
 - [ ] `CHANGELOG.md` registra criação do guia
 - [ ] Mover card para `Done`
 

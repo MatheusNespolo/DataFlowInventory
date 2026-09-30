@@ -14,6 +14,16 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Deployment Guide e atualização de documentação (30/09/2026)**
+  - Novo `docs/DEPLOYMENT.md` (versão inicial): cenários A–D, pré-requisitos, hardware, firmware, broker, servidor, dashboard, observabilidade, validação pós-deploy e rollback. **Não foi executado em máquina limpa ainda** (Fase 3 do card #22)
+  - `README.md`, `docs/INTEGRATION_GUIDE.md` (nova seção 3, Observabilidade; checklist passou a seção 4), `docs/testes/plano_de_testes.md`, `docs/fluxogramas/board_github_projects.md` e os cards #22 e #25 atualizados; `observability/README.md` passa a referenciar o `DEPLOYMENT.md`
+  - Card #25 renomeado para Prometheus/Grafana (InfluxDB descartado) e movido para `In Progress`; Card #22 movido para `In Progress`
+
+- **Desbaste mecânico das esteiras e falha de acionamento B/C (29/09/2026)**
+  - Desbaste da costura da fita das esteiras A, B e C concluído, com ciclo manual suave
+  - Após o desbaste, as esteiras B e C não respondem ao acionamento elétrico (A segue funcional). Hipóteses: solda fria, MOSFET IRF520 danificado, cabo/jumper ou PWM ausente
+  - Diagnóstico em 6 fases (0–5) documentado no roteiro da Semana 7 (seção 4.2). **Nenhuma fase foi executada ainda; a causa-raiz é desconhecida**
+
 - **Telemetria Histórica de Performance — Prometheus + Grafana (30/09/2026)**
   - `GET /metrics` no `server/server.js` (mesma porta 3000 e mesmo padrão aberto do `/api/status`) com 17 métricas `dfi_*` mais as métricas padrão do processo: publish → ack do broker, tempo de confirmação do gateway por comando, tempo de resposta da API por rota, throughput de mensagens e eventos, reconexões MQTT, erros, quedas do gateway (LWT), comandos por resultado, sem resposta e órfãos, estoque e esteiras
   - Lógica isolada em `server/metrics.js` (+ `server/metrics-correlacao.js`, fila FIFO comando → confirmação); todo método é à prova de falha para nunca derrubar o servidor; rótulos só aceitam valores de listas permitidas

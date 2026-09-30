@@ -1,4 +1,6 @@
-# Card: Telemetria Histórica — Grafana/InfluxDB (Métricas de Performance)
+# Card: Telemetria Histórica — Prometheus/Grafana (Métricas de Performance)
+
+> **Atualização 30/09/2026 — Status: 🔄 In Progress.** Implementação entregue (PR #29) com **Prometheus** (modelo *pull*) no lugar de InfluxDB: `GET /metrics`, `docker-compose.yml`, 3 dashboards em `docs/grafana/`, testes sem Docker e job de CI. **Pendente:** validação real com Docker (`scripts/observability-smoke.ps1`), conferência visual no Grafana (cores, legendas dos state-timelines, lacunas em vez de zeros nos gráficos de latência sem tráfego), burn-in observado e screenshots. Itens abaixo marcados `[x]` foram entregues; `[ ]` dependem de Docker/bancada. Onde o texto cita InfluxDB, leia Prometheus.
 
 **Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🟢 Baixa
 
@@ -18,24 +20,24 @@ Implementar camada de observabilidade com séries temporais (InfluxDB ou Prometh
 ## ✅ Critério de Aceite
 
 ### Infraestrutura
-- [ ] InfluxDB (ou Prometheus) provisionado (Docker local para desenvolvimento)
-- [ ] Grafana provisionado e conectado à fonte de dados
-- [ ] `docker-compose.yml` (novo ou estendido) inclui os serviços de observabilidade
+- [x] Prometheus provisionado (Docker local para desenvolvimento; InfluxDB descartado)
+- [x] Grafana provisionado e conectado à fonte de dados
+- [x] `docker-compose.yml` (novo ou estendido) inclui os serviços de observabilidade
 
 ### Instrumentação
-- [ ] `server/server.js` publica métricas: latência de resposta MQTT (publish → ack), tempo de processamento de comando, contagem de eventos por tipo
-- [ ] Métricas de conexão: uptime do broker, reconexões, mensagens perdidas (LWT)
-- [ ] Métricas de estoque: histórico de variação ao longo do tempo (complementar ao SQLite do CX9240)
+- [x] `server/server.js` publica métricas: latência de resposta MQTT (publish → ack), tempo de processamento de comando, contagem de eventos por tipo
+- [x] Métricas de conexão: uptime do broker, reconexões, mensagens perdidas (LWT)
+- [x] Métricas de estoque: histórico de variação ao longo do tempo (complementar ao SQLite do CX9240)
 
 ### Dashboards Grafana
-- [ ] Dashboard "Visão Geral": status esteiras, estoque em tempo real
-- [ ] Dashboard "Performance": latência p50/p95/p99, throughput
-- [ ] Dashboard "Confiabilidade": reconexões, erros, uptime
+- [x] Dashboard "Visão Geral": status esteiras, estoque em tempo real
+- [x] Dashboard "Performance": latência p50/p95/p99, throughput
+- [x] Dashboard "Confiabilidade": reconexões, erros, uptime
 
 ### Documentação
-- [ ] `docs/ARCHITECTURE.md`: nova seção de Observabilidade
-- [ ] `docs/DEPLOYMENT.md` (se já existir — ver Card Deployment): passo a passo de setup do stack de observabilidade
-- [ ] `docs/CHANGELOG.md` registra a introdução da telemetria histórica
+- [x] `docs/ARCHITECTURE.md`: nova seção de Observabilidade
+- [x] `docs/DEPLOYMENT.md`: passo a passo de setup do stack de observabilidade (seção 8, versão inicial)
+- [x] `docs/CHANGELOG.md` registra a introdução da telemetria histórica
 
 ## 🔗 Dependências
 
@@ -46,23 +48,23 @@ Implementar camada de observabilidade com séries temporais (InfluxDB ou Prometh
 ## 📋 Checklist de Execução
 
 ### Fase 1 — Infraestrutura
-- [ ] Provisionar InfluxDB via Docker (`docker-compose.yml`)
-- [ ] Provisionar Grafana via Docker, conectar ao InfluxDB
+- [x] Provisionar Prometheus via Docker (`docker-compose.yml`)
+- [x] Provisionar Grafana via Docker, conectar ao Prometheus
 - [ ] Validar ingestão de dados de teste (ping/pong simples)
 
 ### Fase 2 — Instrumentação
-- [ ] Adicionar client InfluxDB (ou Prometheus exporter) em `server/server.js`
-- [ ] Instrumentar pontos críticos: recepção MQTT, processamento de comando, resposta ao dashboard
-- [ ] Validar métricas aparecendo no InfluxDB
+- [x] Adicionar exporter Prometheus (`prom-client`) em `server/server.js`
+- [x] Instrumentar pontos críticos: recepção MQTT, processamento de comando, resposta ao dashboard
+- [ ] Validar métricas aparecendo no Prometheus (smoke com Docker)
 
 ### Fase 3 — Dashboards
-- [ ] Criar os 3 dashboards Grafana (Visão Geral, Performance, Confiabilidade)
-- [ ] Exportar JSON dos dashboards para versionamento (`docs/grafana/*.json`)
+- [x] Criar os 3 dashboards Grafana (Visão Geral, Performance, Confiabilidade)
+- [x] Exportar JSON dos dashboards para versionamento (`docs/grafana/*.json`)
 
 ### Fase 4 — Documentação e Validação
-- [ ] Atualizar `ARCHITECTURE.md` e `DEPLOYMENT.md`
+- [x] Atualizar `ARCHITECTURE.md` e `DEPLOYMENT.md`
 - [ ] Rodar burn-in test (ver `semana_06_22-26_setembro.md` Bloco 4) observando os dashboards em paralelo
-- [ ] Registrar no `CHANGELOG.md`
+- [x] Registrar no `CHANGELOG.md`
 - [ ] Mover card para `Done`
 
 ## 🗓️ Estimativa

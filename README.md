@@ -359,6 +359,8 @@ Acessar http://localhost:3000 no navegador.
 4. Selecionar placa: **ESP32 Dev Module**
 5. Fazer upload
 
+> 📘 Para um passo a passo completo (hardware, firmware, broker, servidor e validação), veja [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
 #### 3. Rodar o Servidor
 
 ```bash
@@ -381,6 +383,9 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 - 🏭 **Integração Beckhoff CX9240:** persistência do histórico e estoque em banco de dados relacional (lado do simulador implementado; validação com PC industrial em bancada própria).
 - ☁️ **Broker Remoto (HiveMQ Cloud):** validação E2E via internet/TLS (porta 8883) com credenciais em nuvem (parcialmente validado). Ver [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) (Teste 6).
 - 🧪 **Validação de infraestrutura:** scripts em `scripts/` e `docs/testes/validações/validar_infra.ps1` automatizam a checagem de broker, firewall e serviços antes de cada bancada.
+- 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Código e testes automatizados concluídos; a execução real do stack (smoke test e conferência visual dos painéis) depende de Docker e está pendente. Ver [`observability/README.md`](observability/README.md).
+- 📘 **Guia de implantação:** passo a passo para subir o sistema do zero em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) (versão inicial, ainda não validada em máquina limpa).
+- 🔧 **Diagnóstico IRF520 (esteiras B/C):** após o desbaste mecânico de 29/09, B e C não acionam eletricamente; o diagnóstico (Fases 0–5) está em [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) e ainda não foi executado.
 
 ## Equipe
 

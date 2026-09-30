@@ -76,7 +76,9 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 
 | Card | Título | Área | Observação |
 |---|---|---|---|
-| #1 | Montagem mecânica das esteiras e soldagem drivers | `Hardware` | Estrutura mecânica e alinhamento avançados (15/09); soldagem/elétrica replanejadas |
+| #1 | Montagem mecânica das esteiras e soldagem drivers | `Hardware` | Desbaste das esteiras A/B/C concluído (29/09). Esteiras B/C não acionam eletricamente (suspeita: solda ou módulo IRF520); diagnóstico Fases 0–5 a executar (roteiro Semana 7, seção 4.2) |
+| #22 | Deployment Guide — Guia de Implantação | `Docs`/`Infra` | `docs/DEPLOYMENT.md` inicial redigido (30/09); falta validar em máquina limpa |
+| #25 | Telemetria Histórica — Prometheus/Grafana | `Infra` | Implementação entregue (PR #29); falta validação com Docker e burn-in observado |
 | #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
 | #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
 | #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
@@ -257,7 +259,8 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 
 ### 🔹 Card #22 — Deployment Guide — Guia de Implantação Completa
 
-- **Coluna:** `Backlog` · **Área:** `Docs` + `Infra` · **Prioridade:** `P2-Médio`
+- **Coluna:** `In Progress` (30/09/2026) · **Área:** `Docs` + `Infra` · **Prioridade:** `P2-Médio`
+- **Status:** versão inicial de `docs/DEPLOYMENT.md` redigida (seções 1–10, cenários A–D, inclui observabilidade). **Pendente:** executar o guia do zero em máquina limpa, cronometrar e corrigir atritos (Fase 3).
 - **Labels:** `area:docs`, `area:infra`, `tipo:documentation`, `p2-medio`
 - **Arquivo de Comentário:** `docs/cards_comments/card_deployment_guide.md`
 - **Objetivo:** Criar `docs/DEPLOYMENT.md` com passo a passo completo (pré-requisitos, hardware, firmware, broker, servidor, validação pós-deploy) para implantar o sistema do zero em um novo ambiente — cobrindo cenários local, nuvem e simulador.
@@ -279,12 +282,13 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 - **Objetivo:** Introduzir cabeçalhos de versão semântica (`vX.Y.Z`) nos sketches Arduino/ESP32, criar tags Git retroativas para marcos já validados e documentar a convenção de versionamento em `CONTRIBUTING.md` — eliminando a ambiguidade de "qual versão está rodando na bancada".
 - **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
 
-### 🔹 Card #25 — Telemetria Histórica — Grafana/InfluxDB (Métricas de Performance)
+### 🔹 Card #25 — Telemetria Histórica — Prometheus/Grafana (Métricas de Performance)
 
-- **Coluna:** `Backlog` · **Área:** `Infra/Observabilidade` · **Prioridade:** `P3-Baixo`
+- **Coluna:** `In Progress` (30/09/2026) · **Área:** `Infra/Observabilidade` · **Prioridade:** `P3-Baixo`
+- **Status:** implementação entregue (PR #29): `GET /metrics`, stack Prometheus + Grafana e 3 dashboards, com testes sem Docker e job de CI. **Pendente:** executar `scripts/observability-smoke.ps1` com Docker, conferir cores, legendas dos state-timelines e lacunas (não zeros) nos gráficos de latência sem tráfego, e rodar o burn-in observando os painéis. Só então mover para `Done`.
 - **Labels:** `area:infra`, `tipo:feature`, `p3-baixo`
 - **Arquivo de Comentário:** `docs/cards_comments/card_telemetria_historica_grafana.md`
-- **Objetivo:** Provisionar InfluxDB + Grafana (Docker) e instrumentar `server/server.js` com métricas de performance (latência MQTT p50/p95/p99, throughput de eventos, uptime) — complementando o historiador de negócio do CX9240 com observabilidade de infraestrutura.
+- **Objetivo:** Provisionar Prometheus + Grafana (Docker; InfluxDB descartado em favor do modelo *pull*) e instrumentar `server/server.js` com métricas de performance (latência p50/p95/p99, throughput de eventos, uptime) — complementando o historiador de negócio do CX9240 com observabilidade de infraestrutura. Setup em `observability/README.md`.
 - **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
 
 ---
