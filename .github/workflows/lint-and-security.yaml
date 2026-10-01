@@ -112,6 +112,13 @@ jobs:
           arduino-cli core install arduino:avr
           arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 
+      - name: Instalar bibliotecas Arduino
+        run: |
+          arduino-cli lib install "LiquidCrystal I2C" "ArduinoJson@6.21.5" "PubSubClient"
+
+      - name: Criar secrets.h de exemplo (arquivo real não é versionado)
+        run: cp esp32/gateway_mqtt/secrets.h.example esp32/gateway_mqtt/secrets.h
+
       - name: Compilar Arduino Uno (principal)
         run: arduino-cli compile --fqbn arduino:avr:uno --warnings all arduino/data_flow_inventory/data_flow_inventory.ino
 
