@@ -158,7 +158,7 @@ Também são expostas as métricas padrão do `prom-client` (`process_*` e `node
 
 - O casamento comando → confirmação é aproximado enquanto o firmware não devolver um id de correlação.
 - Percentis só existem quando há amostras na janela (sem comandos, os painéis de latência ficam vazios).
-- A execução real do stack e a renderização dos painéis ainda não foram validadas (dependem de Docker); o roteiro de verificação é `scripts/observability-smoke.*`; os testes automatizados (`test/server_metrics`) não usam Docker.
+- A execução real do stack e a renderização dos painéis foram validadas em 01/10/2026; o roteiro de verificação é `scripts/observability-smoke.*`; os testes automatizados (`test/server_metrics`) não usam Docker.
 
 ## 8. Documentação Correlata
 

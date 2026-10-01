@@ -545,4 +545,6 @@ Detalhes completos (pinagem, ligaÃ§Ãµes e checklists): [`test/esteira_peca_b
 - **Burn-in (S1–S7):** Segue agendado para 30/09–02/10, condicionado ao diagnóstico de B/C. Durante o burn-in, observar os dashboards Grafana em paralelo (latência p50/p95/p99, reconexões, quedas do gateway) quando o stack de observabilidade estiver validado.
 - **Telemetria Prometheus/Grafana (Card #25):** Implementação entregue (`GET /metrics`, stack Docker, 3 dashboards, testes sem Docker). **Não validado:** execução real do stack. Pendências: rodar `scripts/observability-smoke.ps1` após instalar o Docker e conferir no Grafana as cores dos painéis, as legendas dos state-timelines e se os gráficos de latência mostram lacunas (e não zeros) quando não há tráfego.
 - **Deployment Guide (Card #22):** `docs/DEPLOYMENT.md` criado em versão inicial; falta executá-lo do zero em máquina limpa.
+- **Telemetria Prometheus/Grafana (Card #25) — Concluída (01/10/2026):** o stack foi validado (smoke test e conferência dos painéis) e as capturas dos dashboards foram anexadas ao card. Esta observação substitui o "Não validado" e as pendências de 30/09, e o burn-in pode observar os dashboards Grafana em paralelo.
+
 

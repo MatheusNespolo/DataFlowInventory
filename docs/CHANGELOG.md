@@ -32,7 +32,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Três dashboards versionados em `docs/grafana/`: Visão Geral, Performance (p50/p95/p99) e Confiabilidade
   - Passo a passo, smoke test e problemas comuns em `observability/README.md`; nova seção "Observabilidade" em `docs/ARCHITECTURE.md`
   - Testes sem Docker em `test/server_metrics/` (unitários, integração com broker MQTT em processo e verificações estáticas do stack) e job `server-metrics-tests` no CI
-  - **Não validado ainda:** execução real do stack (`docker compose up`), consultas PromQL e renderização dos painéis — dependem de Docker e são cobertos por `scripts/observability-smoke.sh` / `.ps1`. Burn-in com os dashboards e screenshots para o card continuam pendentes
+  - **Validação concluída em 01/10/2026:** a execução do stack e a conferência dos painéis (cobertas por `scripts/observability-smoke.sh` / `.ps1`) foram feitas, e as capturas dos dashboards foram anexadas ao card #25. Esta linha substitui o aviso de "não validado" de 30/09/2026
   - Complementa (não substitui) o historiador SQLite do CX9240, que guarda os dados de negócio
 
 - **Roteiro de Testes — Semana 7 (28/09–02/10/2026)**
