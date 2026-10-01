@@ -26,6 +26,10 @@
 <img src="img/DataFlowInventory.png" width="1865" height="884" alt="DataFlowInventory">
 <br>
 
+---
+<img src="img/ArquiteturaDataFlowInventory.png" width="1865" height="884" alt="ArquiteturaDataFlowInventory">
+<br>
+
 SENAI São Caetano do Sul — Boa Vista<br>
 Engenharia de Controle e Automação
 
