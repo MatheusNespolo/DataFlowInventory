@@ -9,7 +9,7 @@ server.js (métricas em memória) ◄── consulta a cada 5 s ── Prometheu
 
 O servidor **nunca empurra dados**: se este stack estiver desligado, nada muda no `server.js`. O stack é **opcional** e voltado a desenvolvimento; não é necessário para a bancada básica.
 
-> **Status de validação:** as métricas, o endpoint `/metrics`, a coerência dos dashboards com as métricas e a configuração são cobertos por testes automatizados que **não usam Docker** (`cd test/server_metrics && npm test`). A execução real do stack (`docker compose up`, consultas PromQL e renderização dos painéis) só é validada por você, com o `scripts/observability-smoke.*` e conferindo os painéis no navegador.
+> **Status de validação:** as métricas, o endpoint `/metrics`, a coerência dos dashboards com as métricas e a configuração são cobertos por testes automatizados que **não usam Docker** (`cd test/server_metrics && npm test`). A execução real do stack (`docker compose up`, consultas PromQL e renderização dos painéis) foi validada em 01/10/2026 com o `scripts/observability-smoke.*` e a conferência dos painéis no navegador. Para repetir em outro ambiente, use esses mesmos passos.
 
 ## Pré-requisitos
 

@@ -182,7 +182,7 @@ Camada **complementar** ao historiador do CX9240: o SQLite guarda dado de **neg�
 - O servidor expõe `GET /metrics` (porta 3000). O Prometheus consulta a cada 5 s; se o stack estiver desligado, nada muda no servidor nem na integração com o CX9240.
 - Contrato MQTT do CX9240 (seção 1.1) **não muda**: nenhum tópico novo e nenhuma alteração de firmware.
 - Dashboards em `docs/grafana/` (Visão Geral, Performance, Confiabilidade). Setup em [`observability/README.md`](../observability/README.md); catálogo de métricas em `docs/ARCHITECTURE.md` (seção 7).
-- **Pendente:** validar o stack com Docker (`scripts/observability-smoke.ps1`) e conferir os painéis no Grafana.
+- **Validado em 01/10/2026:** stack com Docker (`scripts/observability-smoke.ps1`) e painéis do Grafana conferidos.
 - Implantação completa do sistema: [`docs/DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ---

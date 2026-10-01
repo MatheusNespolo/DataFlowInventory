@@ -239,7 +239,7 @@ mosquitto_sub -h localhost -t "dataflow/#" -v
 - **#22 Deployment Guide:** mapear setup local, HiveMQ e simulador; redação inicial em 02/10.
 - **#23 E2E:** manter em Backlog e iniciar na Semana 8.
 - **#24 Firmware Versioning:** definir SemVer e planejar tags retroativas.
-- **#25 Telemetria:** código, stack e dashboards entregues (PR #29); resta validar com Docker (smoke + conferência visual no Grafana) e rodar o burn-in observando os painéis. O `docs/DEPLOYMENT.md` já existe (versão inicial).
+- **#25 Telemetria:** ✅ concluída em 01/10/2026 (código, stack e dashboards do PR #29 validados; capturas dos dashboards anexadas ao card). O `docs/DEPLOYMENT.md` já existe (versão inicial).
 
 ---
 

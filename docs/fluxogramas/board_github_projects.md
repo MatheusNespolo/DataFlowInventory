@@ -78,7 +78,7 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 |---|---|---|---|
 | #1 | Montagem mecânica das esteiras e soldagem drivers | `Hardware` | Desbaste das esteiras A/B/C concluído (29/09). Esteiras B/C não acionam eletricamente (suspeita: solda ou módulo IRF520); diagnóstico Fases 0–5 a executar (roteiro Semana 7, seção 4.2) |
 | #22 | Deployment Guide — Guia de Implantação | `Docs`/`Infra` | `docs/DEPLOYMENT.md` inicial redigido (30/09); falta validar em máquina limpa |
-| #25 | Telemetria Histórica — Prometheus/Grafana | `Infra` | Implementação entregue (PR #29); falta validação com Docker e burn-in observado |
+| #25 | Telemetria Histórica — Prometheus/Grafana | `Infra` | ✅ Concluído (01/10/2026): implementação (PR #29) validada; capturas dos dashboards anexadas ao card |
 | #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
 | #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
 | #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
@@ -284,8 +284,8 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 
 ### 🔹 Card #25 — Telemetria Histórica — Prometheus/Grafana (Métricas de Performance)
 
-- **Coluna:** `In Progress` (30/09/2026) · **Área:** `Infra/Observabilidade` · **Prioridade:** `P3-Baixo`
-- **Status:** implementação entregue (PR #29): `GET /metrics`, stack Prometheus + Grafana e 3 dashboards, com testes sem Docker e job de CI. **Pendente:** executar `scripts/observability-smoke.ps1` com Docker, conferir cores, legendas dos state-timelines e lacunas (não zeros) nos gráficos de latência sem tráfego, e rodar o burn-in observando os painéis. Só então mover para `Done`.
+- **Coluna:** `Done` (01/10/2026; em `In Progress` desde 30/09/2026) · **Área:** `Infra/Observabilidade` · **Prioridade:** `P3-Baixo`
+- **Status:** ✅ concluído em 01/10/2026. Implementação (PR #29): `GET /metrics`, stack Prometheus + Grafana e 3 dashboards, com testes sem Docker e job de CI. Validação do stack concluída; as capturas de tela dos dashboards estão anexadas ao card no GitHub Projects.
 - **Labels:** `area:infra`, `tipo:feature`, `p3-baixo`
 - **Arquivo de Comentário:** `docs/cards_comments/card_telemetria_historica_grafana.md`
 - **Objetivo:** Provisionar Prometheus + Grafana (Docker; InfluxDB descartado em favor do modelo *pull*) e instrumentar `server/server.js` com métricas de performance (latência p50/p95/p99, throughput de eventos, uptime) — complementando o historiador de negócio do CX9240 com observabilidade de infraestrutura. Setup em `observability/README.md`.

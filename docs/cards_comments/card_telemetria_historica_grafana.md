@@ -1,8 +1,8 @@
 # Card: Telemetria Histórica — Prometheus/Grafana (Métricas de Performance)
 
-> **Atualização 30/09/2026 — Status: 🔄 In Progress.** Implementação entregue (PR #29) com **Prometheus** (modelo *pull*) no lugar de InfluxDB: `GET /metrics`, `docker-compose.yml`, 3 dashboards em `docs/grafana/`, testes sem Docker e job de CI. **Pendente:** validação real com Docker (`scripts/observability-smoke.ps1`), conferência visual no Grafana (cores, legendas dos state-timelines, lacunas em vez de zeros nos gráficos de latência sem tráfego), burn-in observado e screenshots. Itens abaixo marcados `[x]` foram entregues; `[ ]` dependem de Docker/bancada. Onde o texto cita InfluxDB, leia Prometheus.
+> **Atualização 01/10/2026 — Status: ✅ Done.** Telemetria concluída e validada; as capturas de tela dos dashboards ficam anexadas ao card #25 no GitHub Projects. O texto a seguir é o registro de 30/09/2026, quando a validação ainda estava pendente. **Atualização 30/09/2026 — Status: 🔄 In Progress.** Implementação entregue (PR #29) com **Prometheus** (modelo *pull*) no lugar de InfluxDB: `GET /metrics`, `docker-compose.yml`, 3 dashboards em `docs/grafana/`, testes sem Docker e job de CI. **Pendente:** validação real com Docker (`scripts/observability-smoke.ps1`), conferência visual no Grafana (cores, legendas dos state-timelines, lacunas em vez de zeros nos gráficos de latência sem tráfego), burn-in observado e screenshots. Itens abaixo marcados `[x]` foram entregues; `[ ]` dependem de Docker/bancada. Onde o texto cita InfluxDB, leia Prometheus.
 
-**Template:** A (Definition of Done) — **Status:** 📋 Backlog · **Prioridade:** 🟢 Baixa
+**Template:** A (Definition of Done) — **Status:** ✅ Done (01/10/2026) · **Prioridade:** 🟢 Baixa
 
 ---
 
@@ -50,12 +50,12 @@ Implementar camada de observabilidade com séries temporais (InfluxDB ou Prometh
 ### Fase 1 — Infraestrutura
 - [x] Provisionar Prometheus via Docker (`docker-compose.yml`)
 - [x] Provisionar Grafana via Docker, conectar ao Prometheus
-- [ ] Validar ingestão de dados de teste (ping/pong simples)
+- [x] Validar ingestão de dados de teste (ping/pong simples)
 
 ### Fase 2 — Instrumentação
 - [x] Adicionar exporter Prometheus (`prom-client`) em `server/server.js`
 - [x] Instrumentar pontos críticos: recepção MQTT, processamento de comando, resposta ao dashboard
-- [ ] Validar métricas aparecendo no Prometheus (smoke com Docker)
+- [x] Validar métricas aparecendo no Prometheus (smoke com Docker)
 
 ### Fase 3 — Dashboards
 - [x] Criar os 3 dashboards Grafana (Visão Geral, Performance, Confiabilidade)
@@ -63,9 +63,9 @@ Implementar camada de observabilidade com séries temporais (InfluxDB ou Prometh
 
 ### Fase 4 — Documentação e Validação
 - [x] Atualizar `ARCHITECTURE.md` e `DEPLOYMENT.md`
-- [ ] Rodar burn-in test (ver `semana_06_22-26_setembro.md` Bloco 4) observando os dashboards em paralelo
+- [x] Rodar burn-in test (ver `semana_06_22-26_setembro.md` Bloco 4) observando os dashboards em paralelo
 - [x] Registrar no `CHANGELOG.md`
-- [ ] Mover card para `Done`
+- [x] Mover card para `Done`
 
 ## 🗓️ Estimativa
 
