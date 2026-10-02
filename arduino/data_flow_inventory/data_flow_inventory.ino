@@ -8,6 +8,8 @@
 // Máquina de estados com 5 etapas:
 //   AGUARDANDO_PEDIDO → VERIFICANDO_ESTOQUE → ACIONANDO_ESTEIRA
 //   → ENTREGANDO_PECA → ERRO
+// Entrega: a peça só é debitada do estoque depois que o sensor de junção da
+// esteira confirma a passagem; sem confirmação em TIMEOUT_ENTREGA → ERRO.
 // 3 esteiras secundárias (A, B, C) alimentam a esteira principal.
 // Roda de estoque com 3 compartimentos ao final da principal.
 //
@@ -89,10 +91,15 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define VELOCIDADE_ESTEIRA_A   VELOCIDADE_SECUNDARIA
 #define VELOCIDADE_ESTEIRA_B   VELOCIDADE_SECUNDARIA
 #define VELOCIDADE_ESTEIRA_C   140
-#define TIMEOUT_ENTREGA        9000 // ms (medição 25/08: peça leva ~5s até o sensor,
-                                      // mas precisa de folga extra para sair da esteira secundária)
+#define TIMEOUT_ENTREGA        12500 // ms — tempo máximo para a peça sair do topo e ser
+                                       // CONFIRMADA pelo sensor de junção (medição 25/08: ~5 s
+                                       // até o sensor; folga ampla). NÃO inclui os
+                                       // TEMPO_SAIDA_ESTEIRA_MS de saída, que contam depois da
+                                       // confirmação. Estourou → ERRO e motor desligado.
 #define DEBOUNCE_BTN           200   // ms
-#define INTERVALO_PUBLICACAO   1000  // ms — intervalo para publicar status periódico
+#define INTERVALO_PUBLICACAO   1000  // ms — ciclo completo: cada mensagem periódica sai 1x por ciclo
+#define PASSOS_PUBLICACAO      4     // mensagens por ciclo (status, estoque, sensores, esteiras), uma por vez
+#define ESTOQUE_INICIAL        15    // peças de cada tipo ao ligar (o LCD 16x2 comporta até 99 por peça)
 
 // ============================================================
 // ESTADOS DA MÁQUINA DE ESTADOS
@@ -118,10 +125,11 @@ const char* nomesEstados[] = {
 // ============================================================
 Estado estadoAtual = AGUARDANDO_PEDIDO;
 int    pecaSolicitada = 0;       // 1 = A, 2 = B, 3 = C
-int    estoque[4] = {0, 5, 5, 5}; // índice 1=A, 2=B, 3=C
+int    estoque[4] = {0, ESTOQUE_INICIAL, ESTOQUE_INICIAL, ESTOQUE_INICIAL}; // índice 1=A, 2=B, 3=C
 unsigned long tempoInicio = 0;
 unsigned long ultimoDebounce = 0;
 unsigned long ultimaPublicacao = 0;
+uint8_t passoPublicacao = 0;     // qual mensagem periódica sai na próxima vez
 bool   erroTimeout = false;
 bool   erroSemEstoque = false;
 
@@ -138,6 +146,12 @@ String bufferComando = "";
 const unsigned long TEMPO_SAIDA_ESTEIRA_MS = 3000;
 bool          saindoDaEsteira    = false;
 unsigned long tempoSaidaIniciada = 0;
+
+// O estoque só é debitado com a peça CONFIRMADA pelo sensor de junção, e a
+// confirmação exige uma passagem: o sensor precisa ser visto livre (HIGH) depois
+// que a esteira liga. Um sensor que já está em LOW na partida (peça parada sobre
+// ele, desalinhamento) não confirma nada sozinho — o pedido termina em timeout.
+bool          juncaoLiberada     = false;
 
 // Pausa pós-entrega sem bloquear o loop (substitui o antigo delay(1500)).
 bool          aguardandoLimpezaEntrega = false;
@@ -271,7 +285,6 @@ void publicarEstado() {
   doc["uptime"] = millis() / 1000;
   serializeJson(doc, Serial);
   Serial.println();
-  Serial.flush();
 }
 
 void publicarEstoque() {
@@ -282,7 +295,6 @@ void publicarEstoque() {
   doc["pecaC"] = estoque[3];
   serializeJson(doc, Serial);
   Serial.println();
-  Serial.flush();
 }
 
 void publicarSensores() {
@@ -333,16 +345,21 @@ void publicarPedido(char peca) {
   Serial.println();
 }
 
+// Esteira secundária realmente ligada: na pausa pós-entrega (Fase C) o motor
+// já está parado, então o dashboard não deve mostrá-la como ligada.
+bool esteiraLigada(int peca) {
+  if (pecaSolicitada != peca) return false;
+  return estadoAtual == ACIONANDO_ESTEIRA ||
+         (estadoAtual == ENTREGANDO_PECA && !aguardandoLimpezaEntrega);
+}
+
 void publicarStatusEsteiras() {
   StaticJsonDocument<200> doc;
   doc["type"] = "esteiras";
   doc["principal"] = 1; // sempre ligada
-  doc["secA"] = (estadoAtual == ACIONANDO_ESTEIRA && pecaSolicitada == 1) ||
-                (estadoAtual == ENTREGANDO_PECA && pecaSolicitada == 1) ? 1 : 0;
-  doc["secB"] = (estadoAtual == ACIONANDO_ESTEIRA && pecaSolicitada == 2) ||
-                (estadoAtual == ENTREGANDO_PECA && pecaSolicitada == 2) ? 1 : 0;
-  doc["secC"] = (estadoAtual == ACIONANDO_ESTEIRA && pecaSolicitada == 3) ||
-                (estadoAtual == ENTREGANDO_PECA && pecaSolicitada == 3) ? 1 : 0;
+  doc["secA"] = esteiraLigada(1) ? 1 : 0;
+  doc["secB"] = esteiraLigada(2) ? 1 : 0;
+  doc["secC"] = esteiraLigada(3) ? 1 : 0;
   serializeJson(doc, Serial);
   Serial.println();
 }
@@ -386,6 +403,7 @@ void interpretarComando(String linha) {
       erroTimeout = false;
       erroSemEstoque = false;
       saindoDaEsteira = false;
+      juncaoLiberada = false;
       aguardandoLimpezaEntrega = false;
       pecaSolicitada = 0;
       pararTodasSecundarias();
@@ -475,16 +493,24 @@ void loop() {
   // Processa comandos recebidos do ESP32
   processarComando();
 
-  // Publicação periódica de status.
+  // Publicação periódica de status, ESCALONADA: uma mensagem por vez, a cada
+  // INTERVALO_PUBLICACAO / PASSOS_PUBLICACAO ms, de modo que cada mensagem
+  // continua saindo 1x por INTERVALO_PUBLICACAO. A Serial do Uno (9600 baud,
+  // buffer de 64 bytes) bloqueia o loop enquanto esvazia o buffer; enviando as
+  // 4 mensagens de uma vez o loop ficava preso por centenas de ms por segundo e
+  // um pulso curto do sensor de junção podia passar despercebido (falso timeout).
   // Inclui o estoque: no trecho UART Arduino→ESP32 as mensagens são QoS 0;
   // republicar a cada ciclo reconcilia o dashboard caso o pacote do boot
   // ou de uma entrega se perca.
-  if (millis() - ultimaPublicacao >= INTERVALO_PUBLICACAO) {
+  if (millis() - ultimaPublicacao >= INTERVALO_PUBLICACAO / PASSOS_PUBLICACAO) {
     ultimaPublicacao = millis();
-    publicarEstado();
-    publicarEstoque();
-    publicarSensores();
-    publicarStatusEsteiras();
+    switch (passoPublicacao) {
+      case 0:  publicarEstado();         break;
+      case 1:  publicarEstoque();        break;
+      case 2:  publicarSensores();       break;
+      default: publicarStatusEsteiras(); break;
+    }
+    passoPublicacao = (passoPublicacao + 1) % PASSOS_PUBLICACAO;
   }
 
   switch (estadoAtual) {
@@ -541,6 +567,7 @@ void loop() {
       if (pecaSolicitada == 3) ligarEsteiraC();
 
       tempoInicio = millis();
+      juncaoLiberada = false;
       publicarStatusEsteiras();
       estadoAtual = ENTREGANDO_PECA;
       break;
@@ -602,16 +629,21 @@ void loop() {
       if (pecaSolicitada == 2) pecaChegou = sensorJuncaoJ2();
       if (pecaSolicitada == 3) pecaChegou = sensorJuncaoJ3();
 
-      if (pecaChegou) {
+      // A confirmação exige passagem: primeiro o sensor precisa ser visto livre.
+      if (!pecaChegou) juncaoLiberada = true;
+
+      if (pecaChegou && juncaoLiberada) {
         // NÃO para o motor ainda — inicia a fase de saída da esteira.
         atualizarLCD("Saindo da", "esteira...");
         saindoDaEsteira = true;
         tempoSaidaIniciada = millis();
 
       } else if (millis() - tempoInicio > TIMEOUT_ENTREGA) {
-        // Timeout — peça nunca chegou ao sensor de junção
+        // Timeout — peça não foi confirmada pelo sensor de junção: motor desligado,
+        // estoque intacto (o débito só ocorre após a confirmação, na Fase B).
         pararTodasSecundarias();
         erroTimeout = true;
+        atualizarLCD("ERRO: Timeout", "Aguarde comando");
         publicarErro("timeout");
         estadoAtual = ERRO;
       }
@@ -622,11 +654,9 @@ void loop() {
     // ESTADO 5: ERRO
     // ----------------------------------------------------------
     case ERRO: {
-      if (erroTimeout) {
-        atualizarLCD("ERRO: Timeout", "Aguarde comando");
-      } else if (erroSemEstoque) {
-        // Mantém mensagem de sem estoque
-      }
+      // A mensagem do LCD é desenhada UMA vez, na transição para ERRO (timeout ou
+      // sem estoque). Redesenhar a cada volta do loop (lcd.clear() + Strings)
+      // fazia o display piscar e fragmentava o heap do Uno (2 KB de RAM).
 
       // Reset via botão físico: DESABILITADO
       // Para reativar, descomente:

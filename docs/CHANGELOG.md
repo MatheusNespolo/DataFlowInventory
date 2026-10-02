@@ -12,6 +12,15 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ## [Não publicado]
 
+### Alterado
+
+- **Firmware Uno — revisão do código e reaplicação das atualizações de 02/10/2026**
+  - **Reaplicado:** `TIMEOUT_ENTREGA` de 9 s para **12,5 s** (vigia só o trajeto topo → junção; estourou, as três esteiras são desligadas e o sistema vai para `ERRO` sem debitar estoque), confirmação por **passagem** no sensor de junção (o sensor precisa ser visto livre depois que a esteira liga) e estoque inicial de **15** peças por tipo. O PWM por esteira (`VELOCIDADE_ESTEIRA_A/B/C`) foi mantido como estava (C em 140)
+  - **Corrigido:** o LCD era redesenhado (`lcd.clear()` e criação de `String`) a cada volta do loop enquanto o sistema estava em `ERRO` por timeout, o que fazia o display piscar e fragmentava o heap do Uno (2 KB de RAM); a mensagem agora é desenhada uma única vez, na transição para `ERRO`
+  - **Corrigido:** a publicação periódica enviava as 4 mensagens (status, estoque, sensores e esteiras) de uma vez, com `Serial.flush()`, o que bloqueava o loop por centenas de milissegundos a cada segundo (9600 baud) e podia fazer um pulso curto do sensor de junção passar despercebido (falso timeout). Agora as mensagens saem escalonadas, uma a cada 250 ms (cada uma continua saindo 1x por segundo) e sem `flush`
+  - **Corrigido:** durante a pausa de 1,5 s depois da entrega o dashboard ainda mostrava a esteira como ligada, mesmo com o motor já parado
+  - **Validado:** o sketch compila para o Arduino Uno (`arduino-cli`, 54% da flash e 55% da RAM). **Não validado em bancada**: o LCD apagado e a esteira C fraca (possível causa elétrica: fiação, diodo antiparalelo, driver IRF520 ou fonte) seguem em investigação e este firmware não os corrige por si só
+
 ### Revertido
 
 - **Firmware Uno — volta ao comportamento anterior às atualizações de 02/10/2026**
