@@ -12,6 +12,14 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ## [Não publicado]
 
+### Revertido
+
+- **Firmware Uno — volta ao comportamento anterior às atualizações de 02/10/2026**
+  - `data_flow_inventory.ino` restaurado ao estado de 28/08 (commit `b5727ad`): `TIMEOUT_ENTREGA` volta a **9000 ms**, o estoque inicial volta a **5 peças** por tipo e a exigência de "passagem" no sensor de junção é removida
+  - **Mantido** apenas o PWM por esteira (`VELOCIDADE_ESTEIRA_A/B/C`; A e B em 200 e C em 140): ajustar o valor da C em bancada
+  - Motivo: a esteira C com o motor novo não move a peça até a junção e o LCD apagou depois da troca; a causa ainda está sendo investigada (fiação, diodo, driver ou fonte) e o firmware volta ao último estado validado até lá
+  - Simulador, dashboard e painel do Grafana continuam com a escala de 15 peças; o estoque exibido no dashboard vem do que o Arduino publica
+
 ### Removido
 
 - **Consolidação da documentação em `docs/ARCHITECTURE.md` (02/10/2026)**
