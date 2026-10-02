@@ -1,4 +1,4 @@
-﻿# Plano de Testes â€” Data Flow Inventory
+﻿# Plano de Testes - Data Flow Inventory
 
 Este documento define os testes de integraÃ§Ã£o da cadeia de comunicaÃ§Ã£o do sistema, do link Serial (Arduino â†” ESP32) atÃ© o teste End-to-End (Dashboard â†” Arduino).
 
