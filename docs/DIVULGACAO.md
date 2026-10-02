@@ -45,7 +45,7 @@ Inventory, um centro de distribuição em miniatura controlado por Arduino Uno +
 
 O pedido sai de um dashboard web em tempo real, viaja por MQTT, passa pelo gateway ESP32 e o Arduino
 aciona as esteiras e lê os sensores. O código é aberto: firmware em C++, servidor Node.js, vista 3D e
-métricas com Prometheus/Grafana. Dá para testar tudo sem hardware, pelo simulador.
+métricas com Prometheus/Grafana. Dá para testar o dashboard sem hardware, pelo simulador.
 
 Ainda está em evolução (as esteiras B e C estão em diagnóstico elétrico e ainda não acionam) e queremos feedback de quem
 trabalha com automação, embarcados e IoT.
@@ -119,6 +119,7 @@ Cada rascunho serve para a equipe criar uma issue **depois de aprovar**. Etiquet
 
 - [ ] Um canal por vez, com **pelo menos três dias** entre posts, adaptando o texto ao formato do canal.
 - [ ] Antes de postar, conferir se o README e o status das esteiras estão atualizados.
+- [ ] **Criar ao menos duas das issues da seção 3** (com `good first issue` ou `help wanted`) antes do primeiro post e antes de manter o tópico `hacktoberfest`.
 - [ ] Responder **todo** comentário e issue em até dois dias, com cordialidade.
 - [ ] Acolher a primeira contribuição de uma pessoa nova: agradecer, orientar com o [Guia de Contribuição](../CONTRIBUTING.md) e revisar rápido.
 - [ ] Manter pelo menos duas issues abertas com `good first issue` ou `help wanted`.
@@ -141,4 +142,4 @@ O tópico `hacktoberfest` entra na lista de tópicos do repositório **somente s
 - **Conferir as regras oficiais do evento no ano corrente** em <https://hacktoberfest.com> antes de
   manter o tópico, pois elas mudam de ano para ano.
 
-Se a equipe não puder cumprir esse compromisso, **remova o tópico** (Configurações do repositório → *About*).
+Se a equipe não puder cumprir esse compromisso, **remova o tópico** (página inicial do repositório → engrenagem ao lado de *About*).

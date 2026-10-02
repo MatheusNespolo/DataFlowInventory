@@ -32,21 +32,21 @@ Engenharia de Controle e Automação
 |----------|---------|----------------------|
 | ⚡ Ver funcionando em 30 segundos | [Quick Start — Simulador](#-quick-start--simulador) | Não |
 | 🔧 Montar a bancada completa | [Materiais](#materiais), [Como Rodar](#como-rodar) e o [Guia de implantação](docs/DEPLOYMENT.md) | Sim |
-| 📈 Ver métricas e dashboards de performance | [Observabilidade](observability/README.md) | Não exige a bancada (precisa de Docker) |
+| 📈 Ver métricas e dashboards de performance | [Observabilidade](observability/README.md) | Não exige a bancada (precisa de Docker e do servidor Node; sem a bancada, parte dos painéis fica vazia) |
 | 🤝 Contribuir | [Contribuindo](#contribuindo) e o [Guia de Contribuição](CONTRIBUTING.md) | Não |
 
 ## Por que este projeto é interessante
 
 | Tema | O que você encontra | Onde está detalhado |
 |------|---------------------|---------------------|
-| 🧠 **C++ embarcado** | Máquina de estados de 5 etapas no Arduino Uno, protocolo serial em JSON e gateway ESP32 com LWT e reconexão Wi-Fi não bloqueante | [Funcionamento](#funcionamento) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| 🧠 **C++ embarcado** | Máquina de estados finita (5 estados) no Arduino Uno, protocolo serial em JSON e gateway ESP32 com LWT e reconexão Wi-Fi não bloqueante | [Funcionamento](#funcionamento) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
 | 🏭 **Automação e intralogística** | 4 esteiras, 6 sensores infravermelhos, controle de estoque e timeout de entrega | [Visão Geral](#visão-geral) · [Funcionamento](#funcionamento) |
 | 📡 **IoT e MQTT** | Mosquitto local ou HiveMQ Cloud, tópicos `dataflow/*`, mensagens retained e LWT | [Tópicos MQTT](#tópicos-mqtt) |
 | ⏱️ **Tempo real** | Servidor Node.js com Socket.IO, dashboard responsivo e vista 3D da bancada | [Destaques Técnicos](#destaques-técnicos) |
 | 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
 | ✅ **Qualidade** | Testes unitários, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
 
-> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras B e C estão em diagnóstico elétrico. Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
+> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras B e C não acionam e aguardam diagnóstico elétrico. Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
 
 ## Sumário
 
@@ -59,6 +59,7 @@ Engenharia de Controle e Automação
 - [Arquitetura](#arquitetura)
 - [Estrutura do Repositório](#estrutura-do-repositório)
 - [Funcionamento](#funcionamento)
+- [Diagrama Elétrico](#diagrama-elétrico)
 - [Materiais](#materiais)
 - [Como Rodar](#como-rodar)
 - [Próximos Passos](#próximos-passos)
