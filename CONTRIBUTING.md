@@ -8,7 +8,7 @@ Este guia padroniza como propor mudanças de forma segura e rastreável.
 
 ## 1. Antes de começar
 
-- Leia a [`docs/arquitetura_mqtt.md`](docs/arquitetura_mqtt.md) para entender o fluxo
+- Leia a [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) para entender o fluxo
   Arduino → ESP32 → Broker → Server → Dashboard.
 - Consulte o [`docs/CHANGELOG.md`](docs/CHANGELOG.md) para o histórico de decisões e regressões.
 - Para rodar sem hardware, use o **simulador** (`simulator/`) — mesmo frontend, sem MQTT.
@@ -100,7 +100,7 @@ retained em `dataflow/status` — isso reintroduz a regressão do "ESP32 Offline
 
 Toda mudança de comportamento observável deve atualizar:
 - `docs/CHANGELOG.md` (obrigatório)
-- O documento afetado (`README.md`, `docs/arquitetura_mqtt.md`, checklists, roteiros)
+- O documento afetado (`README.md`, `docs/ARCHITECTURE.md`, checklists, roteiros)
 
 ---
 

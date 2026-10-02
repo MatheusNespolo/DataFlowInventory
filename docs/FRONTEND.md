@@ -87,7 +87,7 @@ npm install
 npm start
 
 # Terminal 3: opcional — upload do firmware (Arduino + ESP32)
-#参见 docs/arquitetura_mqtt.md para instruções detalhadas
+# Veja docs/DEPLOYMENT.md para instruções detalhadas
 ```
 
 Acesse [http://localhost:3000](http://localhost:3000).
@@ -206,6 +206,6 @@ Socket.IO connected
 ## Relacionado
 
 - [`README.md`](../README.md) — Visão geral do projeto
-- [`docs/arquitetura_mqtt.md`](arquitetura_mqtt.md) — Arquitetura de comunicação MQTT
+- [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) — Arquitetura de comunicação MQTT
 - [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) — Arquitetura completa do sistema
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — Regras de segurança e convenções

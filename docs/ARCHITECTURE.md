@@ -1,8 +1,8 @@
 # Arquitetura Unificada — Data Flow Inventory
 
 > **Documento consolidado de referência técnica**  
-> Data: 14/09/2026 · Versão: 2.0 (Sprint 5 — Limpeza + CI/CD)  
-> Substitui: `arquitetura_mqtt.md`, `fluxogramas/fluxograma_funcionamento.md` (conteúdo consolidado aqui; arquivos originais mantidos para histórico)
+> Data: 14/09/2026 · Revisado em 02/10/2026 · Versão: 2.1  
+> Fonte única de referência técnica. Absorveu o conteúdo de `arquitetura_mqtt.md` e `fluxogramas/fluxograma_funcionamento.md` (removidos em 02/10/2026; o histórico permanece no git). Os diagramas PNG continuam em `docs/fluxogramas/`.
 
 ---
 
@@ -41,6 +41,65 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 | `dataflow/estoque` | Arduino → | ✅ | 1 | `{pecaA: N, pecaB: N, pecaC: N}` — sincronismo LCD/Dashboard |
 | `dataflow/eventos` | Arduino → | ❌ | 1 | Histórico de entregas |
 | `dataflow/comandos/sub` | Server → | ❌ | 1 | Comandos do dashboard → Arduino |
+| `dataflow/comandos/pub` | ESP32 → | ❌ | 1 | Confirmação de comandos encaminhados (`encaminhado`/`rejeitado`) |
+| `dataflow/sensores` | ESP32 → | ❌ | — | Leituras dos 6 sensores IR |
+| `dataflow/esteiras` | ESP32 → | ❌ | — | Estado ligada/desligada de cada esteira |
+
+`dataflow/status` leva o estado da FSM/uptime **e** a presença do gateway (`{"type":"gateway",...}`, retained via LWT). Os nomes são configuráveis no `server/.env` e nas constantes `TOPICO_*` do `gateway_mqtt.ino`; Arduino/ESP32 e servidor devem usar os **mesmos** nomes.
+
+> ⚠️ **Separação de status:** `dataflow/status` é **exclusivo do gateway ESP32**; o servidor publica em `dataflow/status/server`. Publicar o status do servidor no tópico do gateway sobrescreveria o retained e travaria o dashboard em "ESP32 Offline" (regressão histórica; ver `CHANGELOG.md`).
+
+### 2.3 Fluxos de comunicação
+
+**Dados (Arduino → Dashboard):** o Uno emite JSON pela Serial; o ESP32 lê linha a linha (não bloqueante) e publica no tópico conforme o campo `type`; o servidor recebe a mensagem MQTT e a retransmite por `io.emit(...)`; o frontend atualiza a interface.
+
+**Comando (Dashboard → Arduino):** o frontend faz `socket.emit('solicitar_peca', {peca:'A'})`; o servidor publica em `dataflow/comandos/sub`; o ESP32 traduz para texto (`CMD:PECA:A`) na Serial2; o Uno inicia a FSM (`VERIFICANDO_ESTOQUE`); o ESP32 publica a confirmação em `dataflow/comandos/pub`.
+
+Exemplo de comando publicado pelo servidor:
+
+```json
+{"acao":"solicitar_peca","peca":"A","origem":"frontend","clienteId":"<socket_id>"}
+```
+
+### 2.4 Formatos de mensagem
+
+**Arduino → ESP32 (Serial JSON, 9600 baud):**
+
+```json
+{"type":"status","estado":"ENTREGANDO_PECA","pecaSolicitada":1,"uptime":3600}
+{"type":"estoque","pecaA":4,"pecaB":5,"pecaC":5}
+{"type":"sensores","topo":{"A":1,"B":0,"C":1},"juncao":{"J1":0,"J2":0,"J3":0}}
+{"type":"evento","evento":"entrega","peca":"A","estoqueA":4,"estoqueB":5,"estoqueC":5}
+{"type":"evento","evento":"erro","tipo":"timeout","peca":"B"}
+{"type":"esteiras","principal":1,"secA":0,"secB":1,"secC":0}
+```
+
+Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor serial do ESP32.
+
+**ESP32 → Arduino (Serial texto):** `CMD:PECA:A`, `CMD:PECA:B`, `CMD:PECA:C`, `CMD:RESET`.
+
+**Frontend → Servidor (Socket.IO):** `socket.emit('solicitar_peca', { peca: 'A' })` e `socket.emit('reset_sistema')`.
+
+### 2.5 Broker e segurança
+
+| Opção | Uso | Detalhes |
+|---|---|---|
+| **Mosquitto local** | bancada/desenvolvimento | porta 1883, sem TLS, rede confiável; passo a passo e firewall em `docs/broker_local_mosquitto.md` |
+| **HiveMQ Cloud** | broker remoto | TLS na porta 8883; crie as credenciais no cluster, preencha `MQTT_BROKER_URL` (`mqtts://<cluster>.s1.eu.hivemq.com`), `MQTT_PORT`, `MQTT_USERNAME` e `MQTT_PASSWORD` em `server/.env` e, no ESP32, `SECRET_MQTT_*_CLOUD` em `secrets.h` com `USE_TLS=true` |
+
+- **Credenciais** ficam só no `server/.env` e no `secrets.h` (ambos não versionados), nunca no `.ino`.
+- **Client ID único** por dispositivo (`dataflow-esp32-gateway`, `dataflow-node-server`).
+- **Certificados:** o protótipo usa `setInsecure()` no ESP32; em produção, use `setCACert()` com a raiz do broker (ISRG Root X1 no HiveMQ Cloud).
+- Alternativas de nuvem (não usadas): AWS IoT Core e Azure IoT Hub.
+
+### 2.6 Bibliotecas
+
+| Componente | Bibliotecas |
+|---|---|
+| Arduino Uno | `ArduinoJson`, `Wire`, `LiquidCrystal_I2C` |
+| ESP32 | `WiFi`, `WiFiClientSecure`, `PubSubClient`, `ArduinoJson` |
+| Servidor Node.js | `express`, `socket.io`, `mqtt`, `dotenv`, `prom-client` |
+| Frontend | Socket.IO Client, JavaScript vanilla, CSS3 (sem build) |
 
 ---
 
@@ -58,6 +117,17 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 - `ocupado` — Comando durante acionamento
 - `comando_desconhecido` — Inválido
 
+**Diagramas:**
+
+![Máquina de estados (FSM) - Arduino Uno](fluxogramas/maquina_de_estados_fsm_arduino_uno.png)
+
+![Fluxograma operacional — ciclo de um pedido](fluxogramas/fluxograma_operacional_ciclo_pedido.png)
+
+**Observações:**
+- **Botões físicos desabilitados:** o controle é feito exclusivamente pelo dashboard (comandos via MQTT). Os botões permanecem no hardware para eventual fallback.
+- **Modo simulador:** no `simulator/`, a FSM roda em JavaScript e as etapas de MQTT/ESP32/Arduino são substituídas por temporizadores; o frontend recebe os mesmos eventos Socket.IO.
+- **Separador (roda giratória):** ainda não incluído no fluxo; será adicionado quando o motor for definido e o código habilitado.
+
 ---
 
 ## 4. Hardware
@@ -68,6 +138,16 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 | Sensor IR TCRT5000 | 6 | A0, A1, A2, A3, 2, 4 | 5V |
 | LCD 16x2 I2C | 1 | SDA/SCL (A4/A5) | 5V |
 | Motor de Passo 28BYJ-48 (Separador) | 1 | 5, 6, 7, 8 (ULN2003) | 5V |
+
+**Ligação serial Uno ↔ ESP32 (9600 baud):**
+
+| Arduino Uno | ESP32 | Observação |
+|---|---|---|
+| TX (pino 1) | RX2 (GPIO16) | **via divisor de tensão** 1 kΩ + 2 kΩ (Uno é 5 V, ESP32 é 3,3 V) |
+| RX (pino 0) | TX2 (GPIO17) | direto (3,3 V é lido como HIGH pelo Uno) |
+| GND | GND | comum obrigatório |
+
+> ⚠ **Upload no Uno:** os pinos 0/1 são compartilhados com o USB. Desconecte o ESP32 desses pinos durante o upload.
 
 > 📐 **Diagrama elétrico completo:** [`docs/fluxogramas/Diagrama elétrico.png`](fluxogramas/Diagrama%20el%C3%A9trico.png) — esquema unifilar com todos os componentes, pinagem, alimentação e proteções recomendadas (fusível 12V, diodos flyback nos motores DC). Fonte editável: [`Diagrama elétrico.pptx`](fluxogramas/Diagrama%20el%C3%A9trico.pptx). *(Publicado em 23/09/2026)*
 
@@ -93,6 +173,16 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 - **Assinatura MQTT:** TF6701 IoT Communication assinando `dataflow/estoque` e `dataflow/eventos` (QoS 1).
 - **Tabelas:** `estoque_hist` (snapshots por alteração e amostragem periódica) e `eventos_hist` (histórico de entregas, erros e alarmes).
 - **Integração:** Validado de ponta a ponta com o simulador `DataFlowInventory` (`MQTT_PUBLISH=true`).
+- **Contrato do simulador:** tópico `dataflow/estoque`, payload `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}`, QoS 1, retained (o CX9240 recebe o último estoque mesmo conectando depois). A publicação é **opcional** (`MQTT_PUBLISH=true npm start` ou `npm run start:mqtt` em `simulator/`) e não bloqueia o dashboard se o broker falhar. É unidirecional: o simulador não assina nenhum tópico do Beckhoff.
+
+  | Variável (simulador) | Padrão | Descrição |
+  |---|---|---|
+  | `MQTT_PUBLISH` | `false` | habilita a publicação do estoque |
+  | `MQTT_BROKER_URL` / `MQTT_PORT` | `mqtt://127.0.0.1` / `1883` | broker |
+  | `MQTT_USER` / `MQTT_PASS` | — | credenciais, se houver |
+  | `MQTT_TOPIC_ESTOQUE` | `dataflow/estoque` | tópico de publicação |
+
+  Passo a passo do lado Beckhoff (DDL SQL, TwinCAT 3): `docs/INTEGRATION_GUIDE.md`.
 
 ### 6.2 Separador — Roda de Separação
 

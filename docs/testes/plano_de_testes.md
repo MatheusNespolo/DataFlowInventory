@@ -4,8 +4,8 @@ Este documento define os testes de integração da cadeia de comunicação do si
 
 **Documentos relacionados:**
 - 🧪 [`broker_local_mosquitto.md`](../broker_local_mosquitto.md) — Instalação e configuração do broker local
-- 📊 [`fluxograma_funcionamento.md`](../fluxogramas/fluxograma_funcionamento.md) — Máquina de estados e sequência de comunicação
-- 🏗 [`arquitetura_mqtt.md`](../arquitetura_mqtt.md) — Arquitetura geral, tópicos e formatos de mensagem
+- 📊 [`ARCHITECTURE.md`](../ARCHITECTURE.md#3-máquina-de-estados-arduino) — Máquina de estados e sequência de comunicação
+- 🏗 [`ARCHITECTURE.md`](../ARCHITECTURE.md) — Arquitetura geral, tópicos e formatos de mensagem
 
 ---
 
@@ -389,7 +389,7 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 - [ ] LWT (`gateway offline/online`) funciona igual ao broker local
 - [ ] Nenhuma alteração de lógica de FSM foi necessária (apenas configuração de conexão)
 
-> 💡 Ver detalhes de configuração em [`docs/broker_local_mosquitto.md`](../broker_local_mosquitto.md#etapa-e--migração-para-hivemq-cloud-futuro) e [`docs/arquitetura_mqtt.md`](../arquitetura_mqtt.md#opção-2-hivemq-cloud-nuvem-tls).
+> 💡 Ver detalhes de configuração em [`docs/broker_local_mosquitto.md`](../broker_local_mosquitto.md#etapa-e--migração-para-hivemq-cloud-futuro) e [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md#25-broker-e-segurança).
 
 ---
 
@@ -531,7 +531,7 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 > - [ ] Teste em bancada própria (separada da esteira A): CX9240 recebe e grava no banco
 > - [ ] Contrato de tópico/payload validado cruzadamente entre os dois agentes
 >
-> **Atualização 15/09:** lado do simulador **concluído e testado**. Detalhes em `docs/arquitetura_mqtt.md` (seção "Integração Beckhoff CX9240") e `docs/testes/roteiros/semana_05_15-19_setembro.md` (Bloco 4). Card pode avançar de `Backlog` para `Ready` assim que o agente do Beckhoff confirmar disponibilidade para a bancada própria.
+> **Atualização 15/09:** lado do simulador **concluído e testado**. Detalhes em `docs/ARCHITECTURE.md` (seção 6.1, Beckhoff CX9240) e `docs/testes/roteiros/semana_05_15-19_setembro.md` (Bloco 4). Card pode avançar de `Backlog` para `Ready` assim que o agente do Beckhoff confirmar disponibilidade para a bancada própria.
 >
 > **Dependência:** alinhar tópicos com o agente do Beckhoff antes de implementar. Não interferir no fluxo do Teste 5.
 >

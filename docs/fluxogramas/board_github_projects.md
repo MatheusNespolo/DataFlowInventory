@@ -160,7 +160,7 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 
 ## 4. Novos cards — Teste 6: validação MQTT via HiveMQ Cloud
 
-Até então o repositório só possuía o card genérico **#5 “Configurar broker MQTT (HiveMQ Cloud)”**, sem critérios de aceite nem decomposição. Os três cards abaixo detalham o **Teste 6** do [`plano_de_testes.md`](../testes/plano_de_testes.md) e a seção “Opção 2: HiveMQ Cloud” do [`arquitetura_mqtt.md`](../arquitetura_mqtt.md).
+Até então o repositório só possuía o card genérico **#5 “Configurar broker MQTT (HiveMQ Cloud)”**, sem critérios de aceite nem decomposição. Os três cards abaixo detalham o **Teste 6** do [`plano_de_testes.md`](../testes/plano_de_testes.md) e a seção “Opção 2: HiveMQ Cloud” do [`ARCHITECTURE.md`](../ARCHITECTURE.md).
 
 > **Pré-requisito comum:** esteira A consolidada e Teste 4 (end-to-end local) aprovado — condição já atendida em 25–28/08/2026. A migração valida a **independência da camada de transporte** em relação à lógica da FSM: nenhuma linha de máquina de estados deve mudar.
 

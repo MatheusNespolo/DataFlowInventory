@@ -65,7 +65,7 @@ const PECAS = ['A', 'B', 'C'];
 //   QoS    : 1 | retained: true
 //
 // Contrato validado cruzadamente com o agente do Beckhoff CX9240.
-// Ver: docs/arquitetura_mqtt.md §"Integração Beckhoff CX9240"
+// Ver: docs/ARCHITECTURE.md §6.1 "Beckhoff CX9240"
 // ============================================================
 const MQTT_PUBLISH    = process.env.MQTT_PUBLISH === 'true';
 const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL || 'mqtt://127.0.0.1';

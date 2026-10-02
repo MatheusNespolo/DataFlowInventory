@@ -128,7 +128,7 @@ Para testar o dashboard sem nenhum componente físico conectado, o projeto inclu
 
 Diferente do modo real, os tempos de verificação/acionamento/entrega são temporizadores fixos (não dependem de sensores físicos) e não há MQTT nem broker envolvidos. Cobre o fluxo de sucesso e a rejeição por falta de estoque; cenários de timeout do firmware real ainda não são simulados, rejeição por estoque zero e FSM ocupada já são cobertos.
 
-> 🖥️ Detalhes de implementação em [`docs/arquitetura_mqtt.md`](docs/arquitetura_mqtt.md#modos-de-operação).
+> 🖥️ Detalhes de implementação em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#5-modos-de-operação).
 
 ```
 ┌──────────────┐   Serial   ┌──────────┐   MQTT    ┌────────────────┐   WebSocket  ┌─────────────┐
@@ -166,6 +166,8 @@ DataFlowInventory/
 ├── server/
 │   ├── package.json                       # Dependências Node.js
 │   ├── server.js                          # Express + Socket.IO + MQTT
+│   ├── metrics.js                         # Métricas Prometheus (GET /metrics)
+│   ├── metrics-correlacao.js              # Correlação comando → confirmação
 │   └── .env                               # Configurações (não versionado)
 │
 ├── simulator/
@@ -176,21 +178,34 @@ DataFlowInventory/
 │   ├── index.html                         # Dashboard principal
 │   ├── css/
 │   │   └── style.css                      # Estilos (dark theme)
-│   └── js/
-│       └── app.js                         # Lógica WebSocket + UI
+│   ├── js/
+│   │   ├── app.js                         # Lógica WebSocket + UI
+│   │   └── arquitetura-*.js, *3d.js       # Vista de arquitetura e ambiente 3D
+│   └── vendor/                            # three.js e controles (terceiros)
+│
+├── observability/                         # Provisionamento do Prometheus e do Grafana
+├── docker-compose.yml                     # Stack de observabilidade (Prometheus + Grafana)
+├── scripts/                               # setup, validate-env, precommit-checks, observability-smoke
+├── .github/workflows/                     # CI (lint, segurança, testes, compilação dos sketches)
 │
 ├── test/
 │   ├── esteira_peca_a/                    # Códigos de teste incrementais (1 esteira)
 │   ├── esteira_peca_b/                    # Teste 5: duas esteiras (A+B) com FSM completa
-│   └── mqtt_probe/                        # Sonda MQTT (escuta dataflow/# com timestamp)
+│   ├── mqtt_probe/                        # Sonda MQTT (escuta dataflow/# com timestamp)
+│   ├── server_metrics/                    # Testes das métricas e da infra de observabilidade (sem Docker)
+│   ├── frontend/                          # Testes unitários do frontend
+│   └── frontend_smoke/                    # Testes de fumaça com Playwright
 │
 ├── docs/
-│   ├── arquitetura_mqtt.md                # Documentação da arquitetura MQTT
+│   ├── ARCHITECTURE.md                    # Referência técnica única (arquitetura, tópicos, mensagens, observabilidade)
+│   ├── DEPLOYMENT.md                      # Implantação do zero
+│   ├── CI-CD.md, CHANGELOG.md             # Pipelines e histórico de mudanças
+│   ├── INTEGRATION_GUIDE.md               # Integração Beckhoff CX9240
 │   ├── broker_local_mosquitto.md          # Teste local com Mosquitto (sem nuvem)
+│   ├── grafana/                           # Dashboards versionados
 │   ├── artigo/
 │   │   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
-│   ├── fluxogramas/
-│   │   └── fluxograma_funcionamento.md    # Fluxogramas (FSM, operação, sequência)
+│   ├── fluxogramas/                       # Diagramas (FSM, ciclo do pedido, elétrico)
 │   └── testes/
 │       ├── plano_de_testes.md             # Plano de testes de integração (Serial → E2E)
 │       ├── roteiros/                      # Roteiros semanais de execução dos testes
@@ -218,7 +233,7 @@ O Arduino opera com **5 estados**:
 | 4 | **ENTREGANDO_PECA** | Monitora o sensor da junção (timeout de 12,5 s); só debita o estoque após a confirmação e mantém o motor 3 s depois dela |
 | 5 | **ERRO** | Sinaliza falha no LCD, aguarda reset manual |
 
-> 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/fluxogramas/fluxograma_funcionamento.md`](docs/fluxogramas/fluxograma_funcionamento.md).
+> 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#3-máquina-de-estados-arduino).
 >
 > 🧪 Testes de integração da cadeia de comunicação (Serial → Broker → Dashboard) em [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md).
 

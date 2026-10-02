@@ -12,6 +12,14 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ## [Não publicado]
 
+### Removido
+
+- **Consolidação da documentação em `docs/ARCHITECTURE.md` (02/10/2026)**
+  - `docs/arquitetura_mqtt.md` e `docs/fluxogramas/fluxograma_funcionamento.md` foram removidos depois de migrar seu conteúdo exclusivo para o `ARCHITECTURE.md`: tópicos completos, fluxos de dados e comando, formatos de mensagem (Serial, MQTT e Socket.IO), ligação serial Uno ↔ ESP32, configuração de broker e segurança, bibliotecas, contrato do simulador com o CX9240 e diagramas da FSM. O histórico continua no git
+  - `docs/CI-CD-FIXES-2026-09-17.md` removido: duplicava a entrada "Hardening CI/CD" deste changelog e as seções 2.2 e 2.3 do `docs/CI-CD.md`
+  - `docs/testes/validações/test_write.txt` removido (arquivo de teste sem uso)
+  - Links em `README.md`, `CONTRIBUTING.md`, `simulator/`, `docs/FRONTEND.md`, `docs/testes/plano_de_testes.md` e `docs/fluxogramas/board_github_projects.md` apontam para o `ARCHITECTURE.md`; árvore de diretórios do `README.md` atualizada (observabilidade, scripts, CI, testes). Menções antigas nas entradas abaixo e nos roteiros semanais são históricas e foram mantidas
+
 ### Adicionado
 
 - **Deployment Guide e atualização de documentação (30/09/2026)**

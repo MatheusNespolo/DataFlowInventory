@@ -42,7 +42,7 @@ npm run start:mqtt
 
 Publica em `dataflow/estoque` (retained, QoS 1) a cada mudança de estoque e imediatamente ao conectar. Desativado por padrão — sem impacto no funcionamento offline via Socket.IO.
 
-> 📖 Contrato completo (tópico, payload, variáveis de ambiente) em [`../docs/arquitetura_mqtt.md`](../docs/arquitetura_mqtt.md#integração-beckhoff-cx9240-simulador--mqtt--persistência).
+> 📖 Contrato completo (tópico, payload, variáveis de ambiente) em [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md#61-beckhoff-cx9240-historiador-local-mqtt--sqlite).
 
 ## Estrutura
 

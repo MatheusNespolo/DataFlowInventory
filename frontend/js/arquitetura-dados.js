@@ -1,7 +1,7 @@
 // ============================================================
 // DATA FLOW INVENTORY — Modelo estático da arquitetura
 // ------------------------------------------------------------
-// Snapshot de docs/ARCHITECTURE.md e docs/arquitetura_mqtt.md em
+// Snapshot de docs/ARCHITECTURE.md em
 // 29/09/2026 (+ server/server.js para a lista de tópicos).
 // Se a documentação mudar, atualizar este arquivo.
 // Posições em unidades de cena (x = fluxo esquerda→direita, z = profundidade).
