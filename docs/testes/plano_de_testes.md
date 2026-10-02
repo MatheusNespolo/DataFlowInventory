@@ -360,7 +360,7 @@ Detalhes completos (pinagem, ligaÃ§Ãµes e checklists): [`test/esteira_peca_b
 - [ ] Entregas consecutivas de A e B decrementam o estoque corretamente
 - [ ] PeÃ§a C rejeitada com `{"evento":"erro","tipo":"peca_indisponivel"}` sem travar a FSM
 - [ ] Pedido com FSM ocupada gera evento `ocupado`
-- [ ] **Timeout de 9 s** â†’ `ERRO`; `CMD:RESET` recupera o sistema
+- [ ] **Timeout de 12,5 s** â†’ `ERRO`; `CMD:RESET` recupera o sistema
 - [ ] Status periÃ³dico (`status`, `sensores`, `esteiras`) publicado a cada ~1 s nos tÃ³picos MQTT
 
 ---
