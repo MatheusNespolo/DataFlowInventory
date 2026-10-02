@@ -47,7 +47,7 @@ O pedido sai de um dashboard web em tempo real, viaja por MQTT, passa pelo gatew
 aciona as esteiras e lê os sensores. O código é aberto: firmware em C++, servidor Node.js, vista 3D e
 métricas com Prometheus/Grafana. Dá para testar tudo sem hardware, pelo simulador.
 
-Ainda está em evolução (estamos ajustando as esteiras B e C na bancada) e queremos feedback de quem
+Ainda está em evolução (as esteiras B e C estão em diagnóstico elétrico e ainda não acionam) e queremos feedback de quem
 trabalha com automação, embarcados e IoT.
 
 Repositório: https://github.com/MatheusNespolo/DataFlowInventory
@@ -62,7 +62,7 @@ Estrutura sugerida (cerca de 600 a 900 palavras), a adaptar às regras de submis
 2. **A arquitetura:** Arduino (máquina de estados) → ESP32 (gateway) → broker MQTT → servidor Node.js → dashboard. Use o diagrama `img/ArquiteturaDataFlowInventory.png`.
 3. **Uma decisão técnica interessante:** a confirmação de entrega só debita o estoque depois que o sensor de junção detecta a peça, com timeout de segurança; ou o uso do LWT para saber se o gateway caiu.
 4. **Como experimentar em 30 segundos:** o simulador.
-5. **O que ainda falta:** esteiras B e C, validação completa do HiveMQ Cloud.
+5. **O que ainda falta:** diagnóstico elétrico das esteiras B e C e validação completa do HiveMQ Cloud.
 6. **Convite:** issues `good first issue` e o [Guia de Contribuição](../CONTRIBUTING.md).
 
 ### 2.3 Fórum ou comunidade de programação (por exemplo, r/brdev)
@@ -134,7 +134,7 @@ Interprete assim: **visitas altas sem estrelas** pedem melhorar a abertura do RE
 
 ## 6. Hacktoberfest
 
-O tópico `hacktoberfest` foi proposto para outubro. Ao mantê-lo, a equipe assume:
+O tópico `hacktoberfest` entra na lista de tópicos do repositório **somente se a equipe a aprovar**; ele não está aplicado por padrão. Ao mantê-lo, a equipe assume:
 
 - Ter issues abertas e rotuladas (seção 3) e revisar PRs de fora durante o mês.
 - Rejeitar com cordialidade contribuições de baixa qualidade ou só para "marcar presença" (etiqueta `invalid`).
