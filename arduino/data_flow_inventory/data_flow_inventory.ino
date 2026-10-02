@@ -8,6 +8,8 @@
 // Máquina de estados com 5 etapas:
 //   AGUARDANDO_PEDIDO → VERIFICANDO_ESTOQUE → ACIONANDO_ESTEIRA
 //   → ENTREGANDO_PECA → ERRO
+// Entrega: a peça só é debitada do estoque depois que o sensor de junção da
+// esteira confirma a passagem; sem confirmação em TIMEOUT_ENTREGA → ERRO.
 // 3 esteiras secundárias (A, B, C) alimentam a esteira principal.
 // Roda de estoque com 3 compartimentos ao final da principal.
 //
@@ -83,8 +85,11 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // ============================================================
 #define VELOCIDADE_PRINCIPAL   180   // PWM 0-255
 #define VELOCIDADE_SECUNDARIA  200   // PWM 0-255
-#define TIMEOUT_ENTREGA        9000 // ms (medição 25/08: peça leva ~5s até o sensor,
-                                      // mas precisa de folga extra para sair da esteira secundária)
+#define TIMEOUT_ENTREGA        12500 // ms — tempo máximo para a peça sair do topo e ser
+                                       // CONFIRMADA pelo sensor de junção (medição 25/08: ~5 s
+                                       // até o sensor; folga ampla). NÃO inclui os
+                                       // TEMPO_SAIDA_ESTEIRA_MS de saída, que contam depois da
+                                       // confirmação. Estourou → ERRO e motor desligado.
 #define DEBOUNCE_BTN           200   // ms
 #define INTERVALO_PUBLICACAO   1000  // ms — intervalo para publicar status periódico
 
@@ -127,11 +132,17 @@ String bufferComando = "";
 // Fase de SAÍDA DA ESTEIRA: depois que a peça atinge o sensor de junção, a
 // esteira secundária continua ligada por este tempo para a peça sair
 // fisicamente da esteira (a junção só marca "quase no fim"). Calibrar em
-// bancada — a soma (tempo até o sensor + este valor) deve caber no
-// TIMEOUT_ENTREGA. Medição 25/08: ~5 s até o sensor.
+// bancada. Este tempo é contado DEPOIS da confirmação pelo sensor de junção e
+// não entra no TIMEOUT_ENTREGA (que só vigia o trajeto topo → junção).
 const unsigned long TEMPO_SAIDA_ESTEIRA_MS = 3000;
 bool          saindoDaEsteira    = false;
 unsigned long tempoSaidaIniciada = 0;
+
+// O estoque só é debitado com a peça CONFIRMADA pelo sensor de junção, e a
+// confirmação exige uma passagem: o sensor precisa ser visto livre (HIGH) depois
+// que a esteira liga. Um sensor que já está em LOW na partida (peça parada sobre
+// ele, desalinhamento) não confirma nada sozinho — o pedido termina em timeout.
+bool          juncaoLiberada     = false;
 
 // Pausa pós-entrega sem bloquear o loop (substitui o antigo delay(1500)).
 bool          aguardandoLimpezaEntrega = false;
@@ -380,6 +391,7 @@ void interpretarComando(String linha) {
       erroTimeout = false;
       erroSemEstoque = false;
       saindoDaEsteira = false;
+      juncaoLiberada = false;
       aguardandoLimpezaEntrega = false;
       pecaSolicitada = 0;
       pararTodasSecundarias();
@@ -535,6 +547,7 @@ void loop() {
       if (pecaSolicitada == 3) ligarEsteiraC();
 
       tempoInicio = millis();
+      juncaoLiberada = false;
       publicarStatusEsteiras();
       estadoAtual = ENTREGANDO_PECA;
       break;
@@ -596,14 +609,18 @@ void loop() {
       if (pecaSolicitada == 2) pecaChegou = sensorJuncaoJ2();
       if (pecaSolicitada == 3) pecaChegou = sensorJuncaoJ3();
 
-      if (pecaChegou) {
+      // A confirmação exige passagem: primeiro o sensor precisa ser visto livre.
+      if (!pecaChegou) juncaoLiberada = true;
+
+      if (pecaChegou && juncaoLiberada) {
         // NÃO para o motor ainda — inicia a fase de saída da esteira.
         atualizarLCD("Saindo da", "esteira...");
         saindoDaEsteira = true;
         tempoSaidaIniciada = millis();
 
       } else if (millis() - tempoInicio > TIMEOUT_ENTREGA) {
-        // Timeout — peça nunca chegou ao sensor de junção
+        // Timeout — peça não foi confirmada pelo sensor de junção: motor desligado,
+        // estoque intacto (o débito só ocorre após a confirmação, na Fase B).
         pararTodasSecundarias();
         erroTimeout = true;
         publicarErro("timeout");

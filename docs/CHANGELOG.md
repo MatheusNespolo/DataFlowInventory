@@ -83,6 +83,14 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Identificados **7 gaps prioritários** com classificação de impacto (Alta/Média/Baixa): BOM ausente, diagrama elétrico não publicado, deployment guide ausente, firmware sem versioning, testes E2E manuais, documentação inline mínima, performance telemetria ausente
   - Sugestão de 5 cards para próxima sprint: BOM, Deployment Guide, Testes E2E Automatizados, Firmware Versioning, Telemetria Histórica (Grafana/InfluxDB)
 
+### Alterado
+
+- **Firmware Uno — confirmação de entrega pelo sensor de junção (02/10/2026)**
+  - `TIMEOUT_ENTREGA` de **9000 ms → 12500 ms**: vigia só o trajeto topo → junção; sem confirmação da junção em 12,5 s a esteira (qualquer uma das três) é desligada e o sistema vai para `ERRO` (`timeout`) sem debitar o estoque
+  - A confirmação passou a exigir uma **passagem** (o sensor precisa ser visto livre após ligar a esteira): sensor já em LOW na partida não debita estoque sozinho
+  - Mantidos e documentados: o estoque só é debitado após a confirmação, e o motor segue ligado `TEMPO_SAIDA_ESTEIRA_MS` (3 s) depois dela, fora do timeout
+  - **Não validado em bancada** (sem hardware nesta sessão): validar com o cenário de timeout do `docs/testes/plano_de_testes.md`
+
 ### Problemas Conhecidos
 
 - **Falha de conexão MQTT Cloud com `rc=-2` — investigação por rede (22–28/09/2026)**
