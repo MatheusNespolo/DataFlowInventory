@@ -84,7 +84,13 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // PARÂMETROS DO SISTEMA
 // ============================================================
 #define VELOCIDADE_PRINCIPAL   180   // PWM 0-255
-#define VELOCIDADE_SECUNDARIA  200   // PWM 0-255
+#define VELOCIDADE_SECUNDARIA  200   // PWM 0-255 (padrão das esteiras secundárias)
+// Velocidade por esteira secundária (PWM 0-255). A e B usam o padrão; a C tem
+// motor mais forte, então usa um PWM menor para igualar o tempo de entrega.
+// Valor da C é ponto de partida: calibrar em bancada (depois da troca do motor).
+#define VELOCIDADE_ESTEIRA_A   VELOCIDADE_SECUNDARIA
+#define VELOCIDADE_ESTEIRA_B   VELOCIDADE_SECUNDARIA
+#define VELOCIDADE_ESTEIRA_C   140
 #define TIMEOUT_ENTREGA        12500 // ms — tempo máximo para a peça sair do topo e ser
                                        // CONFIRMADA pelo sensor de junção (medição 25/08: ~5 s
                                        // até o sensor; folga ampla). NÃO inclui os
@@ -165,15 +171,15 @@ void pararMotor(int pin) {
 }
 
 void ligarEsteiraA() {
-  ligarMotor(MOTOR_A, VELOCIDADE_SECUNDARIA);
+  ligarMotor(MOTOR_A, VELOCIDADE_ESTEIRA_A);
 }
 
 void ligarEsteiraB() {
-  ligarMotor(MOTOR_B, VELOCIDADE_SECUNDARIA);
+  ligarMotor(MOTOR_B, VELOCIDADE_ESTEIRA_B);
 }
 
 void ligarEsteiraC() {
-  ligarMotor(MOTOR_C, VELOCIDADE_SECUNDARIA);
+  ligarMotor(MOTOR_C, VELOCIDADE_ESTEIRA_C);
 }
 
 void pararEsteiraA() { pararMotor(MOTOR_A); }

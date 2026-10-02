@@ -91,6 +91,12 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Mantidos e documentados: o estoque só é debitado após a confirmação, e o motor segue ligado `TEMPO_SAIDA_ESTEIRA_MS` (3 s) depois dela, fora do timeout
   - **Não validado em bancada** (sem hardware nesta sessão): validar com o cenário de timeout do `docs/testes/plano_de_testes.md`
 
+### Alterado
+
+- **Firmware Uno — velocidade por esteira secundária (02/10/2026)**
+  - Novas constantes `VELOCIDADE_ESTEIRA_A/B/C`; A e B seguem em `VELOCIDADE_SECUNDARIA` (200) e a esteira C usa PWM menor (`VELOCIDADE_ESTEIRA_C`, inicial 140) porque o novo motor é mais forte e entregava rápido demais
+  - **Valor da C não calibrado:** ajustar em bancada após a troca do motor (tempo topo → junção parecido com A e B, partida com peça, folga em relação ao `TIMEOUT_ENTREGA`; avaliar `TEMPO_SAIDA_ESTEIRA_MS` por esteira se a saída da C divergir)
+
 ### Problemas Conhecidos
 
 - **Falha de conexão MQTT Cloud com `rc=-2` — investigação por rede (22–28/09/2026)**
