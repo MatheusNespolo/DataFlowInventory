@@ -89,7 +89,7 @@ https://github.com/MatheusNespolo/DataFlowInventory
 
 ## 3. Issues iniciais (rascunhos — não criadas)
 
-Cada rascunho serve para a equipe criar uma issue **depois de aprovar**. Etiquetas já existem no repositório.
+Os quatro rascunhos abaixo já viraram issues em 02/10/2026: [#36](https://github.com/MatheusNespolo/DataFlowInventory/issues/36) (3.1), [#37](https://github.com/MatheusNespolo/DataFlowInventory/issues/37) (3.2), [#38](https://github.com/MatheusNespolo/DataFlowInventory/issues/38) (3.3) e [#39](https://github.com/MatheusNespolo/DataFlowInventory/issues/39) (3.4). Etiquetas já existem no repositório.
 
 ### 3.1 Simulador: cenário de timeout de entrega
 
