@@ -548,3 +548,5 @@ Detalhes completos (pinagem, ligaÃ§Ãµes e checklists): [`test/esteira_peca_b
 - **Telemetria Prometheus/Grafana (Card #25) — Concluída (01/10/2026):** o stack foi validado (smoke test e conferência dos painéis) e as capturas dos dashboards foram anexadas ao card. Esta observação substitui o "Não validado" e as pendências de 30/09, e o burn-in pode observar os dashboards Grafana em paralelo.
 
 
+- **Firmware Uno — pendências de bancada (02/10/2026):** a compilação dos 4 sketches foi verificada com `arduino-cli` (procedimento em `docs/CI-CD.md`), mas o comportamento não foi testado em hardware. Ao voltar à bancada: (1) calibrar o PWM da esteira C (`VELOCIDADE_ESTEIRA_C`, inicial 140), medindo o tempo topo → junção, que deve ficar próximo ao de A e B (~5 s) e bem abaixo dos 12,5 s do timeout; (2) provocar o timeout de 12,5 s (sem peça) e conferir `ERRO`, motor desligado e estoque intacto; (3) iniciar um pedido com o sensor de junção já bloqueado e confirmar que o estoque não é debitado sem uma passagem; (4) executar antes o diagnóstico B/C do roteiro da Semana 7, ainda não realizado.
+
