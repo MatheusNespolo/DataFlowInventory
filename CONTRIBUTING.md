@@ -102,6 +102,14 @@ Toda mudança de comportamento observável deve atualizar:
 - `docs/CHANGELOG.md` (obrigatório)
 - O documento afetado (`README.md`, `docs/ARCHITECTURE.md`, checklists, roteiros)
 
+## 7. Comunidade e políticas
+
+- Convivência: [Código de Conduta](CODE_OF_CONDUCT.md).
+- Falhas de segurança: [Política de Segurança](SECURITY.md) (não abra issue pública).
+- Issues: use os formulários de **bug** e de **ideia**. Procure as etiquetas `good first issue` e
+  `help wanted` para começar.
+- Pull requests: o modelo de PR traz o checklist da seção 5.
+
 ---
 
 Dúvidas? Abra uma issue ou comente no card correspondente do board.

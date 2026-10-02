@@ -1,0 +1,32 @@
+name: Sugerir uma melhoria
+description: Ideia de funcionalidade, melhoria de documentação ou de testes.
+title: "[Ideia] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Boas ideias são bem-vindas! Veja o
+        [Guia de Contribuição](../blob/main/CONTRIBUTING.md) e os itens de
+        "Próximos Passos" do [README](../blob/main/README.md) para não duplicar algo já planejado.
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qual problema ou necessidade isso resolve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: O que você propõe?
+      description: Descreva a ideia. Se tiver uma sugestão de implementação, inclua.
+    validations:
+      required: true
+  - type: dropdown
+    id: ajuda
+    attributes:
+      label: Você pretende implementar?
+      options:
+        - Sim, quero abrir o PR
+        - Talvez, com orientação
+        - Não, é só uma sugestão

@@ -22,6 +22,11 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Divulgação e organização do README (02/10/2026)**
+  - `README.md` reorganizado sem reescrever as seções: abertura enxuta (frase de posicionamento, badges de 17 para 8), tabela **Escolha seu caminho**, seção **Por que este projeto é interessante**, diagrama de arquitetura movido para a seção Arquitetura e pedido de estrela no fim
+  - `LICENSE` normalizado (aviso de copyright em uma única linha) para o GitHub reconhecer a licença MIT; **o reconhecimento só se confirma depois do merge**
+  - Novos arquivos de comunidade: formulários de issue (bug e ideia), modelo de pull request, `CODE_OF_CONDUCT.md` e `SECURITY.md`; `CONTRIBUTING.md` ganhou a seção 7 com os links
+  - Novo `docs/DIVULGACAO.md`: plano de divulgação orgânica com textos-base, rascunhos por canal, rascunhos de issues iniciais, checklist e métricas. **Nada foi publicado e nenhuma issue foi criada**; a publicação e a checagem dos canais são da equipe
 - **Dashboard Grafana "Visão Geral" (02/10/2026):** o painel "Estoque atual" passa a ter escala máxima 15 (antes 5), alinhada ao estoque inicial de 15 peças por tipo. Limiares de cor inalterados (iguais aos do frontend)
 
 ### Adicionado

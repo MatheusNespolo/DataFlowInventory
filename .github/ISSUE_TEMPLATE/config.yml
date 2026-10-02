@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Como implantar o sistema
+    url: https://github.com/MatheusNespolo/DataFlowInventory/blob/main/docs/DEPLOYMENT.md
+    about: Passo a passo para subir o sistema do zero (bancada, simulador e observabilidade).
+  - name: Arquitetura e tópicos MQTT
+    url: https://github.com/MatheusNespolo/DataFlowInventory/blob/main/docs/ARCHITECTURE.md
+    about: Referência técnica do fluxo Arduino, ESP32, broker, servidor e dashboard.
