@@ -1,0 +1,51 @@
+name: Relatar um problema
+description: Algo não funciona como o esperado (firmware, servidor, simulador, dashboard ou documentação).
+title: "[Problema] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar! Antes de abrir, procure nas issues existentes e confira o
+        [Guia de implantação](../blob/main/docs/DEPLOYMENT.md) e o
+        [histórico de mudanças](../blob/main/docs/CHANGELOG.md).
+        **Nunca cole senhas, tokens ou o conteúdo de `secrets.h` / `.env`.**
+  - type: dropdown
+    id: onde
+    attributes:
+      label: Onde o problema acontece?
+      options:
+        - Simulador (sem hardware)
+        - Servidor Node.js
+        - Dashboard / frontend
+        - Firmware Arduino Uno
+        - Firmware ESP32 (gateway MQTT)
+        - Observabilidade (Prometheus / Grafana)
+        - Documentação
+        - Não sei
+    validations:
+      required: true
+  - type: textarea
+    id: descricao
+    attributes:
+      label: O que aconteceu?
+      description: Descreva o comportamento observado e o que você esperava.
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: Como reproduzir
+      description: Passo a passo, comandos executados e, se houver, a mensagem de erro.
+      placeholder: |
+        1. Rodei `cd simulator && npm start`
+        2. Cliquei em "Solicitar A"
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: ambiente
+    attributes:
+      label: Ambiente
+      description: Sistema operacional, versão do Node.js e, se for firmware, a placa e a versão da Arduino IDE.
+      placeholder: "Windows 11, Node 22, Arduino IDE 2.3"
