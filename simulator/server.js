@@ -30,7 +30,7 @@ const PORT = parseInt(process.env.PORT, 10) || 3000;
 const DELAY_VERIFICACAO = 300;   // ms — delay simulado da verificação
 const DELAY_ACIONAMENTO = 200;   // ms — delay simulado do acionamento
 const DELAY_ENTREGA     = 1500;  // ms — delay simulado da entrega
-const ESTOQUE_INICIAL   = 5;     // peças de cada tipo
+const ESTOQUE_INICIAL   = 15;    // peças de cada tipo (igual ao firmware)
 
 // Intervalo mínimo (ms) entre comandos de um mesmo cliente (anti-flood).
 // Mesmo comportamento do servidor real (../server/server.js).
