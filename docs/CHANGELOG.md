@@ -20,6 +20,10 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - `docs/testes/validações/test_write.txt` removido (arquivo de teste sem uso)
   - Links em `README.md`, `CONTRIBUTING.md`, `simulator/`, `docs/FRONTEND.md`, `docs/testes/plano_de_testes.md` e `docs/fluxogramas/board_github_projects.md` apontam para o `ARCHITECTURE.md`; árvore de diretórios do `README.md` atualizada (observabilidade, scripts, CI, testes). Menções antigas nas entradas abaixo e nos roteiros semanais são históricas e foram mantidas
 
+### Alterado
+
+- **Dashboard Grafana "Visão Geral" (02/10/2026):** o painel "Estoque atual" passa a ter escala máxima 15 (antes 5), alinhada ao estoque inicial de 15 peças por tipo. Limiares de cor inalterados (iguais aos do frontend)
+
 ### Adicionado
 
 - **Deployment Guide e atualização de documentação (30/09/2026)**

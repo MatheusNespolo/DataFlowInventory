@@ -397,7 +397,7 @@
         "defaults": {
           "unit": "none",
           "min": 0,
-          "max": 5,
+          "max": 15,
           "decimals": 0,
           "thresholds": {
             "mode": "absolute",
