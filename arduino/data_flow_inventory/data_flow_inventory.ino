@@ -8,8 +8,6 @@
 // Máquina de estados com 5 etapas:
 //   AGUARDANDO_PEDIDO → VERIFICANDO_ESTOQUE → ACIONANDO_ESTEIRA
 //   → ENTREGANDO_PECA → ERRO
-// Entrega: a peça só é debitada do estoque depois que o sensor de junção da
-// esteira confirma a passagem; sem confirmação em TIMEOUT_ENTREGA → ERRO.
 // 3 esteiras secundárias (A, B, C) alimentam a esteira principal.
 // Roda de estoque com 3 compartimentos ao final da principal.
 //
@@ -91,14 +89,10 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define VELOCIDADE_ESTEIRA_A   VELOCIDADE_SECUNDARIA
 #define VELOCIDADE_ESTEIRA_B   VELOCIDADE_SECUNDARIA
 #define VELOCIDADE_ESTEIRA_C   140
-#define TIMEOUT_ENTREGA        12500 // ms — tempo máximo para a peça sair do topo e ser
-                                       // CONFIRMADA pelo sensor de junção (medição 25/08: ~5 s
-                                       // até o sensor; folga ampla). NÃO inclui os
-                                       // TEMPO_SAIDA_ESTEIRA_MS de saída, que contam depois da
-                                       // confirmação. Estourou → ERRO e motor desligado.
+#define TIMEOUT_ENTREGA        9000 // ms (medição 25/08: peça leva ~5s até o sensor,
+                                      // mas precisa de folga extra para sair da esteira secundária)
 #define DEBOUNCE_BTN           200   // ms
 #define INTERVALO_PUBLICACAO   1000  // ms — intervalo para publicar status periódico
-#define ESTOQUE_INICIAL        15    // peças de cada tipo ao ligar (o LCD 16x2 comporta até 99 por peça)
 
 // ============================================================
 // ESTADOS DA MÁQUINA DE ESTADOS
@@ -124,7 +118,7 @@ const char* nomesEstados[] = {
 // ============================================================
 Estado estadoAtual = AGUARDANDO_PEDIDO;
 int    pecaSolicitada = 0;       // 1 = A, 2 = B, 3 = C
-int    estoque[4] = {0, ESTOQUE_INICIAL, ESTOQUE_INICIAL, ESTOQUE_INICIAL}; // índice 1=A, 2=B, 3=C
+int    estoque[4] = {0, 5, 5, 5}; // índice 1=A, 2=B, 3=C
 unsigned long tempoInicio = 0;
 unsigned long ultimoDebounce = 0;
 unsigned long ultimaPublicacao = 0;
@@ -139,17 +133,11 @@ String bufferComando = "";
 // Fase de SAÍDA DA ESTEIRA: depois que a peça atinge o sensor de junção, a
 // esteira secundária continua ligada por este tempo para a peça sair
 // fisicamente da esteira (a junção só marca "quase no fim"). Calibrar em
-// bancada. Este tempo é contado DEPOIS da confirmação pelo sensor de junção e
-// não entra no TIMEOUT_ENTREGA (que só vigia o trajeto topo → junção).
+// bancada — a soma (tempo até o sensor + este valor) deve caber no
+// TIMEOUT_ENTREGA. Medição 25/08: ~5 s até o sensor.
 const unsigned long TEMPO_SAIDA_ESTEIRA_MS = 3000;
 bool          saindoDaEsteira    = false;
 unsigned long tempoSaidaIniciada = 0;
-
-// O estoque só é debitado com a peça CONFIRMADA pelo sensor de junção, e a
-// confirmação exige uma passagem: o sensor precisa ser visto livre (HIGH) depois
-// que a esteira liga. Um sensor que já está em LOW na partida (peça parada sobre
-// ele, desalinhamento) não confirma nada sozinho — o pedido termina em timeout.
-bool          juncaoLiberada     = false;
 
 // Pausa pós-entrega sem bloquear o loop (substitui o antigo delay(1500)).
 bool          aguardandoLimpezaEntrega = false;
@@ -398,7 +386,6 @@ void interpretarComando(String linha) {
       erroTimeout = false;
       erroSemEstoque = false;
       saindoDaEsteira = false;
-      juncaoLiberada = false;
       aguardandoLimpezaEntrega = false;
       pecaSolicitada = 0;
       pararTodasSecundarias();
@@ -554,7 +541,6 @@ void loop() {
       if (pecaSolicitada == 3) ligarEsteiraC();
 
       tempoInicio = millis();
-      juncaoLiberada = false;
       publicarStatusEsteiras();
       estadoAtual = ENTREGANDO_PECA;
       break;
@@ -616,18 +602,14 @@ void loop() {
       if (pecaSolicitada == 2) pecaChegou = sensorJuncaoJ2();
       if (pecaSolicitada == 3) pecaChegou = sensorJuncaoJ3();
 
-      // A confirmação exige passagem: primeiro o sensor precisa ser visto livre.
-      if (!pecaChegou) juncaoLiberada = true;
-
-      if (pecaChegou && juncaoLiberada) {
+      if (pecaChegou) {
         // NÃO para o motor ainda — inicia a fase de saída da esteira.
         atualizarLCD("Saindo da", "esteira...");
         saindoDaEsteira = true;
         tempoSaidaIniciada = millis();
 
       } else if (millis() - tempoInicio > TIMEOUT_ENTREGA) {
-        // Timeout — peça não foi confirmada pelo sensor de junção: motor desligado,
-        // estoque intacto (o débito só ocorre após a confirmação, na Fase B).
+        // Timeout — peça nunca chegou ao sensor de junção
         pararTodasSecundarias();
         erroTimeout = true;
         publicarErro("timeout");
