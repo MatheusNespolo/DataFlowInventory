@@ -81,7 +81,8 @@ npm install                     # dependências
 npm start                       # sobe o simulador offline
 ```
 
-**Firmware (ESP32 / Arduino):** compile na Arduino IDE (ou `arduino-cli compile`).
+**Firmware (ESP32 / Arduino):** compile na Arduino IDE ou com `arduino-cli` (mesmos comandos do job `arduino-compile` do CI; veja [`docs/CI-CD.md`](docs/CI-CD.md#compilar-o-firmware-localmente-sem-hardware)).
+Compilar **não exige hardware**: só valida que o código compila, não o comportamento na bancada.
 Lembre de **desconectar o ESP32 dos pinos 0/1** durante o upload no Uno.
 
 **Bancada / integração:** siga o roteiro do dia em

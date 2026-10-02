@@ -100,6 +100,8 @@ npm update <package-name>
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
 - **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
 - **Falha em:** Erros de compilação
+- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C`, `ArduinoJson@6.21.5` e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
+- Para repetir o job na sua máquina, veja [Compilar o firmware localmente](#compilar-o-firmware-localmente-sem-hardware)
 
 ---
 
@@ -230,6 +232,43 @@ npx eslint . --fix
 # Validar localmente com Arduino IDE ou arduino-cli
 arduino-cli compile --fqbn arduino:avr:uno arduino/data_flow_inventory/data_flow_inventory.ino
 ```
+
+---
+
+### Compilar o firmware localmente (sem hardware)
+
+Reproduz o job `arduino-compile` do CI. Não precisa de placa conectada.
+
+**1. Obter o `arduino-cli`.** Instale o [Arduino CLI](https://arduino.github.io/arduino-cli/latest/installation/) ou use o que vem com a Arduino IDE 2.x (no Windows: `%LOCALAPPDATA%\Programs\Arduino IDE\resources\app\lib\backend\resources\arduino-cli.exe`). O CI usa a versão 1.0.0.
+
+**2. Preparar cores e bibliotecas (uma vez):**
+```bash
+arduino-cli config init
+arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+arduino-cli core update-index
+arduino-cli core install arduino:avr
+arduino-cli core install esp32:esp32
+arduino-cli lib install "LiquidCrystal I2C" "ArduinoJson@6.21.5" "PubSubClient"
+```
+
+**3. Criar o `secrets.h`** (só se ainda não existir; nunca versione o real):
+```bash
+cp esp32/gateway_mqtt/secrets.h.example esp32/gateway_mqtt/secrets.h        # Linux/Mac/Git Bash
+Copy-Item esp32\gateway_mqtt\secrets.h.example esp32\gateway_mqtt\secrets.h # PowerShell
+```
+
+**4. Compilar os 4 sketches** (na raiz do repositório; opcionalmente acrescente `--build-path <pasta fora do repo>` para não deixar artefatos de build no repositório):
+```bash
+arduino-cli compile --fqbn arduino:avr:uno   --warnings all arduino/data_flow_inventory/data_flow_inventory.ino
+arduino-cli compile --fqbn esp32:esp32:esp32 --warnings all esp32/gateway_mqtt/gateway_mqtt.ino
+arduino-cli compile --fqbn arduino:avr:uno   --warnings all test/esteira_peca_b/arduino_esteiras_ab/arduino_esteiras_ab.ino
+arduino-cli compile --fqbn esp32:esp32:esp32 --warnings all test/esteira_peca_b/esp32_esteiras_ab/esp32_esteiras_ab.ino
+```
+Código de saída `0` em todos = compilou. A compilação do ESP32 leva alguns minutos na primeira vez.
+
+**Observações:**
+- Com `ArduinoJson` 7.x (o que a Arduino IDE instala por padrão) aparecem avisos de depreciação do `StaticJsonDocument`; não impedem a compilação. Para igualar o CI, instale a 6.21.5.
+- Última compilação local registrada: 02/10/2026, com os 4 sketches compilando (Uno principal usa 54% da flash e 55% da RAM). Isso **não** valida o comportamento: timeout, confirmação por passagem e PWM da esteira C seguem pendentes de bancada.
 
 ---
 

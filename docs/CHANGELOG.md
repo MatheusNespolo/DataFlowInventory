@@ -95,6 +95,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 - **Firmware Uno — velocidade por esteira secundária (02/10/2026)**
   - Novas constantes `VELOCIDADE_ESTEIRA_A/B/C`; A e B seguem em `VELOCIDADE_SECUNDARIA` (200) e a esteira C usa PWM menor (`VELOCIDADE_ESTEIRA_C`, inicial 140) porque o novo motor é mais forte e entregava rápido demais
+  - **Compilação local (02/10/2026):** os 4 sketches do job `arduino-compile` compilaram com `arduino-cli` 1.5.1 (Uno principal com a esteira C em PWM 140: 17432 bytes de flash, 54%). Só compilação, sem hardware; procedimento em `docs/CI-CD.md`
   - **Valor da C não calibrado:** ajustar em bancada após a troca do motor (tempo topo → junção parecido com A e B, partida com peça, folga em relação ao `TIMEOUT_ENTREGA`; avaliar `TEMPO_SAIDA_ESTEIRA_MS` por esteira se a saída da C divergir)
 
 ### Problemas Conhecidos
