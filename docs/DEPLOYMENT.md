@@ -2,7 +2,7 @@
 
 Passo a passo para implantar o sistema do zero em um novo ambiente (bancada, demonstração ou desenvolvimento).
 
-> **Status: versão inicial (30/09/2026), revisada em 01/10/2026.** Os comandos foram reunidos a partir do `README.md`, de `server/.env.example`, de `scripts/setup.*`, de `start_services.bat` e dos firmwares, e conferidos contra o código. **Ainda não foram executados em máquina limpa** (Fase 3 do card #22 pendente). Corrija este guia se encontrar atrito.
+> **Status: versão inicial (30/09/2026), revisada em 01/10/2026.** Os comandos foram reunidos a partir do `README.md`, de `server/.env.example`, de `scripts/setup.*`, de `start_services.bat` e dos firmwares, e conferidos contra o código. **Ainda não foram executados em máquina limpa** (Fase 3 do card #22 pendente). A parte de observabilidade (seção 8) teve o stack validado em 01/10/2026 (Card #25). Corrija este guia se encontrar atrito.
 
 ## Sumário
 
@@ -136,7 +136,10 @@ docker compose --env-file observability/.env up -d
 - Smoke test: `.\scripts\observability-smoke.ps1` (Windows) ou `bash scripts/observability-smoke.sh`.
 - Detalhes, operação e problemas comuns: [`observability/README.md`](../observability/README.md). Catálogo de métricas: `docs/ARCHITECTURE.md` (seção 7).
 
-> A execução real do stack e a renderização dos painéis ainda **não foram validadas** (falta Docker na máquina de desenvolvimento).
+- As portas ficam presas ao `127.0.0.1` de propósito. A retenção do Prometheus é de 30 dias. As versões estão fixadas: `prom/prometheus:v3.15.0` e `grafana/grafana-oss:12.4.3`.
+- Se a senha do Grafana tiver `$`, escreva `$$` no `observability/.env`. Se as portas 9090 ou 3030 estiverem ocupadas, defina `PROMETHEUS_PORT` / `GRAFANA_PORT` no mesmo arquivo.
+
+> **Status de validação:** a execução real do stack (`docker compose up`, consultas PromQL e renderização dos painéis) foi validada em 01/10/2026 com o `scripts/observability-smoke.*` e a conferência dos painéis no navegador (Card #25). Isso **não** equivale à validação do guia em máquina limpa (Card #22), que continua pendente.
 
 ## 9. Validação pós-deploy
 
@@ -147,6 +150,7 @@ Execute na ordem; cada linha depende da anterior.
 | Servidor no ar | `curl http://localhost:3000/api/status` | JSON com `"server":"online"`; HTTP 200 com broker conectado, **503** se o broker estiver indisponível |
 | Métricas | `curl http://localhost:3000/metrics` | contém `dfi_mqtt_connected 1` |
 | Broker (local) | `mosquitto_sub -h 127.0.0.1 -t "dataflow/#" -v` | `dataflow/status` com `online` (retained) assim que o ESP32 conectar |
+| Observabilidade (opcional) | `.\scripts\observability-smoke.ps1` ou `bash scripts/observability-smoke.sh`; depois abrir <http://127.0.0.1:9090/targets> | script sai com código 0; alvo `dfi-server` **UP**; dashboards na pasta *Data Flow Inventory* do Grafana (<http://127.0.0.1:3030>) |
 | Probe | `cd test/mqtt_probe && node probe.js` | mensagens dos tópicos `dataflow/*` |
 | Comando | `mosquitto_pub -h 127.0.0.1 -t dataflow/comandos/sub -m '{"acao":"solicitar_peca","peca":"A"}'` | esteira da peça A aciona; confirmação em `dataflow/comandos/pub`. O campo `acao` é obrigatório e `peca` é `A`, `B` ou `C` |
 | Dashboard | abrir <http://localhost:3000> | badges de conexão verdes, estoque visível; ao pedir uma peça pelo botão, esteira e evento aparecem |
@@ -167,6 +171,12 @@ No PowerShell, o `mosquitto_pub` pode exigir outro escape de aspas no JSON; o `s
 | Motor não gira / gira fraco | GND não comum, solda, MOSFET | roteiro da Semana 7, seção 4.2 |
 | `EADDRINUSE` ao subir o servidor | simulador ou outro processo na porta 3000 | pare o outro processo ou altere `PORT` |
 | Alvo `dfi-server` DOWN no Prometheus | servidor parado ou firewall na porta 3000 | `observability/README.md` (Problemas comuns) |
+| Alvo `dfi-server` DOWN com o servidor no ar | Firewall do Windows bloqueia a entrada na porta 3000 vinda do Docker | libere a porta 3000 de entrada (`docs/broker_local_mosquitto.md`, seção do firewall) |
+| `host.docker.internal` não resolve (Linux) | o nome só existe por padrão no Docker Desktop | o `docker-compose.yml` já mapeia `host-gateway`; use Docker 20.10+ |
+| `docker compose up` reclama de `GRAFANA_ADMIN_PASSWORD` | faltou o `--env-file` ou a senha está vazia | use `--env-file observability/.env` e preencha a senha |
+| Senha do Grafana com `$` não funciona | o Compose interpola `$` em arquivos `.env` | escreva `$$` no `observability/.env` |
+| Porta 9090 ou 3030 ocupada | outro programa usa a porta | defina `PROMETHEUS_PORT` / `GRAFANA_PORT` em `observability/.env` |
+| Painéis de latência vazios | ninguém enviou comandos na janela | envie um pedido pelo dashboard web |
 | Grafana ignora a senha nova | senha só vale na 1ª criação do volume | `down -v` ou redefinir pela interface |
 
 **Rollback:** pare o servidor (Ctrl+C). Para a observabilidade, `docker compose --env-file observability/.env down` (mantém dados) ou `down -v` (apaga). O servidor não depende do stack, então desligá-lo não afeta a bancada. Para o firmware, refaça o upload do `.ino` de um commit anterior (`git checkout <sha> -- arduino/ esp32/`; o seu `secrets.h` não é versionado e permanece).
