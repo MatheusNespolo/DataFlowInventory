@@ -4,43 +4,54 @@
 
 **Centro de Distribuição Automatizado — Protótipo IoT em Escala Reduzida**
 
+Do clique no navegador à esteira em movimento: pedido pelo dashboard, MQTT, ESP32 e Arduino, com estoque, sensores e métricas em tempo real.
+
+**Firmware C++ (Arduino Uno e ESP32) · MQTT/IoT · Dashboard em tempo real com vista 3D · Testável sem hardware**
+
 ![Arduino](https://img.shields.io/badge/Arduino-Uno-00979D?logo=arduino&logoColor=white)
 ![ESP32](https://img.shields.io/badge/ESP32-DevModule-000000?logo=espressif&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-v22+-339933?logo=node.js&logoColor=white)
-![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-5391FE?logo=powershell&logoColor=white)
 ![MQTT](https://img.shields.io/badge/MQTT-Mosquitto%20%7C%20HiveMQ-660066?logo=mosquitto&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-3-brightgreen?logo=sqlite&logoColor=white)
-![Socket.IO](https://img.shields.io/badge/Socket.IO-4-010101?logo=socket.io&logoColor=white)
-![Three.js](https://img.shields.io/badge/Three.js-r168-black?logo=three.js&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Prometheus](https://img.shields.io/badge/Prometheus-3.15-E6522C?logo=prometheus&logoColor=white)
-![Grafana](https://img.shields.io/badge/Grafana-12.4-F46800?logo=grafana&logoColor=white)
 [![CI](https://github.com/MatheusNespolo/DataFlowInventory/actions/workflows/lint-and-security.yaml/badge.svg)](https://github.com/MatheusNespolo/DataFlowInventory/actions/workflows/lint-and-security.yaml)
-![School](https://img.shields.io/badge/SENAI-São%20Caetano%20do%20Sul-blue)
-![Year](https://img.shields.io/badge/Ano-2026-orange)
-![IoT](https://img.shields.io/badge/IoT-Arduino%20+%20ESP32-teal)
-[![Industria4](https://img.shields.io/badge/Indústria-4.0-red)](https://github.com/MatheusNespolo/DataFlowInventory#sobre)
-![Docs](https://img.shields.io/badge/Docs-Markdown-083fa1?logo=markdown&logoColor=white)
+[![Licença MIT](https://img.shields.io/badge/Licen%C3%A7a-MIT-green)](LICENSE)
+![SENAI](https://img.shields.io/badge/SENAI-S%C3%A3o%20Caetano%20do%20Sul-blue)
 
 ---
 <img src="img/DataFlowInventory.png" width="1865" height="884" alt="DataFlowInventory">
 <br>
 
----
-<img src="img/ArquiteturaDataFlowInventory.png" width="1865" height="884" alt="ArquiteturaDataFlowInventory">
-<br>
-
 SENAI São Caetano do Sul — Boa Vista<br>
 Engenharia de Controle e Automação
 
----
-
-⭐ **Se este projeto te ajudou, deixe uma estrela no GitHub!** Sua avaliação nos motiva bastante! 🙏
-
 </div>
+
+## Escolha seu caminho
+
+| Quero... | Vá para | Precisa de hardware? |
+|----------|---------|----------------------|
+| ⚡ Ver funcionando em 30 segundos | [Quick Start — Simulador](#-quick-start--simulador) | Não |
+| 🔧 Montar a bancada completa | [Materiais](#materiais), [Como Rodar](#como-rodar) e o [Guia de implantação](docs/DEPLOYMENT.md) | Sim |
+| 📈 Ver métricas e dashboards de performance | [Observabilidade](observability/README.md) | Não exige a bancada (precisa de Docker) |
+| 🤝 Contribuir | [Contribuindo](#contribuindo) e o [Guia de Contribuição](CONTRIBUTING.md) | Não |
+
+## Por que este projeto é interessante
+
+| Tema | O que você encontra | Onde está detalhado |
+|------|---------------------|---------------------|
+| 🧠 **C++ embarcado** | Máquina de estados de 5 etapas no Arduino Uno, protocolo serial em JSON e gateway ESP32 com LWT e reconexão Wi-Fi não bloqueante | [Funcionamento](#funcionamento) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| 🏭 **Automação e intralogística** | 4 esteiras, 6 sensores infravermelhos, controle de estoque e timeout de entrega | [Visão Geral](#visão-geral) · [Funcionamento](#funcionamento) |
+| 📡 **IoT e MQTT** | Mosquitto local ou HiveMQ Cloud, tópicos `dataflow/*`, mensagens retained e LWT | [Tópicos MQTT](#tópicos-mqtt) |
+| ⏱️ **Tempo real** | Servidor Node.js com Socket.IO, dashboard responsivo e vista 3D da bancada | [Destaques Técnicos](#destaques-técnicos) |
+| 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
+| ✅ **Qualidade** | Testes unitários, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
+
+> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras B e C estão em diagnóstico elétrico. Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
 
 ## Sumário
 
+- [Escolha seu caminho](#escolha-seu-caminho)
+- [Por que este projeto é interessante](#por-que-este-projeto-é-interessante)
 - [Sobre](#sobre)
 - [Quick Start — Simulador](#-quick-start--simulador)
 - [Visão Geral](#visão-geral)
@@ -120,6 +131,9 @@ O sistema é composto por:
 </div>
 
 ## Arquitetura
+
+<img src="img/ArquiteturaDataFlowInventory.png" width="1865" height="884" alt="ArquiteturaDataFlowInventory">
+<br>
 
 ### Modo Simulador (sem hardware)
 
@@ -428,6 +442,8 @@ Contribuições são bem-vindas! Antes de abrir um PR, leia o
 (segredos em `secrets.h` / `.env`, nunca no código), convenções de commit e as
 validações obrigatórias. O histórico de mudanças fica em
 [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
+
+⭐ **Se este projeto te ajudou, deixe uma estrela no GitHub!** Sua avaliação nos motiva bastante! 🙏
 
 ## Licença
 
