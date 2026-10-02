@@ -110,6 +110,14 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - **Compilação local (02/10/2026):** os 4 sketches do job `arduino-compile` compilaram com `arduino-cli` 1.5.1 (Uno principal com a esteira C em PWM 140: 17432 bytes de flash, 54%). Só compilação, sem hardware; procedimento em `docs/CI-CD.md`
   - **Valor da C não calibrado:** ajustar em bancada após a troca do motor (tempo topo → junção parecido com A e B, partida com peça, folga em relação ao `TIMEOUT_ENTREGA`; avaliar `TEMPO_SAIDA_ESTEIRA_MS` por esteira se a saída da C divergir)
 
+### Alterado
+
+- **Estoque inicial de 15 peças por tipo (02/10/2026)**
+  - Firmware Uno (`ESTOQUE_INICIAL`) e simulador agora começam com **15** peças de A, B e C (antes 5), para permitir mais rodadas de teste; o valor "5" do `index.html` era só o texto exibido antes da primeira mensagem e foi alinhado
+  - O servidor real não guarda estoque inicial (espelha o que o Arduino publica); o estoque do Arduino continua voltando ao inicial a cada reinício
+  - O painel de estoque do Grafana (`max: 5`) **não foi alterado**: com mais de 5 peças a barra fica cheia, mas o valor numérico continua correto
+  - Estoque de software acima do número de peças físicas não protege nada: se faltar peça no topo, o sensor gera `sem_estoque`
+
 ### Problemas Conhecidos
 
 - **Falha de conexão MQTT Cloud com `rc=-2` — investigação por rede (22–28/09/2026)**

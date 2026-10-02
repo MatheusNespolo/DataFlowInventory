@@ -98,6 +98,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
                                        // confirmação. Estourou → ERRO e motor desligado.
 #define DEBOUNCE_BTN           200   // ms
 #define INTERVALO_PUBLICACAO   1000  // ms — intervalo para publicar status periódico
+#define ESTOQUE_INICIAL        15    // peças de cada tipo ao ligar (o LCD 16x2 comporta até 99 por peça)
 
 // ============================================================
 // ESTADOS DA MÁQUINA DE ESTADOS
@@ -123,7 +124,7 @@ const char* nomesEstados[] = {
 // ============================================================
 Estado estadoAtual = AGUARDANDO_PEDIDO;
 int    pecaSolicitada = 0;       // 1 = A, 2 = B, 3 = C
-int    estoque[4] = {0, 5, 5, 5}; // índice 1=A, 2=B, 3=C
+int    estoque[4] = {0, ESTOQUE_INICIAL, ESTOQUE_INICIAL, ESTOQUE_INICIAL}; // índice 1=A, 2=B, 3=C
 unsigned long tempoInicio = 0;
 unsigned long ultimoDebounce = 0;
 unsigned long ultimaPublicacao = 0;
