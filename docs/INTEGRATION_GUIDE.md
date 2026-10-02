@@ -35,7 +35,7 @@ MQTT_PUBLISH=true npm start
 
 # Terminal 2: Validar
 mosquitto_sub -h localhost -t "dataflow/estoque" -C 1
-# Esperado: {"type":"estoque","pecaA":5,"pecaB":5,"pecaC":5}
+# Esperado: {"type":"estoque","pecaA":15,"pecaB":15,"pecaC":15}
 ```
 
 ### 1.3 Arquitetura de Persistência no CX9240 — SQLite Local (Implementada & Validada)
