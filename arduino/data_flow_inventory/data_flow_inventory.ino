@@ -37,6 +37,12 @@
 
 static const ParamEsteira PARAMS[3] = {PARAM_ESTEIRA_A, PARAM_ESTEIRA_B, PARAM_ESTEIRA_C};
 
+// M1 precisa caber dentro de M2: o prazo da partida não pode passar do timeout.
+#define PRAZOS_COERENTES(P) (ParamEsteira P.prazoPartidaMs <= ParamEsteira P.timeoutMs)
+static_assert(PRAZOS_COERENTES(PARAM_ESTEIRA_A), "esteira A: prazoPartidaMs > timeoutMs");
+static_assert(PRAZOS_COERENTES(PARAM_ESTEIRA_B), "esteira B: prazoPartidaMs > timeoutMs");
+static_assert(PRAZOS_COERENTES(PARAM_ESTEIRA_C), "esteira C: prazoPartidaMs > timeoutMs");
+
 static Fsm fsm;
 static bool lcdPresente = false;
 static uint32_t inicioMs = 0;
@@ -53,7 +59,11 @@ void setup() {
 
   inicioMs = millis();
   sensoresIniciar(inicioMs);
+  // lcdIniciar pode levar mais de 1 s com o I2C ruim: alimenta o watchdog
+  // antes e depois para não entrar em laço de reset no boot.
+  watchdogAlimentar();
   lcdPresente = lcdIniciar();
+  watchdogAlimentar();
   lcdAtualizar("Data Flow", "Inventory v" VERSAO_FIRMWARE);
   aberturaMs = millis();  // lcdIniciar leva ~1 s: a abertura conta daqui
 
@@ -111,6 +121,10 @@ void loop() {
     textoTela(fsm, l1, l2);
     lcdAtualizar(l1, l2);
   }
+
+  // De novo depois da serial e do LCD: no ciclo da partida, o kick de 255
+  // termina no tempo certo mesmo que a publicação tenha demorado.
+  motoresAplicar(desejado, PARAMS, millis());
 
   watchdogAlimentar();
 }

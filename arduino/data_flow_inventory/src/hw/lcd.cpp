@@ -55,6 +55,9 @@ bool lcdIniciar() {
   if (responde(LCD_ENDERECO_1)) ativo = &lcd1;
   else if (responde(LCD_ENDERECO_2)) ativo = &lcd2;
   if (ativo == nullptr) return false;
+  // A sondagem de 0x27 sem resposta pode ter deixado a flag ligada; sem
+  // limpar aqui, um LCD em 0x3F seria desligado à toa logo abaixo.
+  Wire.clearWireTimeoutFlag();
   ativo->init();
   ativo->backlight();
   ativo->clear();
