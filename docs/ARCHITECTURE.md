@@ -139,7 +139,7 @@ flowchart LR
 **Erros que levam a ERRO (exigem CMD:RESET):**
 - `sem_estoque` — contador da peça zerado
 - `sem_peca_topo` — contador > 0, mas sem peça no sensor do topo
-- `juncao_obstruida` — sensor de junção já ocupado antes de ligar o motor
+- `juncao_obstruida` — sensor de junção já ocupado antes de ligar o motor (na verificação ou no próprio ciclo da partida)
 - `motor_sem_avanco` — M1: o topo não liberou no prazo (motor travado, fraco ou peça presa no início)
 - `timeout` — M2: a peça saiu do topo e não chegou à junção no prazo
 - `peca_presa_saida` — M3: a junção continuou ocupada no fim da saída
