@@ -106,3 +106,14 @@ TESTE(supervisor_ocupou_depois_da_leitura_do_millis_nao_confirma) {
   VERIFICA(!passagemValida(j, 2000, 20));
   VERIFICA(supervisorAtualizar(s, 2021, false, j) == SUP_CONFIRMOU);  // 20 ms reais depois
 }
+
+TESTE(supervisor_juncao_ocupada_antes_da_partida_nao_confirma) {
+  // Ocupou entre a checagem prévia e a partida do motor: não é passagem.
+  Supervisor s;
+  supervisorIniciar(s, paramPadrao(), 1000);
+  LeituraJuncao j = livre();
+  j.ocupada = true;
+  j.ocupouEm = 995;
+  VERIFICA(supervisorAtualizar(s, 1100, false, j) == SUP_SEGUE);
+  VERIFICA(supervisorAtualizar(s, 13500, false, j) == SUP_FALHA_TIMEOUT);
+}

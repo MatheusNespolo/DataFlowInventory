@@ -28,7 +28,11 @@ ResultadoSupervisor supervisorAtualizar(Supervisor& s, uint32_t agora,
 
   if (s.fase == FASE_PARTIDA || s.fase == FASE_TRANSITO) {
     // Uma passagem válida prova o avanço mesmo antes de o filtro do topo liberar.
-    if (passagemValida(j, agora, s.p.pulsoMinJuncaoMs)) {
+    // Por nível, só vale a ocupação que começou DEPOIS da partida: uma junção
+    // ocupada na janela entre a checagem prévia e a partida não é passagem.
+    LeituraJuncao jv = j;
+    if (jv.ocupada && (int32_t)(jv.ocupouEm - s.inicioMs) < 0) jv.ocupada = false;
+    if (passagemValida(jv, agora, s.p.pulsoMinJuncaoMs)) {
       s.fase = FASE_SAIDA;
       s.confirmouEm = agora;
       return SUP_CONFIRMOU;

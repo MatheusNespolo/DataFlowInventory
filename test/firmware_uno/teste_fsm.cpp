@@ -233,20 +233,39 @@ TESTE(saida_segura_em_erro_mantem_motores_desligados) {
   }
 }
 
-TESTE(propriedade_nenhum_debito_sem_confirmacao) {
-  // Varre combinações de comportamento do topo e da junção e confere que
-  // o número de débitos é sempre igual ao de entregas publicadas.
-  for (int topoSai = 0; topoSai < 2; topoSai++) {
-    for (int pulso = 0; pulso < 40; pulso += 7) {
-      Bancada b;
-      b.passo(0, CMD_PECA, 'B');
-      b.passo(5);
-      if (topoSai) b.in.topo[1] = false;
-      b.ate(10, 2000);
-      b.in.juncao[1].maiorPulsoMs = (uint16_t)pulso;
-      b.ate(2005, 16000);
-      VERIFICA(b.debitos == b.confirmacoes);
-      VERIFICA(b.debitos <= 1);
+TESTE(propriedade_debito_so_com_passagem_valida_na_juncao_pedida) {
+  // Varre peça pedida × junção que recebe o pulso × largura × instante e
+  // compara com o esperado calculado à parte: só debita se o pulso veio na
+  // junção da esteira PEDIDA, durou >= 20 ms e chegou antes do timeout.
+  const uint16_t larguras[] = {5, 19, 20, 35};
+  const uint32_t instantes[] = {2000, 13000};
+  for (int pedida = 0; pedida < 3; pedida++) {
+    for (int jun = 0; jun < 3; jun++) {
+      for (int l = 0; l < 4; l++) {
+        for (int k = 0; k < 2; k++) {
+          Bancada b;
+          const uint32_t t0 = instantes[k];
+          const uint16_t larg = larguras[l];
+          b.passo(0, CMD_PECA, (char)('A' + pedida));
+          b.passo(5);
+          b.in.topo[pedida] = false;
+          b.ate(10, t0 - 5);
+          LeituraJuncao& j = b.in.juncao[jun];
+          for (uint32_t t = t0; t <= t0 + 40; t++) {  // passo de 1 ms em volta do pulso
+            if (t == t0) { j.ocupada = true; j.ocupouEm = t0; j.bordas++; }
+            if (t == t0 + larg) {
+              j.ocupada = false;
+              if (larg > j.maiorPulsoMs) j.maiorPulsoMs = larg;
+              j.bordas++;
+            }
+            b.passo(t);
+          }
+          b.ate(t0 + 45, 20000);
+          const int esperado = (jun == pedida && larg >= 20 && t0 < 12500) ? 1 : 0;
+          VERIFICA(b.debitos == esperado);
+          VERIFICA(b.debitos == b.confirmacoes);
+        }
+      }
     }
   }
 }

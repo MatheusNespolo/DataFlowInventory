@@ -65,7 +65,7 @@ struct EntradasFsm {
 };
 
 struct SaidasFsm {
-  static const uint8_t MAX_EVENTOS = 4;
+  static const uint8_t MAX_EVENTOS = 6;  // pior caso atual: 4 (pedido/ocupado + falha)
   Evento eventos[MAX_EVENTOS];
   uint8_t nEventos;
   int8_t zerarJuncao;        // -1 = nada; 0..2 = zerar a captura dessa junção
