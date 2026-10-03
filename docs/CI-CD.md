@@ -100,7 +100,8 @@ npm update <package-name>
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
 - **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
 - **Falha em:** Erros de compilação ou RAM global do Uno acima de 65%
-- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C`, `ArduinoJson@6.21.5` e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
+- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C@1.1.2`, `ArduinoJson@6.21.5` e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
+- **LCD:** o CI compila com a LiquidCrystal I2C **1.1.2** (Frank de Brabander), com versão fixa para o build não mudar sozinho. A Arduino IDE da equipe instala outra variante (LiquidCrystal_I2C 2.0.0, Martin Kubovčík / Frank de Brabander); a API usada pelo firmware (`LiquidCrystal_I2C(endereço, 16, 2)`, `init`, `backlight`, `clear`, `setCursor`, `write`) existe nas duas.
 - Para repetir o job na sua máquina, veja [Compilar o firmware localmente](#compilar-o-firmware-localmente-sem-hardware)
 
 #### 5. Lógica do firmware do Uno (`firmware-logica`)
@@ -137,10 +138,13 @@ No GitHub Projects, marcar como **Required Status Checks**:
 - ✅ lint-and-security / lint-javascript
 - ✅ lint-and-security / secret-detection
 - ✅ lint-and-security / arduino-compile
+- ✅ lint-and-security / firmware-logica
 - ✅ test / jest (futuro)
 - ✅ test / e2e-docker (futuro)
 
 **Bloqueio:** PR não pode fazer merge sem passar em todos.
+
+> **Nota:** a lista acima só bloqueia o merge depois que a regra de proteção da branch `main` é ativada no GitHub. Isso é feito pela equipe nas configurações do repositório (Settings → Branches → Branch protection rules), marcando estes checks como obrigatórios; o workflow sozinho não ativa a regra.
 
 ---
 
@@ -253,7 +257,7 @@ arduino-cli config add board_manager.additional_urls https://raw.githubuserconte
 arduino-cli core update-index
 arduino-cli core install arduino:avr
 arduino-cli core install esp32:esp32
-arduino-cli lib install "LiquidCrystal I2C" "ArduinoJson@6.21.5" "PubSubClient"
+arduino-cli lib install "LiquidCrystal I2C@1.1.2" "ArduinoJson@6.21.5" "PubSubClient"
 ```
 
 **3. Criar o `secrets.h`** (só se ainda não existir; nunca versione o real):

@@ -114,7 +114,7 @@ jobs:
 
       - name: Instalar bibliotecas Arduino
         run: |
-          arduino-cli lib install "LiquidCrystal I2C" "ArduinoJson@6.21.5" "PubSubClient"
+          arduino-cli lib install "LiquidCrystal I2C@1.1.2" "ArduinoJson@6.21.5" "PubSubClient"
 
       - name: Criar secrets.h de exemplo (arquivo real não é versionado)
         run: cp esp32/gateway_mqtt/secrets.h.example esp32/gateway_mqtt/secrets.h
