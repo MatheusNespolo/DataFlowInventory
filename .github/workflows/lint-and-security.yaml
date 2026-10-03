@@ -192,3 +192,12 @@ jobs:
 
       - name: Testes das métricas e da infraestrutura de observabilidade (sem Docker)
         run: cd test/server_metrics && npm test
+
+  firmware-logica:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Testes da lógica do firmware do Uno (g++ no PC)
+        run: make -C test/firmware_uno test
