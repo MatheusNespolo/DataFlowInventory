@@ -108,14 +108,18 @@ Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor ser
 **5 estados:**
 1. **AGUARDANDO_PEDIDO** → recebe comando
 2. **VERIFICANDO_ESTOQUE** → verifica se há peça
-3. **ACIONANDO_ESTEIRA** → liga motor, aguarda sensores
-4. **ENTREGANDO_PECA** → pausa, decrementa, publica
-5. **ERRO** → timeout ou rejeição (requer CMD:RESET)
+3. **ACIONANDO_ESTEIRA** → liga o motor da esteira secundária escolhida
+4. **ENTREGANDO_PECA** → monitora o sensor de junção (timeout de 12,5 s); ao confirmar a passagem, mantém o motor 3 s, decrementa o estoque e publica a entrega
+5. **ERRO** → `sem_estoque` ou `timeout` (requer CMD:RESET)
 
-**Rejeições explícitas:**
-- `peca_indisponivel` — Peça não existe (ex.: "C" sem estoque)
-- `ocupado` — Comando durante acionamento
-- `comando_desconhecido` — Inválido
+**Erros que levam a ERRO (exigem CMD:RESET):**
+- `sem_estoque` — sem peça no sensor do topo ou estoque zerado
+- `timeout` — a peça não foi confirmada pelo sensor de junção em 12,5 s (motor desligado, estoque intacto)
+
+**Rejeições (não mudam o estado):**
+- `peca_invalida` — letra diferente de A, B ou C
+- `ocupado` — pedido com a FSM fora de AGUARDANDO_PEDIDO
+- `comando_desconhecido` — linha não reconhecida
 
 **Diagramas:**
 

@@ -242,7 +242,7 @@ O Arduino opera com **5 estados**:
 
 | # | Estado | Descrição |
 |---|--------|-----------|
-| 1 | **AGUARDANDO_PEDIDO** | Sistema em repouso, monitora botões e comandos remotos |
+| 1 | **AGUARDANDO_PEDIDO** | Sistema em repouso, aguarda comandos remotos (botões físicos desabilitados) |
 | 2 | **VERIFICANDO_ESTOQUE** | Verifica sensor do topo + contador interno |
 | 3 | **ACIONANDO_ESTEIRA** | Liga motor da esteira secundária correspondente |
 | 4 | **ENTREGANDO_PECA** | Monitora o sensor da junção (timeout de 12,5 s); só debita o estoque após a confirmação e mantém o motor 3 s depois dela |

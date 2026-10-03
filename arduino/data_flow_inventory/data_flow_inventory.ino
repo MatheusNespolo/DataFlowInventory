@@ -85,12 +85,15 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // ============================================================
 #define VELOCIDADE_PRINCIPAL   180   // PWM 0-255
 #define VELOCIDADE_SECUNDARIA  200   // PWM 0-255 (padrão das esteiras secundárias)
-// Velocidade por esteira secundária (PWM 0-255). A e B usam o padrão; a C tem
-// motor mais forte, então usa um PWM menor para igualar o tempo de entrega.
-// Valor da C é ponto de partida: calibrar em bancada (depois da troca do motor).
+// Velocidade por esteira secundária (PWM 0-255). Cada esteira tem a sua constante
+// para poder ser calibrada sozinha. Em bancada o PWM mínimo que move a esteira
+// com peça foi ~150 (docs/testes/plano_de_testes.md): NÃO fique abaixo disso sem
+// medir. A C começa igual a A e B; para igualar o tempo de entrega de um motor
+// diferente, calibre o valor da C em bancada.
 #define VELOCIDADE_ESTEIRA_A   VELOCIDADE_SECUNDARIA
 #define VELOCIDADE_ESTEIRA_B   VELOCIDADE_SECUNDARIA
-#define VELOCIDADE_ESTEIRA_C   140
+#define VELOCIDADE_ESTEIRA_C   VELOCIDADE_SECUNDARIA
+#define FILTRO_JUNCAO_MS       30    // ms — leitura do sensor de junção precisa ficar estável
 #define TIMEOUT_ENTREGA        12500 // ms — tempo máximo para a peça sair do topo e ser
                                        // CONFIRMADA pelo sensor de junção (medição 25/08: ~5 s
                                        // até o sensor; folga ampla). NÃO inclui os
@@ -141,8 +144,8 @@ String bufferComando = "";
 // Fase de SAÍDA DA ESTEIRA: depois que a peça atinge o sensor de junção, a
 // esteira secundária continua ligada por este tempo para a peça sair
 // fisicamente da esteira (a junção só marca "quase no fim"). Calibrar em
-// bancada — a soma (tempo até o sensor + este valor) deve caber no
-// TIMEOUT_ENTREGA. Medição 25/08: ~5 s até o sensor.
+// bancada. Este tempo é contado DEPOIS da confirmação pelo sensor de junção e
+// NÃO entra no TIMEOUT_ENTREGA (que só vigia o trajeto topo → junção).
 const unsigned long TEMPO_SAIDA_ESTEIRA_MS = 3000;
 bool          saindoDaEsteira    = false;
 unsigned long tempoSaidaIniciada = 0;
@@ -152,6 +155,8 @@ unsigned long tempoSaidaIniciada = 0;
 // que a esteira liga. Um sensor que já está em LOW na partida (peça parada sobre
 // ele, desalinhamento) não confirma nada sozinho — o pedido termina em timeout.
 bool          juncaoLiberada     = false;
+bool          juncaoUltima       = false;   // última leitura do sensor de junção
+unsigned long juncaoMudouEm      = 0;       // quando a leitura mudou pela última vez
 
 // Pausa pós-entrega sem bloquear o loop (substitui o antigo delay(1500)).
 bool          aguardandoLimpezaEntrega = false;
@@ -324,13 +329,17 @@ void publicarEntrega(char peca) {
   Serial.println();
 }
 
-void publicarErro(const char* tipo) {
+// "peca" = letra A/B/C a que o erro se refere, ou 0 quando não se aplica
+// (peca_invalida, comando_desconhecido). Antes o campo levava sempre a peça do
+// pedido em curso, o que mostrava no dashboard "ocupado — Peça A" para um
+// pedido de B.
+void publicarErro(const char* tipo, char peca) {
   StaticJsonDocument<200> doc;
   doc["type"] = "evento";
   doc["evento"] = "erro";
   doc["tipo"] = tipo;
-  if (pecaSolicitada > 0) {
-    doc["peca"] = String((char)('A' + pecaSolicitada - 1));
+  if (peca != 0) {
+    doc["peca"] = String(peca);
   }
   serializeJson(doc, Serial);
   Serial.println();
@@ -380,25 +389,26 @@ void interpretarComando(String linha) {
   if (linha.length() == 0) return;
 
   if (linha.startsWith("CMD:PECA:")) {
-    char pecaChar = linha.charAt(9); // A, B ou C
+    // Formato exato: "CMD:PECA:" + 1 letra (A, B ou C); qualquer outra coisa é inválida.
+    char pecaChar = (linha.length() == 10) ? linha.charAt(9) : 0;
     int peca = 0;
     if (pecaChar == 'A') peca = 1;
     else if (pecaChar == 'B') peca = 2;
     else if (pecaChar == 'C') peca = 3;
 
     if (peca == 0) {
-      publicarErro("peca_invalida");
+      publicarErro("peca_invalida", 0);
       return;
     }
     if (estadoAtual != AGUARDANDO_PEDIDO) {
-      publicarErro("ocupado");
+      publicarErro("ocupado", pecaChar);
       return;
     }
     pecaSolicitada = peca;
     publicarPedido(pecaChar);
     estadoAtual = VERIFICANDO_ESTOQUE;
 
-  } else if (linha.startsWith("CMD:RESET")) {
+  } else if (linha == "CMD:RESET") {
     if (estadoAtual == ERRO) {
       erroTimeout = false;
       erroSemEstoque = false;
@@ -407,15 +417,15 @@ void interpretarComando(String linha) {
       aguardandoLimpezaEntrega = false;
       pecaSolicitada = 0;
       pararTodasSecundarias();
+      estadoAtual = AGUARDANDO_PEDIDO;
       exibirEstoque();
       publicarEstado();
       publicarEstoque(); // sincroniza dashboard com o LCD após reset
-      estadoAtual = AGUARDANDO_PEDIDO;
     }
     // RESET fora de ERRO: ignorado de propósito (sistema já estável)
 
   } else {
-    publicarErro("comando_desconhecido");
+    publicarErro("comando_desconhecido", 0);
   }
 }
 
@@ -439,6 +449,18 @@ void processarComando() {
 void setup() {
   Serial.begin(9600);
 
+  // Motores primeiro: o gate do IRF520 não pode ficar flutuando durante a
+  // inicialização do LCD e o delay de 2 s (o motor poderia dar trancos).
+  // IRF520 — apenas 1 PWM por motor.
+  int motores[] = { MOTOR_A, MOTOR_B, MOTOR_C };
+  for (int i = 0; i < 3; i++) {
+    pinMode(motores[i], OUTPUT);
+    analogWrite(motores[i], 0); // Inicia desligado
+  }
+
+  // Evita que um barramento I2C travado (ruído do motor) prenda o Uno inteiro.
+  Wire.setWireTimeout(25000, true);
+
   // Inicializa LCD
   lcd.init();
   lcd.backlight();
@@ -447,13 +469,6 @@ void setup() {
 
   // Publica estoque inicial para sincronizar com o dashboard
   publicarEstoque();
-
-  // Configura pinos dos motores (IRF520 — apenas 1 PWM por motor)
-  int motores[] = { MOTOR_A, MOTOR_B, MOTOR_C };
-  for (int i = 0; i < 3; i++) {
-    pinMode(motores[i], OUTPUT);
-    analogWrite(motores[i], 0); // Inicia desligado
-  }
 
   // Configura pinos dos sensores
   int sensores[] = {
@@ -547,13 +562,14 @@ void loop() {
 
       if (temPeca && estoque[pecaSolicitada] > 0) {
         atualizarLCD("Separando:", nomePeca);
-        publicarEstado();
         estadoAtual = ACIONANDO_ESTEIRA;
+        publicarEstado();
       } else {
-        atualizarLCD("ERRO: Sem estoque", nomePeca);
+        atualizarLCD("ERRO:Sem estoque", nomePeca);   // 16 colunas
         erroSemEstoque = true;
-        publicarErro("sem_estoque");
         estadoAtual = ERRO;
+        publicarErro("sem_estoque", (char)('A' + pecaSolicitada - 1));
+        publicarEstado();
       }
       break;
     }
@@ -568,6 +584,8 @@ void loop() {
 
       tempoInicio = millis();
       juncaoLiberada = false;
+      juncaoUltima = false;
+      juncaoMudouEm = millis();
       publicarStatusEsteiras();
       estadoAtual = ENTREGANDO_PECA;
       break;
@@ -584,10 +602,10 @@ void loop() {
         if (millis() - tempoLimpezaEntrega >= PAUSA_POS_ENTREGA_MS) {
           aguardandoLimpezaEntrega = false;
           pecaSolicitada = 0;
+          estadoAtual = AGUARDANDO_PEDIDO;
           exibirEstoque();
           publicarEstado();
           publicarStatusEsteiras();
-          estadoAtual = AGUARDANDO_PEDIDO;
         }
         break;
       }
@@ -629,10 +647,18 @@ void loop() {
       if (pecaSolicitada == 2) pecaChegou = sensorJuncaoJ2();
       if (pecaSolicitada == 3) pecaChegou = sensorJuncaoJ3();
 
-      // A confirmação exige passagem: primeiro o sensor precisa ser visto livre.
-      if (!pecaChegou) juncaoLiberada = true;
+      // Filtro: a leitura precisa ficar estável por FILTRO_JUNCAO_MS antes de valer
+      // (ruído do PWM / comparador do TCRT5000 não confirma passagem falsa).
+      if (pecaChegou != juncaoUltima) {
+        juncaoUltima = pecaChegou;
+        juncaoMudouEm = millis();
+      }
+      bool juncaoEstavel = (millis() - juncaoMudouEm) >= FILTRO_JUNCAO_MS;
 
-      if (pecaChegou && juncaoLiberada) {
+      // A confirmação exige passagem: primeiro o sensor precisa ser visto livre.
+      if (juncaoEstavel && !pecaChegou) juncaoLiberada = true;
+
+      if (juncaoEstavel && pecaChegou && juncaoLiberada) {
         // NÃO para o motor ainda — inicia a fase de saída da esteira.
         atualizarLCD("Saindo da", "esteira...");
         saindoDaEsteira = true;
@@ -644,8 +670,10 @@ void loop() {
         pararTodasSecundarias();
         erroTimeout = true;
         atualizarLCD("ERRO: Timeout", "Aguarde comando");
-        publicarErro("timeout");
         estadoAtual = ERRO;
+        publicarErro("timeout", (char)('A' + pecaSolicitada - 1));
+        publicarEstado();
+        publicarStatusEsteiras();
       }
       break;
     }
