@@ -40,6 +40,7 @@ static const ParamEsteira PARAMS[3] = {PARAM_ESTEIRA_A, PARAM_ESTEIRA_B, PARAM_E
 static Fsm fsm;
 static bool lcdPresente = false;
 static uint32_t inicioMs = 0;
+static uint32_t aberturaMs = 0;
 static uint32_t ultimaAmostra = 0;
 static uint32_t ultimaPublicacao = 0;
 static uint8_t passoPublicacao = 0;
@@ -54,6 +55,7 @@ void setup() {
   sensoresIniciar(inicioMs);
   lcdPresente = lcdIniciar();
   lcdAtualizar("Data Flow", "Inventory v" VERSAO_FIRMWARE);
+  aberturaMs = millis();  // lcdIniciar leva ~1 s: a abertura conta daqui
 
   fsmIniciar(fsm, PARAMS, ESTOQUE_INICIAL);
 
@@ -104,7 +106,7 @@ void loop() {
   }
 
   // LCD: depois da tela de abertura, mostra a tela da FSM (redesenha só se mudou).
-  if (lcdPresente && (uint32_t)(agora - inicioMs) >= TELA_ABERTURA_MS) {
+  if (lcdPresente && (uint32_t)(agora - aberturaMs) >= TELA_ABERTURA_MS) {
     char l1[LCD_COLUNAS + 1], l2[LCD_COLUNAS + 1];
     textoTela(fsm, l1, l2);
     lcdAtualizar(l1, l2);

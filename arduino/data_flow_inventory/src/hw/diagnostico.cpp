@@ -4,11 +4,12 @@
 #include <avr/wdt.h>
 
 #include "../logica/causa_reset.h"
+#include "motores.h"
 
 namespace {
 const uint32_t ASSINATURA = 0xDF1A3B5CUL;
 const uint8_t MARCA_WATCHDOG = 0xA5;
-const char* causa = "energia";
+const char* causa = nullptr;  // diagnosticoIniciar sempre preenche antes do uso
 }  // namespace
 
 // Variáveis que sobrevivem a resets com energia (não são zeradas no boot).
@@ -28,6 +29,7 @@ ISR(WDT_vect) {
   // O loop não alimentou o watchdog por 2 s: marca e deixa o próximo
   // estouro reiniciar o Uno.
   dfiMarcaWatchdog = MARCA_WATCHDOG;
+  motoresPararNaInterrupcao();  // não deixa o motor ligado até o reset
 }
 
 static void armarWatchdog() {

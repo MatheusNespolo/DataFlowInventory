@@ -14,5 +14,9 @@
 // inicialização (o gate do IRF520 não pode ficar flutuando).
 void motoresIniciar();
 
+// Segura para chamar de dentro de ISR (watchdog): desliga as saídas PWM e
+// os pinos direto nos registradores. A próxima motoresAplicar religa com kick.
+void motoresPararNaInterrupcao();
+
 // desejado[i] = esteira i deve estar ligada agora.
 void motoresAplicar(const bool desejado[3], const ParamEsteira params[3], uint32_t agora);

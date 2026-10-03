@@ -58,6 +58,11 @@ void sensoresIniciar(uint32_t agora) {
   pinMode(SENSOR_JUNCAO_J3, INPUT_PULLUP);
 
   noInterrupts();
+  // Máscaras e flags primeiro; a leitura inicial depois: uma borda após a
+  // leitura deixa a flag pendente e a ISR ressincroniza.
+  PCMSK1 |= _BV(PCINT11);                  // A3
+  PCMSK2 |= _BV(PCINT18) | _BV(PCINT20);   // D2, D4
+  PCIFR = _BV(PCIF1) | _BV(PCIF2);         // descarta pendências antigas
   const bool inicial[3] = {lerJ1(), lerJ2(), lerJ3()};
   for (uint8_t i = 0; i < 3; i++) {
     juncao[i].ocupada = inicial[i];
@@ -65,9 +70,6 @@ void sensoresIniciar(uint32_t agora) {
     juncao[i].maiorPulsoMs = 0;
     juncao[i].bordas = 0;
   }
-  PCMSK1 |= _BV(PCINT11);                  // A3
-  PCMSK2 |= _BV(PCINT18) | _BV(PCINT20);   // D2, D4
-  PCIFR = _BV(PCIF1) | _BV(PCIF2);         // descarta pendências antigas
   PCICR |= _BV(PCIE1) | _BV(PCIE2);
   interrupts();
 }

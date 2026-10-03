@@ -13,6 +13,7 @@ struct EstadoMotor {
   uint32_t ligouEm;
 };
 EstadoMotor motor[3];
+volatile bool paradosPorEmergencia = false;
 }  // namespace
 
 void motoresIniciar() {
@@ -25,15 +26,31 @@ void motoresIniciar() {
   }
 }
 
+void motoresPararNaInterrupcao() {
+  TCCR1A &= ~(_BV(COM1A1) | _BV(COM1B1));  // pinos 9 e 10
+  TCCR2A &= ~_BV(COM2A1);                  // pino 11
+  PORTB &= ~(_BV(PB1) | _BV(PB2) | _BV(PB3));
+  paradosPorEmergencia = true;
+}
+
 void motoresAplicar(const bool desejado[3], const ParamEsteira params[3], uint32_t agora) {
+  if (paradosPorEmergencia) {
+    // O watchdog cortou as saídas: o estado interno não vale mais, então
+    // um motor desejado volta a partir com kick.
+    noInterrupts();
+    paradosPorEmergencia = false;
+    interrupts();
+    for (uint8_t i = 0; i < 3; i++) {
+      motor[i].ligado = false;
+      motor[i].emRegime = false;
+    }
+  }
   for (uint8_t i = 0; i < 3; i++) {
     EstadoMotor& m = motor[i];
     if (!desejado[i]) {
-      if (m.ligado) {
-        analogWrite(PINOS[i], 0);
-        m.ligado = false;
-        m.emRegime = false;
-      }
+      analogWrite(PINOS[i], 0);  // saída segura a cada ciclo
+      m.ligado = false;
+      m.emRegime = false;
       continue;
     }
     if (!m.ligado) {
