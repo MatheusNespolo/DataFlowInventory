@@ -39,6 +39,9 @@ TESTE(causa_reset) {
   VERIFICA_TEXTO(causaReset(MCUSR_WDRF, false, false), "watchdog");
   VERIFICA_TEXTO(causaReset(0, true, true), "watchdog");
   VERIFICA_TEXTO(causaReset(MCUSR_BORF, true, false), "brownout");
+  // Energização costuma acender PORF e BORF juntos (0x05): é energia.
+  VERIFICA_TEXTO(causaReset(MCUSR_PORF | MCUSR_BORF, true, false), "energia");
+  VERIFICA_TEXTO(causaReset(MCUSR_BORF, false, false), "energia");  // RAM perdida
   VERIFICA_TEXTO(causaReset(MCUSR_PORF, true, false), "energia");
   VERIFICA_TEXTO(causaReset(0, false, false), "energia");
   VERIFICA_TEXTO(causaReset(0, true, false), "reinicio");
