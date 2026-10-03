@@ -137,6 +137,33 @@ TESTE(checagem_previa_vai_para_erro_sem_ligar_motor) {
   }
 }
 
+TESTE(juncao_ocupada_na_partida_vai_para_erro_sem_motor_e_sem_debito) {
+  // A verificação passou (junção livre), mas no ciclo seguinte, o da
+  // partida, a junção já está ocupada: um pulso que começou antes da partida
+  // não pode confirmar a entrega (R1). Erro sem ligar o motor.
+  for (int idx = 0; idx < 3; idx++) {
+    Bancada b;
+    const char letra = (char)('A' + idx);
+    b.passo(0, CMD_PECA, letra);
+    VERIFICA(b.f.estado == ACIONANDO_ESTEIRA);
+    b.in.juncao[idx].ocupada = true;
+    b.in.juncao[idx].ocupouEm = 2;
+    b.passo(5);
+    VERIFICA(b.f.estado == ERRO && !b.algumMotor());
+    VERIFICA(b.out.zerarJuncao < 0);
+    char esperado[64];
+    snprintf(esperado, sizeof esperado, "erro juncao_obstruida %c verificacao\nestado ERRO\nesteiras 000", letra);
+    VERIFICA(b.contem(esperado));
+    // O pulso termina depois com largura "longa": nada debita.
+    b.in.juncao[idx].ocupada = false;
+    b.in.juncao[idx].maiorPulsoMs = 40;
+    b.in.juncao[idx].bordas = 1;
+    b.ate(10, 20000);
+    VERIFICA(b.debitos == 0 && b.confirmacoes == 0);
+    VERIFICA(!b.algumMotor());
+  }
+}
+
 TESTE(caso_p2_esteira_c_travada_para_em_3s_sem_debito) {
   Bancada b;
   b.passo(0, CMD_PECA, 'C');

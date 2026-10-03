@@ -148,6 +148,13 @@ void fsmPasso(Fsm& f, const EntradasFsm& in, SaidasFsm& out) {
       break;
 
     case ACIONANDO_ESTEIRA:
+      // A junção pode ter ocupado entre a verificação e este ciclo. Um pulso
+      // que começou antes da partida não pode confirmar a entrega: erro sem
+      // ligar o motor (e sem zerar a captura nem iniciar o supervisor).
+      if (in.juncao[idx].ocupada) {
+        falhar(f, out, ERR_JUNCAO_OBSTRUIDA, FERR_VERIFICACAO, -1, -1);
+        break;
+      }
       out.zerarJuncao = (int8_t)idx;
       supervisorIniciar(f.sup, f.params[idx], in.agora);
       f.estado = ENTREGANDO_PECA;
