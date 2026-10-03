@@ -93,3 +93,16 @@ TESTE(supervisor_timeout_conta_desde_a_partida_no_estouro_do_millis) {
   VERIFICA(supervisorAtualizar(s, ini + 12499, false, j) == SUP_SEGUE);
   VERIFICA(supervisorAtualizar(s, ini + 12500, false, j) == SUP_FALHA_TIMEOUT);
 }
+
+TESTE(supervisor_ocupou_depois_da_leitura_do_millis_nao_confirma) {
+  // A interrupção marcou ocupouEm 1 ms DEPOIS do agora lido pelo loop.
+  Supervisor s;
+  supervisorIniciar(s, paramPadrao(), 0);
+  LeituraJuncao j = livre();
+  supervisorAtualizar(s, 1000, false, j);
+  j.ocupada = true;
+  j.ocupouEm = 2001;
+  VERIFICA(supervisorAtualizar(s, 2000, false, j) == SUP_SEGUE);
+  VERIFICA(!passagemValida(j, 2000, 20));
+  VERIFICA(supervisorAtualizar(s, 2021, false, j) == SUP_CONFIRMOU);  // 20 ms reais depois
+}

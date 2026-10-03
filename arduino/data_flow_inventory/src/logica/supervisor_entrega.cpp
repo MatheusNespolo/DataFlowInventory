@@ -7,9 +7,19 @@ void supervisorIniciar(Supervisor& s, const ParamEsteira& p, uint32_t agora) {
   s.confirmouEm = agora;
 }
 
+// Tempo que a junção está ocupada, ou 0 se não está ocupada ou se ocupouEm
+// foi marcado no futuro (pela interrupção entre a leitura de millis() e a
+// cópia da captura da junção).
+static uint32_t ocupadaHa(const LeituraJuncao& j, uint32_t agora) {
+  if (!j.ocupada) return 0;
+  int32_t decorrido = (int32_t)(agora - j.ocupouEm);
+  if (decorrido < 0) return 0;  // ocupouEm está no futuro
+  return (uint32_t)decorrido;
+}
+
 bool passagemValida(const LeituraJuncao& j, uint32_t agora, uint16_t pulsoMinMs) {
   if (j.maiorPulsoMs >= pulsoMinMs) return true;
-  return j.ocupada && (uint32_t)(agora - j.ocupouEm) >= pulsoMinMs;
+  return ocupadaHa(j, agora) >= pulsoMinMs;
 }
 
 ResultadoSupervisor supervisorAtualizar(Supervisor& s, uint32_t agora,
@@ -42,7 +52,7 @@ ResultadoSupervisor supervisorAtualizar(Supervisor& s, uint32_t agora,
     if ((uint32_t)(agora - s.confirmouEm) >= s.p.saidaMs) {
       s.fase = FASE_FIM;
       // "Presa" = ainda ocupada e há tempo suficiente para não ser ruído.
-      bool presa = j.ocupada && (uint32_t)(agora - j.ocupouEm) >= s.p.pulsoMinJuncaoMs;
+      bool presa = ocupadaHa(j, agora) >= s.p.pulsoMinJuncaoMs;
       return presa ? SUP_FALHA_PRESA_SAIDA : SUP_SAIDA_OK;
     }
     return SUP_SEGUE;
