@@ -14,6 +14,12 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Firmware do Uno v3.0 — supervisão por marcos e robustez (03/10/2026)**
+  - Firmware reestruturado em módulos: `src/logica/` (C++ puro: protocolo, filtro, supervisor, FSM, telas, causa do reset) testado no PC (`test/firmware_uno`, 40 testes, job `firmware-logica` no CI) e `src/hw/` (motores, sensores, serial, LCD, diagnóstico)
+  - **Compatibilidade:** mensagens JSON idênticas às da v2.x (testes de contrato byte a byte); ESP32 e servidor não mudaram. Novos campos opcionais (`reset`, `lcd`, `ram_livre`, `fase`, `t_ms`, `bordas_juncao`) e novos erros (`sem_peca_topo`, `juncao_obstruida`, `motor_sem_avanco`, `peca_presa_saida`)
+  - **Entrega por marcos:** checagem prévia sem ligar o motor; M1 topo livre em 3 s (motor travado para na hora); M2 junção em 12,5 s; débito na confirmação; M3 junção livre após 3 s de saída. Junções capturadas por interrupção, com pulso mínimo de 20 ms; a confirmação ignora uma ocupação que começou antes da partida do motor
+  - **Robustez:** kick-start dos motores, watchdog de 2 s (quando avisa que o loop travou, desliga os motores na hora, antes do reset), causa do reset no `inicio`, LCD procurado em 0x27/0x3F e opcional (se o I²C travar durante a operação, o LCD é desligado e o sistema segue sem ele), textos na flash (RAM global de 55% para 45%), sem ArduinoJson no Uno
+  - **Rollback:** firmware v2.x no commit `fddde08`. **Validação em bancada pendente:** `docs/testes/roteiros/firmware_uno_v3_validacao.md`
 - **Firmware Uno — revisão do código e reaplicação das atualizações de 02/10/2026**
   - **Reaplicado:** `TIMEOUT_ENTREGA` de 9 s para **12,5 s** (vigia só o trajeto topo → junção; estourou, as três esteiras são desligadas e o sistema vai para `ERRO` sem debitar estoque), confirmação por **passagem** no sensor de junção (o sensor precisa ser visto livre depois que a esteira liga) e estoque inicial de **15** peças por tipo. O PWM por esteira (`VELOCIDADE_ESTEIRA_A/B/C`) foi mantido, mas o valor da C passou de 140 para **200** (igual a A e B): o plano de testes registra ~150 como o PWM mínimo que move a esteira com peça, então 140 não movia a peça; calibre a C em bancada se o motor novo for mais rápido
   - **Corrigido:** o LCD era redesenhado (`lcd.clear()` e criação de `String`) a cada volta do loop enquanto o sistema estava em `ERRO` por timeout, o que fazia o display piscar e fragmentava o heap do Uno (2 KB de RAM); a mensagem agora é desenhada uma única vez, na transição para `ERRO`

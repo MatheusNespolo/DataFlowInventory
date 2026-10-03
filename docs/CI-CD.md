@@ -99,9 +99,14 @@ npm update <package-name>
   - `test/esteira_peca_b/esp32_esteiras_ab/esp32_esteiras_ab.ino` (ESP32 teste AB)
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
 - **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
-- **Falha em:** Erros de compilação
+- **Falha em:** Erros de compilação ou RAM global do Uno acima de 65%
 - **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C`, `ArduinoJson@6.21.5` e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
 - Para repetir o job na sua máquina, veja [Compilar o firmware localmente](#compilar-o-firmware-localmente-sem-hardware)
+
+#### 5. Lógica do firmware do Uno (`firmware-logica`)
+- **O quê:** compila `arduino/data_flow_inventory/src/logica/` com g++ e roda `test/firmware_uno` (FSM, marcos, filtro, protocolo, telas e causa do reset, com tempo simulado)
+- **Contrato:** os testes `*_igual_v2` garantem que as mensagens JSON continuam idênticas às da v2.x
+- **Local:** `docker run --rm -v "<repo>:/w" -w /w gcc:14 make -C test/firmware_uno test` (ou `make -C test/firmware_uno test` com g++ instalado)
 
 ---
 
