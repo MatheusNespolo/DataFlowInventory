@@ -158,6 +158,8 @@ flowchart LR
 
 **Diagramas:**
 
+As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagrama Mermaid acima.
+
 ![Máquina de estados (FSM) - Arduino Uno](fluxogramas/maquina_de_estados_fsm_arduino_uno.png)
 
 ![Fluxograma operacional — ciclo de um pedido](fluxogramas/fluxograma_operacional_ciclo_pedido.png)

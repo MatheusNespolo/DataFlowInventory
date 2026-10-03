@@ -9,7 +9,7 @@ Ferramentas: Serial Monitor (9600 baud) **ou** `test/mqtt_probe` (com o ESP32 co
 ## 1. Boot
 
 1. Ligue o Uno.
-2. **Esperado:** a linha `{"type":"evento","evento":"inicio",...,"versao":"3.0",...,"reset":"energia","lcd":true|false,"ram_livre":N}`.
+2. **Esperado** (se o Uno já estava ligado e foi reiniciado pela USB, `reset` pode ser `"reinicio"`): a linha `{"type":"evento","evento":"inicio",...,"versao":"3.0",...,"reset":"energia","lcd":true|false,"ram_livre":N}`.
 3. Anote `lcd` (se `false`, o LCD não respondeu em 0x27 nem 0x3F: confira 5 V, GND, SDA=A4, SCL=A5) e `ram_livre`.
 
 ## 2. Sensores (antes de qualquer entrega)
@@ -22,12 +22,12 @@ Ferramentas: Serial Monitor (9600 baud) **ou** `test/mqtt_probe` (com o ESP32 co
 ## 3. Uma entrega por esteira (A, B, C)
 
 1. Coloque uma peça no topo da esteira e peça pelo dashboard.
-2. **Esperado:** `pedido` → status `ACIONANDO_ESTEIRA` → esteira liga → `entrega` com o estoque daquela peça diminuído em 1 → após ~3 s a esteira para → status `AGUARDANDO_PEDIDO`.
+2. **Esperado:** `pedido` → status `ACIONANDO_ESTEIRA` → esteira liga → `entrega` com o estoque daquela peça diminuído em 1 → cerca de 3 s depois da `entrega` a esteira para → status `AGUARDANDO_PEDIDO` (volta ~1,5 s depois).
 3. Confira o débito no dashboard e no LCD.
 
 ## 4. Motor travado (esteira C)
 
-1. Segure a esteira C com a mão (ou trave a peça no topo) e peça uma peça C.
+1. Com uma peça no topo da esteira C (sem ela o erro seria `sem_peca_topo`), segure a esteira C com a mão (ou trave a peça no topo) e peça uma peça C.
 2. **Esperado:** em ~3 s, `erro` com `"tipo":"motor_sem_avanco","fase":"partida"`, motor parado, estado `ERRO`, **sem reset do Uno** (nenhum novo `inicio`).
 3. Envie Reiniciar no dashboard: volta a `AGUARDANDO_PEDIDO`.
 
@@ -43,8 +43,8 @@ Ferramentas: Serial Monitor (9600 baud) **ou** `test/mqtt_probe` (com o ESP32 co
 
 ## 7. Junção obstruída
 
-1. Deixe uma peça parada sobre o sensor de junção e peça uma peça daquela esteira.
-2. **Esperado:** `erro` com `"tipo":"juncao_obstruida","fase":"verificacao"`, **sem ligar o motor**.
+1. Com uma peça no topo da esteira, deixe outra peça parada sobre o sensor de junção e peça uma peça daquela esteira.
+2. **Esperado:** `erro` com `"tipo":"juncao_obstruida","fase":"verificacao"`, **sem ligar o motor**. Sem peça no topo, o erro publicado é `sem_peca_topo` (a checagem prévia confere estoque, depois topo, depois junção).
 
 ## 8. Resistência
 

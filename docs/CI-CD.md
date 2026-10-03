@@ -273,7 +273,7 @@ Código de saída `0` em todos = compilou. A compilação do ESP32 leva alguns m
 
 **Observações:**
 - Com `ArduinoJson` 7.x (o que a Arduino IDE instala por padrão) aparecem avisos de depreciação do `StaticJsonDocument`; não impedem a compilação. Para igualar o CI, instale a 6.21.5.
-- Última compilação local registrada: 02/10/2026, com os 4 sketches compilando (Uno principal usa 54% da flash e 55% da RAM). Isso **não** valida o comportamento: timeout, confirmação por passagem e PWM da esteira C seguem pendentes de bancada.
+- Última compilação local registrada: 02/10/2026, com os 4 sketches compilando (Uno principal usa 54% da flash e 55% da RAM). Isso **não** valida o comportamento: timeout, confirmação por passagem e PWM da esteira C seguem pendentes de bancada. (registro anterior ao firmware v3.0; a v3.0 compila com 45% da RAM e a validação em bancada segue o roteiro `docs/testes/roteiros/firmware_uno_v3_validacao.md`)
 
 ---
 
