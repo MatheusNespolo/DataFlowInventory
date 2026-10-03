@@ -369,6 +369,10 @@ void setup() {
   Serial.begin(BAUD_DEBUG);
 
   // Serial2 — comunicação com Arduino Uno (9600, igual ao Uno)
+  // Buffer de recepção maior: durante a reconexão MQTT/TLS o loop fica bloqueado
+  // por segundos e o Uno segue enviando ~300 B/s; com os 256 B padrão as linhas
+  // chegavam truncadas ou concatenadas (e um evento de entrega/erro se perdia).
+  Serial2.setRxBufferSize(2048);
   Serial2.begin(BAUD_ARDUINO, SERIAL_8N1, PIN_RX2, PIN_TX2);
 
   Serial.println();
