@@ -105,23 +105,60 @@ Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor ser
 
 ## 3. Máquina de Estados (Arduino)
 
-**5 estados:**
+**5 estados** (firmware v3.0 — código em `arduino/data_flow_inventory/src/logica/fsm.cpp`):
 1. **AGUARDANDO_PEDIDO** → recebe comando
-2. **VERIFICANDO_ESTOQUE** → verifica se há peça
-3. **ACIONANDO_ESTEIRA** → liga o motor da esteira secundária escolhida
-4. **ENTREGANDO_PECA** → monitora o sensor de junção (timeout de 12,5 s); ao confirmar a passagem, mantém o motor 3 s, decrementa o estoque e publica a entrega
-5. **ERRO** → `sem_estoque` ou `timeout` (requer CMD:RESET)
+2. **VERIFICANDO_ESTOQUE** → checagem prévia, sem ligar o motor: contador > 0, peça no sensor do topo, junção livre
+3. **ACIONANDO_ESTEIRA** → liga o motor da esteira escolhida (kick-start em PWM 255 por 150 ms, depois o PWM de regime da esteira)
+4. **ENTREGANDO_PECA** → supervisão por marcos (abaixo); o estoque é debitado na confirmação da junção
+5. **ERRO** → motores desligados a cada ciclo; só sai com `CMD:RESET`
+
+**Supervisão da entrega por marcos** (prazos por esteira em `arduino/data_flow_inventory/config.h`):
+
+| Marco | Prova | Prazo padrão | Falha → erro | Estoque |
+|---|---|---|---|---|
+| M1 Partida | sensor de topo fica livre | 3 s após ligar | `motor_sem_avanco` (motor parado na hora) | não debita |
+| M2 Trânsito | junção registra uma passagem (pulso ≥ 20 ms, capturado por interrupção) | 12,5 s após ligar | `timeout` (retirar a peça da esteira) | não debita |
+| Confirmação | — | — | — | **debita** e publica a entrega |
+| M3 Saída | motor segue 3 s; no fim a junção precisa estar livre | 3 s | `peca_presa_saida` | já debitado |
+
+```mermaid
+flowchart LR
+    P[Pedido] --> V{Checagem prévia}
+    V -- falha --> E[ERRO]
+    V -- ok --> M1{M1: topo livre em 3 s?}
+    M1 -- não --> E
+    M1 -- sim --> M2{M2: junção em 12,5 s?}
+    M2 -- não --> E
+    M2 -- sim --> D[Debita estoque e publica entrega]
+    D --> M3{M3: junção livre após 3 s?}
+    M3 -- não --> E
+    M3 -- sim --> A[AGUARDANDO_PEDIDO]
+    E -- CMD:RESET --> A
+```
 
 **Erros que levam a ERRO (exigem CMD:RESET):**
-- `sem_estoque` — sem peça no sensor do topo ou estoque zerado
-- `timeout` — a peça não foi confirmada pelo sensor de junção em 12,5 s (motor desligado, estoque intacto)
+- `sem_estoque` — contador da peça zerado
+- `sem_peca_topo` — contador > 0, mas sem peça no sensor do topo
+- `juncao_obstruida` — sensor de junção já ocupado antes de ligar o motor (na verificação ou no próprio ciclo da partida)
+- `motor_sem_avanco` — M1: o topo não liberou no prazo (motor travado, fraco ou peça presa no início)
+- `timeout` — M2: a peça saiu do topo e não chegou à junção no prazo
+- `peca_presa_saida` — M3: a junção continuou ocupada no fim da saída
 
 **Rejeições (não mudam o estado):**
-- `peca_invalida` — letra diferente de A, B ou C
-- `ocupado` — pedido com a FSM fora de AGUARDANDO_PEDIDO
+- `peca_invalida` — formato diferente de `CMD:PECA:` + A, B ou C
+- `ocupado` — pedido com a FSM fora de AGUARDANDO_PEDIDO (o campo `peca` é a peça pedida)
 - `comando_desconhecido` — linha não reconhecida
 
+**Campos opcionais (v3.0)** — as mensagens da v2.x continuam idênticas; os campos abaixo só são acrescentados no fim:
+- `evento: inicio` → `reset` (`energia`, `reinicio`, `watchdog` ou `brownout`), `lcd` (`true`/`false`), `ram_livre`
+- `type: status` → `ram_livre`
+- `evento: erro` → `fase` (`verificacao`, `partida`, `transito`, `saida`), `t_ms` (desde a partida do motor), `bordas_juncao`
+
+**Robustez:** watchdog de 2 s (o Uno reinicia sozinho se o loop travar; quando o watchdog avisa a trava, os motores são desligados na hora, antes do reset); o LCD é procurado em 0x27 e 0x3F e, se não responder, o sistema segue sem ele (se o barramento I²C travar durante a operação, o LCD é desligado em vez de travar o loop); a confirmação da junção ignora uma ocupação que começou antes da partida do motor; o estoque não é persistido (volta a 15 no boot) e o campo `reset` do `inicio` diz por que o Uno reiniciou. Abrir a Serial Monitor reinicia o Uno (auto-reset da USB), o que aparece como `reset: reinicio`.
+
 **Diagramas:**
+
+As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagrama Mermaid acima.
 
 ![Máquina de estados (FSM) - Arduino Uno](fluxogramas/maquina_de_estados_fsm_arduino_uno.png)
 

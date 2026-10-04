@@ -99,9 +99,15 @@ npm update <package-name>
   - `test/esteira_peca_b/esp32_esteiras_ab/esp32_esteiras_ab.ino` (ESP32 teste AB)
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
 - **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
-- **Falha em:** Erros de compilação
-- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C`, `ArduinoJson@6.21.5` e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
+- **Falha em:** Erros de compilação ou RAM global do Uno acima de 65%
+- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C@1.1.2`, `ArduinoJson@6.21.5` e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
+- **LCD:** o CI compila com a LiquidCrystal I2C **1.1.2** (Frank de Brabander), com versão fixa para o build não mudar sozinho. A Arduino IDE da equipe instala outra variante (LiquidCrystal_I2C 2.0.0, Martin Kubovčík / Frank de Brabander); a API usada pelo firmware (`LiquidCrystal_I2C(endereço, 16, 2)`, `init`, `backlight`, `clear`, `setCursor`, `write`) existe nas duas.
 - Para repetir o job na sua máquina, veja [Compilar o firmware localmente](#compilar-o-firmware-localmente-sem-hardware)
+
+#### 5. Lógica do firmware do Uno (`firmware-logica`)
+- **O quê:** compila `arduino/data_flow_inventory/src/logica/` com g++ e roda `test/firmware_uno` (FSM, marcos, filtro, protocolo, telas e causa do reset, com tempo simulado)
+- **Contrato:** os testes `*_igual_v2` garantem que as mensagens JSON continuam idênticas às da v2.x
+- **Local:** `docker run --rm -v "<repo>:/w" -w /w gcc:14 make -C test/firmware_uno test` (ou `make -C test/firmware_uno test` com g++ instalado)
 
 ---
 
@@ -132,10 +138,13 @@ No GitHub Projects, marcar como **Required Status Checks**:
 - ✅ lint-and-security / lint-javascript
 - ✅ lint-and-security / secret-detection
 - ✅ lint-and-security / arduino-compile
+- ✅ lint-and-security / firmware-logica
 - ✅ test / jest (futuro)
 - ✅ test / e2e-docker (futuro)
 
 **Bloqueio:** PR não pode fazer merge sem passar em todos.
+
+> **Nota:** a lista acima só bloqueia o merge depois que a regra de proteção da branch `main` é ativada no GitHub. Isso é feito pela equipe nas configurações do repositório (Settings → Branches → Branch protection rules), marcando estes checks como obrigatórios; o workflow sozinho não ativa a regra.
 
 ---
 
@@ -248,7 +257,7 @@ arduino-cli config add board_manager.additional_urls https://raw.githubuserconte
 arduino-cli core update-index
 arduino-cli core install arduino:avr
 arduino-cli core install esp32:esp32
-arduino-cli lib install "LiquidCrystal I2C" "ArduinoJson@6.21.5" "PubSubClient"
+arduino-cli lib install "LiquidCrystal I2C@1.1.2" "ArduinoJson@6.21.5" "PubSubClient"
 ```
 
 **3. Criar o `secrets.h`** (só se ainda não existir; nunca versione o real):
@@ -268,7 +277,7 @@ Código de saída `0` em todos = compilou. A compilação do ESP32 leva alguns m
 
 **Observações:**
 - Com `ArduinoJson` 7.x (o que a Arduino IDE instala por padrão) aparecem avisos de depreciação do `StaticJsonDocument`; não impedem a compilação. Para igualar o CI, instale a 6.21.5.
-- Última compilação local registrada: 02/10/2026, com os 4 sketches compilando (Uno principal usa 54% da flash e 55% da RAM). Isso **não** valida o comportamento: timeout, confirmação por passagem e PWM da esteira C seguem pendentes de bancada.
+- Última compilação local registrada: 02/10/2026, com os 4 sketches compilando (Uno principal usa 54% da flash e 55% da RAM). Isso **não** valida o comportamento: timeout, confirmação por passagem e PWM da esteira C seguem pendentes de bancada. (registro anterior ao firmware v3.0; a v3.0 compila com 45% da RAM e a validação em bancada segue o roteiro `docs/testes/roteiros/firmware_uno_v3_validacao.md`)
 
 ---
 

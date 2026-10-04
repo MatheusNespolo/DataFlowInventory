@@ -114,13 +114,18 @@ jobs:
 
       - name: Instalar bibliotecas Arduino
         run: |
-          arduino-cli lib install "LiquidCrystal I2C" "ArduinoJson@6.21.5" "PubSubClient"
+          arduino-cli lib install "LiquidCrystal I2C@1.1.2" "ArduinoJson@6.21.5" "PubSubClient"
 
       - name: Criar secrets.h de exemplo (arquivo real não é versionado)
         run: cp esp32/gateway_mqtt/secrets.h.example esp32/gateway_mqtt/secrets.h
 
-      - name: Compilar Arduino Uno (principal)
-        run: arduino-cli compile --fqbn arduino:avr:uno --warnings all arduino/data_flow_inventory/data_flow_inventory.ino
+      - name: Compilar Arduino Uno (principal) e conferir RAM (máx. 65%)
+        run: |
+          set -o pipefail
+          arduino-cli compile --fqbn arduino:avr:uno --warnings all arduino/data_flow_inventory/data_flow_inventory.ino 2>&1 | tee uno.log
+          ram=$(grep -oP 'Global variables use \d+ bytes \(\K\d+' uno.log)
+          echo "RAM global do Uno: ${ram}%"
+          test "$ram" -le 65
 
       - name: Compilar ESP32 (gateway MQTT)
         run: arduino-cli compile --fqbn esp32:esp32:esp32 --warnings all esp32/gateway_mqtt/gateway_mqtt.ino
@@ -192,3 +197,12 @@ jobs:
 
       - name: Testes das métricas e da infraestrutura de observabilidade (sem Docker)
         run: cd test/server_metrics && npm test
+
+  firmware-logica:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Testes da lógica do firmware do Uno (g++ no PC)
+        run: make -C test/firmware_uno test
