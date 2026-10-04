@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { coletarErros, esperarSemErros } from './helpers.mjs';
+import { coletarErros, esperarSemErros, ALTURA_MIN_TOQUE } from './helpers.mjs';
 
 const VISTAS = ['#view-principal', '#view-status', '#view-arquitetura'];
 
@@ -72,7 +72,7 @@ test('cenário 3b — seletor de vistas: teclas, aria-current e contador LOG', a
 test('teclas do seletor têm ≥ 44 px de altura', async ({ page }) => {
   await page.goto('/');
   for (const t of await page.locator('a.seletor-tecla').all()) {
-    expect((await t.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    expect((await t.boundingBox()).height).toBeGreaterThanOrEqual(ALTURA_MIN_TOQUE);
   }
 });
 
