@@ -1,6 +1,6 @@
 // Cenário 6 (spec §7.2): 375 px sem rolagem horizontal, barra inferior e alvos ≥ 44 px.
 import { test, expect } from '@playwright/test';
-import { coletarErros, esperarSemErros } from './helpers.mjs';
+import { coletarErros, esperarSemErros, ALTURA_MIN_TOQUE } from './helpers.mjs';
 
 test.use({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
 
@@ -16,7 +16,7 @@ test('cenário 6 — sem rolagem horizontal, seletor como barra inferior, alvos 
     const nav = await page.locator('nav.seletor').boundingBox();
     expect(nav.y + nav.height).toBeGreaterThan(812 - 2); // colada na base da tela
     for (const t of await page.locator('a.seletor-tecla').all()) {
-      expect((await t.boundingBox()).height).toBeGreaterThanOrEqual(44);
+      expect((await t.boundingBox()).height).toBeGreaterThanOrEqual(ALTURA_MIN_TOQUE);
     }
   }
 
@@ -24,7 +24,7 @@ test('cenário 6 — sem rolagem horizontal, seletor como barra inferior, alvos 
   for (const id of ['btn-solicitar-a', 'btn-solicitar-b', 'btn-solicitar-c', 'btn-reset']) {
     const b = page.locator(`#${id}`);
     await b.scrollIntoViewIfNeeded();
-    expect((await b.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    expect((await b.boundingBox()).height).toBeGreaterThanOrEqual(ALTURA_MIN_TOQUE);
   }
 
   // Controles da cena recolhidos atrás de um botão.
@@ -39,7 +39,7 @@ test('cenário 6 — sem rolagem horizontal, seletor como barra inferior, alvos 
   for (const alvo of await page.locator('#arq-controles .arq-btn, #arq-controles .arq-check').all()) {
     if (!(await alvo.isVisible())) continue;
     const altura = (await alvo.boundingBox()).height;
-    expect(altura, `"${(await alvo.textContent()).trim()}" com ${altura} px`).toBeGreaterThanOrEqual(44);
+    expect(altura, `"${(await alvo.textContent()).trim()}" com ${altura} px`).toBeGreaterThanOrEqual(ALTURA_MIN_TOQUE);
   }
   esperarSemErros(erros);
 });

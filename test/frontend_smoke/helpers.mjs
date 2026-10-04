@@ -61,6 +61,11 @@ export async function roteiroBotoes(page) {
 }
 
 /** IDs usados por frontend/js/app.js (objeto els) e diagrama3d.js — contrato congelado (§3.3). */
+// Alvo de toque mínimo (WCAG 2.5.5: 44 × 44 px). O boundingBox do navegador
+// devolve frações (ex.: 43.99998 px para min-height: 44px com layout em
+// subpixel), então a comparação aceita 0,01 px de arredondamento.
+export const ALTURA_MIN_TOQUE = 44 - 0.01;
+
 export const IDS_CONTRATO = [
   'mqtt-status', 'gateway-status', 'server-time', 'annun-estado', 'annun-estado-v',
   'annun-estoque', 'annun-estoque-v', 'estado-atual', 'peca-solicitada', 'uptime',

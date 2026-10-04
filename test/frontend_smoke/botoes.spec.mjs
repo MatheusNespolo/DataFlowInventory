@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { coletarErros, esperarSemErros, roteiroBotoes, IDS_CONTRATO } from './helpers.mjs';
+import { coletarErros, esperarSemErros, roteiroBotoes, IDS_CONTRATO, ALTURA_MIN_TOQUE } from './helpers.mjs';
 
 test('cenário 1 — botões Solicitar A/B/C e Reiniciar funcionam', async ({ page }) => {
   const erros = coletarErros(page);
@@ -29,7 +29,7 @@ test('botões de controle: ícones SVG (sem emoji), ≥ 44 px, ajuda ligada por 
     const b = page.locator(`#${id}`);
     await expect(b.locator('svg.ico')).toHaveCount(1);
     expect(await b.innerText()).not.toMatch(/\p{Extended_Pictographic}/u);
-    expect((await b.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    expect((await b.boundingBox()).height).toBeGreaterThanOrEqual(ALTURA_MIN_TOQUE);
   }
   for (const id of ['btn-solicitar-a', 'btn-solicitar-b', 'btn-solicitar-c']) {
     await expect(page.locator(`#${id}`)).toHaveAttribute('aria-describedby', 'ajuda-controle');
