@@ -14,6 +14,12 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Documentação pós-revisão do firmware v3.0 (03/10/2026)**
+  - `docs/ARCHITECTURE.md`: novas subseções "Decisões de projeto da v3.0" (código antigo só no git, regra de nenhum débito sem passagem, LCD opcional, saída segura, causa do reset, limitador de rajada) e "Limitações conhecidas da v3.0" (quatro pendências aceitas, todas raras)
+  - `docs/CI-CD.md`: consumo do Uno v3.0 atualizado (44% da flash, 46% da RAM; limite de 65%; a v2.x usava 55%)
+  - `docs/testes/plano_de_testes.md`: nota sobre a v3.0 e sobre quais itens de timeout são do sketch de teste e quais do firmware principal
+  - **Pendência do repositório:** tornar o job `firmware-logica` obrigatório na proteção da `main` é uma configuração do GitHub (passo a passo em `docs/CI-CD.md`)
+
 - **Firmware do Uno v3.0 — supervisão por marcos e robustez (03/10/2026)**
   - Firmware reestruturado em módulos: `src/logica/` (C++ puro: protocolo, filtro, supervisor, FSM, telas, causa do reset) testado no PC (`test/firmware_uno`, 43 testes, job `firmware-logica` no CI) e `src/hw/` (motores, sensores, serial, LCD, diagnóstico)
   - **Compatibilidade:** mensagens JSON idênticas às da v2.x (testes de contrato byte a byte); ESP32 e servidor não mudaram. Novos campos opcionais (`reset`, `lcd`, `ram_livre`, `fase`, `t_ms`, `bordas_juncao`) e novos erros (`sem_peca_topo`, `juncao_obstruida`, `motor_sem_avanco`, `peca_presa_saida`)

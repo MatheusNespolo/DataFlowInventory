@@ -46,7 +46,7 @@ Engenharia de Controle e Automação
 | 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
 | ✅ **Qualidade** | Testes unitários, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
 
-> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras B e C não acionam e aguardam diagnóstico elétrico. Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
+> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras B e C não acionam e aguardam diagnóstico elétrico; o firmware do Uno v3.0 (supervisão por marcos) passou nos testes automatizados, mas **ainda não foi validado em bancada** ([roteiro](docs/testes/roteiros/firmware_uno_v3_validacao.md)). Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
 
 ## Sumário
 

@@ -156,6 +156,22 @@ flowchart LR
 
 **Robustez:** watchdog de 2 s (o Uno reinicia sozinho se o loop travar; quando o watchdog avisa a trava, os motores são desligados na hora, antes do reset); o LCD é procurado em 0x27 e 0x3F e, se não responder, o sistema segue sem ele (se o barramento I²C travar durante a operação, o LCD é desligado em vez de travar o loop); a confirmação da junção ignora uma ocupação que começou antes da partida do motor; o estoque não é persistido (volta a 15 no boot) e o campo `reset` do `inicio` diz por que o Uno reiniciou. Abrir a Serial Monitor reinicia o Uno (auto-reset da USB), o que aparece como `reset: reinicio`.
 
+**Decisões de projeto da v3.0** (registradas na revisão de código de 03/10/2026):
+- **Código antigo fora do `.ino`:** o trecho comentado de botões físicos e do separador não foi levado para a v3.0. Continua no histórico do git (firmware v2.1; o commit `fddde08` serve de rollback para a v2.x).
+- **Nenhum débito sem passagem:** o estoque só é debitado com uma passagem de pelo menos 20 ms na junção da esteira pedida, iniciada depois da partida do motor. Duas brechas foram fechadas além do plano inicial: a interrupção marcar a ocupação depois da leitura do relógio e uma junção ocupada entre a checagem prévia e a partida. Um pulso que atravessa a partida também não confirma. O teste dessa regra varre combinações de peça, junção, largura e instante.
+- **LCD é opcional:** se o I²C travar em operação, o LCD é desligado e o sistema segue.
+- **Saída segura:** a interrupção do watchdog (`WDT_vect`) desliga os motores antes do reset.
+- **Causa do reset:** a energização acende PORF e BORF juntos, e isso é reportado como `energia`, não como `brownout`.
+- **Limitador de rajada:** a interrupção de um sensor de junção que oscila no limiar é limitada, para não prender o loop.
+- **Prazos protegidos:** `static_assert` no `.ino` exige prazos coerentes por esteira; a biblioteca do LCD fica fixada na versão 1.1.2 no CI.
+
+**Limitações conhecidas da v3.0** (aceitas por serem raras; nenhuma foi corrigida):
+- Depois de uma rajada de ruído durante a checagem prévia, a janela de proteção contra ocupação anterior à partida cresce para cerca de 5 ms.
+- Um kick-start extra pode ocorrer depois de uma trava do loop de 2 s ou mais.
+- Pulsos acima de 100 kHz não são pegos pelo limitador de rajada.
+- Falta um teste automatizado de "12499 ms sem passagem" (o de 12500 ms e os de pulso de 19/20 ms existem).
+- **Nada disso foi validado em bancada:** sensores, motores e alimentação dependem do roteiro `docs/testes/roteiros/firmware_uno_v3_validacao.md`. Comece pelo passo 2 (sensores), que ajusta o potenciômetro dos módulos TCRT5000 e resolve a causa provável da "entrega da B sem débito".
+
 **Diagramas:**
 
 As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagrama Mermaid acima.
