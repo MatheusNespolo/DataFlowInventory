@@ -46,7 +46,7 @@ Engenharia de Controle e Automação
 | 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
 | ✅ **Qualidade** | Testes unitários, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
 
-> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras B e C não acionam e aguardam diagnóstico elétrico; o firmware do Uno v3.0 (supervisão por marcos) passou nos testes automatizados, mas **ainda não foi validado em bancada** ([roteiro](docs/testes/roteiros/firmware_uno_v3_validacao.md)). Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
+> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras A, B e C acionam e entregam (03/10; a C usa provisoriamente o módulo IRF520 da A); o firmware do Uno v3.0 (supervisão por marcos, no padrão de processos de automação) passou nos testes automatizados, mas **ainda não foi validado em bancada** (Semana 8: [roteiro](docs/testes/roteiros/semana_08_05-09_outubro.md)). Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
 
 ## Sumário
 
@@ -423,7 +423,8 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 - 🧪 **Validação de infraestrutura:** scripts em `scripts/` e `docs/testes/validações/validar_infra.ps1` automatizam a checagem de broker, firewall e serviços antes de cada bancada.
 - 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Telemetria concluída em 01/10/2026: código, testes automatizados e validação do stack (smoke test e conferência dos painéis). Ver [`observability/README.md`](observability/README.md).
 - 📘 **Guia de implantação:** passo a passo para subir o sistema do zero em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) (versão inicial, ainda não validada em máquina limpa).
-- 🔧 **Diagnóstico IRF520 (esteiras B/C):** após o desbaste mecânico de 29/09, B e C não acionam eletricamente; o diagnóstico (Fases 0–5) está em [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) e ainda não foi executado.
+- 🔧 **Diagnóstico IRF520 (esteiras B/C) — resolvido em 03/10:** a falha era elétrica (módulo IRF520 e motor da C, trocados; o firmware anterior estava correto). A C usa provisoriamente o módulo da A. Ver [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) (seção 4.2.1).
+- 🧪 **Semana 8 (05–09/10):** validação em bancada do firmware v3.0 (esteira A, depois A+B e A+B+C, com calibração) e integração do separador. Roteiro em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md), com aprovação a cada bloco.
 
 ## Equipe
 

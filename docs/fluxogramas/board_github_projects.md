@@ -76,13 +76,13 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 
 | Card | Título | Área | Observação |
 |---|---|---|---|
-| #1 | Montagem mecânica das esteiras e soldagem drivers | `Hardware` | Desbaste das esteiras A/B/C concluído (29/09). Esteiras B/C não acionam eletricamente (suspeita: solda ou módulo IRF520); diagnóstico Fases 0–5 a executar (roteiro Semana 7, seção 4.2) |
+| #1 | Montagem mecânica das esteiras e soldagem drivers | `Hardware` | Desbaste das esteiras A/B/C concluído (29/09). Esteiras B/C voltaram a acionar (03/10): módulo IRF520 e motor da C estavam defeituosos e foram trocados; **provisório:** a C usa o módulo da A (roteiro Semana 7, seção 4.2.1) |
 | #22 | Deployment Guide — Guia de Implantação | `Docs`/`Infra` | `docs/DEPLOYMENT.md` inicial redigido (30/09); falta validar em máquina limpa |
 | #25 | Telemetria Histórica — Prometheus/Grafana | `Infra` | ✅ Concluído (01/10/2026): implementação (PR #29) validada; capturas dos dashboards anexadas ao card |
 | #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
 | #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
 | #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
-| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Código preparado; aguarda teste de bancada com motor 28BYJ-48 |
+| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Rascunho comentado só no histórico do git (firmware v2.x; a v3.0 não o traz); mecânica e integração na Semana 8 (Bloco 4) |
 
 ### 🔴 Coluna `Blocked`
 

@@ -2,6 +2,8 @@
 
 > Objetivo: confirmar na bancada o que os testes automatizados não alcançam (sensores, motores, alimentação). Execute na ordem; anote o resultado de cada passo. Firmware: `arduino/data_flow_inventory/` (v3.0). Desconecte o ESP32 dos pinos 0/1 durante o upload no Uno.
 
+> **Execução:** este roteiro é a base dos blocos 1 a 3 do [roteiro da Semana 8](semana_08_05-09_outubro.md), que o aplica esteira por esteira (A, depois A+B, depois A+B+C), com aprovação a cada bloco.
+
 Ferramentas: Serial Monitor (9600 baud) **ou** `test/mqtt_probe` (com o ESP32 conectado) e o dashboard.
 
 > Abrir a Serial Monitor reinicia o Uno (auto-reset da USB) e o estoque volta a 15. Isso é esperado e aparece como `"reset":"reinicio"`.

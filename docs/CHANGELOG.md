@@ -14,6 +14,14 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Bancada — esteiras B e C funcionando e roteiro da Semana 8 (03/10/2026)**
+  - B e C movem normalmente; entrega ótima e timeout até o `ERRO` funcionam, com o firmware **anterior à v3.0**, que estava correto
+  - **Causa da falha de 29/09:** elétrica. O módulo IRF520 e o motor da esteira C estavam defeituosos e, ao partir o motor, todo o sistema travava (o Arduino deixava de comandar os periféricos e de falar com o ESP32). Isso levou à crença errônea de um defeito no código. Módulo e motor da C foram trocados; **provisoriamente a C usa o módulo IRF520 da esteira A**
+  - **Não registrado:** o tempo topo → junção da C com o motor novo (entra na calibração da Semana 8)
+  - **Esclarecimento sobre a v3.0:** não corrige um defeito do firmware anterior; traz os marcos do processo (mais próximo do padrão de automação produtiva) e facilita o diagnóstico. A validação em bancada é a da Semana 8, começando pela esteira A e adicionando as outras gradualmente
+  - Novo roteiro `docs/testes/roteiros/semana_08_05-09_outubro.md`, com aprovação a cada bloco; Semana 7, `plano_de_testes.md`, `README.md`, `DEPLOYMENT.md` e o board atualizados
+  - A nota da seção "Revertido" abaixo ("causa ainda em investigação") fica superada por este registro
+
 - **Documentação pós-revisão do firmware v3.0 (03/10/2026)**
   - `docs/ARCHITECTURE.md`: novas subseções "Decisões de projeto da v3.0" (código antigo só no git, regra de nenhum débito sem passagem, LCD opcional, saída segura, causa do reset, limitador de rajada) e "Limitações conhecidas da v3.0" (quatro pendências aceitas, todas raras)
   - `docs/CI-CD.md`: consumo do Uno v3.0 atualizado (44% da flash, 46% da RAM; limite de 65%; a v2.x usava 55%)
@@ -42,6 +50,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - `data_flow_inventory.ino` restaurado ao estado de 28/08 (commit `b5727ad`): `TIMEOUT_ENTREGA` volta a **9000 ms**, o estoque inicial volta a **5 peças** por tipo e a exigência de "passagem" no sensor de junção é removida
   - **Mantido** apenas o PWM por esteira (`VELOCIDADE_ESTEIRA_A/B/C`; A e B em 200 e C em 140): ajustar o valor da C em bancada
   - Motivo: a esteira C com o motor novo não move a peça até a junção e o LCD apagou depois da troca; a causa ainda está sendo investigada (fiação, diodo, driver ou fonte) e o firmware volta ao último estado validado até lá
+  - **Atualização (03/10/2026):** a causa era elétrica (módulo IRF520 e motor da C com defeito, já trocados) e o firmware anterior estava correto; ver a primeira entrada desta seção "Não publicado"
   - Simulador, dashboard e painel do Grafana continuam com a escala de 15 peças; o estoque exibido no dashboard vem do que o Arduino publica
 
 ### Removido
@@ -68,10 +77,11 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - `README.md`, `docs/INTEGRATION_GUIDE.md` (nova seção 3, Observabilidade; checklist passou a seção 4), `docs/testes/plano_de_testes.md`, `docs/fluxogramas/board_github_projects.md` e os cards #22 e #25 atualizados; `observability/README.md` passa a referenciar o `DEPLOYMENT.md`
   - Card #25 renomeado para Prometheus/Grafana (InfluxDB descartado) e movido para `In Progress`; Card #22 movido para `In Progress`
 
-- **Desbaste mecânico das esteiras e falha de acionamento B/C (29/09/2026)**
-  - Desbaste da costura da fita das esteiras A, B e C concluído, com ciclo manual suave
-  - Após o desbaste, as esteiras B e C não respondem ao acionamento elétrico (A segue funcional). Hipóteses: solda fria, MOSFET IRF520 danificado, cabo/jumper ou PWM ausente
-  - Diagnóstico em 6 fases (0–5) documentado no roteiro da Semana 7 (seção 4.2). **Nenhuma fase foi executada ainda; a causa-raiz é desconhecida**
+- **Desbaste mecânico das esteiras e falha de acionamento B/C (29/09/2026; atualização 03/10)**
+  - Desbaste da costura das esteiras A, B e C concluído, com ciclo manual suave
+  - B e C voltaram a acionar; entrega ótima e timeout até `ERRO` funcionam com o firmware anterior à v3.0, que estava correto
+  - A falha era elétrica: o módulo IRF520 e o motor da C estavam defeituosos; a partida travava o sistema. Módulo e motor foram trocados; **provisoriamente, C usa o módulo da A**
+  - O rascunho de diagnóstico em 6 fases foi superado pelo diagnóstico conclusivo; ver Semana 7, seção 4.2.1
 
 - **Telemetria Histórica de Performance — Prometheus + Grafana (30/09/2026)**
   - `GET /metrics` no `server/server.js` (mesma porta 3000 e mesmo padrão aberto do `/api/status`) com 17 métricas `dfi_*` mais as métricas padrão do processo: publish → ack do broker, tempo de confirmação do gateway por comando, tempo de resposta da API por rota, throughput de mensagens e eventos, reconexões MQTT, erros, quedas do gateway (LWT), comandos por resultado, sem resposta e órfãos, estoque e esteiras
@@ -134,6 +144,9 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Firmware Uno v3.0 — supervisão por marcos e diagnóstico mais claro (03/10/2026)**
+  - Melhoria de processo, não correção de defeito no firmware anterior: marcos separados para partida (M1), trânsito (M2) e saída (M3), com fase e tempo nos erros
+  - A v3.0 ainda aguarda validação em bancada na Semana 8; os resultados de 03/10 foram obtidos com o firmware anterior, que estava correto
 - **Firmware Uno — confirmação de entrega pelo sensor de junção (02/10/2026)**
   - `TIMEOUT_ENTREGA` de **9000 ms → 12500 ms**: vigia só o trajeto topo → junção; sem confirmação da junção em 12,5 s a esteira (qualquer uma das três) é desligada e o sistema vai para `ERRO` (`timeout`) sem debitar o estoque
   - A confirmação passou a exigir uma **passagem** (o sensor precisa ser visto livre após ligar a esteira): sensor já em LOW na partida não debita estoque sozinho

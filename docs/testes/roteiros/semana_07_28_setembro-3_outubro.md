@@ -46,7 +46,7 @@
 - [x] Fiação UART reconferida (Uno ↔ ESP32, divisor 1k/2kΩ + GND comum)
 - [x] 6 sensores TCRT5000 operacionais
 - [x] Soldagem módulos IRF520 (B/C) — continuidade aprovada
-- [ ] Diagnóstico queda de potência B/C concluído
+- [x] Diagnóstico queda de potência B/C concluído (03/10 — módulo IRF520 e motor da C trocados; ver 4.2.1)
 - [ ] Base MDF — acabamento visual finalizado
 - [x] Desbaste costura fita esteiras concluído (29/09)
 
@@ -181,6 +181,23 @@ Roteiro de 5 fases para isolar falha de acionamento nos motores B/C.
 | Motor B liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"B"}'` | Gira com força normal | ⬜ |
 | Motor C liga | `mosquitto_pub -t dataflow/comandos/sub -m '{"peca":"C"}'` | Gira com força normal | ⬜ |
 
+### 4.2.1 — Resultado do diagnóstico (03/10/2026)
+
+**Conclusão: ✅ resolvido.** O firmware (ainda o anterior à v3.0) **estava correto**; a falha era elétrica.
+
+| Item | Resultado |
+|------|-----------|
+| Esteiras B e C | Movem normalmente, como esperado |
+| Entrega ótima (A, B e C) | ✅ Funciona |
+| Timeout até o `ERRO` | ✅ Funciona |
+| Causa na esteira C | Módulo IRF520 e motor com defeito: ao tentar partir o motor, **todo o sistema travava** (o Arduino deixava de comandar os periféricos e de falar com o ESP32) |
+| Ação | Módulo IRF520 e motor da esteira C **trocados** |
+| Situação atual | **Provisório:** a esteira C usa o módulo IRF520 da esteira A (o módulo definitivo da C ainda não foi reinstalado) |
+
+**Lição registrada:** o travamento do sistema levou à crença errônea de que o código estava funcionando mal. Antes de culpar o firmware, isole a carga elétrica (motor e driver).
+
+**Não registrado:** o tempo topo → junção da esteira C com o motor novo. Medir na rodada de calibração da Semana 8.
+
 ### 4.3 — Critérios de Sucesso
 
 - [ ] Causa identificada (cabo / solda fria / MOSFET / PWM ausente / fonte)
@@ -270,13 +287,13 @@ O simulador permite validar os cenários de FSM e a integração Dashboard/API s
 
 ## 10. Resultados Consolidados da Semana
 
-> Preencher progressivamente. Última atualização: 30/09/2026.
+> Última atualização: 03/10/2026. Continuação: [`semana_08_05-09_outubro.md`](semana_08_05-09_outubro.md).
 
 | Etapa | Resultado | Observações |
 |-------|-----------|-------------|
 | 0 — Pré-voo | ⬜ | — |
 | 1 — HiveMQ via Beckhoff_Guest + hotspot 4G | ✅ CONCLUÍDO | HiveMQ conectou nas duas redes; falha inicial do hotspot foi SSID incorreto e “Maximizar compatibilidade” desativada. Não atribuir o resultado exclusivamente ao firewall do SENAI. |
-| 2 — Diagnóstico IRF520 B/C | 🔄 Em andamento | Desbaste A/B/C concluído em 29/09 (ciclo manual suave); B/C não acionam eletricamente. Fases 0–5 (seção 4.2) a executar em 30/09; nenhum resultado registrado ainda |
+| 2 — Diagnóstico IRF520 B/C | ✅ CONCLUÍDO (03/10) | B e C movem; entrega ótima e timeout até o `ERRO` funcionam. Módulo IRF520 e motor da C trocados (a partida travava o sistema inteiro); a C usa provisoriamente o módulo da A. O firmware anterior estava correto. Detalhes na seção 4.2.1 |
 | 3 — Burn-in S1–S6 | ⬜ | Executar em 30/09–01/10 |
 | 4 — Acabamento MDF/esteiras | 🔄 Parcial | Desbaste das esteiras concluído em 29/09; acabamento MDF em 01/10 |
 | 5 — Documentação/cards | ⬜ | Executar em 02/10 |

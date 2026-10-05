@@ -54,7 +54,7 @@ Depois do script, **você ainda precisa editar** `server/.env` e `secrets.h` com
 Monte conforme o diagrama elétrico e confira a lista de materiais do `README.md`:
 
 - Diagrama: `docs/fluxogramas/Diagrama elétrico.png`.
-- 3 módulos IRF520 (esteiras A, B e C — a esteira principal liga direto na fonte de 12 V), 6 sensores TCRT5000, LCD I²C (endereço `0x27`, 16x2), Arduino Uno e ESP32.
+- 3 módulos IRF520 (esteiras A, B e C — a esteira principal liga direto na fonte de 12 V; desde 03/10 a esteira C usa provisoriamente o módulo da A, até a reinstalação do módulo definitivo), 6 sensores TCRT5000, LCD I²C (endereço `0x27`, 16x2), Arduino Uno e ESP32.
 - **GND comum** entre Uno, ESP32 e drivers; diodo 1N4007 antiparalelo em cada motor.
 - **Ligação Uno ↔ ESP32 (UART, 9600 baud):** TX do Uno (pino 1) → RX2 do ESP32 (GPIO16) **através de divisor 1 kΩ/2 kΩ** (o Uno é 5 V e o ESP32 é 3,3 V); TX2 do ESP32 (GPIO17) → RX do Uno (pino 0), direto.
 - Se um motor não acionar, use o diagnóstico em `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` (seção 4.2).
