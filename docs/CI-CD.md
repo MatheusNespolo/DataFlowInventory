@@ -106,6 +106,21 @@ npm update <package-name>
 
 #### 5. Lógica do firmware do Uno (`firmware-logica`)
 - **O quê:** compila `arduino/data_flow_inventory/src/logica/` com g++ e roda `test/firmware_uno` (FSM, marcos, filtro, protocolo, telas e causa do reset, com tempo simulado)
+
+### 5. Testes E2E do dashboard (Playwright)
+
+Os testes vivem em `test/frontend_smoke/` e usam Playwright com Chromium. Na raiz do repositório, após instalar dependências em `server/`, `simulator/` e `test/frontend_smoke/` (`npm ci` em cada pasta):
+
+```powershell
+cd test/frontend_smoke
+npx playwright install chromium
+npm run test:e2e
+```
+
+`npm run test:e2e:ci` usa os repórteres de lista e HTML. Os web servers Playwright iniciam automaticamente: simulador normal em `localhost:3100`, servidor real com broker propositalmente inalcançável em `localhost:3101`, e simulador isolado com `ESTOQUE_INICIAL=1` em `localhost:3102`. Os projetos são serializados (`workers: 1`) porque o simulador normal mantém estoque compartilhado durante a execução. Em CI há uma retentativa (`retries: 1`) e a execução para após três falhas (`maxFailures: 3`); localmente não há retentativas. Não há `globalTimeout` do Playwright nem `timeout-minutes` no job E2E; cada processo servidor possui timeout de inicialização de 30 s e cada teste limite de 90 s.
+
+A cobertura inclui comandos recusados (sistema ocupado, peça inválida e rate limit), exaustão de estoque e reset, reconexão WebSocket com estado sincronizado, e `/api/status` (503 do servidor sem broker e 404 no simulador). O contrato HTTP 200 com broker conectado é validado pelo harness de integração com broker em processo em `test/server_metrics/integracao/harness.test.mjs`.
+
 - **Contrato:** os testes `*_igual_v2` garantem que as mensagens JSON continuam idênticas às da v2.x
 - **Local:** `docker run --rm -v "<repo>:/w" -w /w gcc:14 make -C test/firmware_uno test` (ou `make -C test/firmware_uno test` com g++ instalado)
 

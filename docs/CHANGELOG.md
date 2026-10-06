@@ -12,6 +12,10 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Cobertura E2E do dashboard (card #27):** Playwright agora valida feedback de comandos ocupados/inválidos/limitados, estoque esgotado e recuperação por reset, reconexão WebSocket sincronizando estado, e `/api/status` nos modos servidor sem broker e simulador. O simulador aceita `ESTOQUE_INICIAL` (padrão 15) para testes isolados; execução documentada em `docs/CI-CD.md` e `CONTRIBUTING.md`.
+
 ### Alterado
 
 - **Bancada — esteiras B e C funcionando e roteiro da Semana 8 (03/10/2026)**

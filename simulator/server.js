@@ -30,7 +30,12 @@ const PORT = parseInt(process.env.PORT, 10) || 3000;
 const DELAY_VERIFICACAO = 300;   // ms — delay simulado da verificação
 const DELAY_ACIONAMENTO = 200;   // ms — delay simulado do acionamento
 const DELAY_ENTREGA     = 1500;  // ms — delay simulado da entrega
-const ESTOQUE_INICIAL   = 15;    // peças de cada tipo (igual ao firmware)
+// Peças de cada tipo (igual ao firmware: 15). ESTOQUE_INICIAL permite subir o
+// simulador com menos peças (ex.: os testes E2E de "sem_estoque" usam 1).
+const ESTOQUE_INICIAL = Number.isInteger(parseInt(process.env.ESTOQUE_INICIAL, 10))
+  && parseInt(process.env.ESTOQUE_INICIAL, 10) >= 0
+  ? parseInt(process.env.ESTOQUE_INICIAL, 10)
+  : 15;
 
 // Intervalo mínimo (ms) entre comandos de um mesmo cliente (anti-flood).
 // Mesmo comportamento do servidor real (../server/server.js).
