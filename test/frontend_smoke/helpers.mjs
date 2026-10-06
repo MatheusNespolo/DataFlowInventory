@@ -33,6 +33,26 @@ function linhas(page, texto) {
   return page.locator('#historico-lista .historico-msg', { hasText: new RegExp(`^${texto}$`) });
 }
 
+/** Linhas do histórico que CONTÊM o trecho (texto literal, sem regex). */
+export function historicoContendo(page, trecho) {
+  return page.locator('#historico-lista .historico-msg', { hasText: trecho });
+}
+
+/**
+ * Registra, dentro da página, os `comando_erro` recebidos pelo socket do dashboard
+ * (window.__errosComando). Use lerErrosComando para ler.
+ */
+export async function gravarErrosComando(page) {
+  await page.evaluate(() => {
+    window.__errosComando = [];
+    window.dfiSocket.on('comando_erro', (e) => window.__errosComando.push(e.erro));
+  });
+}
+
+export async function lerErrosComando(page) {
+  return page.evaluate(() => window.__errosComando);
+}
+
 /**
  * Roteiro dos botões de controle (cenário 1, spec §7.2).
  * Conta as linhas antes de clicar, porque o simulador reenvia os últimos

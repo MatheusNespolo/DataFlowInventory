@@ -65,6 +65,15 @@ bash scripts/precommit-checks.sh
 .\scripts\precommit-checks.ps1
 ```
 
+**Testes E2E do dashboard (Playwright):**
+```powershell
+cd test/frontend_smoke
+npm ci
+npx playwright install chromium
+npm run test:e2e
+```
+Os testes iniciam seus próprios servidores nas portas 3100–3102; não os inicie manualmente. A suíte Playwright está serializada porque alguns cenários alteram o estoque simulado. Consulte [`docs/CI-CD.md`](docs/CI-CD.md) para projetos, cobertura e execução em CI.
+
 **Servidor Node:**
 ```bash
 cd server

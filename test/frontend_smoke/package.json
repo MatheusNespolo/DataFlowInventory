@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "playwright test --reporter=list,html",
     "test:simulador": "playwright test --project=simulador"
   },
   "devDependencies": {
