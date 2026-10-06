@@ -15,6 +15,8 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 ### Adicionado
 
 - **Cobertura E2E do dashboard (card #27):** Playwright agora valida feedback de comandos ocupados/inválidos/limitados, estoque esgotado e recuperação por reset, reconexão WebSocket sincronizando estado, e `/api/status` nos modos servidor sem broker e simulador. O simulador aceita `ESTOQUE_INICIAL` (padrão 15) para testes isolados; execução documentada em `docs/CI-CD.md` e `CONTRIBUTING.md`.
+  - 8 testes novos: 3 em `comandos-recusados` (sistema ocupado, peça inválida, rate limit), 1 em `sem-estoque`, 1 de reconexão em `resiliencia` e 3 em `api-status` (503 do servidor sem broker, recusa com broker offline, 404 do simulador). Suíte serial (`workers: 1`), portas 3100–3102; em CI, 1 retentativa e `maxFailures: 3`
+  - **Validação parcial:** uma execução registrou 31 testes passando e 2 falhas; os testes novos e o cenário de rate limit passaram isoladamente. A suíte completa **ainda não foi reexecutada** após a última correção, portanto não há confirmação de execução totalmente verde
 
 ### Alterado
 

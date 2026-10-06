@@ -172,11 +172,17 @@ Diferente do modo real, os tempos de verificação/acionamento/entrega são temp
 DataFlowInventory/
 ├── arduino/
 │   └── data_flow_inventory/
-│       └── data_flow_inventory.ino        # Código Arduino (FSM + Serial JSON)
+│       ├── data_flow_inventory.ino        # Sketch do Arduino (setup/loop)
+│       ├── config.h                       # Pinos, prazos por esteira e constantes
+│       └── src/
+│           ├── logica/                    # FSM, supervisor de entrega, protocolo, filtro, telas (testável em g++)
+│           └── hw/                        # Motores, sensores, LCD, comunicação e diagnóstico
 │
 ├── esp32/
-│   └── gateway_mqtt/
-│       └── gateway_mqtt.ino               # Código ESP32 (Serial ↔ MQTT)
+│   ├── gateway_mqtt/
+│   │   ├── gateway_mqtt.ino               # Código ESP32 (Serial ↔ MQTT)
+│   │   └── secrets.h.example              # Modelo das credenciais (secrets.h não versionado)
+│   └── test_mqtt_cloud/                   # Sketch de teste de conexão com o HiveMQ Cloud
 │
 ├── server/
 │   ├── package.json                       # Dependências Node.js
@@ -208,8 +214,9 @@ DataFlowInventory/
 │   ├── esteira_peca_b/                    # Teste 5: duas esteiras (A+B) com FSM completa
 │   ├── mqtt_probe/                        # Sonda MQTT (escuta dataflow/# com timestamp)
 │   ├── server_metrics/                    # Testes das métricas e da infra de observabilidade (sem Docker)
-│   ├── frontend/                          # Testes unitários do frontend
-│   └── frontend_smoke/                    # Testes de fumaça com Playwright
+│   ├── firmware_uno/                      # Testes da lógica do Uno (g++ + Makefile, tempo simulado)
+│   ├── frontend/                          # Testes unitários do frontend (node --test)
+│   └── frontend_smoke/                    # Testes E2E com Playwright (portas 3100–3102)
 │
 ├── docs/
 │   ├── ARCHITECTURE.md                    # Referência técnica única (arquitetura, tópicos, mensagens, observabilidade)
@@ -217,6 +224,9 @@ DataFlowInventory/
 │   ├── CI-CD.md, CHANGELOG.md             # Pipelines e histórico de mudanças
 │   ├── INTEGRATION_GUIDE.md               # Integração Beckhoff CX9240
 │   ├── broker_local_mosquitto.md          # Teste local com Mosquitto (sem nuvem)
+│   ├── FRONTEND.md                        # Guia do dashboard e da estrutura do frontend
+│   ├── DIVULGACAO.md                      # Material de divulgação do projeto
+│   ├── cards_comments/                    # Comentários dos cards de planejamento
 │   ├── grafana/                           # Dashboards versionados
 │   ├── artigo/
 │   │   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
