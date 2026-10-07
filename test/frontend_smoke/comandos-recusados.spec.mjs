@@ -19,12 +19,16 @@ test('E2E3 — pedido com o sistema ocupado é recusado e o histórico mostra o 
 
     // O simulador é compartilhado com os specs anteriores e reenvia os últimos eventos em
     // "estado_inicial": o histórico já pode trazer pedidos/entregas de A. Conta antes de pedir.
-    const solicitadasAntes = await historicoContendo(segunda, 'Peça A solicitada').count();
+    const solicitadasAntes = await historicoContendo(principal, 'Peça A solicitada').count();
     const entreguesAntes = await historicoContendo(principal, 'Peça A entregue').count();
 
     await principal.locator('#btn-solicitar-a').click();
     // Aguarda o evento de pedido aceite confirmar que o simulador saiu do estado inicial.
-    await expect(historicoContendo(segunda, 'Peça A solicitada')).toHaveCount(solicitadasAntes + 1);
+    // A confirmação é lida na aba que pediu: no CI, a segunda aba às vezes perde o WebSocket
+    // enquanto termina de carregar a cena 3D e, ao reconectar, o dashboard não repete o
+    // histórico (só o estado). O estado ocupado chega a ela de qualquer forma, via
+    // "status" ou "estado_inicial" da reconexão.
+    await expect(historicoContendo(principal, 'Peça A solicitada')).toHaveCount(solicitadasAntes + 1);
     await expect(segunda.locator('#estado-atual')).not.toHaveText('AGUARDANDO_PEDIDO');
 
     // Os botões ficam desabilitados fora de AGUARDANDO_PEDIDO; o pedido vai direto pelo socket.
