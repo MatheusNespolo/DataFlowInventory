@@ -17,9 +17,14 @@ test('E2E3 — pedido com o sistema ocupado é recusado e o histórico mostra o 
     await expect(principal.locator('#estado-atual')).toHaveText('AGUARDANDO_PEDIDO');
     await expect(segunda.locator('#estado-atual')).toHaveText('AGUARDANDO_PEDIDO');
 
+    // O simulador é compartilhado com os specs anteriores e reenvia os últimos eventos em
+    // "estado_inicial": o histórico já pode trazer pedidos/entregas de A. Conta antes de pedir.
+    const solicitadasAntes = await historicoContendo(segunda, 'Peça A solicitada').count();
+    const entreguesAntes = await historicoContendo(principal, 'Peça A entregue').count();
+
     await principal.locator('#btn-solicitar-a').click();
     // Aguarda o evento de pedido aceite confirmar que o simulador saiu do estado inicial.
-    await expect(historicoContendo(segunda, 'Peça A solicitada')).toHaveCount(1);
+    await expect(historicoContendo(segunda, 'Peça A solicitada')).toHaveCount(solicitadasAntes + 1);
     await expect(segunda.locator('#estado-atual')).not.toHaveText('AGUARDANDO_PEDIDO');
 
     // Os botões ficam desabilitados fora de AGUARDANDO_PEDIDO; o pedido vai direto pelo socket.
@@ -28,7 +33,7 @@ test('E2E3 — pedido com o sistema ocupado é recusado e o histórico mostra o 
 
     // O pedido original não é afetado: A é entregue e o sistema volta a aguardar.
     await expect(principal.locator('#estado-atual')).toHaveText('AGUARDANDO_PEDIDO');
-    await expect(historicoContendo(principal, 'Peça A entregue')).toHaveCount(1);
+    await expect(historicoContendo(principal, 'Peça A entregue')).toHaveCount(entreguesAntes + 1);
     await expect(principal.locator('#estado-atual')).toHaveText('AGUARDANDO_PEDIDO');
     await expect(historicoContendo(principal, 'Sistema ocupado')).toHaveCount(0);
     esperarSemErros(erros);

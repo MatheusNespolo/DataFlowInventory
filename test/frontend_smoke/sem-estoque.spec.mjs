@@ -1,7 +1,7 @@
 // E2E3 (card #27), caso sem_estoque: roda contra um simulador DEDICADO (porta 3102) que sobe
 // com 1 peça de cada tipo (ESTOQUE_INICIAL=1). Assim o estoque zerado não afeta os outros specs.
 import { test, expect } from '@playwright/test';
-import { historicoContendo } from './helpers.mjs';
+import { historicoContendo, INTERVALO_COMANDO_MS } from './helpers.mjs';
 
 test('E2E3 — peça sem estoque: ERRO sem_estoque aparece no histórico, nos botões e some após o reset', async ({ page }) => {
   await page.goto('/');
@@ -30,6 +30,10 @@ test('E2E3 — peça sem estoque: ERRO sem_estoque aparece no histórico, nos bo
   await page.locator('#btn-reset').click();
   await expect(estado).toHaveText('AGUARDANDO_PEDIDO');
   await expect(page.locator('#estoque-b')).toHaveText('1');
+  // O reset e o pedido saem do mesmo socket: sem esperar COMANDO_INTERVALO_MS (500 ms no
+  // simulador), o pedido de B seria recusado pelo rate limit ("Muitos comandos").
+  await page.waitForTimeout(INTERVALO_COMANDO_MS + 100);
+  const entregasBAntes = await historicoContendo(page, 'Peça B entregue').count();
   await page.locator('#btn-solicitar-b').click();
-  await expect(historicoContendo(page, 'Peça B entregue')).toHaveCount(1);
+  await expect(historicoContendo(page, 'Peça B entregue')).toHaveCount(entregasBAntes + 1);
 });

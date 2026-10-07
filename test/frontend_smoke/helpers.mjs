@@ -80,12 +80,15 @@ export async function roteiroBotoes(page) {
   await expect(estado).toHaveText('AGUARDANDO_PEDIDO');
 }
 
-/** IDs usados por frontend/js/app.js (objeto els) e diagrama3d.js — contrato congelado (§3.3). */
+// Intervalo mínimo entre comandos do mesmo socket (COMANDO_INTERVALO_MS do simulador, padrão 500).
+export const INTERVALO_COMANDO_MS = 500;
+
 // Alvo de toque mínimo (WCAG 2.5.5: 44 × 44 px). O boundingBox do navegador
 // devolve frações (ex.: 43.99998 px para min-height: 44px com layout em
 // subpixel), então a comparação aceita 0,01 px de arredondamento.
 export const ALTURA_MIN_TOQUE = 44 - 0.01;
 
+/** IDs usados por frontend/js/app.js (objeto els) e diagrama3d.js — contrato congelado (§3.3). */
 export const IDS_CONTRATO = [
   'mqtt-status', 'gateway-status', 'server-time', 'annun-estado', 'annun-estado-v',
   'annun-estoque', 'annun-estoque-v', 'estado-atual', 'peca-solicitada', 'uptime',
