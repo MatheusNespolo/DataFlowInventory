@@ -1,6 +1,7 @@
 # Guia de Integração — Beckhoff CX9240 (Historiador SQLite) + Separador (Roda de Separação)
 
 > **Passo a passo para integração final com PC industrial e roda de separação**  
+> ⚠️ **Status:** a §1 (CX9240) está parcialmente validada. A §2 (separador) é **pendente**: o código da §2.3 é da v2.x e não existe na v3.0 do firmware Uno.
 > Data: 14/09/2026 · Sprint 5
 
 ---
@@ -111,7 +112,9 @@ CREATE TABLE IF NOT EXISTS eventos_log (
    sqlite3 /var/lib/dfi/historian.db "SELECT * FROM eventos_hist ORDER BY id DESC LIMIT 10;"
    ```
 
-### 1.5 Checklist CX9240 — ✅ CONCLUÍDO (15/09/2026)
+### 1.5 Checklist CX9240 — 🟡 PARCIALMENTE VALIDADO (15/09/2026; homologado em 19/09/2026)
+
+> Pendências: o contrato `dataflow/eventos` (usado por `eventos_hist`) ainda não foi confirmado com o firmware real, porque o simulador publica só `dataflow/estoque`. O card #27 (E2E) só pode ser marcado como concluído após uma execução verde no GitHub Actions da `main`.
 
 - [x] Contrato MQTT e payload definidos (`dataflow/estoque` e `dataflow/eventos`)
 - [x] Publicação MQTT validada no simulador (`MQTT_PUBLISH=true`)
