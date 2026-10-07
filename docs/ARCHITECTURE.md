@@ -223,7 +223,7 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 
 ### 6.1 Beckhoff CX9240 (Historiador Local MQTT → SQLite)
 
-**Status:** ✅ **CONCLUÍDO E VALIDADO (15/09/2026)**
+**Status:** 🟡 **PARCIALMENTE VALIDADO** — persistência e DB comissionados (15/09/2026); fluxo completo Arduino/ESP32 → HiveMQ Cloud → Node.js → CX9240 homologado em 19/09/2026. Pendências: E2E automatizado (card #27) e confirmação do contrato `dataflow/eventos` com o firmware real (ver `docs/INTEGRATION_GUIDE.md` §1.5).
 
 - **Hardware/OS:** Beckhoff CX9240 rodando TwinCAT 3 em RT Linux ARM64.
 - **Banco de Dados:** SQLite local (`/var/lib/dfi/historian.db`) em modo WAL, operado via TF6420 Database Server (SQL Expert Mode).
@@ -236,14 +236,14 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
   |---|---|---|
   | `MQTT_PUBLISH` | `false` | habilita a publicação do estoque |
   | `MQTT_BROKER_URL` / `MQTT_PORT` | `mqtt://127.0.0.1` / `1883` | broker |
-  | `MQTT_USER` / `MQTT_PASS` | — | credenciais, se houver |
+  | `MQTT_USER` / `MQTT_PASS` | — | credenciais, se houver (o servidor `server/` usa `MQTT_USERNAME` / `MQTT_PASSWORD`) |
   | `MQTT_TOPIC_ESTOQUE` | `dataflow/estoque` | tópico de publicação |
 
   Passo a passo do lado Beckhoff (DDL SQL, TwinCAT 3): `docs/INTEGRATION_GUIDE.md`.
 
 ### 6.2 Separador — Roda de Separação
 
-**Status:** Código comentado; integração em Sprint 5–6
+**Status:** ⬜ **PENDENTE** — não há código ativo na v3.0 do firmware Uno. O trecho antigo (`Stepper.h`, `moverSeparador`) existe só no histórico do git (firmware v2.x). A integração depende da mecânica (Semana 8, Bloco 4).
 
 **Hardware:** Motor 28BYJ-48 + ULN2003 (pinos 5-8)  
 **Integração:** Nova etapa FSM após ENTREGANDO_PECA
