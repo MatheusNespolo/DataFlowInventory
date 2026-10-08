@@ -8,6 +8,10 @@ Do clique no navegador à esteira em movimento: pedido pelo dashboard, MQTT, ESP
 
 **Firmware C++ (Arduino Uno e ESP32) · MQTT/IoT · Dashboard em tempo real com vista 3D · Testável sem hardware**
 
+### [🌐 Conheça o projeto pela página de apresentação →](https://matheusnespolo.github.io/dataflow-inventory-site/)
+
+Uma visão geral visual, com a bancada em 3D e o caminho de um pedido contado pela rolagem. Código da página em [`dataflow-inventory-site`](https://github.com/MatheusNespolo/dataflow-inventory-site).
+
 ![Arduino](https://img.shields.io/badge/Arduino-Uno-00979D?logo=arduino&logoColor=white)
 ![ESP32](https://img.shields.io/badge/ESP32-DevModule-000000?logo=espressif&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-v22+-339933?logo=node.js&logoColor=white)
@@ -30,6 +34,7 @@ Engenharia de Controle e Automação
 
 | Quero... | Vá para | Precisa de hardware? |
 |----------|---------|----------------------|
+| 🌐 Conhecer o projeto em poucos minutos | [Página de apresentação](https://matheusnespolo.github.io/dataflow-inventory-site/) | Não |
 | ⚡ Ver funcionando em 30 segundos | [Quick Start — Simulador](#-quick-start--simulador) | Não |
 | 🔧 Montar a bancada completa | [Materiais](#materiais), [Como Rodar](#como-rodar) e o [Guia de implantação](docs/DEPLOYMENT.md) | Sim |
 | 📈 Ver métricas e dashboards de performance | [Observabilidade](observability/README.md) | Não exige a bancada (precisa de Docker e do servidor Node; sem a bancada, parte dos painéis fica vazia) |
