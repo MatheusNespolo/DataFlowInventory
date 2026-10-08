@@ -21,6 +21,10 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Diagrama elétrico: rótulo do driver da esteira C corrigido (08/10/2026)**
+  - A terceira placa aparecia como `IRF520_B`; agora é `IRF520_C` (sinal no pino 11), em `docs/fluxogramas/Diagrama elétrico.png` e na fonte `.pptx`
+  - A Figura 2 do `docs/artigo/Projeto de pesquisa - Final.docx` foi trocada pela versão corrigida (mesmo tamanho; nada mais mudou no documento)
+
 - **Projeto de pesquisa (`docs/artigo/Projeto de pesquisa - Final.docx`) atualizado com o histórico até 08/10/2026**, sem mudar a estrutura de tópicos nem a formatação
   - Capa: orientadores preenchidos
   - Seção 7 (desenhos): Figura 2 trocada pelo diagrama elétrico consolidado (23/09) e Figura 3 pela máquina de estados do Uno; texto do código atualizado (firmware v3.0, supervisão por marcos, pinagem atual, JSON, ESP32, servidor, CX9240)
