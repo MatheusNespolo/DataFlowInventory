@@ -21,6 +21,12 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Projeto de pesquisa (`docs/artigo/Projeto de pesquisa - Final.docx`) atualizado com o histórico até 08/10/2026**, sem mudar a estrutura de tópicos nem a formatação
+  - Capa: orientadores preenchidos
+  - Seção 7 (desenhos): Figura 2 trocada pelo diagrama elétrico consolidado (23/09) e Figura 3 pela máquina de estados do Uno; texto do código atualizado (firmware v3.0, supervisão por marcos, pinagem atual, JSON, ESP32, servidor, CX9240)
+  - Seção "Desenvolvimento e evolução": itens a), d), e), g), i), j), l) e m) atualizados; novos itens n) a u) (robustez do firmware v3.0, estoque e PWM por esteira, historiador CX9240, Prometheus/Grafana, CI/CD, montagem e diagrama elétrico, roda de separação pendente, documentação); Tabela 1 passa de 13 para 20 decisões
+  - Conclusões atualizadas com o estado atual e os próximos passos. As seções 1 a 6 e 8 seguem como concepção inicial, como o próprio documento declara
+
 - **Bancada — esteiras B e C funcionando e roteiro da Semana 8 (03/10/2026)**
   - B e C movem normalmente; entrega ótima e timeout até o `ERRO` funcionam, com o firmware **anterior à v3.0**, que estava correto
   - **Causa da falha de 29/09:** elétrica. O módulo IRF520 e o motor da esteira C estavam defeituosos e, ao partir o motor, todo o sistema travava (o Arduino deixava de comandar os periféricos e de falar com o ESP32). Isso levou à crença errônea de um defeito no código. Módulo e motor da C foram trocados; **provisoriamente a C usa o módulo IRF520 da esteira A**
