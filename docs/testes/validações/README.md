@@ -67,4 +67,4 @@ powershell -ExecutionPolicy Bypass -File .\docs\testes\validações\validar_infr
 
 ---
 
-> ⚠️ Para qualquer dúvida, consultar também o guia completo do broker local em [`docs/broker_local_mosquitto.md`](../../broker_local_mosquitto.md) e a arquitetura MQTT em [`docs/arquitetura_mqtt.md`](../../arquitetura_mqtt.md).
+> ⚠️ Para qualquer dúvida, consultar também o guia completo do broker local em [`docs/broker_local_mosquitto.md`](../../broker_local_mosquitto.md) e a arquitetura unificada em [`docs/ARCHITECTURE.md`](../../ARCHITECTURE.md).

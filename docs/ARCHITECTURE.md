@@ -1,7 +1,7 @@
-# Arquitetura Unificada — Data Flow Inventory
+﻿# Arquitetura Unificada — Data Flow Inventory
 
 > **Documento consolidado de referência técnica**  
-> Data: 14/09/2026 · Revisado em 02/10/2026 · Versão: 2.1  
+> Data: 14/09/2026 · Revisado em 13/10/2026 · Versão: 2.2
 > Fonte única de referência técnica. Absorveu o conteúdo de `arquitetura_mqtt.md` e `fluxogramas/fluxograma_funcionamento.md` (removidos em 02/10/2026; o histórico permanece no git). Os diagramas PNG continuam em `docs/fluxogramas/`.
 
 ---
@@ -243,7 +243,7 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 
 ### 6.2 Separador — Roda de Separação
 
-**Status:** ⬜ **PENDENTE** — não há código ativo na v3.0 do firmware Uno. O trecho antigo (`Stepper.h`, `moverSeparador`) está registrado, **todo comentado e nunca testado**, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h`, com as chamadas comentadas no `.ino`. O giro foi redesenhado **sem bloqueio** para não estourar o watchdog de 2 s: `Stepper::step()` espera ativamente (~2 s para 120° a 10 RPM), então a lógica `src/logica/plano_separador.*` (testada no PC) dá no máximo 1 passo por volta do loop e solta as bobinas parado. Em aberto: não há sensor de referência (a posição se perde em reinício), o motor deve ter alimentação de 5 V própria e o giro nunca foi testado em hardware. A integração depende da mecânica (Semana 8, Bloco 4).
+**Status:** ⬜ **PENDENTE** — o firmware Uno v3.0 foi validado em bancada em 13/10/2026, mas o código do separador segue pendente de validação e não está ativo. O trecho antigo (`Stepper.h`, `moverSeparador`) está registrado, **todo comentado e nunca testado**, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h`, com as chamadas comentadas no `.ino`. O giro foi redesenhado **sem bloqueio** para não estourar o watchdog de 2 s: `Stepper::step()` espera ativamente (~2 s para 120° a 10 RPM), então a lógica `src/logica/plano_separador.*` (testada no PC) dá no máximo 1 passo por volta do loop e solta as bobinas parado. Em aberto: não há sensor de referência (a posição se perde em reinício), o motor deve ter alimentação de 5 V própria e o giro nunca foi testado em hardware. A integração depende da validação do código, da mecânica e dos testes isolados; prioridade no roteiro da Semana 9.
 
 **Hardware:** Motor 28BYJ-48 + ULN2003 (pinos 5-8)  
 **Integração:** Nova etapa FSM após ENTREGANDO_PECA

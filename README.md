@@ -51,7 +51,7 @@ Engenharia de Controle e Automação
 | 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
 | ✅ **Qualidade** | Testes unitários, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
 
-> **Status de validação:** o broker Mosquitto local foi validado em bancada; o HiveMQ Cloud está parcialmente validado; as esteiras A, B e C acionam e entregam (03/10; a C usa provisoriamente o módulo IRF520 da A); o firmware do Uno v3.0 (supervisão por marcos, no padrão de processos de automação) passou nos testes automatizados, mas **ainda não foi validado em bancada** (Semana 8: [roteiro](docs/testes/roteiros/semana_08_05-09_outubro.md)). Veja [Próximos Passos](#próximos-passos) para o estado atual de cada item.
+> **Status de validação (13/10/2026):** firmware Uno v3.0 validado em bancada; itens 1.1–1.11 e Bloco 2 aprovados, e esteiras B e C funcionando com o firmware novo. O teste integrado A+B+C com calibração e a validação do separador permanecem pendentes/replanejados. Consulte [Semana 8](docs/testes/roteiros/semana_08_05-09_outubro.md), [roteiro da Semana 9](docs/testes/roteiros/semana_09_14-18_outubro.md) e [plano de testes](docs/testes/plano_de_testes.md).
 
 ## Sumário
 
@@ -431,15 +431,17 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## Próximos Passos
 
-- 🚀 **CI/CD Automatizado:** workflows de linting, secret detection e compilação de firmware via GitHub Actions (ver [`docs/CI-CD.md`](docs/CI-CD.md)).
-- 🎡 **Roda de Separação (3 compartimentos):** motor de passo 28BYJ-48 + ULN2003 para separação automática das peças A/B/C ao fim da esteira principal (ver [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md)).
-- 🏭 **Integração Beckhoff CX9240:** persistência do histórico e estoque em banco de dados relacional (lado do simulador implementado; validação com PC industrial em bancada própria).
-- ☁️ **Broker Remoto (HiveMQ Cloud):** validação E2E via internet/TLS (porta 8883) com credenciais em nuvem (parcialmente validado). Ver [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) (Teste 6).
-- 🧪 **Validação de infraestrutura:** scripts em `scripts/` e `docs/testes/validações/validar_infra.ps1` automatizam a checagem de broker, firewall e serviços antes de cada bancada.
+### Próximas validações (13/10/2026)
+
+- **Prioridade — separador:** validar o código e o motor em bancada; o módulo está registrado/comentado no firmware v3.0 e ainda não foi integrado ao ciclo.
+- **Semana 9 (14–18/10):** dias úteis para preparação segura da bancada e testes isolados; fim de semana com hardware completo para tarefas opcionais independentes de Data Flow System e CX9240, além da validação física do separador. Ver [roteiro](docs/testes/roteiros/semana_09_14-18_outubro.md).
+- **Semana 10 (19–23/10):** executar A+B+C, calibrar e concluir o que foi adiado; manter a integração do separador condicionada à aprovação dos testes isolados. Ver [roteiro](docs/testes/roteiros/semana_10_19-23_outubro.md).
+- **Itens concluídos:** CI/CD, telemetria Prometheus/Grafana, broker HiveMQ Cloud E2E e historiador CX9240 possuem documentação de implementação/validação em [`docs/CI-CD.md`](docs/CI-CD.md), [`observability/README.md`](observability/README.md), [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) e [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md).
+- **Implantação:** o guia [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) ainda aguarda execução do zero em máquina limpa.
 - 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Telemetria concluída em 01/10/2026: código, testes automatizados e validação do stack (smoke test e conferência dos painéis). Ver [`observability/README.md`](observability/README.md).
-- 📘 **Guia de implantação:** passo a passo para subir o sistema do zero em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) (versão inicial, ainda não validada em máquina limpa).
+- 📘 **Guia de implantação:** passo a passo para subir o sistema do zero em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md); ainda não validado em máquina limpa.
 - 🔧 **Diagnóstico IRF520 (esteiras B/C) — resolvido em 03/10:** a falha era elétrica (módulo IRF520 e motor da C, trocados; o firmware anterior estava correto). A C usa provisoriamente o módulo da A. Ver [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) (seção 4.2.1).
-- 🧪 **Semana 8 (05–09/10):** validação em bancada do firmware v3.0 (esteira A, depois A+B e A+B+C, com calibração) e integração do separador. Roteiro em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md), com aprovação a cada bloco.
+- 🧪 **Semana 8 (fechamento em 13/10):** firmware Uno v3.0 validado em bancada (itens 1.1–1.11 e Bloco 2; B/C funcionando); integração A+B+C com calibração e separador foram replanejados. Resultados em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md).
 
 ## Equipe
 

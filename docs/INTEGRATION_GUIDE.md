@@ -1,8 +1,8 @@
 # Guia de Integração — Beckhoff CX9240 (Historiador SQLite) + Separador (Roda de Separação)
 
 > **Passo a passo para integração final com PC industrial e roda de separação**  
-> ⚠️ **Status:** a §1 (CX9240) está parcialmente validada. A §2 (separador) é **pendente**: o código da §2.3 é da v2.x; na v3.0 do firmware Uno ele está só registrado, comentado, em `src/hw/separador.*` e `config.h`, sem teste.
-> Data: 14/09/2026 · Sprint 5
+> ⚠️ **Status (revisado em 13/10/2026):** o historiador CX9240 foi comissionado e o fluxo com o simulador foi validado; consultar §1 para limitações de contrato/teste real. Firmware Uno v3.0 validado em bancada, mas a validação do código do separador permanece pendente: na v3.0 ele está registrado/comentado em `src/hw/separador.*` e `config.h`, sem integração ativa. As instruções antigas de ativação abaixo são referência histórica e não devem ser aplicadas diretamente à v3.0.
+> Data: 14/09/2026 · Sprint 5 · Revisado em 13/10/2026
 
 ---
 
@@ -145,7 +145,9 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 | **B** | 120° | 683 |
 | **C** | 240° | 1365 |
 
-### 2.3 Ativação (Arduino IDE)
+### 2.3 Ativação — procedimento legado (v2.x; não aplicar à v3.0)
+
+> **Atenção:** este trecho descreve o procedimento antigo da v2.x. Não descomente o `Stepper.h` nem as chamadas no `.ino` da v3.0 sem projeto, revisão e testes específicos: o movimento legado pode bloquear o loop e acionar o watchdog. A lógica incremental foi exercitada em testes no PC, mas ainda precisa de validação em hardware.
 
 1. **Descomentarincludes:**
    ```cpp
@@ -165,7 +167,9 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 
 4. **Compilar e fazer upload**
 
-### 2.4 Testes (Semana 5, Bloco 3)
+### 2.4 Testes em bancada — pendentes (replanejados para a Semana 9/10)
+
+> Os testes abaixo são a matriz planejada da Semana 5 e continuam úteis como referência, mas não foram executados/aprovados. Siga o roteiro atualizado antes de energizar a montagem: [`Semana 9`](testes/roteiros/semana_09_14-18_outubro.md) e [`Semana 10`](testes/roteiros/semana_10_19-23_outubro.md).
 
 | Teste | Procedimento | Esperado |
 |-------|-----------|----------|

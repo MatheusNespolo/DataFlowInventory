@@ -1,11 +1,11 @@
 # Roteiro de Testes — Semana 8 (05–09/10/2026)
 
-**Objetivo:** validar em bancada o firmware do Uno v3.0 (supervisão por marcos), começando pela esteira A e adicionando B e C gradualmente, calibrar tempos e PWM de cada esteira, e finalizar a mecânica e a integração do separador final.
+**Objetivo:** registrar os testes concluídos do firmware Uno v3.0 e documentar as etapas transferidas para a semana seguinte.
 
-> **Data:** 05–09/10/2026
+> **Data:** 05–09/10/2026 · **Fechamento atualizado:** 13/10/2026
 > **Continuação de:** [`semana_07_28_setembro-3_outubro.md`](semana_07_28_setembro-3_outubro.md)
-> **Blocos:** 6 (0 a 5), um por dia; segunda concentra os blocos 0 e 1
-> **Regra de aprovação:** cada bloco termina com um **portão de aprovação**. O bloco seguinte só começa depois que o portão do anterior for assinado (✅). Se o resultado for ❌, registre a causa, corrija e repita o bloco; não avance.
+> **Status:** firmware v3.0 validado; itens 1.1–1.11 e Bloco 2 aprovados. Bloco 3 em diante replanejado; validação do código do separador ainda pendente.
+> **Regra de registro:** resultado informado pela equipe é marcado concluído; não inferir resultados de subtestes ou medições que não foram comunicados.
 
 ---
 
@@ -16,10 +16,13 @@
 | Esteiras A, B e C movem; entrega ótima e timeout até o `ERRO` funcionam (firmware anterior à v3.0) | 03/10 | ✅ |
 | Módulo IRF520 e motor da esteira C trocados (a partida travava o sistema inteiro) | 03/10 | ✅ |
 | **Provisório:** esteira C usa o módulo IRF520 da esteira A | 03/10 | ⚠️ módulo definitivo da C a reinstalar |
-| Firmware v3.0 na `main` (PR #43), 43 testes de lógica no PC | 03/10 | ✅ no PC · ⬜ em bancada |
-| Tempo topo → junção da C com o motor novo | — | ⬜ **não registrado** |
+| Firmware v3.0 (43 testes de lógica no PC) | 03/10 | ✅ no PC e validado em bancada (resultado confirmado em 13/10) |
+| Esteiras B e C com firmware v3.0 | 13/10 | ✅ testadas e funcionando |
+| Tempo topo → junção da C / calibração consolidada | — | ⬜ não informado; registrar na próxima sessão |
 
-**Contexto:** o firmware anterior estava correto; a falha de 29/09 era elétrica (ver [Semana 7, seção 4.2.1](semana_07_28_setembro-3_outubro.md)). A v3.0 **não corrige um defeito**: ela traz os marcos do processo (partida, trânsito, saída), mais próximos do padrão de automação produtiva, e dá erros com `fase` e `t_ms` que facilitam o diagnóstico. Por isso a validação começa pela esteira A, a mais conhecida, e acrescenta as outras uma a uma.
+**Resultado consolidado (atualizado em 13/10):** firmware Uno v3.0 validado em bancada. A equipe confirmou sucesso nos itens **1.1–1.11** e no **Bloco 2**; as esteiras B e C também foram testadas com o firmware novo e estão funcionando. Não foram informadas medições de tempos/PWM nem aprovação do Bloco 3 completo (A+B+C com calibração); essas atividades permanecem replanejadas. A validação do código do separador segue pendente.
+
+O firmware anterior estava correto; a falha de 29/09 era elétrica (ver [Semana 7, seção 4.2.1](semana_07_28_setembro-3_outubro.md)). A v3.0 traz os marcos do processo (partida, trânsito, saída) e erros com `fase` e `t_ms`, facilitando o diagnóstico.
 
 **Referências do firmware v3.0:** estados, marcos e erros em [`ARCHITECTURE.md`](../../ARCHITECTURE.md) (seção 3); parâmetros por esteira em `arduino/data_flow_inventory/config.h` (`PARAM_ESTEIRA_A/B/C`: PWM 200, kick 150 ms, M1 3 s, M2 12,5 s, saída 3 s, pulso mínimo 20 ms).
 
@@ -31,11 +34,9 @@
 
 | Dia | Bloco | Atividade |
 |-----|-------|-----------|
-| **05/10 (Seg)** | 0 e 1 | Pré-voo + esteira A isolada com a v3.0 |
-| **06/10 (Ter)** | 2 | A + B |
-| **07/10 (Qua)** | 3 | A + B + C, seguido da **rodada de calibração** |
-| **08/10 (Qui)** | 4 | Mecânica e integração do separador |
-| **09/10 (Sex)** | 5 | Documentação, CHANGELOG e cards |
+| **05/10 (Seg)** | 0 e 1 | Pré-voo + esteira A isolada com a v3.0 — concluído; itens 1.1–1.11 aprovados |
+| **06/10 (Ter)** | 2 | A + B — concluído; B e C posteriormente confirmadas OK com v3.0 |
+| **07–09/10** | 3–5 | A+B+C com calibração, separador e fechamento documental — adiados para 19–23/10; validar separador como prioridade |
 
 ---
 
@@ -96,10 +97,10 @@ A falha de 29/09 travava todo o sistema na partida do motor. Na primeira partida
 
 | Critério | Resultado |
 |----------|-----------|
-| Passos 1.1 a 1.11 aprovados | ⬜ |
-| Nenhum reset inesperado (`inicio` fora do boot) | ⬜ |
-| `tempo_ms` da A registrado (seção 9) | ⬜ |
-| Aprovado por | ⬜ nome · data |
+| Passos 1.1 a 1.11 aprovados | ✅ (confirmado pela equipe) |
+| Firmware v3.0 validado em bancada | ✅ (confirmado pela equipe; detalhes/medições não fornecidos) |
+| Nenhum reset inesperado e `tempo_ms` da A | não detalhado; não inferir |
+| Aprovado por | equipe · confirmação registrada em 13/10/2026 |
 
 ---
 
@@ -124,10 +125,10 @@ A falha de 29/09 travava todo o sistema na partida do motor. Na primeira partida
 
 | Critério | Resultado |
 |----------|-----------|
-| Passos 2.1 a 2.9 aprovados | ⬜ |
-| Bloco 1 continua válido (A não regrediu) | ⬜ |
-| `tempo_ms` da B registrado (seção 9) | ⬜ |
-| Aprovado por | ⬜ nome · data |
+| Bloco 2 concluído com sucesso | ✅ (confirmado pela equipe) |
+| Esteiras B e C testadas com firmware v3.0 e funcionando | ✅ (confirmado pela equipe) |
+| Medições de tempo/PWM e aprovação individual de cada cenário | não detalhadas; registrar na próxima sessão se necessárias |
+| Aprovado por | equipe · confirmação registrada em 13/10/2026 |
 
 ---
 
@@ -261,17 +262,17 @@ Regras:
 
 ## 9. Resultados consolidados da semana
 
-> Preencher progressivamente. Não registrar resultado que não foi medido.
+> Fechamento em 13/10/2026. Resultados conforme confirmação da equipe; não foram acrescentadas medições não fornecidas.
 
 | Bloco | Resultado | Observações |
 |-------|-----------|-------------|
-| 0 — Pré-voo | ⬜ | — |
-| 1 — Esteira A (v3.0) | ⬜ | — |
-| 2 — A + B | ⬜ | — |
-| 3 — A + B + C | ⬜ | — |
-| 3 — Calibração | ⬜ | — |
-| 4 — Separador | ⬜ | — |
-| 5 — Documentação | ⬜ | — |
+| 0 — Pré-voo | ✅ | Incluído na validação confirmada; checklist detalhado não informado |
+| 1 — Esteira A (v3.0), itens 1.1–1.11 | ✅ | Sucesso confirmado pela equipe |
+| 2 — A + B; B/C com firmware v3.0 | ✅ | Sucesso confirmado; B e C funcionando |
+| 3 — A + B + C | ⏭️ Replanejado | Executar em 19–23/10; validar montagem conjunta |
+| 3 — Calibração | ⏭️ Replanejado | Medir e registrar tempos/PWM; sem valores presumidos |
+| 4 — Separador | ⏭️ Pendente | Prioridade: validar código e movimento em hardware |
+| 5 — Documentação | 🔄 Em atualização | Consolidar os resultados reais nos documentos e cards |
 
 **Falhas e linhas de erro capturadas:** _(nenhuma registrada)_
 
