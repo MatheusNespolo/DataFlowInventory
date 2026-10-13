@@ -193,7 +193,7 @@ Regras:
 
 > **Pré-requisito:** portão do Bloco 3 (validação e calibração) aprovado.
 >
-> **Situação do código:** o firmware v3.0 **não ativa** o separador. O rascunho do `.ino` da v2.x (commit `15922e7`) está registrado, todo comentado, em `src/hw/separador.*` e `config.h`, e **não será testado nesta semana**: motor de passo 28BYJ-48 + driver ULN2003 nos pinos D5–D8, 2048 passos por volta (a confirmar), três posições (0°, 120° e 240°). A estrutura modular já tem o registro; decida na integração se ele será reaproveitado (atenção ao `Stepper::step()` bloqueante contra o watchdog de 2 s).
+> **Situação do código:** o firmware v3.0 **não ativa** o separador. O rascunho do `.ino` da v2.x (commit `15922e7`) está registrado, todo comentado, em `src/hw/separador.*` e `config.h`, e **não será testado nesta semana**: motor de passo 28BYJ-48 + driver ULN2003 nos pinos D5–D8, 2048 passos por volta (a confirmar), três posições (0°, 120° e 240°). O registro já está na estrutura modular e foi refeito **sem bloqueio** (`Stepper::step()` espera ativamente e estouraria o watchdog de 2 s); a lógica do giro tem testes no PC (`src/logica/plano_separador.*`), mas o hardware não foi testado. Ao integrar: alimentar o ULN2003 com 5 V próprios, alinhar a roda à mão (não há sensor de referência) e seguir a ordem de ativação de `src/hw/separador.h`.
 >
 > **Restrições:** o Uno já usa D2, D4, D9–D11, A0–A3 (sensores e motores) e A4/A5 (I²C do LCD); D5–D8 estão livres. A integração não pode bloquear o loop (o watchdog é de 2 s).
 

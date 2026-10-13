@@ -23,8 +23,10 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 - **Separador (roda giratória): código do firmware v2.x devolvido como registro, todo comentado**
   - Novos `src/hw/separador.h` e `src/hw/separador.cpp` (declarações e implementação comentadas), bloco comentado de pinos e posições em `config.h` (28BYJ-48 + ULN2003 nos pinos 5 a 8, 2048 passos por volta, posições 0°/120°/240°) e chamadas comentadas no `data_flow_inventory.ino`
-  - **Sem efeito no firmware:** compilado antes e depois, o Uno usa os mesmos 14510 bytes de flash (44%) e 951 de RAM (46%). **Sem testes**, nesta semana: nunca foi compilado nem validado em bancada
-  - **Aviso registrado nos arquivos:** `Stepper::step()` bloqueia (~2 s para 120° a 10 RPM) e o watchdog da v3.0 é de 2 s; ao habilitar, girar em fatias curtas ou alimentar o watchdog
+  - **Sem efeito no firmware:** compilado antes e depois, o Uno usa os mesmos 14510 bytes de flash (44%) e 951 de RAM (46%). **Sem testes em bancada nesta semana:** o giro nunca foi validado em hardware
+  - **Giro sem bloqueio, para o watchdog não reiniciar o Uno:** `Stepper::step()` é uma espera ativa (confirmado no código da biblioteca): a 10 RPM, 120° levam ~2 s, o mesmo do watchdog. A camada de hardware registrada foi refeita para dar no máximo 1 passo por volta do `loop()`, nunca em rajada, e soltar as bobinas depois de 0,5 s parada (e no ISR do watchdog)
+  - **Lógica testada no PC:** novo `src/logica/plano_separador.*` com 10 testes em `test/firmware_uno/teste_separador.cpp` (caminho mais curto, 1 passo por chamada, intervalo mínimo entre passos, mudança de alvo no meio do giro, estouro do `micros()`, atraso do loop e bobinas): a suíte do firmware passa de 43 para 53 testes. O módulo ainda não é usado pelo firmware, então o Uno segue com os mesmos 14510 bytes de flash e 951 de RAM; com tudo descomentado (verificado só como compilação), compila sem avisos em 16348 bytes (50%) e 1002 de RAM (48%)
+  - **Ainda em aberto, registrado em `src/hw/separador.h`:** sem sensor de referência (a posição se perde em reinício), motor de passo com 5 V próprios (~240 mA) e o momento do giro em relação à chegada da peça; o giro **nunca foi testado em hardware**
   - Corrige a documentação que dizia que o rascunho existia só no histórico do git (`ARCHITECTURE.md`, `INTEGRATION_GUIDE.md`, board e roteiro da Semana 8)
 
 ### Alterado

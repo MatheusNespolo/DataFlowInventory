@@ -243,7 +243,7 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 
 ### 6.2 Separador — Roda de Separação
 
-**Status:** ⬜ **PENDENTE** — não há código ativo na v3.0 do firmware Uno. O trecho antigo (`Stepper.h`, `moverSeparador`) está registrado, **todo comentado e nunca testado**, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h`, com as chamadas comentadas no `.ino`. Atenção ao habilitar: `Stepper::step()` bloqueia (~2 s para 120° a 10 RPM) e o watchdog da v3.0 é de 2 s. A integração depende da mecânica (Semana 8, Bloco 4).
+**Status:** ⬜ **PENDENTE** — não há código ativo na v3.0 do firmware Uno. O trecho antigo (`Stepper.h`, `moverSeparador`) está registrado, **todo comentado e nunca testado**, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h`, com as chamadas comentadas no `.ino`. O giro foi redesenhado **sem bloqueio** para não estourar o watchdog de 2 s: `Stepper::step()` espera ativamente (~2 s para 120° a 10 RPM), então a lógica `src/logica/plano_separador.*` (testada no PC) dá no máximo 1 passo por volta do loop e solta as bobinas parado. Em aberto: não há sensor de referência (a posição se perde em reinício), o motor deve ter alimentação de 5 V própria e o giro nunca foi testado em hardware. A integração depende da mecânica (Semana 8, Bloco 4).
 
 **Hardware:** Motor 28BYJ-48 + ULN2003 (pinos 5-8)  
 **Integração:** Nova etapa FSM após ENTREGANDO_PECA

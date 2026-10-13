@@ -107,8 +107,8 @@ void loop() {
 
   for (uint8_t i = 0; i < out.nEventos; i++) {
     publicarEvento(out.eventos[i], fsm, agora);
-    // Separador: DESABILITADO. Na confirmação da entrega, giraria a roda até o
-    // compartimento da peça (Stepper bloqueia; ver src/hw/separador.h).
+    // Separador: DESABILITADO. Na confirmação da entrega, pediria o giro até o
+    // compartimento da peça (sem bloquear; ver src/hw/separador.h).
     // if (out.eventos[i].tipo == EV_ENTREGA) separadorMoverPara(out.eventos[i].peca);
   }
 
@@ -131,6 +131,9 @@ void loop() {
     textoTela(fsm, l1, l2);
     lcdAtualizar(l1, l2);
   }
+
+  // Separador: DESABILITADO. Dá no máximo 1 passo por volta do loop (sem bloquear).
+  // separadorAtualizar(micros());
 
   // De novo depois da serial e do LCD: no ciclo da partida, o kick de 255
   // termina no tempo certo mesmo que a publicação tenha demorado.
