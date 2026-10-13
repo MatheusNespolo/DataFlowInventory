@@ -1,7 +1,7 @@
 # Guia de Integração — Beckhoff CX9240 (Historiador SQLite) + Separador (Roda de Separação)
 
 > **Passo a passo para integração final com PC industrial e roda de separação**  
-> ⚠️ **Status:** a §1 (CX9240) está parcialmente validada. A §2 (separador) é **pendente**: o código da §2.3 é da v2.x e não existe na v3.0 do firmware Uno.
+> ⚠️ **Status:** a §1 (CX9240) está parcialmente validada. A §2 (separador) é **pendente**: o código da §2.3 é da v2.x; na v3.0 do firmware Uno ele está só registrado, comentado, em `src/hw/separador.*` e `config.h`, sem teste.
 > Data: 14/09/2026 · Sprint 5
 
 ---

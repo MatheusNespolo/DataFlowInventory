@@ -157,7 +157,7 @@ flowchart LR
 **Robustez:** watchdog de 2 s (o Uno reinicia sozinho se o loop travar; quando o watchdog avisa a trava, os motores são desligados na hora, antes do reset); o LCD é procurado em 0x27 e 0x3F e, se não responder, o sistema segue sem ele (se o barramento I²C travar durante a operação, o LCD é desligado em vez de travar o loop); a confirmação da junção ignora uma ocupação que começou antes da partida do motor; o estoque não é persistido (volta a 15 no boot) e o campo `reset` do `inicio` diz por que o Uno reiniciou. Abrir a Serial Monitor reinicia o Uno (auto-reset da USB), o que aparece como `reset: reinicio`.
 
 **Decisões de projeto da v3.0** (registradas na revisão de código de 03/10/2026):
-- **Código antigo fora do `.ino`:** o trecho comentado de botões físicos e do separador não foi levado para a v3.0. Continua no histórico do git (firmware v2.1; o commit `fddde08` serve de rollback para a v2.x).
+- **Código antigo fora do `.ino`:** o trecho comentado dos botões físicos não foi levado para a v3.0 e continua só no histórico do git (firmware v2.1; o commit `fddde08` serve de rollback para a v2.x). O do separador foi devolvido **comentado**, como registro, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h` (nada é compilado).
 - **Nenhum débito sem passagem:** o estoque só é debitado com uma passagem de pelo menos 20 ms na junção da esteira pedida, iniciada depois da partida do motor. Duas brechas foram fechadas além do plano inicial: a interrupção marcar a ocupação depois da leitura do relógio e uma junção ocupada entre a checagem prévia e a partida. Um pulso que atravessa a partida também não confirma. O teste dessa regra varre combinações de peça, junção, largura e instante.
 - **LCD é opcional:** se o I²C travar em operação, o LCD é desligado e o sistema segue.
 - **Saída segura:** a interrupção do watchdog (`WDT_vect`) desliga os motores antes do reset.
@@ -243,7 +243,7 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 
 ### 6.2 Separador — Roda de Separação
 
-**Status:** ⬜ **PENDENTE** — não há código ativo na v3.0 do firmware Uno. O trecho antigo (`Stepper.h`, `moverSeparador`) existe só no histórico do git (firmware v2.x). A integração depende da mecânica (Semana 8, Bloco 4).
+**Status:** ⬜ **PENDENTE** — não há código ativo na v3.0 do firmware Uno. O trecho antigo (`Stepper.h`, `moverSeparador`) está registrado, **todo comentado e nunca testado**, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h`, com as chamadas comentadas no `.ino`. O giro foi redesenhado **sem bloqueio** para não estourar o watchdog de 2 s: `Stepper::step()` espera ativamente (~2 s para 120° a 10 RPM), então a lógica `src/logica/plano_separador.*` (testada no PC) dá no máximo 1 passo por volta do loop e solta as bobinas parado. Em aberto: não há sensor de referência (a posição se perde em reinício), o motor deve ter alimentação de 5 V própria e o giro nunca foi testado em hardware. A integração depende da mecânica (Semana 8, Bloco 4).
 
 **Hardware:** Motor 28BYJ-48 + ULN2003 (pinos 5-8)  
 **Integração:** Nova etapa FSM após ENTREGANDO_PECA
