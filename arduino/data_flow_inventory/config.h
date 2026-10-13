@@ -29,8 +29,23 @@
 #define LCD_ENDERECO_1 0x27
 #define LCD_ENDERECO_2 0x3F
 
+// ---- Separador (roda giratória) — REGISTRO, NÃO ATIVO ------------------------
+// Motor de passo 28BYJ-48 + driver ULN2003 (4 fios IN1-IN4). Pinos 5 a 8:
+// sequenciais e livres no Uno. Valores do firmware v2.x, nunca testados em
+// bancada; veja src/hw/separador.h antes de habilitar.
+// #define STEPPER_IN1        5      // [HABILITAR]
+// #define STEPPER_IN2        6      // [HABILITAR]
+// #define STEPPER_IN3        7      // [HABILITAR]
+// #define STEPPER_IN4        8      // [HABILITAR]
+// #define STEPS_PER_REV      2048   // 28BYJ-48 em passo completo; conferir no datasheet do driver usado
+// #define SEPARADOR_RPM      10     // velocidade do giro; ajustar conforme o torque necessário
+// #define SEPARADOR_POSICAO_INICIAL  0                          // 0°   — compartimento neutro
+// #define SEPARADOR_POSICAO_A        (STEPS_PER_REV / 3)        // 120° — compartimento A
+// #define SEPARADOR_POSICAO_B        ((STEPS_PER_REV * 2) / 3)  // 240° — compartimento B
+// #define SEPARADOR_POSICAO_C        0                          // 0°   — compartimento C (mesmo ponto do neutro; ajustar ao layout físico)
+
 // ---- Sistema -----------------------------------------------------------------
-#define ESTOQUE_INICIAL        15     // peças de cada tipo ao ligar (não persiste)
+#define ESTOQUE_INICIAL       15     // peças de cada tipo ao ligar (não persiste)
 #define INTERVALO_AMOSTRA_MS   5      // amostragem dos sensores
 #define FILTRO_TOPO_MS         20     // estabilidade exigida no sensor de topo
 #define INTERVALO_PUBLICACAO   1000   // ciclo das mensagens periódicas

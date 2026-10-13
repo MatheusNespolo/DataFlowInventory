@@ -193,7 +193,7 @@ Regras:
 
 > **Pré-requisito:** portão do Bloco 3 (validação e calibração) aprovado.
 >
-> **Situação do código:** o firmware v3.0 **não inclui** o separador. O rascunho existe só no histórico do git, comentado no `.ino` da v2.x (commit `15922e7`): motor de passo 28BYJ-48 + driver ULN2003 nos pinos D5–D8, 2048 passos por volta (a confirmar), três posições (0°, 120° e 240°). Decida se o rascunho será reaproveitado na estrutura modular da v3.0.
+> **Situação do código:** o firmware v3.0 **não ativa** o separador. O rascunho do `.ino` da v2.x (commit `15922e7`) está registrado, todo comentado, em `src/hw/separador.*` e `config.h`, e **não será testado nesta semana**: motor de passo 28BYJ-48 + driver ULN2003 nos pinos D5–D8, 2048 passos por volta (a confirmar), três posições (0°, 120° e 240°). A estrutura modular já tem o registro; decida na integração se ele será reaproveitado (atenção ao `Stepper::step()` bloqueante contra o watchdog de 2 s).
 >
 > **Restrições:** o Uno já usa D2, D4, D9–D11, A0–A3 (sensores e motores) e A4/A5 (I²C do LCD); D5–D8 estão livres. A integração não pode bloquear o loop (o watchdog é de 2 s).
 

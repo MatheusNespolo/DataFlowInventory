@@ -19,6 +19,14 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - 8 testes novos: 3 em `comandos-recusados` (sistema ocupado, peça inválida, rate limit), 1 em `sem-estoque`, 1 de reconexão em `resiliencia` e 3 em `api-status` (503 do servidor sem broker, recusa com broker offline, 404 do simulador). Suíte serial (`workers: 1`), portas 3100–3102; em CI, 1 retentativa e `maxFailures: 3`
   - **Validação parcial:** uma execução registrou 31 testes passando e 2 falhas; os testes novos e o cenário de rate limit passaram isoladamente. A suíte completa **ainda não foi reexecutada** após a última correção, portanto não há confirmação de execução totalmente verde
 
+### Adicionado
+
+- **Separador (roda giratória): código do firmware v2.x devolvido como registro, todo comentado**
+  - Novos `src/hw/separador.h` e `src/hw/separador.cpp` (declarações e implementação comentadas), bloco comentado de pinos e posições em `config.h` (28BYJ-48 + ULN2003 nos pinos 5 a 8, 2048 passos por volta, posições 0°/120°/240°) e chamadas comentadas no `data_flow_inventory.ino`
+  - **Sem efeito no firmware:** compilado antes e depois, o Uno usa os mesmos 14510 bytes de flash (44%) e 951 de RAM (46%). **Sem testes**, nesta semana: nunca foi compilado nem validado em bancada
+  - **Aviso registrado nos arquivos:** `Stepper::step()` bloqueia (~2 s para 120° a 10 RPM) e o watchdog da v3.0 é de 2 s; ao habilitar, girar em fatias curtas ou alimentar o watchdog
+  - Corrige a documentação que dizia que o rascunho existia só no histórico do git (`ARCHITECTURE.md`, `INTEGRATION_GUIDE.md`, board e roteiro da Semana 8)
+
 ### Alterado
 
 - **Diagrama elétrico: rótulo do driver da esteira C corrigido (08/10/2026)**

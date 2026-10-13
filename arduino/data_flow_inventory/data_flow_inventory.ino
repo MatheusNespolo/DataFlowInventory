@@ -21,8 +21,9 @@
 //
 // Comunicação com o ESP32 (Serial 9600): mensagens JSON idênticas às do
 // firmware v2.x, com campos opcionais novos. Comandos: CMD:PECA:X, CMD:RESET.
-// Botões físicos e separador (motor de passo) seguem desabilitados; o código
-// antigo deles está no histórico do Git (firmware v2.1).
+// Botões físicos e separador (motor de passo) seguem desabilitados. O código do
+// separador está registrado, comentado, em src/hw/separador.* e config.h; o dos
+// botões está só no histórico do Git (firmware v2.1).
 // ============================================================
 
 #include "config.h"
@@ -31,6 +32,7 @@
 #include "src/hw/lcd.h"
 #include "src/hw/motores.h"
 #include "src/hw/sensores.h"
+// #include "src/hw/separador.h"   // [HABILITAR] separador — ver src/hw/separador.h
 #include "src/logica/fsm.h"
 #include "src/logica/telas.h"
 #include "src/logica/texto_flash.h"
@@ -67,6 +69,9 @@ void setup() {
   lcdAtualizar("Data Flow", "Inventory v" VERSAO_FIRMWARE);
   aberturaMs = millis();  // lcdIniciar leva ~1 s: a abertura conta daqui
 
+  // Separador (roda giratória): DESABILITADO — motor de passo ainda não montado.
+  // separadorIniciar();   // [HABILITAR] depois de resolver o aviso do watchdog
+
   fsmIniciar(fsm, PARAMS, ESTOQUE_INICIAL);
 
   // Mesma ordem do firmware v2.x: estoque inicial e depois o evento de início.
@@ -100,7 +105,12 @@ void loop() {
   for (uint8_t i = 0; i < 3; i++) desejado[i] = fsmMotorLigado(fsm, i);
   motoresAplicar(desejado, PARAMS, agora);
 
-  for (uint8_t i = 0; i < out.nEventos; i++) publicarEvento(out.eventos[i], fsm, agora);
+  for (uint8_t i = 0; i < out.nEventos; i++) {
+    publicarEvento(out.eventos[i], fsm, agora);
+    // Separador: DESABILITADO. Na confirmação da entrega, giraria a roda até o
+    // compartimento da peça (Stepper bloqueia; ver src/hw/separador.h).
+    // if (out.eventos[i].tipo == EV_ENTREGA) separadorMoverPara(out.eventos[i].peca);
+  }
 
   // Publicação periódica escalonada: uma mensagem a cada 250 ms, cada uma
   // 1x por segundo (evita prender o loop na serial de 9600 baud).
