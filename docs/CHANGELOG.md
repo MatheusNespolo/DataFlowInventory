@@ -17,6 +17,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 - **Status de validação/documentação (13/10/2026):** registrado o sucesso da validação em bancada do firmware Uno v3.0 (itens 1.1–1.11 e Bloco 2; B/C funcionando), sem presumir medições não fornecidas nem concluir o teste integrado A+B+C/calibração. README, arquitetura, guia de integração e plano de testes atualizados para separar resultados concluídos de pendências.
 - **Planejamento:** criados os roteiros da Semana 9 (14–18/10; separador prioritário e tarefas opcionais de fim de semana para Data Flow System/CX9240) e Semana 10 (19–23/10; A+B+C, calibração e fechamento condicional do separador).
 - **Separador:** guia deixa explícito que a ativação documentada é legado v2.x, não aplicável diretamente à v3.0; validação física e integração seguem pendentes.
+- **Diagrama 3D do mímico:** objeto do separador no fim da esteira principal reorientado de cilindro horizontal (roda-gigante) para vertical (tipo balde), com a base assentada na bancada; comentário do `diagrama3d.js` e rótulo do SVG de fallback no `index.html` atualizados de "Roda de Estoque" para "Separador", alinhando a terminologia do dashboard à usada no firmware e na documentação.
 
 
 ### Adicionado

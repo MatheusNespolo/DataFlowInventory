@@ -102,13 +102,12 @@ function init() {
   secC.corLigada = new THREE.Color(corC);
   [secA, secB, secC].forEach((s) => mundo.add(s.mesh));
 
-  // Roda de estoque (fim da principal)
+  // Separador (cilindro vertical tipo balde, fim da principal)
   const roda = new THREE.Mesh(
     new THREE.CylinderGeometry(0.72, 0.72, 0.55, 32),
     new THREE.MeshStandardMaterial({ color: 0x2b2f3a, roughness: 0.5, metalness: 0.5 })
   );
-  roda.rotation.z = Math.PI / 2;
-  roda.position.set(3.75, 0.42, 1.0);
+  roda.position.set(3.97, 0.275, 1.0);
   roda.castShadow = true;
   mundo.add(roda);
 
