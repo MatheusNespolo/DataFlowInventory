@@ -2,7 +2,9 @@
 
 Este documento define os testes de integração da cadeia de comunicação do sistema, do link Serial (Arduino ↔ ESP32) até o teste End-to-End (Dashboard ↔ Arduino).
 
-**Situação de validação atualizada em 13/10/2026:** firmware Uno v3.0 validado em bancada; itens 1.1–1.11 e Bloco 2 concluídos, e B/C funcionando com o firmware novo. Integração A+B+C com calibração e separador permanecem pendentes. Consulte os roteiros da [Semana 8 (resultados)](roteiros/semana_08_05-09_outubro.md), [Semana 9 (14–18/10)](roteiros/semana_09_14-18_outubro.md) e [Semana 10 (19–23/10)](roteiros/semana_10_19-23_outubro.md).
+**Situação de validação atualizada (bancada, 18/10/2026):** firmware Uno v3.0 validado em bancada; itens 1.1–1.11 e Bloco 2 concluídos, e B/C funcionando com o firmware novo. A calibração A/B/C (parâmetros `pwmRegime`/`kickMs`) está registrada e funciona em operação simultânea **como relato** (commit `e3c8833`).
+
+**Pendências/retestes:** (1) Bloco 3 ainda sem entrega de tempos/ciclos/dispersão para preenchimento (não converter plano em aprovação), (2) LCD I2C com falha elétrica (`i2c_n=0`) — precisa troca e reteste após a troca, (3) separador **automático** não foi validado em hardware (PC/lógica apenas). Consulte os roteiros da [Semana 8 (resultados)](roteiros/semana_08_05-09_outubro.md), [Semana 9 (14–18/10)](roteiros/semana_09_14-18_outubro.md) e [Semana 10 (19–23/10)](roteiros/semana_10_19-23_outubro.md).
 
 **Documentos relacionados:**
 - 🧪 [`broker_local_mosquitto.md`](../broker_local_mosquitto.md) — Instalação e configuração do broker local
@@ -21,7 +23,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | **1** | **Serial Arduino ↔ ESP32** | Arduino Uno + ESP32 + divisor de tensão | Arduino publica status via Serial → ESP32 recebe | ESP32 imprime JSON recebido no monitor serial ✅ **(CONCLUÍDO)** |
 | **B1** | **Bancada 3.1 — Ciclo completo** | Arduino Uno + IRF520 + 1 esteira + 1 TCRT5000 | Solicitar peça A → acionar motor → sensor detecta saída → parar motor | Ciclo completo funcionando |
 | **B2** | **Bancada 3.2 — Sem estoque** | Mesma montagem do B1 | Solicitar peça B/C (inexistente) → retorna "peca_indisponivel" | Resposta de erro correta + recuperação via reset |
-| **B3** | **Bancada 3.3 — LCD I2C** | Arduino Uno + LCD 16x2 I2C | Exibir estoque e status no display | LCD mostra informações legíveis |
+| **B3** | **Bancada 3.3 — LCD I2C** | Arduino Uno + LCD 16x2 I2C | Exibir estoque e status no display | LCD mostra informações legíveis (reteste após troca; causa elétrica `i2c_n=0`) |
 | 2 | ESP32 → Broker → Node.js | Item 1 + PC com Mosquitto + server Node | ESP32 publica no broker → Node.js recebe | Mensagem aparece nos logs do servidor |
 | 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / LCD) |
 | 4 | End-to-End (Dashboard) | Item 2 + navegador | Clicar no dashboard → Arduino executa → dashboard atualiza | Ciclo completo pedido → entrega refletido na UI |

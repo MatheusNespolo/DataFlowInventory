@@ -108,7 +108,7 @@ Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor ser
 **5 estados** (firmware v3.0 — código em `arduino/data_flow_inventory/src/logica/fsm.cpp`):
 1. **AGUARDANDO_PEDIDO** → recebe comando
 2. **VERIFICANDO_ESTOQUE** → checagem prévia, sem ligar o motor: contador > 0, peça no sensor do topo, junção livre
-3. **ACIONANDO_ESTEIRA** → liga o motor da esteira escolhida (kick-start em PWM 255 por 150 ms, depois o PWM de regime da esteira)
+3. **ACIONANDO_ESTEIRA** → liga o motor da esteira escolhida (kick-start em **PWM 255** por **kickMs**; por esteira: **A=180 ms, B=130 ms, C=180 ms**) e depois aplica o **PWM de regime** da própria esteira (**A=225, B=200, C=230**), parâmetros calibrados em bancada no commit `e3c8833`.
 4. **ENTREGANDO_PECA** → supervisão por marcos (abaixo); o estoque é debitado na confirmação da junção
 5. **ERRO** → motores desligados a cada ciclo; só sai com `CMD:RESET`
 

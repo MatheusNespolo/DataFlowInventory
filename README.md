@@ -259,7 +259,7 @@ O Arduino opera com **5 estados**:
 |---|--------|-----------|
 | 1 | **AGUARDANDO_PEDIDO** | Sistema em repouso, aguarda comandos remotos (botões físicos desabilitados) |
 | 2 | **VERIFICANDO_ESTOQUE** | Verifica sensor do topo + contador interno |
-| 3 | **ACIONANDO_ESTEIRA** | Liga o motor da esteira escolhida (kick-start e depois o PWM de regime) |
+| 3 | **ACIONANDO_ESTEIRA** | Liga o motor da esteira escolhida: kick-start em PWM 255 por **kickMs** (A=180 ms, B=130 ms, C=180 ms) e depois PWM de regime da própria esteira (A=225, B=200, C=230), calibrado em bancada no commit `e3c8833` |
 | 4 | **ENTREGANDO_PECA** | Supervisão por marcos: topo livre em 3 s, junção em 12,5 s (débito na confirmação) e 3 s de saída |
 | 5 | **ERRO** | Motores desligados; LCD e dashboard mostram onde falhou (ver `docs/ARCHITECTURE.md` §3); aguarda reset |
 

@@ -4,7 +4,7 @@
 
 ## Objetivos
 
-1. Completar o Bloco 3: integração A+B+C e calibração com valores medidos.
+1. Completar o Bloco 3: integração A+B+C e registrar a calibração (PWM/kick) de A/B/C; **tempos/ciclos/dispersão** seguem pendentes.
 2. Resolver a validação do separador, condicionada à segurança elétrica e à aprovação mecânica isolada conforme o [roteiro da Semana 9](semana_09_14-18_outubro.md).
 3. Consolidar resultados opcionais de Data Flow System e CX9240 feitos no fim de semana anterior.
 
@@ -14,7 +14,7 @@
 |---|---|---|
 | **19/10 (seg.)** | Revisar evidências da Semana 9, montagem e pré-voo; inspecionar reinstalação do IRF520 definitivo da C. | Checklist de segurança e configuração; adiar energização se pinagem/alimentação não estiverem confirmadas. |
 | **20/10 (ter.)** | Testes integrados A+B+C, gradualmente e com uma esteira por vez; verificar sensores, pedidos e erros. | Resultado por esteira e de integração; falhas com mensagens/logs preservados. |
-| **21/10 (qua.)** | Calibração de A/B/C: medir repetidamente tempo topo → junção e ajustar PWM de forma controlada. | Tabela de medições e configuração antes/depois; não substituir limites sem justificativa. |
+| **21/10 (qua.)** | Calibração de A/B/C (relato): registrar `pwmRegime`/`kickMs` calibrados em bancada (`e3c8833`); **sem** preencher tempos/ciclos/dispersão ainda. | Tabela de medições (pendente de tempos topo → junção e dispersão); não substituir limites sem evidência. |
 | **22/10 (qui.)** | Repetição de cenários instáveis; separador: teste/integracão somente se os critérios da Semana 9 foram aprovados. | Evidência de estabilidade ou bloqueio explícito. |
 | **23/10 (sex.)** | Fechamento, atualizar plano de testes, arquitetura/guia de integração e changelog conforme fatos; encaminhar pendências. | Registros consistentes e referências cruzadas atualizadas. |
 
@@ -30,13 +30,20 @@ Pré-requisitos: firmware v3.0 já validado; verificar alimentação, GND comum,
 - [ ] Calibrar PWM gradualmente e registrar valor anterior/novo; manter tempo de trânsito compatível com os marcos configurados e margem para o timeout M2 de 12,5 s.
 - [ ] Conferir se entrega/estoque/eventos permanecem consistentes após sequências repetidas.
 
+> ✅ **Calibração registrada (commit `e3c8833`, 18/10):**
+> - **A:** `pwmRegime=225` e `kickMs=180 ms`
+> - **B:** `pwmRegime=200` e `kickMs=130 ms`
+> - **C:** `pwmRegime=230` e `kickMs=180 ms`
+>
+> ⬜ **Pendentes (para preencher a tabela):** tempos topo → junção, dispersão e número de ciclos (Bloco 3).
+
 | Esteira | PWM antes | PWM validado | Tempos medidos (ms) | Ciclos | Status/observações |
 |---|---:|---:|---|---:|---|
 | A |  |  |  |  |  |
 | B |  |  |  |  |  |
 | C |  |  |  |  |  |
 
-**Portão do Bloco 3:** [ ] três esteiras individualmente aprovadas · [ ] integração A+B+C aprovada · [ ] medições/calibração registradas · [ ] falhas e resets documentados. Aprovado por/data: __________.
+**Portão do Bloco 3:** [ ] três esteiras individualmente aprovadas · [ ] integração A+B+C aprovada · [ ] medições/calibração registradas (calibração PWM/kick ✅; tempos/ciclos/dispersão ⬜) · [ ] falhas e resets documentados. Aprovado por/data: __________.
 
 ## Separador
 
@@ -51,4 +58,10 @@ Executar apenas se a frente isolada do roteiro da Semana 9 foi aprovada. Não at
 
 ## Fechamento e evidências
 
-Anexar logs Serial/MQTT relevantes, configuração de hardware, firmware/commit, dados de calibração e evidência do CX9240/Data Flow System conforme executados. Marcar cada item como aprovado, falhou, bloqueado ou não executado. Atualizar [`plano_de_testes.md`](../plano_de_testes.md), [`ARCHITECTURE.md`](../../ARCHITECTURE.md), [`INTEGRATION_GUIDE.md`](../../INTEGRATION_GUIDE.md) e [`CHANGELOG.md`](../../CHANGELOG.md) sem converter planos em resultados.
+Anexar logs Serial/MQTT relevantes, configuração de hardware, firmware/commit (ex.: `e3c8833`), dados de calibração e evidência do CX9240/Data Flow System conforme executados. Marcar cada item como aprovado, falhou, bloqueado ou não executado.
+
+Também incluir:
+- **LCD:** registrar `lcd_end`/`i2c_n`/`lcd_quedas` do `status` antes e após a troca do módulo (causa elétrica `i2c_n=0`).
+- **Separador automático:** registrar como **não executado/pendente** se não houver evidências em hardware.
+
+Atualizar [`plano_de_testes.md`](../plano_de_testes.md), [`ARCHITECTURE.md`](../../ARCHITECTURE.md), [`INTEGRATION_GUIDE.md`](../../INTEGRATION_GUIDE.md) e [`CHANGELOG.md`](../../CHANGELOG.md) sem converter planos em resultados.

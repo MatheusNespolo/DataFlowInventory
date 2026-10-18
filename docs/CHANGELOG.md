@@ -18,6 +18,11 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 - **Planejamento:** criados os roteiros da Semana 9 (14–18/10; separador prioritário e tarefas opcionais de fim de semana para Data Flow System/CX9240) e Semana 10 (19–23/10; A+B+C, calibração e fechamento condicional do separador).
 - **Separador:** guia deixa explícito que a ativação documentada é legado v2.x, não aplicável diretamente à v3.0; validação física e integração seguem pendentes.
 - **Diagrama 3D do mímico:** objeto do separador no fim da esteira principal reorientado de cilindro horizontal (roda-gigante) para vertical (tipo balde), com a base assentada na bancada; comentário do `diagrama3d.js` e rótulo do SVG de fallback no `index.html` atualizados de "Roda de Estoque" para "Separador", alinhando a terminologia do dashboard à usada no firmware e na documentação.
+- **Calibração de esteiras (bancada) — commit `e3c8833` (18/10/2026):** registro dos parâmetros por esteira no firmware Uno v3.0:
+  - **A:** `pwmRegime=225` e `kickMs=180 ms`
+  - **B:** `pwmRegime=200` e `kickMs=130 ms`
+  - **C:** `pwmRegime=230` e `kickMs=180 ms`
+  - Marcos M1/M2/M3 e pulso mínimo não foram alterados por este commit (apenas ajuste de `pwmRegime`/`kickMs`).
 
 
 ### Adicionado
