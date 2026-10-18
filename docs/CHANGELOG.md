@@ -29,6 +29,15 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **LCD: busca de endereço, recuperação em operação e diagnóstico (18/10/2026)**
+  - **Motivo:** na bancada o display mostra só quadrados pretos na primeira linha e o `inicio` traz `lcd: false`, ou seja, o controlador do display tem energia, mas o Uno não recebeu resposta do módulo I²C em 0x27 nem em 0x3F. Revisão do código: a sondagem era uma tentativa só e só em dois endereços, e **um único timeout de I²C desligava o LCD para sempre** (ele só voltava reiniciando o Uno, e o `inicio` continuava dizendo `lcd: true`)
+  - **Busca de endereço:** o firmware varre o barramento (0x08–0x77) e usa o módulo que responder em qualquer endereço de expansor (0x20–0x27 ou 0x38–0x3F; 0x27 e 0x3F primeiro). Com o barramento preso, a varredura desiste no primeiro timeout (25 ms)
+  - **Recuperação:** se o LCD sumir (ruído de motor, mau contato) ou não responder no boot, o firmware tenta religá-lo **só com o sistema parado** (`AGUARDANDO_PEDIDO` ou `ERRO`, nenhum motor ligado), a cada 5 s, dobrando até 60 s se não adiantar (`LCD_RECUPERACAO_BASE_MS`/`MAX_MS` em `config.h`). Religar leva ~1 s por causa do `delay(1000)` da biblioteca; o watchdog é alimentado antes e depois
+  - **Diagnóstico:** o `status` ganha os campos opcionais `lcd_end` (endereço em uso, `0` = LCD fora), `i2c_n` (dispositivos vistos no barramento) e `lcd_quedas`. As mensagens existentes seguem idênticas quando os campos não são informados (testes de contrato). O pior caso do `status` fica em ≤ 150 B (buffer de 160 B; uma mensagem que estoura é descartada inteira) e bem abaixo do `StaticJsonDocument<512>` do ESP32
+  - **Testes (PC):** a suíte do firmware passa de 53 para **73 testes**, e agora compila o `src/hw/lcd.cpp` real contra um I²C e uma biblioteca de LCD de mentira (`test/firmware_uno/mocks/`): endereços, barramento preso, timeout na inicialização, queda em operação, religamento e redesenho. Reintroduzi de propósito os dois defeitos originais e os testes falharam
+  - **Uno:** 15182 bytes de flash (47%, +672) e 957 de RAM (46%, +6); abaixo do limite de 65% do CI
+  - **Não validado em hardware:** a recuperação e a busca de endereço só foram testadas no PC. Se o módulo da bancada não falar com o Uno (`i2c_n: 0`), o defeito é elétrico e nenhum software resolve; ver o passo 1 de `docs/testes/roteiros/firmware_uno_v3_validacao.md`
+
 - **Separador (roda giratória): código do firmware v2.x devolvido como registro, todo comentado**
   - Novos `src/hw/separador.h` e `src/hw/separador.cpp` (declarações e implementação comentadas), bloco comentado de pinos e posições em `config.h` (28BYJ-48 + ULN2003 nos pinos 5 a 8, 2048 passos por volta, posições 0°/120°/240°) e chamadas comentadas no `data_flow_inventory.ino`
   - **Sem efeito no firmware:** compilado antes e depois, o Uno usa os mesmos 14510 bytes de flash (44%) e 951 de RAM (46%). **Sem testes em bancada nesta semana:** o giro nunca foi validado em hardware

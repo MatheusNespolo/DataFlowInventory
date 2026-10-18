@@ -12,7 +12,15 @@ Ferramentas: Serial Monitor (9600 baud) **ou** `test/mqtt_probe` (com o ESP32 co
 
 1. Ligue o Uno.
 2. **Esperado** (se o Uno já estava ligado e foi reiniciado pela USB, `reset` pode ser `"reinicio"`): a linha `{"type":"evento","evento":"inicio",...,"versao":"3.0",...,"reset":"energia","lcd":true|false,"ram_livre":N}`.
-3. Anote `lcd` (se `false`, o LCD não respondeu em 0x27 nem 0x3F: confira 5 V, GND, SDA=A4, SCL=A5) e `ram_livre`.
+3. Anote `lcd` e `ram_livre`. Se `lcd` for `false`, leia a mensagem `"type":"status"` (sai a cada segundo) e use `lcd_end` e `i2c_n` para localizar o defeito:
+
+| `i2c_n` | `lcd_end` | O que significa | O que fazer |
+|---|---|---|---|
+| `0` | `0` | Nada responde no barramento | Confira SDA=A4, SCL=A5 (sem inverter), solda dos 4 pinos do módulo, 5 V e GND. Quadrados pretos na 1ª linha com isso = display com energia, mas o módulo I²C não fala com o Uno |
+| `1` ou mais | `0` | O barramento está vivo, mas o módulo de LCD não está em 0x20–0x27 nem 0x38–0x3F | O módulo pode ser de outro tipo: rode o scanner de `test/esteira_peca_a/arduino_teste_lcd` e anote o endereço |
+| `1` ou mais | `39` (0x27), `63` (0x3F) ou outro | O LCD foi achado nesse endereço | Se o display continuar em branco, ajuste o contraste (trimpot) e o jumper do backlight |
+
+   Se o LCD apagar depois de uma partida de motor, `lcd_quedas` sobe e o firmware tenta religá-lo sozinho em até alguns segundos, com o sistema parado: confira `lcd_end` voltando a um endereço e anote quantas quedas ocorreram por entrega (mais de uma por entrega indica ruído de motor: diodo 1N4007 nos motores, capacitor em paralelo, fios afastados do I²C).
 
 ## 2. Sensores (antes de qualquer entrega)
 

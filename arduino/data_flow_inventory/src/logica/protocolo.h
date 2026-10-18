@@ -43,7 +43,8 @@ bool leitorAlimentar(LeitorLinha& l, char c);
 // tamanho escrito (sem o 0), ou 0 se não couber.
 // Valores "opcionais": passe -1 (inteiros) ou nullptr (texto) para omitir.
 size_t formatarStatus(char* buf, size_t cap, const char* estado,
-                      int pecaSolicitada, uint32_t uptimeS, long ramLivre);
+                      int pecaSolicitada, uint32_t uptimeS, long ramLivre,
+                      int lcdEnd = -1, int i2cN = -1, int lcdQuedas = -1);
 size_t formatarEstoque(char* buf, size_t cap, const int estoque[3]);
 size_t formatarSensores(char* buf, size_t cap, const bool topo[3],
                         const bool juncao[3]);

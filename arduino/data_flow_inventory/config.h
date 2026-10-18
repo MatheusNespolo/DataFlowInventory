@@ -25,9 +25,14 @@
 #define SENSOR_JUNCAO_J2 2    // PCINT18 (porta D)
 #define SENSOR_JUNCAO_J3 4    // PCINT20 (porta D)
 
-// ---- LCD I2C 16x2 (endereços procurados no boot) ---------------------------
-#define LCD_ENDERECO_1 0x27
-#define LCD_ENDERECO_2 0x3F
+// ---- LCD I2C 16x2 -------------------------------------------------------------
+// O endereço não é fixo: o firmware varre o barramento e usa o módulo que
+// responder em 0x20–0x27 ou 0x38–0x3F (src/logica/lcd_logica.h). Se o LCD sumir
+// (ruído de motor, mau contato), tenta religá-lo com o sistema parado:
+// primeiro depois de LCD_RECUPERACAO_BASE_MS e, se não adiantar, cada vez mais
+// devagar, até LCD_RECUPERACAO_MAX_MS.
+#define LCD_RECUPERACAO_BASE_MS  5000UL
+#define LCD_RECUPERACAO_MAX_MS   60000UL
 
 // ---- Separador (roda giratória) — REGISTRO, NÃO ATIVO ------------------------
 // Motor de passo 28BYJ-48 + driver ULN2003 (4 fios IN1-IN4). Pinos 5 a 8:

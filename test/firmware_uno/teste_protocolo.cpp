@@ -131,3 +131,31 @@ TESTE(leitor_descarta_linha_longa_inteira) {
   VERIFICA(pronto);
   VERIFICA_TEXTO(l.buf, "CMD:RESET");
 }
+
+// ---- Diagnóstico do LCD no status ----------------------------------------------
+
+TESTE(status_com_diagnostico_do_lcd) {
+  char buf[160];
+  formatarStatus(buf, sizeof buf, "AGUARDANDO_PEDIDO", 0, 42, 1097, 39, 1, 0);
+  VERIFICA_TEXTO(buf, "{\"type\":\"status\",\"estado\":\"AGUARDANDO_PEDIDO\",\"pecaSolicitada\":0,\"uptime\":42,\"ram_livre\":1097,\"lcd_end\":39,\"i2c_n\":1,\"lcd_quedas\":0}");
+  // LCD fora: endereço 0 (campo presente), para o dashboard distinguir de "sem informação".
+  formatarStatus(buf, sizeof buf, "ERRO", 2, 7, 900, 0, 0, 3);
+  VERIFICA_TEXTO(buf, "{\"type\":\"status\",\"estado\":\"ERRO\",\"pecaSolicitada\":2,\"uptime\":7,\"ram_livre\":900,\"lcd_end\":0,\"i2c_n\":0,\"lcd_quedas\":3}");
+}
+
+TESTE(status_sem_campos_do_lcd_continua_igual) {
+  char buf[160];
+  formatarStatus(buf, sizeof buf, "ERRO", 2, 7, 900);  // chamada antiga: nada muda
+  VERIFICA_TEXTO(buf, "{\"type\":\"status\",\"estado\":\"ERRO\",\"pecaSolicitada\":2,\"uptime\":7,\"ram_livre\":900}");
+}
+
+// O buffer do Uno tem 160 B e uma mensagem que estoura é DESCARTADA inteira (fim() devolve 0):
+// o pior caso do status precisa caber com folga, e o ESP32 lê cada linha num
+// StaticJsonDocument<512>.
+TESTE(status_pior_caso_cabe_no_buffer_com_folga) {
+  char buf[160];
+  const size_t n = formatarStatus(buf, sizeof buf, "VERIFICANDO_ESTOQUE", 3, 4294967295UL, 2048, 127, 112, 65535);
+  VERIFICA(n > 0);
+  VERIFICA(n <= 150);  // folga de 10 B sobre o buffer de 160
+}
+
