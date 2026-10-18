@@ -243,18 +243,19 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 
 ### 6.2 Separador — Roda de Separação
 
-**Status:** 🟡 **IMPLEMENTADO, NÃO VALIDADO EM BANCADA (18/10/2026).** O firmware Uno v3.0 foi validado em bancada em 13/10/2026; o separador foi implementado depois e testado só no PC (lógica do giro e protocolo) e na compilação. Nunca girou um motor.
+**Status:** 🟡 **IMPLEMENTADO; giro isolado relatado como funcionando; modo automático ainda não validado em bancada (18/10/2026).** O firmware Uno v3.0 foi validado em bancada em 13/10/2026; o separador foi implementado depois e testado no PC (lógica do giro, do modo automático e do protocolo) e na compilação. **Relato da equipe (depois da implementação):** o giro isolado pelos comandos `CMD:SEP:A`, `B` e `C` funcionou; repetibilidade, aquecimento e os demais critérios do roteiro não foram registrados.
 
 - **Ligação:** ULN2003 IN1..IN4 nos pinos **5, 6, 7 e 8** do Uno (livres; fora da serial, dos sensores, do I²C e dos motores DC). Alimentação de 5 V **própria**, com GND comum; nunca pelo 5 V do Uno via USB. Biblioteca `Stepper` 1.1.3.
 - **Não bloqueia:** `Stepper::step()` espera ativamente (~2 s para 120° a 10 RPM, o mesmo tempo do watchdog), então `src/logica/plano_separador.*` (testada no PC) dá no máximo 1 passo por volta do `loop()`, nunca em rajada, e solta as bobinas depois de 0,5 s parada e no ISR do watchdog.
-- **Dois modos:** por padrão só gira pelo comando de bancada `CMD:SEP:A|B|C|0` (Serial Monitor). A rotação automática na confirmação da entrega liga com `SEPARADOR_NA_ENTREGA 1` em `config.h`, depois de validar a roda isolada (roteiro das Semanas 9 e 10).
+- **Automático (padrão, `SEPARADOR_AUTOMATICO 1` em `config.h`):** a roda se prepara de acordo com a peça pedida. Ela parte assim que a checagem prévia aprova o pedido (estado `ACIONANDO_ESTEIRA`), antes de o motor da esteira ligar e bem antes da confirmação da entrega, então tem de ~3 s a 12,5 s (o giro leva ~2 s por 120°) para chegar ao compartimento; um pedido recusado (sem estoque, sem peça, junção obstruída) não gira a roda. Depois da entrega ela **fica** no compartimento (a peça ainda percorre a esteira principal) e só vai a outro no pedido seguinte. Lógica em `src/logica/separador_auto.*` (testada no PC, inclusive com a FSM real). `SEPARADOR_ESPERA_APOS_ENTREGA_MS` (padrão 0) atrasa a troca de compartimento se pedidos seguidos puderem tirar a roda do lugar antes de a peça anterior cair; o tempo da peça na esteira principal **não foi medido**.
+- **Manual:** o comando de bancada `CMD:SEP:A|B|C|0` (Serial Monitor) continua valendo; com `SEPARADOR_AUTOMATICO 0` é o único modo.
 - **Posições:** `SEPARADOR_GRAUS_A/B/C/NEUTRO` em `config.h` (padrão A 120°, B 240°, C e neutro 0°); a roda real define os valores. `SEPARADOR_PASSOS_POR_VOLTA` é 2038 (engrenagem 63,68:1 do 28BYJ-48), e não 2048, para os compartimentos não desalinharem.
 - **Em aberto:** sem sensor de referência (a roda é suposta no neutro ao ligar e a posição se perde em qualquer reinício do Uno); o sentido de giro e o tempo da peça até o fim da esteira principal precisam ser medidos; a rotação em ciclos seguidos muito próximos pode mover a roda antes de a peça anterior chegar.
 
 Procedimento: [`separador_bancada.md`](testes/roteiros/separador_bancada.md).
 
 **Hardware:** Motor 28BYJ-48 + ULN2003 (pinos 5-8)  
-**Integração:** acionado na confirmação da entrega (evento `entrega`, marco M2), fora da FSM e sem bloqueio; desligado por padrão (`SEPARADOR_NA_ENTREGA`)
+**Integração:** a roda se prepara quando a checagem prévia aprova o pedido (fora da FSM e sem bloqueio) e fica no compartimento depois da entrega; `SEPARADOR_AUTOMATICO` em `config.h`
 
 ---
 

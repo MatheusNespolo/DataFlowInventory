@@ -52,11 +52,16 @@
 #define SEPARADOR_RPM      10     // se a roda perder passos ou travar, diminua (ex.: 8)
 // 1 = inverte o sentido do giro: use se a roda girar ao contrário do esperado (A e B trocam de lugar).
 #define SEPARADOR_INVERTER_SENTIDO  0
-// 1 = a roda gira sozinha até o compartimento da peça quando a entrega é confirmada.
-// 0 (padrão) = só gira pelo comando de bancada CMD:SEP:A|B|C|0 no Serial Monitor.
-// Valide a roda ISOLADA (sem a FSM) e só então mude para 1: assim o motor de passo
-// não interfere nos testes das esteiras.
-#define SEPARADOR_NA_ENTREGA  0
+// 1 (padrão) = a roda se prepara sozinha de acordo com a peça pedida: parte assim que
+// a checagem prévia aprova o pedido (antes de o motor da esteira ligar) e FICA no
+// compartimento depois da entrega, até o pedido seguinte.
+// 0 = só gira pelo comando de bancada CMD:SEP:A|B|C|0 no Serial Monitor.
+#define SEPARADOR_AUTOMATICO  1
+// Depois de uma entrega, quanto esperar antes de levar a roda a OUTRO compartimento
+// (a peça anterior ainda percorre a esteira principal até cair nela). 0 = não espera.
+// Meça o tempo da peça entre a junção e o fim da esteira principal e use um valor
+// um pouco maior; um valor grande demais deixa a roda atrasada para o pedido seguinte.
+#define SEPARADOR_ESPERA_APOS_ENTREGA_MS  0
 // Ângulo de cada compartimento a partir da posição ao ligar (a roda deve estar no
 // neutro quando o Uno liga: não há sensor de referência). C = neutro por padrão.
 #define SEPARADOR_GRAUS_NEUTRO  0

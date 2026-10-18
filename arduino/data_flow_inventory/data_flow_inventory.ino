@@ -23,9 +23,9 @@
 // firmware v2.x, com campos opcionais novos. Comandos: CMD:PECA:X, CMD:RESET.
 // Botões físicos seguem desabilitados (o código deles está só no histórico do Git,
 // firmware v2.1). O separador (motor de passo 28BYJ-48 + ULN2003, pinos 5 a 8) não
-// bloqueia o loop (src/hw/separador.*). Por padrão só gira pelo comando de bancada
-// CMD:SEP:A|B|C|0 no Serial Monitor; a rotação automática na entrega liga em
-// SEPARADOR_NA_ENTREGA (config.h), depois de validar a roda isolada.
+// bloqueia o loop (src/hw/separador.*): a roda se prepara de acordo com a peça pedida
+// (SEPARADOR_AUTOMATICO em config.h) e também gira pelo comando de bancada
+// CMD:SEP:A|B|C|0 no Serial Monitor.
 // ============================================================
 
 #include "config.h"
@@ -37,6 +37,7 @@
 #include "src/hw/separador.h"
 #include "src/logica/fsm.h"
 #include "src/logica/lcd_logica.h"
+#include "src/logica/separador_auto.h"
 #include "src/logica/telas.h"
 #include "src/logica/texto_flash.h"
 
@@ -50,6 +51,7 @@ static_assert(PRAZOS_COERENTES(PARAM_ESTEIRA_C), "esteira C: prazoPartidaMs > ti
 
 static Fsm fsm;
 static LcdRecuperacao lcdRecup;
+static SeparadorAuto sepAuto;
 static uint32_t inicioMs = 0;
 static uint32_t aberturaMs = 0;
 static uint32_t ultimaAmostra = 0;
@@ -75,6 +77,7 @@ void setup() {
 
   // Separador (roda giratória): bobinas soltas e roda suposta no neutro.
   separadorIniciar(micros());
+  separadorAutoIniciar(sepAuto, SEPARADOR_ESPERA_APOS_ENTREGA_MS);
 
   fsmIniciar(fsm, PARAMS, ESTOQUE_INICIAL);
 
@@ -117,11 +120,18 @@ void loop() {
 
   for (uint8_t i = 0; i < out.nEventos; i++) {
     publicarEvento(out.eventos[i], fsm, agora);
-#if SEPARADOR_NA_ENTREGA
-    // Confirmação da entrega: a roda gira até o compartimento da peça (sem bloquear).
-    if (out.eventos[i].tipo == EV_ENTREGA) separadorMoverPara(out.eventos[i].peca);
+#if SEPARADOR_AUTOMATICO
+    if (out.eventos[i].tipo == EV_ENTREGA) separadorAutoEntrega(sepAuto, agora);
 #endif
   }
+
+#if SEPARADOR_AUTOMATICO
+  // A roda se prepara de acordo com a peça pedida: parte assim que a checagem prévia
+  // aprova o pedido e fica no compartimento depois da entrega. Pedir de novo o mesmo
+  // destino a cada volta é inofensivo (o plano de giro só recalcula o caminho).
+  const char destinoRoda = separadorAutoDestino(sepAuto, fsm.estado, fsm.peca, agora);
+  if (destinoRoda) separadorMoverPara(destinoRoda);
+#endif
 
   // Publicação periódica escalonada: uma mensagem a cada 250 ms, cada uma
   // 1x por segundo (evita prender o loop na serial de 9600 baud).

@@ -1,5 +1,6 @@
 // Cenários da FSM com tempo simulado (casos de bancada P1–P5 inclusos).
 #include "fsm.h"
+#include "separador_auto.h"
 #include "teste.h"
 
 namespace {
@@ -307,5 +308,57 @@ TESTE(fsm_ignora_o_comando_do_separador) {
   VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
   VERIFICA(b.out.nEventos == 0);
   VERIFICA_TEXTO(b.log, "");
+}
+
+// A roda se prepara com a FSM de verdade: assim que a checagem aprova o pedido, bem
+// antes da confirmação da entrega, e FICA no compartimento depois dela.
+TESTE(separador_se_prepara_para_a_peca_pedida_antes_da_entrega) {
+  Bancada b;
+  SeparadorAuto a;
+  separadorAutoIniciar(a, 0);
+  char destino = 0;  // último compartimento pedido à roda, como o .ino faz a cada volta do loop
+  auto consulta = [&](uint32_t t) {
+    const char d = separadorAutoDestino(a, b.f.estado, b.f.peca, t);
+    if (d) destino = d;
+  };
+  consulta(0);
+  VERIFICA(destino == 0);                 // sem pedido: a roda fica onde está
+
+  b.passo(0, CMD_PECA, 'B');              // checagem aprovada -> ACIONANDO_ESTEIRA
+  consulta(0);
+  VERIFICA(destino == 'B');               // a roda já parte, antes de o motor ligar
+  VERIFICA(b.confirmacoes == 0 && b.debitos == 0);
+
+  b.passo(5);
+  b.in.topo[1] = false;
+  b.ate(10, 4000);
+  consulta(4000);
+  VERIFICA(destino == 'B');               // segue em B durante o transito
+  VERIFICA(b.confirmacoes == 0);
+
+  b.in.juncao[1].ocupada = true;
+  b.in.juncao[1].ocupouEm = 4005;
+  b.ate(4005, 4030);
+  VERIFICA(b.confirmacoes == 1);
+  separadorAutoEntrega(a, 4030);
+  b.in.juncao[1].ocupada = false;
+  b.ate(4035, 8600);
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  consulta(8600);
+  VERIFICA(destino == 'B');               // depois da entrega, fica em B (a peça ainda está na esteira)
+
+  b.passo(8605, CMD_PECA, 'A');           // próximo pedido
+  consulta(8605);
+  VERIFICA(destino == 'A');               // vai para A no novo pedido
+}
+
+TESTE(separador_nao_gira_se_o_pedido_for_recusado) {
+  Bancada b;
+  SeparadorAuto a;
+  separadorAutoIniciar(a, 0);
+  b.f.estoque[2] = 0;                     // sem estoque de C
+  b.passo(0, CMD_PECA, 'C');
+  VERIFICA(b.f.estado == ERRO);
+  VERIFICA(separadorAutoDestino(a, b.f.estado, b.f.peca, 0) == 0);  // a roda não se mexe à toa
 }
 

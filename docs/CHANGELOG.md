@@ -22,6 +22,15 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Adicionado
 
+- **Separador automático: a roda se prepara de acordo com a peça pedida (padrão)**
+  - **Relato da equipe:** o giro isolado pelos comandos `CMD:SEP:A`, `B` e `C` funcionou. Repetibilidade, aquecimento e os demais critérios do roteiro não foram registrados
+  - **Quando a roda se move:** assim que a checagem prévia aprova o pedido (estado `ACIONANDO_ESTEIRA`), antes de o motor da esteira ligar e bem antes da confirmação da entrega: a roda tem de ~3 s a 12,5 s (o giro leva ~2 s por 120°) para chegar ao compartimento. Pedido recusado (sem estoque, sem peça, junção obstruída) não gira a roda. Depois da entrega ela **fica** no compartimento (a peça ainda percorre a esteira principal) e só muda no pedido seguinte
+  - **Como:** nova lógica pura `src/logica/separador_auto.*`, "por nível": a cada volta do `loop()` o firmware pergunta o destino e repete o pedido à roda, o que é inofensivo (o plano de giro só recalcula o caminho); não há fila nem estado intermediário
+  - **Configuração (`config.h`):** `SEPARADOR_AUTOMATICO` (1 por padrão; 0 deixa só o comando de bancada) **substitui** `SEPARADOR_NA_ENTREGA`, que girava na confirmação da entrega e vinha desligada. `SEPARADOR_ESPERA_APOS_ENTREGA_MS` (0 por padrão) atrasa a troca de compartimento se pedidos seguidos puderem tirar a roda do lugar antes de a peça anterior cair nela
+  - **Testes (PC):** a suíte do firmware passa de 78 para **84 testes**, inclusive dois com a FSM real (a roda parte antes da entrega e permanece depois; pedido recusado não gira) e o estouro do `millis()`
+  - **Uno:** 17350 B de flash (53%, +290) e 1021 B de RAM (49%, +9); sem avisos no código do projeto; abaixo do limite de 65% de RAM do CI
+  - **Não validado em hardware:** o modo automático nunca rodou com as esteiras. Em aberto: o tempo da peça na esteira principal (para calibrar a espera), a perda de posição em qualquer reinício do Uno (sem sensor de referência) e o sentido e os ângulos definitivos da roda real. Procedimento em `docs/testes/roteiros/separador_bancada.md` (seção 6)
+
 - **Separador (roda giratória) ativado, sem bloqueio (18/10/2026)**
   - **Pinagem:** ULN2003 IN1..IN4 nos pinos **D5, D6, D7 e D8** do Uno (livres, fora da serial, dos sensores, do I²C e dos motores DC; constam no diagrama elétrico). Alimentação de 5 V **própria**, com GND comum; não pelo 5 V do Uno via USB
   - **Código ativo:** `src/hw/separador.*` (biblioteca `Stepper` 1.1.3, que agora o CI instala) usa o plano de giro sem bloqueio de `src/logica/plano_separador.*`: no máximo 1 passo por volta do `loop()`, solta as bobinas parado e no ISR do watchdog. Substitui o rascunho legado da v2.x, cujo `step()` bloqueante estouraria o watchdog de 2 s
