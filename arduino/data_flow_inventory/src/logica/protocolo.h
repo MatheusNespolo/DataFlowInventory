@@ -19,11 +19,15 @@ enum ComandoTipo : uint8_t {
   CMD_PECA,             // CMD:PECA:A|B|C (peça válida em *peca)
   CMD_PECA_INVALIDA,    // CMD:PECA: com letra/forma inválida
   CMD_RESET,            // CMD:RESET
+  CMD_SEPARADOR,        // CMD:SEP:A|B|C|0 (teste de bancada, só pela USB; ver abaixo)
   CMD_DESCONHECIDO      // qualquer outra linha
 };
 
 // Interpreta uma linha (sem '\n'). Ignora espaços nas pontas.
-// Em CMD_PECA, *peca recebe 'A', 'B' ou 'C'; nos demais casos, 0.
+// Em CMD_PECA, *peca recebe 'A', 'B' ou 'C'; em CMD_SEPARADOR, 'A', 'B', 'C' ou '0'
+// (compartimento neutro); nos demais casos, 0.
+// CMD:SEP só vem do Serial Monitor: o ESP32 nunca o gera (ele só traduz pedidos e
+// reset), então o dashboard e o MQTT não alcançam o separador por esse caminho.
 ComandoTipo interpretarComando(const char* linha, char* peca);
 
 // Acumula bytes da serial até '\n'. '\r' é ignorado. Linha maior que

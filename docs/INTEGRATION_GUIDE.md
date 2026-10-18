@@ -1,7 +1,7 @@
 # Guia de Integração — Beckhoff CX9240 (Historiador SQLite) + Separador (Roda de Separação)
 
 > **Passo a passo para integração final com PC industrial e roda de separação**  
-> ⚠️ **Status (revisado em 13/10/2026):** o historiador CX9240 foi comissionado e o fluxo com o simulador foi validado; consultar §1 para limitações de contrato/teste real. Firmware Uno v3.0 validado em bancada, mas a validação do código do separador permanece pendente: na v3.0 ele está registrado/comentado em `src/hw/separador.*` e `config.h`, sem integração ativa. As instruções antigas de ativação abaixo são referência histórica e não devem ser aplicadas diretamente à v3.0.
+> ⚠️ **Status (revisado em 18/10/2026):** o historiador CX9240 foi comissionado e o fluxo com o simulador foi validado; consultar §1 para limitações de contrato/teste real. Firmware Uno v3.0 validado em bancada. O separador (§2) está **implementado sem bloqueio** em `src/hw/separador.*`, testado só no PC e na compilação, e **ainda não foi validado em hardware**; a rotação na entrega vem desligada (`SEPARADOR_NA_ENTREGA`). As instruções antigas da §2.3 são referência histórica e não devem ser aplicadas à v3.0.
 > Data: 14/09/2026 · Sprint 5 · Revisado em 13/10/2026
 
 ---
@@ -139,11 +139,13 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 
 ### 2.2 Posições
 
-| Peça | Ângulo | Passos |
+| Peça | Ângulo (padrão do firmware) | Passos (2038 por volta) |
 |------|--------|--------|
-| **A** | 0° | 0 |
-| **B** | 120° | 683 |
-| **C** | 240° | 1365 |
+| **A** | 120° | 679 |
+| **B** | 240° | 1359 |
+| **C** e neutro | 0° | 0 |
+
+> Valores padrão de `SEPARADOR_GRAUS_*` em `config.h`, herdados do código da v2.x (a tabela antiga deste guia, A=0°, B=120°, C=240°, **não** era a usada pelo código). A roda real define os ângulos: ajuste as constantes. A roda deve estar no neutro quando o Uno liga (não há sensor de referência).
 
 ### 2.3 Ativação — procedimento legado (v2.x; não aplicar à v3.0)
 
@@ -174,11 +176,11 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 | Teste | Procedimento | Esperado |
 |-------|-----------|----------|
 | **T7.1** | Verificar continuidade ULN2003 | Sem curtos |
-| **T7.2** | Enviar CMD:PECA:A | Motor gira → A |
-| **T7.3** | Enviar CMD:PECA:B | Motor gira → B |
-| **T7.4** | Enviar CMD:PECA:C | Motor gira → C |
+| **T7.2** | Enviar `CMD:SEP:A` (Serial Monitor; não use `CMD:PECA:A`, que dispara uma entrega completa) | Motor gira → A |
+| **T7.3** | Enviar `CMD:SEP:B` | Motor gira → B (pelo caminho mais curto, no sentido contrário) |
+| **T7.4** | Enviar `CMD:SEP:C` | Motor gira → C (neutro, por padrão) |
 | **T7.5** | 10 ciclos seguidos | Sem travamento |
-| **T7.6** | Dashboard: A, B, C alternados | Separador acompanha |
+| **T7.6** | Com `SEPARADOR_NA_ENTREGA 1`, dashboard: A, B, C alternados | Separador acompanha |
 
 ---
 

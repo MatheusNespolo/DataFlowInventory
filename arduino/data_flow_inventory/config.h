@@ -34,20 +34,35 @@
 #define LCD_RECUPERACAO_BASE_MS  5000UL
 #define LCD_RECUPERACAO_MAX_MS   60000UL
 
-// ---- Separador (roda giratória) — REGISTRO, NÃO ATIVO ------------------------
-// Motor de passo 28BYJ-48 + driver ULN2003 (4 fios IN1-IN4). Pinos 5 a 8:
-// sequenciais e livres no Uno. Valores do firmware v2.x, nunca testados em
-// bancada; veja src/hw/separador.h antes de habilitar.
-// #define STEPPER_IN1        5      // [HABILITAR]
-// #define STEPPER_IN2        6      // [HABILITAR]
-// #define STEPPER_IN3        7      // [HABILITAR]
-// #define STEPPER_IN4        8      // [HABILITAR]
-// #define STEPS_PER_REV      2048   // 28BYJ-48 em passo completo; conferir no datasheet do driver usado
-// #define SEPARADOR_RPM      10     // velocidade do giro; ajustar conforme o torque necessário
-// #define SEPARADOR_POSICAO_INICIAL  0                          // 0°   — compartimento neutro
-// #define SEPARADOR_POSICAO_A        (STEPS_PER_REV / 3)        // 120° — compartimento A
-// #define SEPARADOR_POSICAO_B        ((STEPS_PER_REV * 2) / 3)  // 240° — compartimento B
-// #define SEPARADOR_POSICAO_C        0                          // 0°   — compartimento C (mesmo ponto do neutro; ajustar ao layout físico)
+// ---- Separador (roda giratória): motor de passo 28BYJ-48 + driver ULN2003 -----
+// ULN2003 IN1..IN4 nos pinos 5 a 8: sequenciais, livres no Uno e fora do que já
+// está em uso (serial 0/1, sensores 2, 4 e A0–A3, I²C A4/A5, motores DC 9/10/11).
+// NÃO ligue o VCC do ULN2003 no 5 V do Uno alimentado por USB: o motor puxa
+// ~240 mA e o ruído derruba o LCD. Use 5 V próprios, com o GND em comum.
+#define STEPPER_IN1        5
+#define STEPPER_IN2        6
+#define STEPPER_IN3        7
+#define STEPPER_IN4        8
+// Passos por volta DA RODA (passo completo). O 28BYJ-48 tem engrenagem 63,68:1, ou
+// seja ~2038 passos por volta, e não 2048: com 2048 o erro acumularia ~1,8° a cada
+// volta e os compartimentos desalinhariam em poucos ciclos. Calibre em bancada.
+#define SEPARADOR_PASSOS_POR_VOLTA   2038
+// A biblioteca Stepper só precisa de um múltiplo de 4 (fases das bobinas) e do ritmo.
+#define SEPARADOR_PASSOS_BIBLIOTECA  2048
+#define SEPARADOR_RPM      10     // se a roda perder passos ou travar, diminua (ex.: 8)
+// 1 = inverte o sentido do giro: use se a roda girar ao contrário do esperado (A e B trocam de lugar).
+#define SEPARADOR_INVERTER_SENTIDO  0
+// 1 = a roda gira sozinha até o compartimento da peça quando a entrega é confirmada.
+// 0 (padrão) = só gira pelo comando de bancada CMD:SEP:A|B|C|0 no Serial Monitor.
+// Valide a roda ISOLADA (sem a FSM) e só então mude para 1: assim o motor de passo
+// não interfere nos testes das esteiras.
+#define SEPARADOR_NA_ENTREGA  0
+// Ângulo de cada compartimento a partir da posição ao ligar (a roda deve estar no
+// neutro quando o Uno liga: não há sensor de referência). C = neutro por padrão.
+#define SEPARADOR_GRAUS_NEUTRO  0
+#define SEPARADOR_GRAUS_A       120
+#define SEPARADOR_GRAUS_B       240
+#define SEPARADOR_GRAUS_C       0
 
 // ---- Sistema -----------------------------------------------------------------
 #define ESTOQUE_INICIAL       15     // peças de cada tipo ao ligar (não persiste)

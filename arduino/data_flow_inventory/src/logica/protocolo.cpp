@@ -38,6 +38,15 @@ ComandoTipo interpretarComando(const char* linha, char* peca) {
     return CMD_PECA_INVALIDA;
   }
   if (igualTxt(ini, n, TXT("CMD:RESET"))) return CMD_RESET;
+
+  const size_t TAM_PREFIXO_SEP = 8;  // "CMD:SEP:"
+  if (n == TAM_PREFIXO_SEP + 1 && igualTxt(ini, TAM_PREFIXO_SEP, TXT("CMD:SEP:"))) {
+    const char c = ini[TAM_PREFIXO_SEP];
+    if (c == 'A' || c == 'B' || c == 'C' || c == '0') {
+      *peca = c;
+      return CMD_SEPARADOR;
+    }
+  }
   return CMD_DESCONHECIDO;
 }
 

@@ -10,6 +10,12 @@ static int32_t reduzir(int32_t v, int32_t volta) {
   return r < 0 ? r + volta : r;
 }
 
+int32_t separadorGrausParaPassos(int32_t graus, int32_t passosPorVolta) {
+  if (passosPorVolta <= 0) return 0;
+  const int32_t g = reduzir(graus, 360);
+  return (g * passosPorVolta + 180) / 360;
+}
+
 int32_t separadorDelta(int32_t de, int32_t para, int32_t passosPorVolta) {
   int32_t delta = reduzir(para - de, passosPorVolta);
   if (delta > passosPorVolta / 2) delta -= passosPorVolta;  // caminho mais curto

@@ -159,3 +159,32 @@ TESTE(status_pior_caso_cabe_no_buffer_com_folga) {
   VERIFICA(n <= 150);  // folga de 10 B sobre o buffer de 160
 }
 
+// ---- Teste de bancada do separador (CMD:SEP, só pela USB) ------------------------
+
+TESTE(comando_separador_aceita_compartimentos_e_neutro) {
+  const char letras[] = {'A', 'B', 'C', '0'};
+  for (int i = 0; i < 4; i++) {
+    char linha[16] = "CMD:SEP:";
+    linha[8] = letras[i];
+    linha[9] = 0;
+    char peca = 0;
+    VERIFICA(interpretarComando(linha, &peca) == CMD_SEPARADOR);
+    VERIFICA(peca == letras[i]);
+  }
+  char peca = 0;
+  VERIFICA(interpretarComando("  CMD:SEP:B \r", &peca) == CMD_SEPARADOR);  // espaços nas pontas
+  VERIFICA(peca == 'B');
+}
+
+TESTE(comando_separador_recusa_formas_invalidas) {
+  char peca = 'x';
+  VERIFICA(interpretarComando("CMD:SEP:Z", &peca) == CMD_DESCONHECIDO);
+  VERIFICA(peca == 0);
+  VERIFICA(interpretarComando("CMD:SEP:", &peca) == CMD_DESCONHECIDO);
+  VERIFICA(interpretarComando("CMD:SEP:AB", &peca) == CMD_DESCONHECIDO);
+  VERIFICA(interpretarComando("CMD:SEP:a", &peca) == CMD_DESCONHECIDO);   // minúscula não vale
+  VERIFICA(interpretarComando("CMD:SEP", &peca) == CMD_DESCONHECIDO);
+  // Os comandos que já existiam não mudam.
+  VERIFICA(interpretarComando("CMD:PECA:A", &peca) == CMD_PECA);
+  VERIFICA(interpretarComando("CMD:RESET", &peca) == CMD_RESET);
+}

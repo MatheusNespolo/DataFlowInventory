@@ -148,3 +148,36 @@ TESTE(separador_solta_as_bobinas_depois_de_parado) {
   VERIFICA(planoPasso(p, t + 3000000UL) == -1);
   VERIFICA(p.bobinasEnergizadas);
 }
+
+TESTE(separador_graus_para_passos_arredonda_e_normaliza) {
+  VERIFICA(separadorGrausParaPassos(0, 2038) == 0);
+  VERIFICA(separadorGrausParaPassos(120, 2038) == 679);    // 679,33
+  VERIFICA(separadorGrausParaPassos(240, 2038) == 1359);   // 1358,67
+  VERIFICA(separadorGrausParaPassos(360, 2038) == 0);      // volta cheia = mesma posição
+  VERIFICA(separadorGrausParaPassos(-120, 2038) == 1359);  // = 240°
+  VERIFICA(separadorGrausParaPassos(480, 2038) == 679);    // = 120°
+  VERIFICA(separadorGrausParaPassos(120, 2048) == 683);    // 682,67
+  VERIFICA(separadorGrausParaPassos(90, 0) == 0);          // passos inválidos
+}
+
+// Os compartimentos são posições ABSOLUTAS: pedir A, B e C em sequência, muitas
+// vezes, não acumula erro de arredondamento no software (o erro que sobra, se houver,
+// é a diferença entre os passos por volta configurados e os reais do motor).
+TESTE(separador_ciclo_a_b_c_fecha_exatamente_uma_volta) {
+  const int32_t volta = 2038;
+  const int32_t alvo[3] = {separadorGrausParaPassos(120, volta), separadorGrausParaPassos(240, volta), 0};
+  PlanoSeparador p;
+  planoIniciar(p, volta, RPM, 0);
+  uint32_t t = 0;
+  int32_t passos = 0;
+  for (int ciclo = 0; ciclo < 100; ciclo++) {
+    for (int k = 0; k < 3; k++) {
+      planoIrPara(p, alvo[k]);
+      Resultado r = girar(p, t, 1000);
+      t += r.duracaoUs;
+      passos += r.passos;
+      VERIFICA(p.posicao == alvo[k]);
+    }
+  }
+  VERIFICA(passos == 100 * volta);  // 100 ciclos = 100 voltas exatas, sempre pelo caminho mais curto
+}

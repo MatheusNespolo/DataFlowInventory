@@ -296,3 +296,16 @@ TESTE(propriedade_debito_so_com_passagem_valida_na_juncao_pedida) {
     }
   }
 }
+
+// O CMD:SEP é tratado fora da FSM (no .ino). Se mesmo assim chegasse até ela,
+// não pode mudar o estado nem gerar erro de comando desconhecido.
+TESTE(fsm_ignora_o_comando_do_separador) {
+  Bancada b;
+  b.passo(0);
+  b.log[0] = 0;
+  b.passo(10, CMD_SEPARADOR, 'B');
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  VERIFICA(b.out.nEventos == 0);
+  VERIFICA_TEXTO(b.log, "");
+}
+

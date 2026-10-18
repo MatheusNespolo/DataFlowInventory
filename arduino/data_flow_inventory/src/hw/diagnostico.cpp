@@ -5,7 +5,7 @@
 
 #include "../logica/causa_reset.h"
 #include "motores.h"
-// #include "separador.h"  // [HABILITAR] separador
+#include "separador.h"
 
 namespace {
 const uint32_t ASSINATURA = 0xDF1A3B5CUL;
@@ -31,7 +31,7 @@ ISR(WDT_vect) {
   // estouro reiniciar o Uno.
   dfiMarcaWatchdog = MARCA_WATCHDOG;
   motoresPararNaInterrupcao();  // não deixa o motor ligado até o reset
-  // separadorPararNaInterrupcao();  // [HABILITAR] solta as bobinas do separador
+  separadorPararNaInterrupcao();  // solta as bobinas do separador
 }
 
 static void armarWatchdog() {

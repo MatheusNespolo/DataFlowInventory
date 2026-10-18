@@ -21,9 +21,11 @@
 //
 // Comunicação com o ESP32 (Serial 9600): mensagens JSON idênticas às do
 // firmware v2.x, com campos opcionais novos. Comandos: CMD:PECA:X, CMD:RESET.
-// Botões físicos e separador (motor de passo) seguem desabilitados. O código do
-// separador está registrado, comentado, em src/hw/separador.* e config.h; o dos
-// botões está só no histórico do Git (firmware v2.1).
+// Botões físicos seguem desabilitados (o código deles está só no histórico do Git,
+// firmware v2.1). O separador (motor de passo 28BYJ-48 + ULN2003, pinos 5 a 8) não
+// bloqueia o loop (src/hw/separador.*). Por padrão só gira pelo comando de bancada
+// CMD:SEP:A|B|C|0 no Serial Monitor; a rotação automática na entrega liga em
+// SEPARADOR_NA_ENTREGA (config.h), depois de validar a roda isolada.
 // ============================================================
 
 #include "config.h"
@@ -32,7 +34,7 @@
 #include "src/hw/lcd.h"
 #include "src/hw/motores.h"
 #include "src/hw/sensores.h"
-// #include "src/hw/separador.h"   // [HABILITAR] separador — ver src/hw/separador.h
+#include "src/hw/separador.h"
 #include "src/logica/fsm.h"
 #include "src/logica/lcd_logica.h"
 #include "src/logica/telas.h"
@@ -71,8 +73,8 @@ void setup() {
   lcdAtualizar("Data Flow", "Inventory v" VERSAO_FIRMWARE);
   aberturaMs = millis();  // lcdIniciar leva ~1 s: a abertura conta daqui
 
-  // Separador (roda giratória): DESABILITADO — motor de passo ainda não montado.
-  // separadorIniciar();   // [HABILITAR] depois de resolver o aviso do watchdog
+  // Separador (roda giratória): bobinas soltas e roda suposta no neutro.
+  separadorIniciar(micros());
 
   fsmIniciar(fsm, PARAMS, ESTOQUE_INICIAL);
 
@@ -97,6 +99,12 @@ void loop() {
     in.juncao[i] = sensorJuncao(i);
   }
   in.cmd = comunicacaoLer(&in.cmdPeca);
+  // Teste de bancada do separador (só pela USB; o ESP32 nunca gera este comando):
+  // gira a roda sem passar pela FSM, sem pedido e sem estoque.
+  if (in.cmd == CMD_SEPARADOR) {
+    separadorMoverPara(in.cmdPeca);
+    in.cmd = CMD_NENHUM;
+  }
 
   SaidasFsm out;
   fsmPasso(fsm, in, out);
@@ -109,9 +117,10 @@ void loop() {
 
   for (uint8_t i = 0; i < out.nEventos; i++) {
     publicarEvento(out.eventos[i], fsm, agora);
-    // Separador: DESABILITADO. Na confirmação da entrega, pediria o giro até o
-    // compartimento da peça (sem bloquear; ver src/hw/separador.h).
-    // if (out.eventos[i].tipo == EV_ENTREGA) separadorMoverPara(out.eventos[i].peca);
+#if SEPARADOR_NA_ENTREGA
+    // Confirmação da entrega: a roda gira até o compartimento da peça (sem bloquear).
+    if (out.eventos[i].tipo == EV_ENTREGA) separadorMoverPara(out.eventos[i].peca);
+#endif
   }
 
   // Publicação periódica escalonada: uma mensagem a cada 250 ms, cada uma
@@ -147,8 +156,8 @@ void loop() {
     lcdAtualizar(l1, l2);
   }
 
-  // Separador: DESABILITADO. Dá no máximo 1 passo por volta do loop (sem bloquear).
-  // separadorAtualizar(micros());
+  // Separador: no máximo 1 passo por volta do loop (não bloqueia) e solta as bobinas parado.
+  separadorAtualizar(micros());
 
   // De novo depois da serial e do LCD: no ciclo da partida, o kick de 255
   // termina no tempo certo mesmo que a publicação tenha demorado.
