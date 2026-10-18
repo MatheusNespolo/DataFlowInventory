@@ -100,7 +100,7 @@ npm update <package-name>
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
 - **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
 - **Falha em:** Erros de compilação ou RAM global do Uno acima de 65%
-- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C@1.1.2`, `ArduinoJson@6.21.5` e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
+- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C@1.1.2`, `Stepper@1.1.3` (separador do Uno), `ArduinoJson@6.21.5` (só o ESP32) e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
 - **LCD:** o CI compila com a LiquidCrystal I2C **1.1.2** (Frank de Brabander), com versão fixa para o build não mudar sozinho. A Arduino IDE da equipe instala outra variante (LiquidCrystal_I2C 2.0.0, Martin Kubovčík / Frank de Brabander); a API usada pelo firmware (`LiquidCrystal_I2C(endereço, 16, 2)`, `init`, `backlight`, `clear`, `setCursor`, `write`) existe nas duas.
 - Para repetir o job na sua máquina, veja [Compilar o firmware localmente](#compilar-o-firmware-localmente-sem-hardware)
 
@@ -272,7 +272,7 @@ arduino-cli config add board_manager.additional_urls https://raw.githubuserconte
 arduino-cli core update-index
 arduino-cli core install arduino:avr
 arduino-cli core install esp32:esp32
-arduino-cli lib install "LiquidCrystal I2C@1.1.2" "ArduinoJson@6.21.5" "PubSubClient"
+arduino-cli lib install "LiquidCrystal I2C@1.1.2" "Stepper@1.1.3" "ArduinoJson@6.21.5" "PubSubClient"
 ```
 
 **3. Criar o `secrets.h`** (só se ainda não existir; nunca versione o real):

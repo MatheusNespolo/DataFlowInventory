@@ -15,8 +15,8 @@
 //   - solta as bobinas depois de um tempo parada (menos corrente, calor e
 //     ruído na alimentação de 5 V).
 //
-// C++ puro, testado no PC (test/firmware_uno). Ainda NÃO é usado pelo firmware:
-// a camada de hardware está só registrada, comentada, em src/hw/separador.*.
+// C++ puro, testado no PC (test/firmware_uno). A camada de hardware, que liga
+// isto ao motor de passo, está em src/hw/separador.*.
 // ============================================================
 #pragma once
 #include <stdint.h>
@@ -36,6 +36,9 @@ struct PlanoSeparador {
 
 // RPM → intervalo entre passos (µs). Mesma conta do Stepper::setSpeed.
 uint32_t separadorIntervaloUs(int32_t passosPorVolta, int32_t rpm);
+
+// Ângulo (qualquer inteiro, em graus) → passos, arredondado. 360° = 0 passo.
+int32_t separadorGrausParaPassos(int32_t graus, int32_t passosPorVolta);
 
 // Menor deslocamento (em passos, com sinal) de `de` até `para`. Empate
 // (exatamente meia volta) vai no sentido horário (+).

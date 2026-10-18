@@ -82,7 +82,7 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 | #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
 | #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
 | #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
-| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Rascunho do firmware v2.x devolvido **comentado** à v3.0 como registro (`src/hw/separador.*`, `config.h`), sem teste; mecânica e integração na Semana 8 (Bloco 4) |
+| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Implementado sem bloqueio em `src/hw/separador.*` (pinos 5 a 8), lógica testada no PC; **não validado em hardware**. Rotação na entrega desligada por padrão; ver [`separador_bancada.md`](../testes/roteiros/separador_bancada.md) |
 
 ### 🔴 Coluna `Blocked`
 

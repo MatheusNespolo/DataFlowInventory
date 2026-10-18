@@ -1,19 +1,3 @@
-// ============================================================
-// DATA FLOW INVENTORY — Separador (roda giratória) — REGISTRO, NÃO ATIVO
-// ------------------------------------------------------------
-// Camada de hardware do separador, versão SEM BLOQUEIO. Parte do rascunho do
-// firmware v2.x (commit d5fa4c4^), que usava Stepper::step(delta) bloqueante,
-// agora apoiada em src/logica/plano_separador.* (testado no PC).
-//
-// Tudo comentado: nunca foi compilado com o hardware nem testado em bancada.
-// Leia o cabeçalho de separador.h antes de habilitar (riscos abertos,
-// alimentação do motor e ordem de ativação).
-//
-// Com tudo comentado, este arquivo não gera código: o Arduino IDE e o
-// arduino-cli o compilam como uma unidade vazia.
-// ============================================================
-
-/*
 #include "separador.h"
 
 #include <Arduino.h>
@@ -22,16 +6,26 @@
 #include "../../config.h"
 #include "../logica/plano_separador.h"
 
+// O ritmo vem dos passos reais da roda (2038), que são MENOS que os 2048 da
+// biblioteca: o intervalo entre passos do plano é, portanto, sempre >= ao da
+// biblioteca, e step(±1) nunca espera.
+static_assert(SEPARADOR_PASSOS_POR_VOLTA <= SEPARADOR_PASSOS_BIBLIOTECA,
+              "o plano nao pode ser mais rapido que a biblioteca Stepper");
+static_assert(SEPARADOR_PASSOS_BIBLIOTECA % 4 == 0,
+              "a Stepper usa 4 fases: o numero de passos deve ser multiplo de 4");
+
 namespace {
 // A ordem IN1, IN3, IN2, IN4 é a da fiação do ULN2003 com o 28BYJ-48.
-Stepper motorSeparador(STEPS_PER_REV, STEPPER_IN1, STEPPER_IN3, STEPPER_IN2, STEPPER_IN4);
+Stepper motor(SEPARADOR_PASSOS_BIBLIOTECA, STEPPER_IN1, STEPPER_IN3, STEPPER_IN2, STEPPER_IN4);
 PlanoSeparador plano;
 
-long alvoDaPeca(char peca) {
-  if (peca == 'A') return SEPARADOR_POSICAO_A;
-  if (peca == 'B') return SEPARADOR_POSICAO_B;
-  if (peca == 'C') return SEPARADOR_POSICAO_C;
-  return SEPARADOR_POSICAO_INICIAL;
+int32_t grausDoDestino(char destino) {
+  switch (destino) {
+    case 'A': return SEPARADOR_GRAUS_A;
+    case 'B': return SEPARADOR_GRAUS_B;
+    case 'C': return SEPARADOR_GRAUS_C;
+    default:  return SEPARADOR_GRAUS_NEUTRO;
+  }
 }
 
 void soltarBobinas() {
@@ -42,21 +36,21 @@ void soltarBobinas() {
 }
 }  // namespace
 
-void separadorIniciar() {
-  motorSeparador.setSpeed(SEPARADOR_RPM);
-  planoIniciar(plano, STEPS_PER_REV, SEPARADOR_RPM, micros());  // posição suposta: 0
+void separadorIniciar(uint32_t agoraUs) {
+  motor.setSpeed(SEPARADOR_RPM);
+  planoIniciar(plano, SEPARADOR_PASSOS_POR_VOLTA, SEPARADOR_RPM, agoraUs);  // roda suposta no neutro
   soltarBobinas();
 }
 
-void separadorMoverPara(char peca) {
-  planoIrPara(plano, alvoDaPeca(peca));
+void separadorMoverPara(char destino) {
+  planoIrPara(plano, separadorGrausParaPassos(grausDoDestino(destino), SEPARADOR_PASSOS_POR_VOLTA));
 }
 
 void separadorAtualizar(uint32_t agoraUs) {
   const int8_t passo = planoPasso(plano, agoraUs);
   if (passo != 0) {
     // O intervalo do motor já venceu, então step(±1) executa e devolve na hora.
-    motorSeparador.step(passo);
+    motor.step(SEPARADOR_INVERTER_SENTIDO ? -passo : passo);
   } else if (planoDeveSoltar(plano, agoraUs)) {
     soltarBobinas();
     planoSoltou(plano);
@@ -71,4 +65,3 @@ void separadorPararNaInterrupcao() {
   PORTD &= ~(_BV(PD5) | _BV(PD6) | _BV(PD7));  // pinos 5, 6 e 7
   PORTB &= ~_BV(PB0);                          // pino 8
 }
-*/

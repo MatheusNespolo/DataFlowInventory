@@ -433,7 +433,7 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ### Próximas validações (13/10/2026)
 
-- **Prioridade — separador:** validar o código e o motor em bancada; o módulo está registrado/comentado no firmware v3.0 e ainda não foi integrado ao ciclo.
+- **Prioridade — separador:** implementado sem bloqueio em `src/hw/separador.*` (ULN2003 nos pinos 5 a 8), com a lógica do giro testada no PC, mas **ainda não validado em bancada**; a rotação automática na entrega vem desligada até a validação isolada (ver [`separador_bancada.md`](docs/testes/roteiros/separador_bancada.md)).
 - **Semana 9 (14–18/10):** dias úteis para preparação segura da bancada e testes isolados; fim de semana com hardware completo para tarefas opcionais independentes de Data Flow System e CX9240, além da validação física do separador. Ver [roteiro](docs/testes/roteiros/semana_09_14-18_outubro.md).
 - **Semana 10 (19–23/10):** executar A+B+C, calibrar e concluir o que foi adiado; manter a integração do separador condicionada à aprovação dos testes isolados. Ver [roteiro](docs/testes/roteiros/semana_10_19-23_outubro.md).
 - **Itens concluídos:** CI/CD, telemetria Prometheus/Grafana, broker HiveMQ Cloud E2E e historiador CX9240 possuem documentação de implementação/validação em [`docs/CI-CD.md`](docs/CI-CD.md), [`observability/README.md`](observability/README.md), [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) e [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md).

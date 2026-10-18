@@ -76,7 +76,7 @@ Exemplo de comando publicado pelo servidor:
 
 Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor serial do ESP32.
 
-**ESP32 → Arduino (Serial texto):** `CMD:PECA:A`, `CMD:PECA:B`, `CMD:PECA:C`, `CMD:RESET`.
+**ESP32 → Arduino (Serial texto):** `CMD:PECA:A`, `CMD:PECA:B`, `CMD:PECA:C`, `CMD:RESET`. Só pela USB (Serial Monitor), nunca pelo ESP32: `CMD:SEP:A|B|C|0`, teste de bancada do separador (gira a roda sem passar pela FSM).
 
 **Frontend → Servidor (Socket.IO):** `socket.emit('solicitar_peca', { peca: 'A' })` e `socket.emit('reset_sistema')`.
 
@@ -96,7 +96,7 @@ Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor ser
 
 | Componente | Bibliotecas |
 |---|---|
-| Arduino Uno | `ArduinoJson`, `Wire`, `LiquidCrystal_I2C` |
+| Arduino Uno | `Wire`, `LiquidCrystal_I2C`, `Stepper` (o JSON é montado à mão, sem `ArduinoJson`) |
 | ESP32 | `WiFi`, `WiFiClientSecure`, `PubSubClient`, `ArduinoJson` |
 | Servidor Node.js | `express`, `socket.io`, `mqtt`, `dotenv`, `prom-client` |
 | Frontend | Socket.IO Client, JavaScript vanilla, CSS3 (sem build) |
@@ -157,7 +157,7 @@ flowchart LR
 **Robustez:** watchdog de 2 s (o Uno reinicia sozinho se o loop travar; quando o watchdog avisa a trava, os motores são desligados na hora, antes do reset); o LCD é procurado varrendo o barramento I²C (qualquer endereço de expansor, 0x20–0x27 ou 0x38–0x3F, o 0x27 e o 0x3F primeiro) e, se não responder, o sistema segue sem ele; se o barramento I²C travar durante a operação, o LCD é desligado em vez de travar o loop e **o firmware tenta religá-lo** com o sistema parado (a cada 5 s, dobrando até 60 s se não adiantar); a confirmação da junção ignora uma ocupação que começou antes da partida do motor; o estoque não é persistido (volta a 15 no boot) e o campo `reset` do `inicio` diz por que o Uno reiniciou. Abrir a Serial Monitor reinicia o Uno (auto-reset da USB), o que aparece como `reset: reinicio`.
 
 **Decisões de projeto da v3.0** (registradas na revisão de código de 03/10/2026):
-- **Código antigo fora do `.ino`:** o trecho comentado dos botões físicos não foi levado para a v3.0 e continua só no histórico do git (firmware v2.1; o commit `fddde08` serve de rollback para a v2.x). O do separador foi devolvido **comentado**, como registro, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h` (nada é compilado).
+- **Código antigo fora do `.ino`:** o trecho comentado dos botões físicos não foi levado para a v3.0 e continua só no histórico do git (firmware v2.1; o commit `fddde08` serve de rollback para a v2.x). O do separador foi reescrito sem bloqueio e está ativo em `src/hw/separador.*` (ver §6.2).
 - **Nenhum débito sem passagem:** o estoque só é debitado com uma passagem de pelo menos 20 ms na junção da esteira pedida, iniciada depois da partida do motor. Duas brechas foram fechadas além do plano inicial: a interrupção marcar a ocupação depois da leitura do relógio e uma junção ocupada entre a checagem prévia e a partida. Um pulso que atravessa a partida também não confirma. O teste dessa regra varre combinações de peça, junção, largura e instante.
 - **LCD é opcional e se recupera:** se o I²C travar em operação, o LCD é desligado e o sistema segue; com os motores parados (`AGUARDANDO_PEDIDO` ou `ERRO`), o firmware refaz a busca e a inicialização (~1 s, por causa do `delay(1000)` da biblioteca). Nunca com motor ligado. O `status` informa `lcd_end`, `i2c_n` e `lcd_quedas` para diagnosticar pelo dashboard ou pelo `mqtt_probe`.
 - **Saída segura:** a interrupção do watchdog (`WDT_vect`) desliga os motores antes do reset.
@@ -243,10 +243,18 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 
 ### 6.2 Separador — Roda de Separação
 
-**Status:** ⬜ **PENDENTE** — o firmware Uno v3.0 foi validado em bancada em 13/10/2026, mas o código do separador segue pendente de validação e não está ativo. O trecho antigo (`Stepper.h`, `moverSeparador`) está registrado, **todo comentado e nunca testado**, em `src/hw/separador.h`, `src/hw/separador.cpp` e `config.h`, com as chamadas comentadas no `.ino`. O giro foi redesenhado **sem bloqueio** para não estourar o watchdog de 2 s: `Stepper::step()` espera ativamente (~2 s para 120° a 10 RPM), então a lógica `src/logica/plano_separador.*` (testada no PC) dá no máximo 1 passo por volta do loop e solta as bobinas parado. Em aberto: não há sensor de referência (a posição se perde em reinício), o motor deve ter alimentação de 5 V própria e o giro nunca foi testado em hardware. A integração depende da validação do código, da mecânica e dos testes isolados; prioridade no roteiro da Semana 9.
+**Status:** 🟡 **IMPLEMENTADO, NÃO VALIDADO EM BANCADA (18/10/2026).** O firmware Uno v3.0 foi validado em bancada em 13/10/2026; o separador foi implementado depois e testado só no PC (lógica do giro e protocolo) e na compilação. Nunca girou um motor.
+
+- **Ligação:** ULN2003 IN1..IN4 nos pinos **5, 6, 7 e 8** do Uno (livres; fora da serial, dos sensores, do I²C e dos motores DC). Alimentação de 5 V **própria**, com GND comum; nunca pelo 5 V do Uno via USB. Biblioteca `Stepper` 1.1.3.
+- **Não bloqueia:** `Stepper::step()` espera ativamente (~2 s para 120° a 10 RPM, o mesmo tempo do watchdog), então `src/logica/plano_separador.*` (testada no PC) dá no máximo 1 passo por volta do `loop()`, nunca em rajada, e solta as bobinas depois de 0,5 s parada e no ISR do watchdog.
+- **Dois modos:** por padrão só gira pelo comando de bancada `CMD:SEP:A|B|C|0` (Serial Monitor). A rotação automática na confirmação da entrega liga com `SEPARADOR_NA_ENTREGA 1` em `config.h`, depois de validar a roda isolada (roteiro das Semanas 9 e 10).
+- **Posições:** `SEPARADOR_GRAUS_A/B/C/NEUTRO` em `config.h` (padrão A 120°, B 240°, C e neutro 0°); a roda real define os valores. `SEPARADOR_PASSOS_POR_VOLTA` é 2038 (engrenagem 63,68:1 do 28BYJ-48), e não 2048, para os compartimentos não desalinharem.
+- **Em aberto:** sem sensor de referência (a roda é suposta no neutro ao ligar e a posição se perde em qualquer reinício do Uno); o sentido de giro e o tempo da peça até o fim da esteira principal precisam ser medidos; a rotação em ciclos seguidos muito próximos pode mover a roda antes de a peça anterior chegar.
+
+Procedimento: [`separador_bancada.md`](testes/roteiros/separador_bancada.md).
 
 **Hardware:** Motor 28BYJ-48 + ULN2003 (pinos 5-8)  
-**Integração:** Nova etapa FSM após ENTREGANDO_PECA
+**Integração:** acionado na confirmação da entrega (evento `entrega`, marco M2), fora da FSM e sem bloqueio; desligado por padrão (`SEPARADOR_NA_ENTREGA`)
 
 ---
 
