@@ -163,7 +163,8 @@ void inicioMsg(Escritor& e, char* buf, size_t cap, const char* type) {
 // ---- Mensagens --------------------------------------------------------------
 
 size_t formatarStatus(char* buf, size_t cap, const char* estado,
-                      int pecaSolicitada, uint32_t uptimeS, long ramLivre) {
+                      int pecaSolicitada, uint32_t uptimeS, long ramLivre,
+                      int lcdEnd, int i2cN, int lcdQuedas) {
   Escritor e;
   inicioMsg(e, buf, cap, TXT("status"));
   campoTexto(e, TXT("estado"), estado);
@@ -171,6 +172,11 @@ size_t formatarStatus(char* buf, size_t cap, const char* estado,
   chave(e, TXT("uptime"));
   numU(e, uptimeS);
   if (ramLivre >= 0) campoNum(e, TXT("ram_livre"), ramLivre);
+  // Diagnóstico do LCD (omitido com -1): endereço I²C em uso (0 = LCD fora),
+  // dispositivos vistos no barramento e quedas em operação.
+  if (lcdEnd >= 0) campoNum(e, TXT("lcd_end"), lcdEnd);
+  if (i2cN >= 0) campoNum(e, TXT("i2c_n"), i2cN);
+  if (lcdQuedas >= 0) campoNum(e, TXT("lcd_quedas"), lcdQuedas);
   return fim(e);
 }
 

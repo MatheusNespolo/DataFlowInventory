@@ -5,6 +5,7 @@
 #include "../../config.h"
 #include "../logica/protocolo.h"
 #include "diagnostico.h"
+#include "lcd.h"
 #include "sensores.h"
 
 namespace {
@@ -33,7 +34,8 @@ ComandoTipo comunicacaoLer(char* peca) {
 }
 
 void publicarEstado(const Fsm& f, uint32_t agora) {
-  enviar(formatarStatus(buf, sizeof buf, nomeEstado(f.estado), f.peca, agora / 1000UL, ramLivre()));
+  enviar(formatarStatus(buf, sizeof buf, nomeEstado(f.estado), f.peca, agora / 1000UL, ramLivre(),
+                        lcdEndereco(), lcdDispositivos(), lcdQuedas()));
 }
 
 void publicarEstoque(const Fsm& f) { enviar(formatarEstoque(buf, sizeof buf, f.estoque)); }

@@ -105,7 +105,7 @@ npm update <package-name>
 - Para repetir o job na sua máquina, veja [Compilar o firmware localmente](#compilar-o-firmware-localmente-sem-hardware)
 
 #### 5. Lógica do firmware do Uno (`firmware-logica`)
-- **O quê:** compila `arduino/data_flow_inventory/src/logica/` com g++ e roda `test/firmware_uno` (FSM, marcos, filtro, protocolo, telas e causa do reset, com tempo simulado)
+- **O quê:** compila `arduino/data_flow_inventory/src/logica/` com g++ e roda `test/firmware_uno` (FSM, marcos, filtro, protocolo, telas, causa do reset, plano do separador e regras do LCD, com tempo simulado). Também compila o `src/hw/lcd.cpp` **real** contra um I²C e uma biblioteca de LCD de mentira (`test/firmware_uno/mocks/`), para testar busca de endereço, barramento preso, queda e religamento; o restante de `src/hw/` (motores, sensores, serial) depende de registradores do AVR e só se valida em bancada
 
 ### 5. Testes E2E do dashboard (Playwright)
 
