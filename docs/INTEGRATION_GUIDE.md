@@ -1,7 +1,7 @@
 # Guia de Integração — Beckhoff CX9240 (Historiador SQLite) + Separador (Roda de Separação)
 
 > **Passo a passo para integração final com PC industrial e roda de separação**  
-> ⚠️ **Status (revisado em 18/10/2026):** o historiador CX9240 foi comissionado e o fluxo com o simulador foi validado; consultar §1 para limitações de contrato/teste real. Firmware Uno v3.0 validado em bancada. O separador (§2) está **implementado sem bloqueio** em `src/hw/separador.*`, testado só no PC e na compilação, e **ainda não foi validado em hardware**; a rotação na entrega vem desligada (`SEPARADOR_NA_ENTREGA`). As instruções antigas da §2.3 são referência histórica e não devem ser aplicadas à v3.0.
+> ⚠️ **Status (revisado em 18/10/2026):** o historiador CX9240 foi comissionado e o fluxo com o simulador foi validado; consultar §1 para limitações de contrato/teste real. Firmware Uno v3.0 validado em bancada. O separador (§2) está **implementado sem bloqueio** em `src/hw/separador.*`: o giro isolado pelos comandos de bancada foi relatado como funcionando e a roda se prepara de acordo com a peça pedida (`SEPARADOR_AUTOMATICO`), mas o **modo automático ainda não foi validado em hardware**. As instruções antigas da §2.3 são referência histórica e não devem ser aplicadas à v3.0.
 > Data: 14/09/2026 · Sprint 5 · Revisado em 13/10/2026
 
 ---
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 | **T7.3** | Enviar `CMD:SEP:B` | Motor gira → B (pelo caminho mais curto, no sentido contrário) |
 | **T7.4** | Enviar `CMD:SEP:C` | Motor gira → C (neutro, por padrão) |
 | **T7.5** | 10 ciclos seguidos | Sem travamento |
-| **T7.6** | Com `SEPARADOR_NA_ENTREGA 1`, dashboard: A, B, C alternados | Separador acompanha |
+| **T7.6** | Com `SEPARADOR_AUTOMATICO 1` (padrão), dashboard: A, B, C alternados | A roda se prepara no compartimento do pedido antes de a peça chegar |
 
 ---
 

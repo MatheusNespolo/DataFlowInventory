@@ -1,6 +1,6 @@
 # Separador (roda giratória) — ligação e roteiro de bancada
 
-> **Status (18/10/2026): implementado, NÃO validado em hardware.** O firmware compila e a lógica do giro tem testes no PC, mas o motor nunca girou com este código. Registre cada resultado como aprovado, falhou, bloqueado ou **não executado**; não presuma sucesso.
+> **Status (18/10/2026): giro isolado relatado como funcionando; modo automático NÃO validado em hardware.** **Relato da equipe (depois da implementação):** o giro isolado pelos comandos `CMD:SEP:A`, `B` e `C` funcionou; repetibilidade, aquecimento e os demais critérios do roteiro não foram registrados. O modo automático (a roda se prepara de acordo com a peça pedida) tem testes no PC, mas nunca rodou com as esteiras. Registre cada resultado como aprovado, falhou, bloqueado ou **não executado**; não presuma sucesso.
 >
 > Segue a frente A da [Semana 9](semana_09_14-18_outubro.md) e a seção "Separador" da [Semana 10](semana_10_19-23_outubro.md): primeiro a roda **isolada** (sem a FSM), depois a integração.
 
@@ -31,7 +31,7 @@ Por que D5 a D8: são livres e contíguos; ficam fora da serial (0/1), dos senso
 
 ## 3. Ensaio isolado (sem a FSM)
 
-Com `SEPARADOR_NA_ENTREGA 0` (padrão), a roda só gira por comando. Abra o Serial Monitor em **9600 baud** com final de linha **"Nova linha"** (ou "Ambos, NL e CR").
+Para este ensaio, a roda deve girar só por comando: com `SEPARADOR_AUTOMATICO 1` (padrão) ela também se move quando um pedido é aprovado, então **não faça pedidos** durante o ensaio isolado (ou use `SEPARADOR_AUTOMATICO 0`). Abra o Serial Monitor em **9600 baud** com final de linha **"Nova linha"** (ou "Ambos, NL e CR").
 
 | Comando | Efeito |
 |---|---|
@@ -62,11 +62,13 @@ Roteiro (um passo por vez; **pare** nos critérios da seção 5):
 
 Pare e desenergize se houver: cheiro de queimado, motor ou driver quentes demais para tocar, perda de passo, travamento, **reinício do Uno**, apagamento do LCD ou ruído elétrico nas esteiras. Registre a pendência; não improvise.
 
-## 6. Integração à entrega (só depois do ensaio isolado aprovado)
+## 6. Modo automático (a roda se prepara de acordo com a peça pedida)
 
-Em `config.h`, mude `SEPARADOR_NA_ENTREGA` para `1` e regrave. A roda passa a girar, na confirmação da entrega (marco M2), até o compartimento da peça. Limitações conhecidas:
+Com `SEPARADOR_AUTOMATICO 1` (padrão em `config.h`), a roda parte assim que a checagem prévia aprova o pedido (antes de o motor da esteira ligar) e **fica** no compartimento depois da entrega, até o pedido seguinte. Um pedido recusado (sem estoque, sem peça, junção obstruída) não move a roda. Com `0`, só o comando `CMD:SEP` move a roda.
 
-- **Tempo da peça:** o giro começa no momento em que a junção confirma a passagem, e a peça ainda percorre a esteira principal até o fim. Se um novo pedido for confirmado antes de a peça anterior chegar, a roda pode sair da posição cedo demais. O tempo de trânsito na esteira principal **não foi medido**.
+Para testar: alinhe a roda ao neutro, ligue o sistema e faça um pedido de A, depois de B, depois de C pelo dashboard (uma esteira por vez). Confira se a roda **já está** no compartimento certo quando a peça chega ao fim da esteira principal, e se ela permanece ali depois da entrega. Limitações conhecidas:
+
+- **Tempo da peça:** depois da confirmação, a peça ainda percorre a esteira principal até o fim. Se um novo pedido for aprovado antes de ela chegar, a roda pode sair da posição cedo demais. O tempo de trânsito na esteira principal **não foi medido**. Meça-o e, se for maior que o intervalo entre pedidos, ajuste `SEPARADOR_ESPERA_APOS_ENTREGA_MS` (padrão 0, sem espera) para um valor um pouco maior; um valor grande demais deixa a roda atrasada para o pedido seguinte.
 - **Posição:** sem sensor de referência, qualquer reinício do Uno desalinha a roda; realinhe à mão.
 - **Não valide junto com o Bloco 3:** teste A+B+C e o separador em sessões separadas, para não misturar causas de falha.
 
@@ -75,14 +77,16 @@ Em `config.h`, mude `SEPARADOR_NA_ENTREGA` para `1` e regrave. A roda passa a gi
 | Passo | Resultado | Observações |
 |---|---|---|
 | Ligação e pré-voo | ⬜ | |
-| Sentido (`CMD:SEP:A`) | ⬜ | |
-| Ângulo A/B/C | ⬜ | |
+| Sentido (`CMD:SEP:A`) | ✅ relatado | Funcionou; sem medições registradas |
+| Ângulo A/B/C | ✅ relatado | Os 3 comandos levaram a roda ao lugar esperado; sem medição de desvio |
 | Repetibilidade, 10 ciclos | ⬜ | |
 | Uno sem reinício / LCD estável | ⬜ | |
 | Aquecimento e ruído | ⬜ | |
 | Comportamento após reinício | ⬜ | |
 | Com carga/peça | ⬜ | |
 | Calibração (`PASSOS_POR_VOLTA`, `RPM`) | ⬜ | |
-| Integração na entrega (`SEPARADOR_NA_ENTREGA 1`) | ⬜ | |
+| Modo automático (`SEPARADOR_AUTOMATICO 1`): pedidos A, B e C | ⬜ | |
+| Roda pronta antes de a peça chegar; permanece após a entrega | ⬜ | |
+| Tempo da peça na esteira principal (para `SEPARADOR_ESPERA_APOS_ENTREGA_MS`) | ⬜ | |
 
 Responsável/data: __________
