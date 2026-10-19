@@ -1,5 +1,17 @@
 # Roteiro de Testes — Semana 9 (14–18/10/2026)
 
+> **Planejamento atualizado em 13/10/2026.** Este roteiro aborda a preparação básica e os ensaios isolados necessários antes de integrações mais avançadas (Semana 10). As atividades incluem validação elétrica, estabilidade, e testes pré-requisitos ao Bloco 3. Todas as pendências aqui descritas devem ser resolvidas antes do avanço para a integração total.
+
+## Resumo de Saída
+
+| Tarefa                         | Status/Pendências             |
+|--------------------------------|--------------------------------|
+| Inventário do hardware         | ⬜                            |
+| Verificação do Motor 28BYJ-48  | ⬜                            |
+| Roteiro isolado do separador   | ⬜ Funcionalidade parcial ok   |
+
+---
+
 > **Planejamento atualizado em 13/10/2026.** Datas e disponibilidade conforme confirmação da equipe: hardware completo disponível no sábado e domingo. Dias úteis priorizam preparação, verificação segura e documentação; testes opcionais de sistema e CX9240 ficam no fim de semana.
 
 ## Objetivos e prioridades

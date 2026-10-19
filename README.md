@@ -440,6 +440,10 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 - **Implantação:** o guia [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) ainda aguarda execução do zero em máquina limpa.
 - 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Telemetria concluída em 01/10/2026: código, testes automatizados e validação do stack (smoke test e conferência dos painéis). Ver [`observability/README.md`](observability/README.md).
 - 📘 **Guia de implantação:** passo a passo para subir o sistema do zero em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md); ainda não validado em máquina limpa.
+## Próximos Passos e Roteiros Disponíveis Atualizados
+
+Para etapas detalhadas sobre cada fase: [Semana 9](docs/testes/roteiros/semana_09_14-18_outubro.md) vs [Semana 10 (integrações)](docs/testes/roteiros/semana_10_19-23_outubro.md).
+
 - 🔧 **Diagnóstico IRF520 (esteiras B/C) — resolvido em 03/10:** a falha era elétrica (módulo IRF520 e motor da C, trocados; o firmware anterior estava correto). A C usa provisoriamente o módulo da A. Ver [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) (seção 4.2.1).
 - 🧪 **Semana 8 (fechamento em 13/10):** firmware Uno v3.0 validado em bancada (itens 1.1–1.11 e Bloco 2; B/C funcionando); integração A+B+C com calibração e separador foram replanejados. Resultados em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md).
 

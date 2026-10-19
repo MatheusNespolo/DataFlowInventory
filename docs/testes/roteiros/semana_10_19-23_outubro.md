@@ -1,5 +1,16 @@
 # Roteiro de Testes — Semana 10 (19–23/10/2026)
 
+## Resumo Refinado e Critérios de Saída
+
+Dadas as validações prévias da Semana 9, avançaremos com a validação de integração do Bloco 3 e os primeiros ensaios envolvendo comportamentos automáticos. Cada seção executada deverá documentar saídas com tabelas ou relatórios anexos.
+
+| Tarefas (Semana 10) | Status / Evidências             |
+|---------------------|---------------------------------|
+| Integração Bloco 3  | ⬜ Resultados finais pendentes  |
+| Separador Isolado   | ⬜ OK em isolado / hardware     |
+
+---
+
 > Replanejamento das atividades adiadas da Semana 8. Firmware Uno v3.0 validado; itens 1.1–1.11 e Bloco 2 aprovados. B e C foram testadas com o firmware novo e estão funcionando. **Não presumir aprovação de A+B+C, calibração ou separador:** registrar evidências nesta semana.
 
 ## Objetivos
