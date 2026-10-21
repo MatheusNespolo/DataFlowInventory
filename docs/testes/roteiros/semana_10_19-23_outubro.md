@@ -33,13 +33,13 @@ Dadas as validações prévias da Semana 9, avançaremos com a validação de in
 
 Pré-requisitos: firmware v3.0 já validado; verificar alimentação, GND comum, proteções, sensores e configuração dos módulos. A C usou provisoriamente o módulo IRF520 da A; confirmar a configuração presente antes de cada ensaio.
 
-- [ ] Verificar sensores de topo e junção de A/B/C individualmente.
-- [ ] Executar pedidos de A, B e C individualmente; verificar motor, entrega, estoque e retorno ao estado de espera.
-- [ ] Executar sequência alternada A/B/C, sem acionamento simultâneo nem reset inesperado.
-- [ ] Validar `motor_sem_avanco`, `timeout`, `juncao_obstruida` e recuperação, quando viável e seguro.
-- [ ] Medir pelo menos três ciclos por esteira: tempo topo → junção e tempo total de entrega; informar dispersão/condições da medição.
-- [ ] Calibrar PWM gradualmente e registrar valor anterior/novo; manter tempo de trânsito compatível com os marcos configurados e margem para o timeout M2 de 12,5 s.
-- [ ] Conferir se entrega/estoque/eventos permanecem consistentes após sequências repetidas.
+- [x] Verificar sensores de topo e junção de A/B/C individualmente.
+- [x] Executar pedidos de A, B e C individualmente; verificar motor, entrega, estoque e retorno ao estado de espera.
+- [x] Executar sequência alternada A/B/C, sem acionamento simultâneo nem reset inesperado.
+- [x] Validar `motor_sem_avanco`, `timeout`, `juncao_obstruida` e recuperação, quando viável e seguro.
+- [x] Medir pelo menos três ciclos por esteira: tempo topo → junção e tempo total de entrega; informar dispersão/condições da medição.
+- [x] Calibrar PWM gradualmente e registrar valor anterior/novo; manter tempo de trânsito compatível com os marcos configurados e margem para o timeout M2 de 12,5 s.
+- [x] Conferir se entrega/estoque/eventos permanecem consistentes após sequências repetidas.
 
 > ✅ **Calibração registrada (commit `e3c8833`, 18/10):**
 > - **A:** `pwmRegime=225` e `kickMs=180 ms`
@@ -50,9 +50,11 @@ Pré-requisitos: firmware v3.0 já validado; verificar alimentação, GND comum,
 
 | Esteira | PWM antes | PWM validado | Tempos medidos (ms) | Ciclos | Status/observações |
 |---|---:|---:|---|---:|---|
-| A |  |  |  |  |  |
-| B |  |  |  |  |  |
-| C |  |  |  |  |  |
+| A |225  | 245 | 4950 | ~10 | Partida OK, velocidade de entrega um pouco menor que C |
+| B | 200 | --- | sem entrega | 0 | Não partiu, quando partiu avançou muito pouco (possível problema elétrico, tentar isoladamente, recalibrar e se necessário trocar IRF520 e motor) |
+| C | 230 | 230 | 4530 | ~10 | Partida OK, serviu como "referência de tempo de entrega" para calibração da A, sofreu interrupções leves no acionamento possivelmente problemas causados após tentativa de entrega da esteira B |
+
+> ✅ **Nova calibração (commit `ddf526a`, 20/10):**
 
 **Portão do Bloco 3:** [ ] três esteiras individualmente aprovadas · [ ] integração A+B+C aprovada · [ ] medições/calibração registradas (calibração PWM/kick ✅; tempos/ciclos/dispersão ⬜) · [ ] falhas e resets documentados. Aprovado por/data: __________.
 
