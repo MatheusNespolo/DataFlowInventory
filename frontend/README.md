@@ -38,6 +38,7 @@ frontend/
 │   └── style.css     # Estilos (IBM Plex, IEC-60073, depth CSS, temas de status)
 ├── js/
 │   ├── app.js        # Lógica principal (Socket.IO, roteamento de hash, eventos, UI)
-│   └── diagrama3d.js # Diagrama 3D com Three.js
+│   ├── diagrama3d.js # Diagrama 3D com Three.js
+│   └── separador.js  # Posição estimada da roda do separador (SVG e 3D)
 └── vendor/           # Dependências locais (Socket.IO client, Three.js)
 ```

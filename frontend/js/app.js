@@ -202,6 +202,7 @@ socket.on('estado_inicial', (data) => {
   console.log('[WS] Estado inicial recebido:', data);
 
   if (data.status && data.status.estado) {
+    window.dfiUltimoStatus = data.status; // semente do separador (js/separador.js)
     atualizarEstado(data.status);
   }
   if (data.estoque && data.estoque.pecaA !== undefined) {
@@ -245,6 +246,7 @@ socket.on('gateway', (data) => {
 
 // Status do sistema
 socket.on('status', (data) => {
+  window.dfiUltimoStatus = data;
   atualizarEstado(data);
 });
 

@@ -111,9 +111,20 @@
           <circle id="svg-sensor-topo-c" cx="350" cy="45" r="6" fill="#666"/>
           <circle id="svg-sensor-j3" cx="350" cy="135" r="6" fill="#666"/>
 
-          <!-- Separador (final da principal) -->
-          <circle cx="440" cy="150" r="35" fill="none" stroke="#777" stroke-width="2" stroke-dasharray="5,3"/>
-          <text x="440" y="153" text-anchor="middle" fill="#aaa" font-size="10">Separador</text>
+          <!-- Separador (final da principal): 3 compartimentos que giram até a peça pedida.
+               C fica no neutro (ponto de recebimento, à esquerda); A e B ficam a 120° e 240°.
+               js/separador.js gira o grupo; os ângulos espelham SEPARADOR_GRAUS_* do firmware. -->
+          <circle cx="440" cy="150" r="35" fill="#171a22" stroke="#777" stroke-width="2" stroke-dasharray="5,3"/>
+          <g id="svg-separador-roda" data-destino="" data-movendo="nao">
+            <path d="M440 150 L421.9 129.9 A27 27 0 0 0 421.9 170.1 Z" fill="#3498db" fill-opacity="0.75" stroke="#1b1e27" stroke-width="1"/>
+            <text x="423.3" y="153.0" text-anchor="middle" fill="white" font-size="9" font-weight="600">C</text>
+            <path d="M440 150 L431.7 175.7 A27 27 0 0 0 466.4 155.6 Z" fill="#2ecc71" fill-opacity="0.75" stroke="#1b1e27" stroke-width="1"/>
+            <text x="448.4" y="167.5" text-anchor="middle" fill="white" font-size="9" font-weight="600">B</text>
+            <path d="M440 150 L466.4 144.4 A27 27 0 0 0 431.7 124.3 Z" fill="#e74c3c" fill-opacity="0.75" stroke="#1b1e27" stroke-width="1"/>
+            <text x="448.4" y="138.5" text-anchor="middle" fill="white" font-size="9" font-weight="600">A</text>
+          </g>
+          <polygon points="403,144 403,156 411,150" fill="#dfe6ff"/>
+          <text x="440" y="198" text-anchor="middle" fill="#aaa" font-size="10">Separador</text>
 
           <!-- Sensores -->
           <text x="10" y="45" fill="#888" font-size="9">Sensor Topo</text>
@@ -354,6 +365,9 @@
   <script src="js/app.js"></script>
   <!-- LED da tecla ARC + polling de /api/status (módulo independente de app.js) -->
   <script type="module" src="js/seletor.js"></script>
+  <!-- Posição estimada da roda do separador (alimenta o SVG e a cena 3D abaixo; deve
+       vir ANTES de diagrama3d.js, que lê window.EstadoDiagrama.separador). -->
+  <script type="module" src="js/separador.js"></script>
   <!-- Aprimoramento progressivo: cena 3D do diagrama (three.js local).
        Se falhar, o SVG acima continua valendo. -->
   <script type="module" src="js/diagrama3d.js"></script>

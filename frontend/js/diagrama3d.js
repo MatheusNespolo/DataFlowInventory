@@ -102,14 +102,67 @@ function init() {
   secC.corLigada = new THREE.Color(corC);
   [secA, secB, secC].forEach((s) => mundo.add(s.mesh));
 
-  // Separador (cilindro vertical tipo balde, fim da principal)
-  const roda = new THREE.Mesh(
+  // Separador (cilindro vertical tipo balde, fim da principal). Tem 3 compartimentos
+  // coloridos (A, B, C) que giram até a peça pedida; js/separador.js mantém o ângulo
+  // (window.EstadoDiagrama.separador.graus, 0° = neutro). C fica no neutro, voltado
+  // para o fim da esteira principal (lado -X); A e B ficam a 120° e 240° e vêm até lá
+  // girando no sentido anti-horário visto de cima, como o SVG. Os ângulos locais
+  // abaixo (direção (sen a, cos a) no plano XZ) fazem o compartimento X chegar ao
+  // ponto de recebimento quando a roda gira GRAUS[X] graus.
+  const roda = new THREE.Group();
+  roda.position.set(3.97, 0, 1.0);
+  mundo.add(roda);
+
+  const corpoRoda = new THREE.Mesh(
     new THREE.CylinderGeometry(0.72, 0.72, 0.55, 32),
     new THREE.MeshStandardMaterial({ color: 0x2b2f3a, roughness: 0.5, metalness: 0.5 })
   );
-  roda.position.set(3.97, 0.275, 1.0);
-  roda.castShadow = true;
-  mundo.add(roda);
+  corpoRoda.position.y = 0.275;
+  corpoRoda.castShadow = true;
+  roda.add(corpoRoda);
+
+  const compartimentos = {};
+  [['A', corA, 150], ['B', corB, 30], ['C', corC, -90]].forEach(([letra, cor, graus]) => {
+    const abertura = THREE.MathUtils.degToRad(96);
+    const mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(cor).multiplyScalar(0.55), roughness: 0.45, metalness: 0.2,
+      emissive: new THREE.Color(cor), emissiveIntensity: 0.12,
+    });
+    const mesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.66, 0.66, 0.1, 24, 1, false, THREE.MathUtils.degToRad(graus) - abertura / 2, abertura),
+      mat
+    );
+    mesh.position.y = 0.6;
+    mesh.castShadow = true;
+    roda.add(mesh);
+    compartimentos[letra] = { mesh, mat, alvo: 0, atual: 0 };
+  });
+
+  // Anel da borda: acende enquanto a roda gira (a ativação do separador).
+  const anel = {
+    mat: new THREE.MeshStandardMaterial({
+      color: 0x2c323c, roughness: 0.4, metalness: 0.4,
+      emissive: new THREE.Color(0x9a7bff), emissiveIntensity: 0.05,
+    }),
+    alvo: 0, atual: 0,
+  };
+  const anelMesh = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 8, 64), anel.mat);
+  anelMesh.rotation.x = Math.PI / 2;
+  anelMesh.position.y = 0.56;
+  roda.add(anelMesh);
+
+  // Marcador FIXO (não gira) sobre o ponto de recebimento: o compartimento que
+  // estiver sob ele é o que recebe a peça.
+  const marcador = new THREE.Mesh(
+    new THREE.ConeGeometry(0.09, 0.22, 3),
+    new THREE.MeshStandardMaterial({
+      color: 0xdfe6ff, roughness: 0.3, metalness: 0.2,
+      emissive: new THREE.Color(0x9aa8ff), emissiveIntensity: 0.5,
+    })
+  );
+  marcador.rotation.x = Math.PI; // ponta para baixo
+  marcador.position.set(3.97 - 0.55, 0.86, 1.0);
+  mundo.add(marcador);
 
   // Sensores: topo de cada secundária + junção com a principal
   const sensores = {
@@ -226,6 +279,23 @@ function init() {
       const k = aprox(s, 'atual', s.alvo, 8);
       s.mat.emissiveIntensity = 0.03 + k * 1.0;
       s.mesh.scale.setScalar(1 + k * 0.14);
+    });
+
+    // separador: ângulo estimado (malha aberta, ver js/separador.js), anel aceso
+    // enquanto gira e compartimento destacado quando a roda chega
+    const sep = estado.separador;
+    if (sep) {
+      const rot = THREE.MathUtils.degToRad(sep.graus);
+      if (Math.abs(rot - roda.rotation.y) > 1e-4) animando = true;
+      roda.rotation.y = rot;
+      anel.alvo = sep.movendo ? 1 : 0;
+      Object.entries(compartimentos).forEach(([letra, c]) => {
+        c.alvo = sep.destino === letra && !sep.movendo ? 1 : 0;
+      });
+    }
+    anel.mat.emissiveIntensity = 0.05 + aprox(anel, 'atual', anel.alvo, 8) * 1.4;
+    Object.values(compartimentos).forEach((c) => {
+      c.mat.emissiveIntensity = 0.12 + aprox(c, 'atual', c.alvo, 6) * 0.7;
     });
 
     // parallax
