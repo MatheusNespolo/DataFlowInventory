@@ -35,10 +35,12 @@ O frontend é um **dashboard web responsivo** que conecta ao servidor Node.js vi
 | Componente | Descrição |
 |------------|-----------|
 | **Faixa Anunciadora (IEC 60073)** | LEDs de status: verde (ok), amarelo (atenção), vermelho (fault) — seguem a norma de cores para sinais industriais |
-| **Diagrama do Sistema** | SVG interativo das esteiras e sensores; aprimoramento progressivo com three.js (WebGL) |
+| **Diagrama do Sistema** | SVG interativo das esteiras e sensores; aprimoramento progressivo com three.js (WebGL). O cilindro do **separador** tem 3 compartimentos (A, B, C, nas cores das peças) e gira até a peça pedida, na mesma velocidade e pelo mesmo caminho mais curto da roda real (60°/s); o anel acende enquanto gira e o compartimento chega sob o marcador de recebimento. É uma **posição estimada** (malha aberta, ver abaixo) |
 | **Controle de Estoque** | Badges coloridos: aviso (=3), alerta (=2), crítico (≤1) |
 | **Botões de Comando** | Solicitar peça A/B/C, Reset do sistema |
 | **Relógio do Servidor** | Horário sincronizado com o servidor Node.js |
+
+**Roda do separador no diagrama (`js/separador.js`).** O firmware não publica a posição da roda, então o diagrama aplica a **mesma regra do firmware** (`separador_auto`) sobre o `status` que já recebe: do estado `ACIONANDO_ESTEIRA` (checagem prévia aprovada) até o fim da entrega (`ENTREGANDO_PECA`) a roda busca o compartimento da peça pedida (A 120°, B 240°, C e neutro 0°, iguais a `SEPARADOR_GRAUS_*` de `config.h`); depois da entrega ela **fica** onde está até o pedido seguinte. Pedido recusado não a move, e o evento `inicio` (Uno reiniciado) a devolve ao neutro, porque o firmware volta a supor a roda ali. Funciona igual com o simulador. **Limites:** é uma estimativa; a posição real pode diferir (o comando de bancada `CMD:SEP` move a roda sem aparecer no `status`, e qualquer reinício a desalinha). Com `prefers-reduced-motion` a roda vai direto ao destino. O estado fica em `window.EstadoDiagrama.separador` (`destino`, `alvo`, `graus`, `movendo`).
 
 ### Histórico e Equipamentos (`#/status`)
 
@@ -115,6 +117,7 @@ frontend/
 ├── js/
 │   ├── app.js                    # Socket.IO, handlers, roteamento
 │   ├── diagrama3d.js             # Three.js WebGL (mimic 3D)
+│   ├── separador.js              # Posição estimada da roda do separador (alimenta o SVG e o 3D)
 │   ├── ambiente3d.js             # Ambiente/câmera three.js
 │   ├── arquitetura-sinais.js     # Coletor de sinais Socket.IO/MQTT
 │   ├── arquitetura-status.js     # Função pura de status
