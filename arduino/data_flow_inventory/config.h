@@ -86,5 +86,5 @@
 // pulsoMinJuncaoMs : pulso mínimo na junção para valer como passagem
 //                         pwm  kick  partida  timeout  saida  pulso
 #define PARAM_ESTEIRA_A { 245,  180,  3000,    12500,   3000,  20 }
-#define PARAM_ESTEIRA_B { 200,  130,  3000,    12500,   3000,  20 }
+#define PARAM_ESTEIRA_B { 200,  180,  3000,    12500,   3000,  20 }
 #define PARAM_ESTEIRA_C { 230,  180,  3000,    12500,   3000,  20 }
