@@ -27,6 +27,10 @@ test('E2E3 — peça sem estoque: ERRO sem_estoque aparece no histórico, nos bo
   await expect(page.locator('#ajuda-controle')).toBeVisible();
 
   // O reset recupera o sistema; as outras peças (B, C) seguem disponíveis.
+  // O ERRO chega ~300 ms após o pedido (DELAY_VERIFICACAO do simulador): sem esperar
+  // COMANDO_INTERVALO_MS desde o pedido, o reset seria recusado pelo rate limit e o
+  // sistema ficaria em ERRO.
+  await page.waitForTimeout(INTERVALO_COMANDO_MS + 100);
   await page.locator('#btn-reset').click();
   await expect(estado).toHaveText('AGUARDANDO_PEDIDO');
   await expect(page.locator('#estoque-b')).toHaveText('1');
