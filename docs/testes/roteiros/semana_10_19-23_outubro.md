@@ -2,12 +2,16 @@
 
 ## Resumo Refinado e Critérios de Saída
 
+> **Atualização de estado (23/10/2026):** na quarta-feira conseguimos rodar todas as esteiras em bancada, e o ajuste do PWM foi registrado nos últimos commits (`ddf526a`, `1e8fbf1`, `d4ecc2f`). A etapa funcional foi validada como estrutura de teste; o que restou em bancada é a montagem final na estrutura do projeto, com fixação das esteiras na base e teste individual de cada uma para garantir que a montagem mecânica não afete o comportamento padrão.
+
 Dadas as validações prévias da Semana 9, avançaremos com a validação de integração do Bloco 3 e os primeiros ensaios envolvendo comportamentos automáticos. Cada seção executada deverá documentar saídas com tabelas ou relatórios anexos.
 
-| Tarefas (Semana 10) | Status / Evidências             |
-|---------------------|---------------------------------|
-| Integração Bloco 3  | ⬜ Resultados finais pendentes  |
-| Separador Isolado   | ⬜ OK em isolado / hardware     |
+| Item | Status atualizado (23/10/2026) | Evidência |
+|---|---|---|
+| Esteiras A/B/C rodando em bancada | ✅ Concluído em parte | teste em bancada na quarta-feira; PWM e kick registrados no firmware |
+| Ajuste de PWM / kick | ✅ Registrado | commits `ddf526a`, `1e8fbf1`, `d4ecc2f` |
+| Montagem na base / estrutura | ⬜ Restante | fixação física e teste um a um na estrutura final |
+| Peças 3D do separador e do deslocador | ⬜ Próxima semana | validação mecânica e funcional na Semana 11 |
 
 ---
 

@@ -2,9 +2,9 @@
 
 Este documento define os testes de integração da cadeia de comunicação do sistema, do link Serial (Arduino ↔ ESP32) até o teste End-to-End (Dashboard ↔ Arduino).
 
-**Situação de validação atualizada (bancada, 18/10/2026):** firmware Uno v3.0 validado em bancada; itens 1.1–1.11 e Bloco 2 concluídos, e B/C funcionando com o firmware novo. A calibração A/B/C (parâmetros `pwmRegime`/`kickMs`) está registrada e funciona em operação simultânea **como relato** (commit `e3c8833`).
+**Situação de validação atualizada (bancada, 23/10/2026):** na quarta-feira todas as esteiras foram rodadas em bancada e o ajuste do PWM foi registrado nos últimos commits (`ddf526a`, `1e8fbf1`, `d4ecc2f`). O software/firmware já está em um patamar estável de bancada; o que resta é o fechamento mecânico e funcional na estrutura do projeto: fixação das esteiras na base, teste individual para confirmar que a montagem final não afeta o funcionamento padrão e a validação das peças 3D do separador e do deslocador.
 
-**Pendências/retestes:** (1) Bloco 3 ainda sem entrega de tempos/ciclos/dispersão para preenchimento (não converter plano em aprovação), (2) LCD I2C com falha elétrica (`i2c_n=0`) — precisa troca e reteste após a troca, (3) separador **automático** não foi validado em hardware (PC/lógica apenas). Consulte os roteiros da [Semana 8 (resultados)](roteiros/semana_08_05-09_outubro.md), [Semana 9 (14–18/10)](roteiros/semana_09_14-18_outubro.md) e [Semana 10 (19–23/10)](roteiros/semana_10_19-23_outubro.md).
+**Pendências/retestes:** (1) montagem final na base e garantia de que a estrutura não altera a operação original, (2) teste individual e sequencial de cada esteira fixada na base, (3) validação das peças 3D do separador e da peça que percorre as esteiras, (4) integração total ao final da próxima semana. O separador automático segue como item de validação em hardware, condicionado a evidência de bancada. Consulte os roteiros da [Semana 8 (resultados)](roteiros/semana_08_05-09_outubro.md), [Semana 9 (14–18/10)](roteiros/semana_09_14-18_outubro.md), [Semana 10 (19–23/10)](roteiros/semana_10_19-23_outubro.md) e [Semana 11 (26–30/10)](roteiros/semana_11_26-30_outubro.md).
 
 **Documentos relacionados:**
 - 🧪 [`broker_local_mosquitto.md`](../broker_local_mosquitto.md) — Instalação e configuração do broker local
