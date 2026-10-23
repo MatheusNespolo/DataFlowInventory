@@ -45,13 +45,13 @@ Engenharia de Controle e Automação
 | Tema | O que você encontra | Onde está detalhado |
 |------|---------------------|---------------------|
 | 🧠 **C++ embarcado** | Máquina de estados finita (5 estados) no Arduino Uno, protocolo serial em JSON e gateway ESP32 com LWT e reconexão Wi-Fi não bloqueante | [Funcionamento](#funcionamento) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
-| 🏭 **Automação e intralogística** | 4 esteiras, 6 sensores infravermelhos, controle de estoque e timeout de entrega | [Visão Geral](#visão-geral) · [Funcionamento](#funcionamento) |
+| 🏭 **Automação e intralogística** | 4 esteiras, 6 sensores infravermelhos, roda separadora com motor de passo, controle de estoque e supervisão da entrega por marcos | [Visão Geral](#visão-geral) · [Funcionamento](#funcionamento) |
 | 📡 **IoT e MQTT** | Mosquitto local ou HiveMQ Cloud, tópicos `dataflow/*`, mensagens retained e LWT | [Tópicos MQTT](#tópicos-mqtt) |
 | ⏱️ **Tempo real** | Servidor Node.js com Socket.IO, dashboard responsivo e vista 3D da bancada | [Destaques Técnicos](#destaques-técnicos) |
 | 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
-| ✅ **Qualidade** | Testes unitários, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
+| ✅ **Qualidade** | Testes da lógica do firmware em g++ (84 testes), testes unitários do frontend, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
 
-> **Status de validação (13/10/2026):** firmware Uno v3.0 validado em bancada; itens 1.1–1.11 e Bloco 2 aprovados, e esteiras B e C funcionando com o firmware novo. O teste integrado A+B+C com calibração e a validação do separador permanecem pendentes/replanejados. Consulte [Semana 8](docs/testes/roteiros/semana_08_05-09_outubro.md), [roteiro da Semana 9](docs/testes/roteiros/semana_09_14-18_outubro.md) e [plano de testes](docs/testes/plano_de_testes.md).
+> **Status de validação (23/10/2026):** firmware Uno v3.0 validado em bancada; as três esteiras (A, B e C) foram calibradas e rodaram juntas em 21/10, com PWM e kick registrados em `config.h` (`e3c8833`, `ddf526a`, `d4ecc2f`). O separador (roda giratória) está integrado ao firmware e respondeu aos comandos de bancada; o modo automático e as peças impressas em 3D serão validados na Semana 11, a última bancada, junto com a montagem final na base e a integração total. Consulte o [roteiro da Semana 10](docs/testes/roteiros/semana_10_19-23_outubro.md), o [roteiro da Semana 11](docs/testes/roteiros/semana_11_26-30_outubro.md) e o [plano de testes](docs/testes/plano_de_testes.md).
 
 ## Sumário
 
@@ -108,28 +108,28 @@ O sistema é composto por:
 |------------|--------|
 | 🏗️ **4 esteiras transportadoras** | 1 principal (liga direto na fonte) + 3 secundárias com driver IRF520 |
 | 🔍 **6 sensores infravermelhos** | TCRT5000 — 3 no topo + 3 nas junções |
-| 🎡 **Roda giratória** (melhoria) | 3 compartimentos para separação de peças |
+| 🎡 **Roda giratória (separador)** | 3 compartimentos para separação de peças; motor de passo 28BYJ-48 + driver ULN2003 |
 | 🎛️ **Arduino Uno** | Controlador principal (FSM de 5 estados) |
 | 📡 **ESP32** | Gateway MQTT (bridge Serial ↔ Wi-Fi) |
 | 🖥️ **Dashboard web** | HTML/CSS/JS + Socket.IO em tempo real |
 | ⚙️ **Servidor Node.js** | Ponte entre MQTT e WebSocket |
-| ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (parcialmente validado — TLS/8883 OK, E2E remoto pendente) |
+| ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (TLS/8883, E2E remoto validado em 19/09/2026) |
 
-> A roda giratória é um aprimoramento futuro do projeto, uma sugestão de melhoria. Atualmente existem menções ao controle no motor de passo no código, mas ele está comentado para ajustes durante o desenvolvimento até a integração final.
+> A roda giratória está integrada ao firmware v3.0 (pinos 5 a 8, sem bloquear o `loop()`): ela se prepara sozinha no compartimento da peça pedida assim que a checagem prévia aprova o pedido e fica nele até o pedido seguinte. Também aceita o comando de bancada `CMD:SEP:A|B|C|0` pela USB. A roda impressa em 3D e o modo automático com o hardware serão validados na Semana 11 (ver [`separador_bancada.md`](docs/testes/roteiros/separador_bancada.md)).
 
 ## Destaques Técnicos
 
 | Capacidade | Detalhe |
 |------------|---------|
 | 🏭 **Indicadores IEC-60073** | Painel anunciador com LEDs de status: verde (ok) / amarelo (atenção) / vermelho (fault), seguindo a norma de cores para sinais industriais. |
-| 🔮 **Diagrama 3D** | Visualização panorâmica da bancada com three.js e depth CSS, com parallax controller — SVG estático como fallback. |
+| 🔮 **Diagrama 3D** | Visualização panorâmica da bancada com three.js e depth CSS, com parallax controller — SVG estático como fallback. O cilindro do separador gira até a peça pedida, na velocidade da roda real (posição estimada a partir do `status`). |
 | 🎨 **Tipografia IBM Plex** | Sans (UI) e Mono (readouts de estado), reforçando a identidade visual industrial. |
 | 📊 **Alertas de estoque graduados** | Aviso (=3 peças), alerta (=2), crítico (≤1) — com badges, cores e anunciador luminoso dedicados. |
 | 🔐 **Segurança** | Helmet + CSP, CORS restrito por `ALLOWED_ORIGIN`, rate limit por socket (`COMANDO_INTERVALO_MS`), validação de entrada de comandos. |
 | 📡 **LWT e Health Check** | Last Will and Testament para monitoramento de presença; endpoint `/api/status` retorna HTTP 503 quando o broker está indisponível. |
 | 🔄 **Resiliência** | Reconexão Wi-Fi não-bloqueante, shutdown gracioso (SIGINT/SIGTERM), estoque e gateway como retained. |
 | 📱 **Responsivo** | Layout adaptável testado em 1920×1080, 1366×768 e ≤720px. |
-| 🗺️ **Hash routing** | Vistas `#/` (painel principal) e `#/status` (histórico/equipamentos) com navegação por hash. |
+| 🗺️ **Hash routing** | Vistas `#/` (painel principal), `#/status` (histórico/equipamentos) e `#/arquitetura` (arquitetura 3D navegável com o status de cada conexão) com navegação por hash. |
 | 🖥️ **Simulador offline** | FSM completa em JavaScript emitindo os mesmos eventos Socket.IO do servidor real — teste sem hardware. |
 
 <div align="center">
@@ -180,8 +180,8 @@ DataFlowInventory/
 │       ├── data_flow_inventory.ino        # Sketch do Arduino (setup/loop)
 │       ├── config.h                       # Pinos, prazos por esteira e constantes
 │       └── src/
-│           ├── logica/                    # FSM, supervisor de entrega, protocolo, filtro, telas (testável em g++)
-│           └── hw/                        # Motores, sensores, LCD, comunicação e diagnóstico
+│           ├── logica/                    # FSM, supervisor de entrega, protocolo, filtro, telas, LCD e plano do separador (testável em g++)
+│           └── hw/                        # Motores, sensores, LCD, separador, comunicação e diagnóstico
 │
 ├── esp32/
 │   ├── gateway_mqtt/
@@ -206,6 +206,7 @@ DataFlowInventory/
 │   │   └── style.css                      # Estilos (dark theme)
 │   ├── js/
 │   │   ├── app.js                         # Lógica WebSocket + UI
+│   │   ├── separador.js                   # Posição estimada da roda do separador no diagrama
 │   │   └── arquitetura-*.js, *3d.js       # Vista de arquitetura e ambiente 3D
 │   └── vendor/                            # three.js e controles (terceiros)
 │
@@ -258,8 +259,8 @@ O Arduino opera com **5 estados**:
 | # | Estado | Descrição |
 |---|--------|-----------|
 | 1 | **AGUARDANDO_PEDIDO** | Sistema em repouso, aguarda comandos remotos (botões físicos desabilitados) |
-| 2 | **VERIFICANDO_ESTOQUE** | Verifica sensor do topo + contador interno |
-| 3 | **ACIONANDO_ESTEIRA** | Liga o motor da esteira escolhida: kick-start em PWM 255 por **kickMs** (A=180 ms, B=130 ms, C=180 ms) e depois PWM de regime da própria esteira (A=225, B=200, C=230), calibrado em bancada no commit `e3c8833` |
+| 2 | **VERIFICANDO_ESTOQUE** | Checagem prévia sem ligar o motor: estoque, peça no topo e junção livre |
+| 3 | **ACIONANDO_ESTEIRA** | Liga o motor da esteira escolhida: kick-start em PWM 255 por **kickMs** (A=180 ms, B=180 ms, C=180 ms) e depois PWM de regime da própria esteira (A=245, B=200, C=230), calibrados em bancada (`e3c8833`, `ddf526a`, `d4ecc2f`). O separador parte para o compartimento da peça neste momento |
 | 4 | **ENTREGANDO_PECA** | Supervisão por marcos: topo livre em 3 s, junção em 12,5 s (débito na confirmação) e 3 s de saída |
 | 5 | **ERRO** | Motores desligados; LCD e dashboard mostram onde falhou (ver `docs/ARCHITECTURE.md` §3); aguarda reset |
 
@@ -299,7 +300,9 @@ O Arduino opera com **5 estados**:
 | ESP32 Dev Module | 1 | Gateway MQTT |
 | Driver IRF520 | 3 | Controle de 1 motor cada |
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
-| Display LCD 16x2 | 1 | Com módulo I2C (endereço 0x27) |
+| Display LCD 16x2 | 1 | Com módulo I2C (endereço detectado automaticamente: 0x20–0x27 ou 0x38–0x3F) |
+| Motor de passo 28BYJ-48 + driver ULN2003 | 1 | Roda separadora (alimentação 5 V própria, GND comum) |
+| Peças impressas em 3D | — | Roda separadora (3 compartimentos) e peça transportada |
 | Botões | 4 | 3 solicitação + 1 reset (opcionais) |
 | Fonte 12V DC | 1 | Alimentação geral |
 
@@ -339,7 +342,8 @@ O Arduino opera com **5 estados**:
 | 6 sensores TCRT5000 | 6 digitais | A0, A1, A2, A3, 2, 4 |
 | LCD I2C | 2 (SDA/SCL) | A4 (SDA), A5 (SCL) |
 | Serial ESP32 | 2 (RX/TX) | 0 (RX), 1 (TX) |
-| **Total** | **14** | **Uno tem 20 disponíveis ✅** |
+| Separador (ULN2003 IN1–IN4) | 4 digitais | 5, 6, 7, 8 |
+| **Total** | **18** | **Uno tem 20 disponíveis ✅** |
 
 **⚠️ Atenções com Arduino Uno**:
 - Pins 0 e 1 são compartilhados com a porta USB de programação. **Desconecte o ESP32 durante upload de código**.
@@ -350,7 +354,7 @@ O Arduino opera com **5 estados**:
 
 | Configuração | Controlador | Driver | Pinos Usados | Custo |
 |-------------|-------------|--------|--------------|-------|
-| **Principal** (econômica) | Uno | 3× IRF520 | 14 (sem botões) | Baixo |
+| **Principal** (econômica) | Uno | 3× IRF520 | 18 (sem botões, com separador) | Baixo |
 | **Alternativa B** (misturada) | Mega 2560 | 3× IRF520 | 17 + 4 botões | Médio-Baixo |
 | **Alternativa C** (limitada) | Uno | 2× L298N | 10 + 4 botões | *Botões não cabem ❌* |
 
@@ -395,8 +399,9 @@ Acessar http://localhost:3000 no navegador.
 #### 1. Configurar o Arduino
 
 1. Abrir `arduino/data_flow_inventory/data_flow_inventory.ino`
-2. Selecionar placa: **Arduino Uno R3**
-3. Fazer upload
+2. Instalar as bibliotecas **LiquidCrystal I2C** (1.1.2) e **Stepper** (1.1.3) pelo Gerenciador de Bibliotecas
+3. Selecionar placa: **Arduino Uno R3**
+4. Fazer upload (com a roda do separador no neutro: não há sensor de referência)
 
 #### 2. Configurar o ESP32
 
@@ -431,22 +436,23 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## Próximos Passos
 
-### Próximas validações (13/10/2026)
+### Próximas validações (23/10/2026)
 
-- **Prioridade — separador:** implementado sem bloqueio em `src/hw/separador.*` (ULN2003 nos pinos 5 a 8); o giro isolado por comando foi relatado como funcionando e a roda se prepara sozinha de acordo com a peça pedida, mas o **modo automático ainda não foi validado em bancada** (ver [`separador_bancada.md`](docs/testes/roteiros/separador_bancada.md)).
-- **Semana 9 (14–18/10):** dias úteis para preparação segura da bancada e testes isolados; fim de semana com hardware completo para tarefas opcionais independentes de Data Flow System e CX9240, além da validação física do separador. Ver [roteiro](docs/testes/roteiros/semana_09_14-18_outubro.md).
-- **Semana 10 (19–23/10):** validação funcional concluída em bancada para as três esteiras; PWM/kick registrados nos últimos commits e a fase de montagem final ficou concentrada na fixação da estrutura do projeto. Ver [roteiro](docs/testes/roteiros/semana_10_19-23_outubro.md).
-- **Semana 11 (26–30/10):** última bancada de teste com integração total ao final da semana, focando na montagem final na base, testes um a um e validação das peças 3D (roda separadora para motor de passo e peça que percorre as esteiras). Ver [roteiro](docs/testes/roteiros/semana_11_26-30_outubro.md).
+- **Semana 11 (26–30/10) — última bancada de teste:** montagem final das esteiras na base, com teste de uma esteira por vez para garantir que a estrutura não altera o funcionamento calibrado; validação das peças impressas em 3D (roda separadora no motor de passo e peça que percorre as esteiras) e do separador em modo automático; integração total em 30/10. Ver [roteiro](docs/testes/roteiros/semana_11_26-30_outubro.md).
+- **LCD:** o firmware procura o módulo em qualquer endereço e se recupera de quedas, mas na bancada nenhum dispositivo respondeu no I²C (`i2c_n 0`): falha elétrica, o módulo será trocado. O sistema opera sem o LCD.
 - **Itens concluídos:** CI/CD, telemetria Prometheus/Grafana, broker HiveMQ Cloud E2E e historiador CX9240 possuem documentação de implementação/validação em [`docs/CI-CD.md`](docs/CI-CD.md), [`observability/README.md`](observability/README.md), [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) e [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md).
-- **Implantação:** o guia [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) ainda aguarda execução do zero em máquina limpa.
+- **Planejamento:** o andamento de cada frente está no [GitHub Project](https://github.com/users/MatheusNespolo/projects/3), com os commits e PRs de evidência em cada card.
 - 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Telemetria concluída em 01/10/2026: código, testes automatizados e validação do stack (smoke test e conferência dos painéis). Ver [`observability/README.md`](observability/README.md).
 - 📘 **Guia de implantação:** passo a passo para subir o sistema do zero em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md); ainda não validado em máquina limpa.
+
 ## Próximos Passos e Roteiros Disponíveis Atualizados
 
-Para etapas detalhadas sobre cada fase: [Semana 9](docs/testes/roteiros/semana_09_14-18_outubro.md) vs [Semana 10 (integrações)](docs/testes/roteiros/semana_10_19-23_outubro.md).
+Para etapas detalhadas sobre cada fase: [Semana 10 (calibração das esteiras)](docs/testes/roteiros/semana_10_19-23_outubro.md) vs [Semana 11 (montagem final e integração total)](docs/testes/roteiros/semana_11_26-30_outubro.md).
 
 - 🔧 **Diagnóstico IRF520 (esteiras B/C) — resolvido em 03/10:** a falha era elétrica (módulo IRF520 e motor da C, trocados; o firmware anterior estava correto). A C usa provisoriamente o módulo da A. Ver [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) (seção 4.2.1).
-- 🧪 **Semana 8 (fechamento em 13/10):** firmware Uno v3.0 validado em bancada (itens 1.1–1.11 e Bloco 2; B/C funcionando); integração A+B+C com calibração e separador foram replanejados. Resultados em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md).
+- 🧪 **Semana 8 (fechamento em 13/10):** firmware Uno v3.0 validado em bancada (itens 1.1–1.11 e Bloco 2; B/C funcionando). Resultados em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md).
+- 🎡 **Separador (18/10):** roda giratória integrada ao firmware sem bloqueio, comandos `CMD:SEP:A|B|C` validados em bancada e preparo automático conforme a peça pedida. Ver [`separador_bancada.md`](docs/testes/roteiros/separador_bancada.md).
+- ⚙️ **Semana 10 (21/10):** as três esteiras calibradas e rodando juntas. A esteira B não partia ou avançava pouco com o kick de 130 ms; com 180 ms (`d4ecc2f`) passou a partir normalmente, e a revisão do firmware confirmou que o acionamento é idêntico nas três esteiras. Resultados em [`docs/testes/roteiros/semana_10_19-23_outubro.md`](docs/testes/roteiros/semana_10_19-23_outubro.md).
 
 ## Equipe
 
