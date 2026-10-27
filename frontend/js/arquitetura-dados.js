@@ -10,7 +10,7 @@
 export const NOS_ARQ = {
   arduino: {
     codigo: 'FLD', nome: 'Arduino Uno — FSM', curto: 'Arduino Uno', camada: 'Campo', forma: 'placa', posicao: [-8, 0, 0],
-    funcao: 'Controla esteiras, sensores, LCD e separador; executa a máquina de estados e fala com o gateway pela serial.',
+    funcao: 'Controla esteiras, sensores, display OLED e separador; executa a máquina de estados e fala com o gateway pela serial.',
     secoes: [
       {
         titulo: 'Estados da FSM', fonte: 'ARCHITECTURE.md §3',
@@ -32,7 +32,7 @@ export const NOS_ARQ = {
         linhas: [
           ['Motor DC (esteiras)', '3', 'PWM 9, 10, 11', '12V (via IRF520)'],
           ['Sensor IR TCRT5000', '6', 'A0, A1, A2, A3, 2, 4', '5V'],
-          ['LCD 16x2 I2C', '1', 'SDA/SCL (A4/A5)', '5V'],
+          ['Display OLED 0,96" I2C (SSD1306)', '1', 'SDA/SCL (A4/A5)', '3,3–5V'],
           ['Motor de passo 28BYJ-48', '1', '5, 6, 7, 8 (ULN2003)', '5V'],
         ],
       },
@@ -142,7 +142,7 @@ export const ENLACES_ARQ = {
 export const HARDWARE = [
   { id: 'motores',  nome: 'Motores DC ×3', detalhe: 'PWM 9, 10, 11 · IRF520 · 12V', posicao: [-9.6, 0, 1.8] },
   { id: 'sensores', nome: 'Sensores IR ×6', detalhe: 'TCRT5000 · A0–A3, 2, 4', posicao: [-8, 0, 2.4] },
-  { id: 'lcd',      nome: 'LCD 16x2 I2C', detalhe: 'SDA/SCL (A4/A5)', posicao: [-6.4, 0, 1.8] },
+  { id: 'lcd',      nome: 'Display OLED', detalhe: 'SSD1306 · SDA/SCL (A4/A5)', posicao: [-6.4, 0, 1.8] },
   { id: 'passo',    nome: 'Motor de passo', detalhe: '28BYJ-48 · ULN2003 · 5–8', posicao: [-9.6, 0, -1.6] },
 ];
 

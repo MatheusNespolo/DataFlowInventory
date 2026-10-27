@@ -25,20 +25,25 @@
 #define SENSOR_JUNCAO_J2 2    // PCINT18 (porta D)
 #define SENSOR_JUNCAO_J3 4    // PCINT20 (porta D)
 
-// ---- LCD I2C 16x2 -------------------------------------------------------------
-// O endereço não é fixo: o firmware varre o barramento e usa o módulo que
-// responder em 0x20–0x27 ou 0x38–0x3F (src/logica/lcd_logica.h). Se o LCD sumir
-// (ruído de motor, mau contato), tenta religá-lo com o sistema parado:
+// ---- Display OLED 0,96" I2C 128x64 (SSD1306) -----------------------------------
+// Substituiu o LCD 16x2 (mesma tela de 2 linhas x 16 colunas; os nomes LCD_* e
+// lcd* ficaram). SDA em A4 e SCL em A5, como antes. O endereço não é fixo: o
+// firmware varre o barramento e usa o display que responder em 0x3C ou 0x3D
+// (src/logica/lcd_logica.h). Se ele sumir (ruído de motor, mau contato), tenta
+// religá-lo com o sistema parado:
 // primeiro depois de LCD_RECUPERACAO_BASE_MS e, se não adiantar, cada vez mais
 // devagar, até LCD_RECUPERACAO_MAX_MS.
 #define LCD_RECUPERACAO_BASE_MS  5000UL
 #define LCD_RECUPERACAO_MAX_MS   60000UL
+// 1 = o módulo usa o controlador SH1106 (comum nos de 1,3"; a tela sai deslocada
+// ou com uma faixa de pixels aleatórios na borda com o padrão SSD1306).
+#define OLED_CONTROLADOR_SH1106  0
 
 // ---- Separador (roda giratória): motor de passo 28BYJ-48 + driver ULN2003 -----
 // ULN2003 IN1..IN4 nos pinos 5 a 8: sequenciais, livres no Uno e fora do que já
 // está em uso (serial 0/1, sensores 2, 4 e A0–A3, I²C A4/A5, motores DC 9/10/11).
 // NÃO ligue o VCC do ULN2003 no 5 V do Uno alimentado por USB: o motor puxa
-// ~240 mA e o ruído derruba o LCD. Use 5 V próprios, com o GND em comum.
+// ~240 mA e o ruído derruba o display. Use 5 V próprios, com o GND em comum.
 #define STEPPER_IN1        5
 #define STEPPER_IN2        6
 #define STEPPER_IN3        7

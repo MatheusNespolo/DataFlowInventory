@@ -17,7 +17,7 @@
 //   config.h        pinos e parâmetros por esteira
 //   src/logica/     regras puras (FSM, marcos, filtro, protocolo, telas),
 //                   testadas no PC em test/firmware_uno
-//   src/hw/         motores, sensores, serial, LCD e diagnóstico
+//   src/hw/         motores, sensores, serial, display OLED, separador e diagnóstico
 //
 // Comunicação com o ESP32 (Serial 9600): mensagens JSON idênticas às do
 // firmware v2.x, com campos opcionais novos. Comandos: CMD:PECA:X, CMD:RESET.
@@ -66,14 +66,14 @@ void setup() {
 
   inicioMs = millis();
   sensoresIniciar(inicioMs);
-  // lcdIniciar pode levar mais de 1 s com o I2C ruim: alimenta o watchdog
+  // lcdIniciar (display OLED) pode levar ~1 s com o I2C ruim: alimenta o watchdog
   // antes e depois para não entrar em laço de reset no boot.
   watchdogAlimentar();
   const bool lcdNoBoot = lcdIniciar();
   watchdogAlimentar();
   lcdRecuperacaoIniciar(lcdRecup, millis(), LCD_RECUPERACAO_BASE_MS, LCD_RECUPERACAO_MAX_MS);
   lcdAtualizar("Data Flow", "Inventory v" VERSAO_FIRMWARE);
-  aberturaMs = millis();  // lcdIniciar leva ~1 s: a abertura conta daqui
+  aberturaMs = millis();  // a abertura conta a partir do display pronto
 
   // Separador (roda giratória): bobinas soltas e roda suposta no neutro.
   separadorIniciar(micros());
@@ -146,10 +146,10 @@ void loop() {
     passoPublicacao = (uint8_t)((passoPublicacao + 1) % PASSOS_PUBLICACAO);
   }
 
-  // LCD fora do ar (ruído de motor, mau contato, módulo que ainda não respondia no
-  // boot): tenta religar, mas só com o sistema parado. Achar o módulo custa ~1 s
-  // (a biblioteca espera 1 s no init), então nunca com motor ligado; o watchdog é
-  // alimentado antes e depois.
+  // Display fora do ar (ruído de motor, mau contato, módulo que ainda não respondia
+  // no boot): tenta religar, mas só com o sistema parado. A varredura e a
+  // inicialização custam ~0,1 s (até ~1 s com o I2C ruim), então nunca com motor
+  // ligado; o watchdog é alimentado antes e depois.
   const bool sistemaParado = (fsm.estado == AGUARDANDO_PEDIDO || fsm.estado == ERRO) &&
                              !desejado[0] && !desejado[1] && !desejado[2];
   if (lcdDeveTentar(lcdRecup, lcdAtivo(), sistemaParado, agora)) {
@@ -159,7 +159,7 @@ void loop() {
     lcdRegistrarTentativa(lcdRecup, millis(), religou);
   }
 
-  // LCD: depois da tela de abertura, mostra a tela da FSM (redesenha só se mudou).
+  // Display: depois da tela de abertura, mostra a tela da FSM (redesenha só se mudou).
   if (lcdAtivo() && (uint32_t)(agora - aberturaMs) >= TELA_ABERTURA_MS) {
     char l1[LCD_COLUNAS + 1], l2[LCD_COLUNAS + 1];
     textoTela(fsm, l1, l2);
@@ -169,7 +169,7 @@ void loop() {
   // Separador: no máximo 1 passo por volta do loop (não bloqueia) e solta as bobinas parado.
   separadorAtualizar(micros());
 
-  // De novo depois da serial e do LCD: no ciclo da partida, o kick de 255
+  // De novo depois da serial e do display: no ciclo da partida, o kick de 255
   // termina no tempo certo mesmo que a publicação tenha demorado.
   motoresAplicar(desejado, PARAMS, millis());
 
