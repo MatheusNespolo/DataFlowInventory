@@ -38,7 +38,7 @@ Arduino Uno (FSM) ←→ ESP32 (Gateway MQTT) ←→ Broker ←→ Server Node.j
 |--------|---------|----------|-----|-----------|
 | `dataflow/status` | ESP32 → | ✅ | 1 | Gateway online/offline (LWT) — **exclusivo gateway** |
 | `dataflow/status/server` | Server → | ✅ | 1 | Server online/offline — **não contamina dataflow/status** |
-| `dataflow/estoque` | Arduino → | ✅ | 1 | `{pecaA: N, pecaB: N, pecaC: N}` — sincronismo LCD/Dashboard |
+| `dataflow/estoque` | Arduino → | ✅ | 1 | `{pecaA: N, pecaB: N, pecaC: N}` — sincronismo display/Dashboard |
 | `dataflow/eventos` | Arduino → | ❌ | 1 | Histórico de entregas |
 | `dataflow/comandos/sub` | Server → | ❌ | 1 | Comandos do dashboard → Arduino |
 | `dataflow/comandos/pub` | ESP32 → | ❌ | 1 | Confirmação de comandos encaminhados (`encaminhado`/`rejeitado`) |
@@ -96,7 +96,7 @@ Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor ser
 
 | Componente | Bibliotecas |
 |---|---|
-| Arduino Uno | `Wire`, `LiquidCrystal_I2C`, `Stepper` (o JSON é montado à mão, sem `ArduinoJson`) |
+| Arduino Uno | `Wire`, `SSD1306Ascii` (display OLED), `Stepper` (o JSON é montado à mão, sem `ArduinoJson`) |
 | ESP32 | `WiFi`, `WiFiClientSecure`, `PubSubClient`, `ArduinoJson` |
 | Servidor Node.js | `express`, `socket.io`, `mqtt`, `dotenv`, `prom-client` |
 | Frontend | Socket.IO Client, JavaScript vanilla, CSS3 (sem build) |
@@ -151,19 +151,19 @@ flowchart LR
 
 **Campos opcionais (v3.0)** — as mensagens da v2.x continuam idênticas; os campos abaixo só são acrescentados no fim:
 - `evento: inicio` → `reset` (`energia`, `reinicio`, `watchdog` ou `brownout`), `lcd` (`true`/`false`), `ram_livre`
-- `type: status` → `ram_livre`, `lcd_end` (endereço I²C do LCD em uso; `0` = LCD fora), `i2c_n` (dispositivos que responderam na última varredura do barramento) e `lcd_quedas` (vezes em que o LCD parou de responder em operação)
+- `type: status` → `ram_livre`, `lcd_end` (endereço I²C do display OLED em uso: `60` = 0x3C ou `61` = 0x3D; `0` = display fora), `i2c_n` (dispositivos que responderam na última varredura do barramento) e `lcd_quedas` (vezes em que o display parou de responder em operação). Os nomes `lcd*` ficaram do LCD 16x2 que o OLED substituiu
 - `evento: erro` → `fase` (`verificacao`, `partida`, `transito`, `saida`), `t_ms` (desde a partida do motor), `bordas_juncao`
 
-**Robustez:** watchdog de 2 s (o Uno reinicia sozinho se o loop travar; quando o watchdog avisa a trava, os motores são desligados na hora, antes do reset); o LCD é procurado varrendo o barramento I²C (qualquer endereço de expansor, 0x20–0x27 ou 0x38–0x3F, o 0x27 e o 0x3F primeiro) e, se não responder, o sistema segue sem ele; se o barramento I²C travar durante a operação, o LCD é desligado em vez de travar o loop e **o firmware tenta religá-lo** com o sistema parado (a cada 5 s, dobrando até 60 s se não adiantar); a confirmação da junção ignora uma ocupação que começou antes da partida do motor; o estoque não é persistido (volta a 15 no boot) e o campo `reset` do `inicio` diz por que o Uno reiniciou. Abrir a Serial Monitor reinicia o Uno (auto-reset da USB), o que aparece como `reset: reinicio`.
+**Robustez:** watchdog de 2 s (o Uno reinicia sozinho se o loop travar; quando o watchdog avisa a trava, os motores são desligados na hora, antes do reset); o display OLED é procurado varrendo o barramento I²C (0x3C primeiro, depois 0x3D) e, se não responder, o sistema segue sem ele; se o barramento I²C travar durante a operação, o display é desligado em vez de travar o loop e **o firmware tenta religá-lo** com o sistema parado (a cada 5 s, dobrando até 60 s se não adiantar); a confirmação da junção ignora uma ocupação que começou antes da partida do motor; o estoque não é persistido (volta a 15 no boot) e o campo `reset` do `inicio` diz por que o Uno reiniciou. Abrir a Serial Monitor reinicia o Uno (auto-reset da USB), o que aparece como `reset: reinicio`.
 
 **Decisões de projeto da v3.0** (registradas na revisão de código de 03/10/2026):
 - **Código antigo fora do `.ino`:** o trecho comentado dos botões físicos não foi levado para a v3.0 e continua só no histórico do git (firmware v2.1; o commit `fddde08` serve de rollback para a v2.x). O do separador foi reescrito sem bloqueio e está ativo em `src/hw/separador.*` (ver §6.2).
 - **Nenhum débito sem passagem:** o estoque só é debitado com uma passagem de pelo menos 20 ms na junção da esteira pedida, iniciada depois da partida do motor. Duas brechas foram fechadas além do plano inicial: a interrupção marcar a ocupação depois da leitura do relógio e uma junção ocupada entre a checagem prévia e a partida. Um pulso que atravessa a partida também não confirma. O teste dessa regra varre combinações de peça, junção, largura e instante.
-- **LCD é opcional e se recupera:** se o I²C travar em operação, o LCD é desligado e o sistema segue; com os motores parados (`AGUARDANDO_PEDIDO` ou `ERRO`), o firmware refaz a busca e a inicialização (~1 s, por causa do `delay(1000)` da biblioteca). Nunca com motor ligado. O `status` informa `lcd_end`, `i2c_n` e `lcd_quedas` para diagnosticar pelo dashboard ou pelo `mqtt_probe`.
+- **Display é opcional e se recupera:** se o I²C travar em operação, o display é desligado e o sistema segue; com os motores parados (`AGUARDANDO_PEDIDO` ou `ERRO`), o firmware refaz a busca e a inicialização (~0,1 s com o OLED; eram ~1 s com o LCD 16x2, por causa do `delay(1000)` da biblioteca dele). Nunca com motor ligado. O `status` informa `lcd_end`, `i2c_n` e `lcd_quedas` para diagnosticar pelo dashboard ou pelo `mqtt_probe`.
 - **Saída segura:** a interrupção do watchdog (`WDT_vect`) desliga os motores antes do reset.
 - **Causa do reset:** a energização acende PORF e BORF juntos, e isso é reportado como `energia`, não como `brownout`.
 - **Limitador de rajada:** a interrupção de um sensor de junção que oscila no limiar é limitada, para não prender o loop.
-- **Prazos protegidos:** `static_assert` no `.ino` exige prazos coerentes por esteira; a biblioteca do LCD fica fixada na versão 1.1.2 no CI.
+- **Prazos protegidos:** `static_assert` no `.ino` exige prazos coerentes por esteira; a biblioteca do display fica fixada no CI (SSD1306Ascii 1.3.5; era a LiquidCrystal I2C 1.1.2 até a troca do LCD pelo OLED, em 27/10/2026).
 
 **Limitações conhecidas da v3.0** (aceitas por serem raras; nenhuma foi corrigida):
 - Depois de uma rajada de ruído durante a checagem prévia, a janela de proteção contra ocupação anterior à partida cresce para cerca de 5 ms.
@@ -193,7 +193,7 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 |-----------|-----|-------------|-------------|
 | Motor DC (esteiras) | 3 | PWM 9, 10, 11 | 12V (via IRF520) |
 | Sensor IR TCRT5000 | 6 | A0, A1, A2, A3, 2, 4 | 5V |
-| LCD 16x2 I2C | 1 | SDA/SCL (A4/A5) | 5V |
+| Display OLED 0,96" I2C (SSD1306, 128x64) | 1 | SDA/SCL (A4/A5) | 3,3–5V |
 | Motor de Passo 28BYJ-48 (Separador) | 1 | 5, 6, 7, 8 (ULN2003) | 5V |
 
 **Ligação serial Uno ↔ ESP32 (9600 baud):**

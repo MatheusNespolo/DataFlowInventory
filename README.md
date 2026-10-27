@@ -180,8 +180,8 @@ DataFlowInventory/
 │       ├── data_flow_inventory.ino        # Sketch do Arduino (setup/loop)
 │       ├── config.h                       # Pinos, prazos por esteira e constantes
 │       └── src/
-│           ├── logica/                    # FSM, supervisor de entrega, protocolo, filtro, telas, LCD e plano do separador (testável em g++)
-│           └── hw/                        # Motores, sensores, LCD, separador, comunicação e diagnóstico
+│           ├── logica/                    # FSM, supervisor de entrega, protocolo, filtro, telas, display e plano do separador (testável em g++)
+│           └── hw/                        # Motores, sensores, display OLED, separador, comunicação e diagnóstico
 │
 ├── esp32/
 │   ├── gateway_mqtt/
@@ -262,7 +262,7 @@ O Arduino opera com **5 estados**:
 | 2 | **VERIFICANDO_ESTOQUE** | Checagem prévia sem ligar o motor: estoque, peça no topo e junção livre |
 | 3 | **ACIONANDO_ESTEIRA** | Liga o motor da esteira escolhida: kick-start em PWM 255 por **kickMs** (A=180 ms, B=180 ms, C=180 ms) e depois PWM de regime da própria esteira (A=245, B=200, C=230), calibrados em bancada (`e3c8833`, `ddf526a`, `d4ecc2f`). O separador parte para o compartimento da peça neste momento |
 | 4 | **ENTREGANDO_PECA** | Supervisão por marcos: topo livre em 3 s, junção em 12,5 s (débito na confirmação) e 3 s de saída |
-| 5 | **ERRO** | Motores desligados; LCD e dashboard mostram onde falhou (ver `docs/ARCHITECTURE.md` §3); aguarda reset |
+| 5 | **ERRO** | Motores desligados; display e dashboard mostram onde falhou (ver `docs/ARCHITECTURE.md` §3); aguarda reset |
 
 > 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#3-máquina-de-estados-arduino).
 >
@@ -285,7 +285,7 @@ O Arduino opera com **5 estados**:
 > 📐 **Diagrama elétrico completo do protótipo:**
 > - 🖼️ Visualização: [`docs/fluxogramas/Diagrama elétrico.png`](docs/fluxogramas/Diagrama%20el%C3%A9trico.png) (GitHub renderiza a imagem)
 > - 📝 Editável: [`docs/fluxogramas/Diagrama elétrico.pptx`](docs/fluxogramas/Diagrama%20el%C3%A9trico.pptx) (PowerPoint — baixe para editar)
-> - **Conteúdo:** Esquema unifilar com pinagem completa, alimentação 12V/5V, proteções (fusível, diodos), e integração com Arduino Uno, ESP32, 3× IRF520, 6× TCRT5000, LCD I²C e motor de passo 28BYJ-48
+> - **Conteúdo:** Esquema unifilar com pinagem completa, alimentação 12V/5V, proteções (fusível, diodos), e integração com Arduino Uno, ESP32, 3× IRF520 e 6× TCRT5000. O display OLED I²C (A4/A5) e o motor de passo 28BYJ-48 do separador (pinos 5–8) ainda não estão desenhados; a pinagem deles está em [Materiais](#materiais)
 > - **Publicação:** 23/09/2026 — Gap resolvido ✅
 
 ## Materiais
@@ -300,7 +300,7 @@ O Arduino opera com **5 estados**:
 | ESP32 Dev Module | 1 | Gateway MQTT |
 | Driver IRF520 | 3 | Controle de 1 motor cada |
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
-| Display LCD 16x2 | 1 | Com módulo I2C (endereço detectado automaticamente: 0x20–0x27 ou 0x38–0x3F) |
+| Display OLED 0,96" I2C | 1 | 128x64, controlador SSD1306 (endereço detectado automaticamente: 0x3C ou 0x3D). Substituiu o LCD 16x2 em 27/10/2026 |
 | Motor de passo 28BYJ-48 + driver ULN2003 | 1 | Roda separadora (alimentação 5 V própria, GND comum) |
 | Peças impressas em 3D | — | Roda separadora (3 compartimentos) e peça transportada |
 | Botões | 4 | 3 solicitação + 1 reset (opcionais) |
@@ -340,7 +340,7 @@ O Arduino opera com **5 estados**:
 |-----------|-------|-----------------|
 | 3 motores (IRF520) | 3 PWM | 9, 10, 11 |
 | 6 sensores TCRT5000 | 6 digitais | A0, A1, A2, A3, 2, 4 |
-| LCD I2C | 2 (SDA/SCL) | A4 (SDA), A5 (SCL) |
+| Display OLED I2C | 2 (SDA/SCL) | A4 (SDA), A5 (SCL) |
 | Serial ESP32 | 2 (RX/TX) | 0 (RX), 1 (TX) |
 | Separador (ULN2003 IN1–IN4) | 4 digitais | 5, 6, 7, 8 |
 | **Total** | **18** | **Uno tem 20 disponíveis ✅** |
@@ -399,7 +399,7 @@ Acessar http://localhost:3000 no navegador.
 #### 1. Configurar o Arduino
 
 1. Abrir `arduino/data_flow_inventory/data_flow_inventory.ino`
-2. Instalar as bibliotecas **LiquidCrystal I2C** (1.1.2) e **Stepper** (1.1.3) pelo Gerenciador de Bibliotecas
+2. Instalar as bibliotecas **SSD1306Ascii** (Bill Greiman, 1.3.5) e **Stepper** (1.1.3) pelo Gerenciador de Bibliotecas
 3. Selecionar placa: **Arduino Uno R3**
 4. Fazer upload (com a roda do separador no neutro: não há sensor de referência)
 
@@ -439,7 +439,7 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 ### Próximas validações (23/10/2026)
 
 - **Semana 11 (26–30/10) — última bancada de teste:** montagem final das esteiras na base, com teste de uma esteira por vez para garantir que a estrutura não altera o funcionamento calibrado; validação das peças impressas em 3D (roda separadora no motor de passo e peça que percorre as esteiras) e do separador em modo automático; integração total em 30/10. Ver [roteiro](docs/testes/roteiros/semana_11_26-30_outubro.md).
-- **LCD:** o firmware procura o módulo em qualquer endereço e se recupera de quedas, mas na bancada nenhum dispositivo respondeu no I²C (`i2c_n 0`): falha elétrica, o módulo será trocado. O sistema opera sem o LCD.
+- **Display:** o LCD 16x2 não respondia no I²C (`i2c_n 0`, falha elétrica) e foi substituído por um **display OLED 0,96" I²C (SSD1306)**, com a mesma tela de 2 linhas × 16 colunas (PR #68). O firmware está pronto e testado; falta a validação na bancada (`lcd_end` = 60 no `status` e a tela legível). O sistema opera sem o display.
 - **Itens concluídos:** CI/CD, telemetria Prometheus/Grafana, broker HiveMQ Cloud E2E e historiador CX9240 possuem documentação de implementação/validação em [`docs/CI-CD.md`](docs/CI-CD.md), [`observability/README.md`](observability/README.md), [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) e [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md).
 - **Planejamento:** o andamento de cada frente está no [GitHub Project](https://github.com/users/MatheusNespolo/projects/3), com os commits e PRs de evidência em cada card.
 - 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Telemetria concluída em 01/10/2026: código, testes automatizados e validação do stack (smoke test e conferência dos painéis). Ver [`observability/README.md`](observability/README.md).

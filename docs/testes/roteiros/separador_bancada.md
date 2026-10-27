@@ -19,7 +19,7 @@ Motor de passo **28BYJ-48** + driver **ULN2003** (a placa com 4 LEDs e o conecto
 
 Por que D5 a D8: são livres e contíguos; ficam fora da serial (0/1), dos sensores (A0–A3, D2, D4), do I²C (A4/A5) e dos motores DC (D9–D11); e constam no diagrama elétrico.
 
-**Alimentação:** o motor puxa ~240 mA com as bobinas energizadas. Ligado ao 5 V do Uno via USB, o pico e o ruído derrubam o LCD e podem reiniciar o Uno. Use uma fonte de 5 V própria (por exemplo, um dos módulos "Fonte 5V" do diagrama), ligue o **GND dela ao GND do Uno** e conecte o motor ao conector branco do ULN2003.
+**Alimentação:** o motor puxa ~240 mA com as bobinas energizadas. Ligado ao 5 V do Uno via USB, o pico e o ruído derrubam o display e podem reiniciar o Uno. Use uma fonte de 5 V própria (por exemplo, um dos módulos "Fonte 5V" do diagrama), ligue o **GND dela ao GND do Uno** e conecte o motor ao conector branco do ULN2003.
 
 ## 2. Pré-voo (antes de energizar)
 
@@ -47,7 +47,7 @@ Roteiro (um passo por vez; **pare** nos critérios da seção 5):
 1. **Sentido:** envie `CMD:SEP:A`. A roda foi para o lado esperado? Se não, troque `SEPARADOR_INVERTER_SENTIDO` para `1` em `config.h`, regrave e repita (A e B trocam de lugar com o sentido invertido).
 2. **Ângulo:** a roda parou a 120° do neutro? Se o desvio for sistemático, ajuste `SEPARADOR_GRAUS_A/B/C` ou calibre os passos por volta (seção 4).
 3. **Repetibilidade sem carga:** alterne A → B → C → A... por 10 ciclos. A roda volta sempre ao mesmo ponto? Anote o desvio observado.
-4. **Estabilidade do sistema:** durante os giros, o Uno **não** pode reiniciar (não deve aparecer um novo `inicio` com `reset`), e o LCD (se houver) não pode apagar (`lcd_quedas` no `status` não deve subir).
+4. **Estabilidade do sistema:** durante os giros, o Uno **não** pode reiniciar (não deve aparecer um novo `inicio` com `reset`), e o display (se houver) não pode apagar (`lcd_quedas` no `status` não deve subir).
 5. **Aquecimento/ruído:** driver e motor só devem ficar mornos. O motor solta as bobinas ~0,5 s depois de parar.
 6. **Reinício:** reinicie o Uno com a roda fora do neutro e confirme o comportamento documentado: o firmware assume o neutro, e a posição real se perde.
 7. **Com carga/peça:** só depois de a repetibilidade sem carga estar aprovada.
@@ -60,7 +60,7 @@ Roteiro (um passo por vez; **pare** nos critérios da seção 5):
 
 ## 5. Critérios de parada
 
-Pare e desenergize se houver: cheiro de queimado, motor ou driver quentes demais para tocar, perda de passo, travamento, **reinício do Uno**, apagamento do LCD ou ruído elétrico nas esteiras. Registre a pendência; não improvise.
+Pare e desenergize se houver: cheiro de queimado, motor ou driver quentes demais para tocar, perda de passo, travamento, **reinício do Uno**, apagamento do display ou ruído elétrico nas esteiras. Registre a pendência; não improvise.
 
 ## 6. Modo automático (a roda se prepara de acordo com a peça pedida)
 
@@ -80,7 +80,7 @@ Para testar: alinhe a roda ao neutro, ligue o sistema e faça um pedido de A, de
 | Sentido (`CMD:SEP:A`) | ✅ relatado | Funcionou; sem medições registradas |
 | Ângulo A/B/C | ✅ relatado | Os 3 comandos levaram a roda ao lugar esperado; sem medição de desvio |
 | Repetibilidade, 10 ciclos | ⬜ | |
-| Uno sem reinício / LCD estável | ⬜ | |
+| Uno sem reinício / display estável | ⬜ | |
 | Aquecimento e ruído | ⬜ | |
 | Comportamento após reinício | ⬜ | |
 | Com carga/peça | ⬜ | |

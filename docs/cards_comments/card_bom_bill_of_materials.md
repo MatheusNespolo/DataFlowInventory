@@ -20,7 +20,7 @@ Publicar documento formal (`docs/BILL_OF_MATERIALS.md`) contendo todos os compon
 
 ### Estrutura do Documento
 - [ ] Arquivo `docs/BILL_OF_MATERIALS.md` criado com seções:
-  - **1. Eletrônica principal** (Arduino Uno, ESP32, drivers, sensores, LCD)
+  - **1. Eletrônica principal** (Arduino Uno, ESP32, drivers, sensores, display OLED 0,96" I2C SSD1306)
   - **2. Motores e mecânica** (motores DC, motor de passo 28BYJ-48, roda separadora)
   - **3. Alimentação** (fonte 12V/5A, cabeamento, conectores)
   - **4. Estrutura mecânica** (base MDF, parafusos, suportes)

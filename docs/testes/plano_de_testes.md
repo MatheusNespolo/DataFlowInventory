@@ -23,9 +23,9 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | **1** | **Serial Arduino ↔ ESP32** | Arduino Uno + ESP32 + divisor de tensão | Arduino publica status via Serial → ESP32 recebe | ESP32 imprime JSON recebido no monitor serial ✅ **(CONCLUÍDO)** |
 | **B1** | **Bancada 3.1 — Ciclo completo** | Arduino Uno + IRF520 + 1 esteira + 1 TCRT5000 | Solicitar peça A → acionar motor → sensor detecta saída → parar motor | Ciclo completo funcionando |
 | **B2** | **Bancada 3.2 — Sem estoque** | Mesma montagem do B1 | Solicitar peça B/C (inexistente) → retorna "peca_indisponivel" | Resposta de erro correta + recuperação via reset |
-| **B3** | **Bancada 3.3 — LCD I2C** | Arduino Uno + LCD 16x2 I2C | Exibir estoque e status no display | LCD mostra informações legíveis (reteste após troca; causa elétrica `i2c_n=0`) |
+| **B3** | **Bancada 3.3 — Display I2C** | Arduino Uno + display OLED 0,96" I2C (SSD1306) | Exibir estoque e status no display | Display mostra informações legíveis (reteste com o OLED, que substituiu o LCD 16x2 em 27/10; causa elétrica `i2c_n=0` no LCD) |
 | 2 | ESP32 → Broker → Node.js | Item 1 + PC com Mosquitto + server Node | ESP32 publica no broker → Node.js recebe | Mensagem aparece nos logs do servidor |
-| 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / LCD) |
+| 3 | Comando remoto (MQTT Box) | Item 2 + MQTT Box/Explorer | Enviar comando via MQTT Box → ESP32 → Arduino | Arduino processa comando (muda de estado / display) |
 | 4 | End-to-End (Dashboard) | Item 2 + navegador | Clicar no dashboard → Arduino executa → dashboard atualiza | Ciclo completo pedido → entrega refletido na UI |
 | 5 | **Três esteiras (A + B + C)** | Itens 1–3 + 2ª/3ª esteira secundária + 4 sensores TCRT5000 + 3 drivers IRF520 | Validar FSM completa com 3 esteiras e cenários de rejeição | Entregas A/B/C, rejeição de peça inexistente, `ocupado`, timeout + reset |
 | 6 | Migração para broker remoto (HiveMQ Cloud) | Item 2 aprovado + conta HiveMQ Cloud + `USE_TLS=true` no ESP32 | Repetir a cadeia de comunicação (Serial → MQTT → Dashboard) usando um broker em nuvem via TLS, sem alterar lógica de FSM | ✅ **(CONCLUÍDO)** Conexão TLS/8883, integração real, E2E validado |
@@ -69,7 +69,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 
 ---
 
-## Testes de Bancada B1–B3 (Hardware: motor, sensor e LCD)
+## Testes de Bancada B1–B3 (Hardware: motor, sensor e display)
 
 > Objetivo: validar os componentes físicos integrados antes de conectá-los à cadeia MQTT. Correspondem aos itens 3.1, 3.2 e 3.3 do plano do artigo.
 
@@ -121,9 +121,34 @@ Este documento define os testes de integração da cadeia de comunicação do si
 - [ ] `CMD:RESET` recupera o sistema
 - [ ] Comando inválido não trava a FSM
 
-### B3 (3.3) — LCD I2C 16x2
+### B3 (3.3) — Display I2C
 
-**Sketch:** `test/esteira_peca_a/arduino_teste_lcd/`
+> **Troca do display (27/10/2026):** o LCD 16x2 deixou de responder no I²C (`i2c_n 0`, falha elétrica) e foi substituído por um **display OLED 0,96" 128x64 I²C (controlador SSD1306)**, com a mesma tela de 2 linhas × 16 colunas (PR #68). O reteste usa o **firmware principal**, e não um sketch dedicado; o procedimento original com o LCD 16x2 (aprovado em 18/08) fica abaixo, como registro.
+
+#### Reteste com o display OLED (firmware principal)
+
+| Display OLED | Arduino Uno |
+|--------------|-------------|
+| SDA | A4 |
+| SCL | A5 |
+| VCC | 5V (o módulo aceita 3,3–5 V; confirmar na placa) |
+| GND | GND |
+
+1. **Antes de ligar:** conferir a ordem dos pinos na serigrafia do módulo (`GND VCC SCL SDA` ou `VCC GND SCL SDA`, varia entre lotes). Ligar invertido pode queimar o display
+2. Instalar a biblioteca **SSD1306Ascii** 1.3.5 e fazer o upload de `arduino/data_flow_inventory`
+3. Conferir a tela de abertura ("Data Flow / Inventory v3.0") e depois a tela de estoque ("Estoque:" / "A:15 B:15 C:15")
+4. No `status` (MQTT ou Serial Monitor), conferir `lcd_end` = **60** (0x3C) ou 61 (0x3D) e `i2c_n` ≥ 1
+5. Fazer um pedido e conferir as telas de entrega e de erro; durante a operação, `lcd_quedas` não deve subir
+6. Se a tela sair deslocada ou com uma faixa de pixels aleatórios na borda, o módulo usa o controlador SH1106: mudar `OLED_CONTROLADOR_SH1106` para `1` em `config.h`
+
+#### Critérios de validação (OLED)
+- [ ] `lcd_end` = 60 (ou 61) e `i2c_n` ≥ 1 no `status`
+- [ ] Abertura, estoque, entrega e erro legíveis, sem caracteres cortados (16 colunas)
+- [ ] `lcd_quedas` estável durante pedidos com motor ligado
+
+#### Procedimento original — LCD 16x2 (registro, aprovado em 18/08/2026)
+
+**Sketch:** `test/esteira_peca_a/arduino_teste_lcd/` (só para o LCD 16x2 antigo)
 
 #### Materiais e ligações
 | LCD I2C | Arduino Uno |
@@ -156,7 +181,9 @@ Este documento define os testes de integração da cadeia de comunicação do si
 | Sensor sempre LOW/HIGH | Trimpot desajustado | Calibrar com a peça na distância real da esteira |
 | Entrega "confirmada" sem a peça sair | Ruído no sensor | Aumentar `DEBOUNCE_SENSOR` (50 → 100 ms) |
 | Arduino reseta ao ligar motor | Pico de corrente / ruído | Fonte externa + capacitores 100 nF/470 µF; afastar fiação |
-| LCD em branco | Contraste ou endereço errado | Trimpot do módulo; usar endereço do scanner |
+| LCD em branco (LCD 16x2 antigo) | Contraste ou endereço errado | Trimpot do módulo; usar endereço do scanner |
+| OLED apagado com `i2c_n` = 0 | Fiação, VCC/GND invertidos ou solda | Conferir a ordem dos pinos na placa; SDA→A4, SCL→A5 |
+| OLED deslocado ou com faixa de pixels na borda | Controlador SH1106 | `OLED_CONTROLADOR_SH1106 1` em `config.h` |
 | Nenhum dispositivo I2C | Fiação SDA/SCL invertida | SDA→A4, SCL→A5 |
 
 ---
@@ -408,6 +435,7 @@ Detalhes completos (pinagem, ligações e checklists): [`test/esteira_peca_b/REA
 | B1 | Bancada 3.1 — Ciclo completo | 18/08/2026 | ✅ Aprovado | tempo_ms: 5000 · PWM mínimo: 150 (calibrações aplicadas ao sketch principal) |
 | B2 | Bancada 3.2 — Sem estoque | 18/08/2026 | ✅ Aprovado | Rejeição `peca_indisponivel` + recuperação via reset OK |
 | B3 | Bancada 3.3 — LCD I2C | 18/08/2026 | ✅ Aprovado | Endereço I2C: 0x27 |
+| B3 (reteste) | Bancada 3.3 — Display OLED 0,96" (SSD1306) | Semana 11 | ⬜ Pendente | LCD 16x2 trocado em 27/10 (`i2c_n 0`, falha elétrica); conferir `lcd_end` = 60 |
 | 2 | ESP32 → Broker → Node.js | 25/08/2026 | ✅ Aprovado | JSONs do Uno chegam via ESP32 aos tópicos dataflow/#; broker 0.0.0.0:1883 OK |
 | 3 | Comando via MQTT Box | 01/09/2026 | ✅ Aprovado | Comando direto via MQTT Box em `dataflow/comandos/sub` validado de forma desacoplada; ESP32 repassa `CMD:PECA:A` e FSM aciona esteira com confirmação em `dataflow/comandos/pub` |
 | 4 | End-to-End (Dashboard) | 25/08/2026 | ✅ Aprovado | Pedido de peça A via Dashboard → esteira parte → entrega completa |
