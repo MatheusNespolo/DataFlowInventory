@@ -1,8 +1,9 @@
 // ============================================================
-// DATA FLOW INVENTORY — Textos do LCD 16x2 (lógica pura)
+// DATA FLOW INVENTORY — Textos do display (lógica pura)
 // ------------------------------------------------------------
-// Cada tela vira duas linhas de no máximo 16 caracteres. A camada de
-// hardware só redesenha quando o texto muda. C++ puro (testado no PC).
+// Cada tela vira duas linhas de no máximo 16 caracteres (o formato do antigo
+// LCD 16x2, mantido no display OLED; ver src/hw/lcd.h). A camada de hardware
+// só redesenha quando o texto muda. C++ puro (testado no PC).
 // ============================================================
 #pragma once
 #include "fsm.h"

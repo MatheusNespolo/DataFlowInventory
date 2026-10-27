@@ -3,7 +3,7 @@
 LOGICA := ../../arduino/data_flow_inventory/src/logica
 HW := ../../arduino/data_flow_inventory/src/hw
 CXX ?= g++
-# mocks/ tem o Wire e a biblioteca do LCD de mentira para compilar src/hw/lcd.cpp no PC.
+# mocks/ tem o Wire e a biblioteca do display OLED (SSD1306Ascii) de mentira para compilar src/hw/lcd.cpp no PC.
 CXXFLAGS := -std=c++11 -Wall -Wextra -Werror -O1 -I$(LOGICA) -I$(HW) -Imocks
 
 # A camada de hardware entra no teste só no que tem lógica própria (o LCD); o resto

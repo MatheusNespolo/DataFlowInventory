@@ -114,7 +114,8 @@ jobs:
 
       - name: Instalar bibliotecas Arduino
         run: |
-          arduino-cli lib install "LiquidCrystal I2C@1.1.2" "Stepper@1.1.3" "ArduinoJson@6.21.5" "PubSubClient"
+          # SSD1306Ascii: display OLED do Uno. LiquidCrystal I2C: só os sketches históricos de test/ (LCD 16x2).
+          arduino-cli lib install "SSD1306Ascii@1.3.5" "LiquidCrystal I2C@1.1.2" "Stepper@1.1.3" "ArduinoJson@6.21.5" "PubSubClient"
 
       - name: Criar secrets.h de exemplo (arquivo real não é versionado)
         run: cp esp32/gateway_mqtt/secrets.h.example esp32/gateway_mqtt/secrets.h

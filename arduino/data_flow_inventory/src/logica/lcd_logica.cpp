@@ -1,10 +1,7 @@
 #include "lcd_logica.h"
 
 uint8_t lcdCandidato(uint8_t i) {
-  if (i == 0) return 0x27;
-  if (i == 1) return 0x3F;
-  if (i < 9) return (uint8_t)(0x20 + (i - 2));   // 0x20..0x26
-  if (i < LCD_N_CANDIDATOS) return (uint8_t)(0x38 + (i - 9));  // 0x38..0x3E
+  if (i < LCD_N_CANDIDATOS) return (uint8_t)(0x3C + i);  // 0x3C, 0x3D
   return 0;
 }
 

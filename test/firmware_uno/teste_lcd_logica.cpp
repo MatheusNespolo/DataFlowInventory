@@ -1,19 +1,12 @@
-// Regras do LCD: onde procurar o módulo e quando tentar religá-lo.
+// Regras do display OLED: onde procurar, quando tentar religar e o layout das 2 linhas.
 #include "lcd_logica.h"
+#include "telas.h"
 #include "teste.h"
 
-TESTE(lcd_candidatos_cobrem_os_dois_expansores_sem_repetir) {
-  bool visto[128] = {};
-  for (uint8_t i = 0; i < LCD_N_CANDIDATOS; i++) {
-    const uint8_t a = lcdCandidato(i);
-    VERIFICA((a >= 0x20 && a <= 0x27) || (a >= 0x38 && a <= 0x3F));
-    VERIFICA(!visto[a]);
-    visto[a] = true;
-  }
-  for (uint8_t a = 0x20; a <= 0x27; a++) VERIFICA(visto[a]);  // PCF8574
-  for (uint8_t a = 0x38; a <= 0x3F; a++) VERIFICA(visto[a]);  // PCF8574A
-  VERIFICA(lcdCandidato(0) == 0x27);  // os mais comuns primeiro
-  VERIFICA(lcdCandidato(1) == 0x3F);
+TESTE(lcd_candidatos_sao_os_dois_enderecos_do_ssd1306) {
+  VERIFICA(LCD_N_CANDIDATOS == 2);
+  VERIFICA(lcdCandidato(0) == 0x3C);  // o de quase todos os módulos vem primeiro
+  VERIFICA(lcdCandidato(1) == 0x3D);
   VERIFICA(lcdCandidato(LCD_N_CANDIDATOS) == 0);
 }
 
@@ -22,19 +15,25 @@ TESTE(lcd_indice_e_candidato_sao_inversos) {
     VERIFICA(lcdIndiceCandidato(lcdCandidato(i)) == (int8_t)i);
   }
   VERIFICA(lcdIndiceCandidato(0x50) == -1);  // EEPROM, por exemplo
-  VERIFICA(lcdIndiceCandidato(0x28) == -1);  // entre as duas faixas
+  VERIFICA(lcdIndiceCandidato(0x27) == -1);  // expansor do LCD 16x2 antigo
+  VERIFICA(lcdIndiceCandidato(0x3F) == -1);
   VERIFICA(lcdIndiceCandidato(0x00) == -1);
 }
 
 TESTE(lcd_escolhe_o_candidato_preferido) {
   VERIFICA(lcdEscolher(0) == -1);
-  VERIFICA(lcdEscolher((uint16_t)(1u << lcdIndiceCandidato(0x3F))) == lcdIndiceCandidato(0x3F));
-  // Dois módulos no barramento: vence o mais comum (0x27).
-  const uint16_t dois = (uint16_t)((1u << lcdIndiceCandidato(0x27)) | (1u << lcdIndiceCandidato(0x3F)));
-  VERIFICA(lcdCandidato((uint8_t)lcdEscolher(dois)) == 0x27);
-  // 0x20 e 0x3F: 0x3F é mais comum que 0x20.
-  const uint16_t outros = (uint16_t)((1u << lcdIndiceCandidato(0x20)) | (1u << lcdIndiceCandidato(0x3F)));
-  VERIFICA(lcdCandidato((uint8_t)lcdEscolher(outros)) == 0x3F);
+  VERIFICA(lcdEscolher((uint16_t)(1u << lcdIndiceCandidato(0x3D))) == lcdIndiceCandidato(0x3D));
+  // Dois displays no barramento: vence o 0x3C.
+  const uint16_t dois = (uint16_t)((1u << lcdIndiceCandidato(0x3C)) | (1u << lcdIndiceCandidato(0x3D)));
+  VERIFICA(lcdCandidato((uint8_t)lcdEscolher(dois)) == 0x3C);
+}
+
+TESTE(lcd_layout_16_colunas_cabem_nos_128_px_e_as_linhas_nao_se_sobrepoem) {
+  VERIFICA(LCD_COLUNAS * (OLED_FONTE_LARGURA_PX + OLED_ESPACO_LETRA_PX) <= OLED_LARGURA_PX);
+  VERIFICA(OLED_PAGINA_LINHA1 + OLED_FONTE_PAGINAS <= OLED_PAGINA_LINHA2);
+  VERIFICA(OLED_PAGINA_LINHA2 + OLED_FONTE_PAGINAS <= OLED_PAGINAS);
+  // Linha 1 inteira nos 16 px de cima (faixa amarela dos módulos bicolores).
+  VERIFICA((OLED_PAGINA_LINHA1 + OLED_FONTE_PAGINAS) * 8 <= 16);
 }
 
 TESTE(lcd_recuperacao_so_tenta_parado_e_sem_lcd) {
