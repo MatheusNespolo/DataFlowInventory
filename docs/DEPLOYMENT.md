@@ -34,7 +34,7 @@ A observabilidade (seção 8) é opcional em qualquer cenário, mas só mostra d
 
 - **Node.js v22** (o CI usa a 22) e npm; **Git**.
 - **Arduino IDE** (Uno e ESP32) — cenários A, B e D. Bibliotecas usadas pelos firmwares:
-  - Uno: `LiquidCrystal_I2C` e `Stepper` (a `Stepper` pode não vir com a IDE: instale pelo Gerenciador de Bibliotecas, "Stepper" da Arduino, versão 1.1.3). O Uno não usa `ArduinoJson`: a v3.0 monta o JSON à mão.
+  - Uno: `SSD1306Ascii` (display OLED; "SSD1306Ascii" de Bill Greiman, versão 1.3.5) e `Stepper` (pode não vir com a IDE: "Stepper" da Arduino, versão 1.1.3), ambas pelo Gerenciador de Bibliotecas. O Uno não usa `ArduinoJson`: a v3.0 monta o JSON à mão.
   - ESP32 (instale o suporte à placa ESP32 no Gerenciador de Placas): `PubSubClient` e `ArduinoJson`.
 - **Mosquitto** — cenário A (`docs/broker_local_mosquitto.md`).
 - **Docker Desktop** ou Docker Engine + Compose v2 — apenas para a observabilidade.

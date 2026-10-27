@@ -100,12 +100,12 @@ npm update <package-name>
 - **Placas:** Arduino:avr:uno (Uno) · esp32:esp32:esp32 (ESP32)
 - **Cache:** Habilitado para cores e bibliotecas (reduz tempo de CI em ~60%)
 - **Falha em:** Erros de compilação ou RAM global do Uno acima de 65%
-- **Passos antes de compilar:** instala as bibliotecas `LiquidCrystal I2C@1.1.2`, `Stepper@1.1.3` (separador do Uno), `ArduinoJson@6.21.5` (só o ESP32) e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
-- **LCD:** o CI compila com a LiquidCrystal I2C **1.1.2** (Frank de Brabander), com versão fixa para o build não mudar sozinho. A Arduino IDE da equipe instala outra variante (LiquidCrystal_I2C 2.0.0, Martin Kubovčík / Frank de Brabander); a API usada pelo firmware (`LiquidCrystal_I2C(endereço, 16, 2)`, `init`, `backlight`, `clear`, `setCursor`, `write`) existe nas duas.
+- **Passos antes de compilar:** instala as bibliotecas `SSD1306Ascii@1.3.5` (display OLED do Uno), `LiquidCrystal I2C@1.1.2` (só os sketches históricos de `test/`), `Stepper@1.1.3` (separador do Uno), `ArduinoJson@6.21.5` (só o ESP32) e `PubSubClient` e copia `esp32/gateway_mqtt/secrets.h.example` para `secrets.h` (o arquivo real não é versionado)
+- **Display:** o firmware do Uno usa a **SSD1306Ascii 1.3.5** (Bill Greiman), com versão fixa para o build não mudar sozinho; ela escreve direto no OLED, sem imagem da tela na RAM. A LiquidCrystal I2C **1.1.2** (Frank de Brabander) continua instalada só para os sketches históricos de `test/`, que usam o LCD 16x2 antigo. Para esses sketches, a Arduino IDE da equipe instala outra variante (LiquidCrystal_I2C 2.0.0, Martin Kubovčík / Frank de Brabander); a API usada por eles (`LiquidCrystal_I2C(endereço, 16, 2)`, `init`, `backlight`, `clear`, `setCursor`, `write`) existe nas duas.
 - Para repetir o job na sua máquina, veja [Compilar o firmware localmente](#compilar-o-firmware-localmente-sem-hardware)
 
 #### 5. Lógica do firmware do Uno (`firmware-logica`)
-- **O quê:** compila `arduino/data_flow_inventory/src/logica/` com g++ e roda `test/firmware_uno` (FSM, marcos, filtro, protocolo, telas, causa do reset, plano do separador e regras do LCD, com tempo simulado). Também compila o `src/hw/lcd.cpp` **real** contra um I²C e uma biblioteca de LCD de mentira (`test/firmware_uno/mocks/`), para testar busca de endereço, barramento preso, queda e religamento; o restante de `src/hw/` (motores, sensores, serial) depende de registradores do AVR e só se valida em bancada
+- **O quê:** compila `arduino/data_flow_inventory/src/logica/` com g++ e roda `test/firmware_uno` (FSM, marcos, filtro, protocolo, telas, causa do reset, plano do separador e regras do display, com tempo simulado). Também compila o `src/hw/lcd.cpp` **real** contra um I²C e uma biblioteca do display OLED (SSD1306Ascii) de mentira (`test/firmware_uno/mocks/`), para testar busca de endereço, layout das 2 linhas, barramento preso, queda e religamento; o restante de `src/hw/` (motores, sensores, serial) depende de registradores do AVR e só se valida em bancada
 
 ### 5. Testes E2E do dashboard (Playwright)
 
@@ -272,7 +272,7 @@ arduino-cli config add board_manager.additional_urls https://raw.githubuserconte
 arduino-cli core update-index
 arduino-cli core install arduino:avr
 arduino-cli core install esp32:esp32
-arduino-cli lib install "LiquidCrystal I2C@1.1.2" "Stepper@1.1.3" "ArduinoJson@6.21.5" "PubSubClient"
+arduino-cli lib install "SSD1306Ascii@1.3.5" "LiquidCrystal I2C@1.1.2" "Stepper@1.1.3" "ArduinoJson@6.21.5" "PubSubClient"
 ```
 
 **3. Criar o `secrets.h`** (só se ainda não existir; nunca versione o real):

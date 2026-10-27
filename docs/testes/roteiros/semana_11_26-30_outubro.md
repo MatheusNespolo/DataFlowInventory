@@ -126,7 +126,7 @@ Marcar cada item como **aprovado**, **falhou**, **bloqueado** ou **não executad
 
 Também registrar:
 
-- **LCD:** `lcd_end`/`i2c_n`/`lcd_quedas` do status e eventual troca do módulo.
+- **Display:** OLED 0,96" I²C (SSD1306) instalado no lugar do LCD 16x2: conferir `lcd_end` = 60 (0x3C) e `i2c_n` ≥ 1 no status, a tela legível (abertura, estoque, entrega e erro) e `lcd_quedas` estável. Procedimento em `docs/testes/plano_de_testes.md`, item B3.
 - **Separador automático:** o resultado deve ser explicitado como validado, pendente ou não executado.
 - **Estrutura do projeto:** confirmar se as modificações mecânicas da base preservaram o comportamento original.
 

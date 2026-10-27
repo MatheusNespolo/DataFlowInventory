@@ -14,6 +14,18 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Display do Uno: LCD 16x2 → OLED 0,96" I2C (SSD1306), em 27/10/2026 (PR #68, `0d8566a`)**
+  - **Motivo:** o LCD 16x2 não respondia no I²C; com o firmware v3.0, o `status` mostrava `i2c_n 0` (nenhum dispositivo no barramento): falha elétrica do módulo
+  - **Firmware:** biblioteca `LiquidCrystal_I2C` → **SSD1306Ascii 1.3.5** (Bill Greiman), que escreve direto no display sem imagem da tela na RAM (a Adafruit_SSD1306 pediria 1024 bytes; o firmware usa 1021 de 2048). RAM igual à de antes; flash de 53% para 59% (fonte)
+  - **Tela ("layout A"):** as mesmas 2 linhas × 16 colunas e os mesmos textos, em fonte X11fixed7x14 com 2 px entre letras (16 colunas = 128 px); linha 1 no topo (faixa amarela dos módulos bicolores) e linha 2 no meio da tela
+  - **Endereço:** varredura em 0x3C ou 0x3D (antes 0x20–0x27 e 0x38–0x3F, do expansor PCF8574 do LCD, faixa que incluía o 0x3C e confundiria o OLED com um LCD)
+  - **Mantidos:** recuperação automática com o sistema parado (agora ~0,1 s em vez de ~1 s), timeout de I²C, campos do `status` (`lcd_end` passa a ser 60 ou 61 com o display presente, `i2c_n`, `lcd_quedas`) e nomes `lcd*`/`LCD_*`. **Sem mudança** no ESP32, no servidor nem no dashboard (só os rótulos da vista de arquitetura)
+  - **Nova opção:** `OLED_CONTROLADOR_SH1106` em `config.h` para módulos com o controlador SH1106
+  - **Pinos:** os mesmos (SDA em A4, SCL em A5); alimentação de 3,3–5 V conforme a placa; a ordem dos pinos `GND/VCC` varia entre lotes
+  - **Testes e CI:** 88 testes em `test/firmware_uno`, com dublês da SSD1306Ascii; o CI instala `SSD1306Ascii@1.3.5` (a `LiquidCrystal I2C` fica só para os sketches históricos de `test/`)
+  - **Pendente:** validação na bancada (reteste do item B3 na Semana 11)
+  - **Documentação:** README, ARCHITECTURE, CI-CD, DEPLOYMENT, plano de testes (B3), roteiro da Semana 11, guia do separador, card do BOM e projeto de pesquisa atualizados. O diagrama elétrico não desenha o display (nem o LCD antigo), então não mudou
+
 - **Status de validação/documentação (13/10/2026):** registrado o sucesso da validação em bancada do firmware Uno v3.0 (itens 1.1–1.11 e Bloco 2; B/C funcionando), sem presumir medições não fornecidas nem concluir o teste integrado A+B+C/calibração. README, arquitetura, guia de integração e plano de testes atualizados para separar resultados concluídos de pendências.
 - **Planejamento:** criados os roteiros da Semana 9 (14–18/10; separador prioritário e tarefas opcionais de fim de semana para Data Flow System/CX9240) e Semana 10 (19–23/10; A+B+C, calibração e fechamento condicional do separador).
 - **Separador:** guia deixa explícito que a ativação documentada é legado v2.x, não aplicável diretamente à v3.0; validação física e integração seguem pendentes.
