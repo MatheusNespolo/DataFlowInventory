@@ -14,6 +14,13 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
 
 ### Alterado
 
+- **Display OLED: faixa de ícones dos estados da FSM (28/10/2026)**
+  - **O que mudou:** os 16 px de baixo do OLED, que estavam vazios, ganharam uma faixa com um ícone por estado da FSM (ampulheta = aguardando, lupa = verificando, raio = acionando, caixa sobre a esteira = entregando, triângulo = erro), com o do estado atual **invertido** (bloco aceso com o desenho recortado). A linha 2 do texto subiu 8 px (páginas 3–4); as duas linhas continuam com 16 colunas e os mesmos textos
+  - **Como:** os ícones são uma "fonte" de 5 glifos de 20 × 16 px na flash (`src/hw/icones_fsm.h`, 206 bytes), desenhados pela própria SSD1306Ascii com `setInvertMode`. `lcdIcones()` só redesenha quando o estado muda, e só os dois ícones que trocam (~10 ms de I²C, no máximo 4 vezes por pedido); a faixa inteira só depois de iniciar ou religar o display. Sem animação, de propósito: escrever no I²C continuamente com o motor ligado é o pior momento por causa do ruído. Um timeout no meio de um ícone cai na mesma recuperação do texto
+  - **Custo:** flash de 59% para 60% (+482 bytes); RAM igual (1021 de 2048 bytes). Sem mudança no protocolo, no ESP32, no servidor nem no dashboard
+  - **Testes:** 97 em `test/firmware_uno` (9 novos: ícone por estado, layout da faixa, formato e margem dos glifos, faixa inteira na primeira vez, nada de I²C com o mesmo estado, só 2 glifos na troca, texto normal depois dos ícones, timeout e religamento). Mutações (esquecer de desfazer a inversão, redesenhar sempre) são detectadas
+  - **Não validado na bancada:** o display ainda não chegou; conferir no reteste B3
+
 - **Display do Uno: LCD 16x2 → OLED 0,96" I2C (SSD1306), em 27/10/2026 (PR #68, `0d8566a`)**
   - **Motivo:** o LCD 16x2 não respondia no I²C; com o firmware v3.0, o `status` mostrava `i2c_n 0` (nenhum dispositivo no barramento): falha elétrica do módulo
   - **Firmware:** biblioteca `LiquidCrystal_I2C` → **SSD1306Ascii 1.3.5** (Bill Greiman), que escreve direto no display sem imagem da tela na RAM (a Adafruit_SSD1306 pediria 1024 bytes; o firmware usa 1021 de 2048). RAM igual à de antes; flash de 53% para 59% (fonte)

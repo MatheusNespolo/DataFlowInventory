@@ -36,6 +36,16 @@ TESTE(lcd_layout_16_colunas_cabem_nos_128_px_e_as_linhas_nao_se_sobrepoem) {
   VERIFICA((OLED_PAGINA_LINHA1 + OLED_FONTE_PAGINAS) * 8 <= 16);
 }
 
+TESTE(lcd_layout_faixa_de_icones_cabe_no_rodape_sem_encostar_no_texto) {
+  VERIFICA(OLED_PAGINA_LINHA2 + OLED_FONTE_PAGINAS <= OLED_PAGINA_ICONES);  // não sobrepõe a linha 2
+  VERIFICA(OLED_PAGINA_ICONES + 2 <= OLED_PAGINAS);                         // 16 px de altura
+  // O último ícone termina dentro dos 128 px e eles não se sobrepõem.
+  VERIFICA(oledIconeX(TELA_N_ICONES - 1) + OLED_ICONE_LARGURA_PX <= OLED_LARGURA_PX);
+  VERIFICA(OLED_ICONE_PASSO_PX >= OLED_ICONE_LARGURA_PX);
+  VERIFICA(oledIconeX(0) == 2 && oledIconeX(4) == 102);
+  VERIFICA(OLED_ICONE_NENHUM >= TELA_N_ICONES);
+}
+
 TESTE(lcd_recuperacao_so_tenta_parado_e_sem_lcd) {
   LcdRecuperacao r;
   lcdRecuperacaoIniciar(r, 1000, 5000, 60000);

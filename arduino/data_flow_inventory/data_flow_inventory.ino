@@ -164,6 +164,7 @@ void loop() {
     char l1[LCD_COLUNAS + 1], l2[LCD_COLUNAS + 1];
     textoTela(fsm, l1, l2);
     lcdAtualizar(l1, l2);
+    lcdIcones(iconeTela(fsm));  // redesenha só quando o estado muda
   }
 
   // Separador: no máximo 1 passo por volta do loop (não bloqueia) e solta as bobinas parado.

@@ -5,7 +5,8 @@
 // barramento I²C e usa o display que responder em 0x3C ou 0x3D. Sem display,
 // o sistema segue SEM display (nada trava). Mostra as mesmas 2 linhas de 16
 // colunas de antes, em fonte 7x14; redesenha só quando o texto muda,
-// sobrescrevendo com espaços (sem clear(), sem piscar).
+// sobrescrevendo com espaços (sem clear(), sem piscar). No rodapé, uma faixa
+// com um ícone por estado da FSM, o atual invertido (lcdIcones).
 //
 // lcdIniciar() pode ser chamada de novo para religar o display que sumiu
 // (ruído de motor, mau contato): ela refaz a busca e a inicialização do zero.
@@ -17,6 +18,10 @@
 
 bool lcdIniciar();                                  // true se achou e iniciou o LCD
 void lcdAtualizar(const char* l1, const char* l2);  // no-op sem LCD
+// Faixa de ícones da FSM (rodapé): acende o ícone `atual` (0..4, ver iconeTela em
+// telas.h). Redesenha só o que mudou: o ícone que apaga e o que acende. No-op sem
+// display ou com o mesmo ícone de antes.
+void lcdIcones(uint8_t atual);
 
 bool lcdAtivo();                // o LCD está respondendo agora
 uint8_t lcdEndereco();          // endereço I²C em uso; 0 se o LCD está fora

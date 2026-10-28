@@ -9,7 +9,7 @@
 // Três assuntos, todos testados no PC (test/firmware_uno):
 //   1. Em que endereços procurar o display.
 //   2. Quando tentar religar o display depois que ele sumiu.
-//   3. Onde as 2 linhas da tela ficam no OLED.
+//   3. Onde as 2 linhas da tela e a faixa de ícones da FSM ficam no OLED.
 // A conversa com o hardware fica em src/hw/lcd.cpp.
 // ============================================================
 #pragma once
@@ -59,6 +59,19 @@ static const uint8_t OLED_FONTE_LARGURA_PX = 6;
 static const uint8_t OLED_FONTE_PAGINAS = 2;
 static const uint8_t OLED_ESPACO_LETRA_PX = 2;
 // Linha 1 nas páginas 0–1 (a faixa amarela dos módulos bicolores: o estado fica
-// em destaque); linha 2 nas páginas 4–5, separada da primeira.
+// em destaque); linha 2 nas páginas 3–4; páginas 2 e 5 vazias, de respiro.
 static const uint8_t OLED_PAGINA_LINHA1 = 0;
-static const uint8_t OLED_PAGINA_LINHA2 = 4;
+static const uint8_t OLED_PAGINA_LINHA2 = 3;
+
+// Faixa de ícones da FSM nas páginas 6–7 (os 16 px de baixo): um ícone por
+// estado (src/hw/icones_fsm.h), o do estado atual invertido. Glifos de 20 px
+// (desenho de 16 px + 2 px de margem de cada lado) em x = 2, 27, 52, 77, 102.
+static const uint8_t OLED_PAGINA_ICONES = 6;
+static const uint8_t OLED_ICONE_LARGURA_PX = 20;
+static const uint8_t OLED_ICONE_X0_PX = 2;
+static const uint8_t OLED_ICONE_PASSO_PX = 25;
+// Nenhum ícone desenhado ainda (depois de iniciar o display): desenha a faixa toda.
+static const uint8_t OLED_ICONE_NENHUM = 0xFF;
+
+// Coluna (px) do ícone k na faixa.
+inline uint8_t oledIconeX(uint8_t k) { return (uint8_t)(OLED_ICONE_X0_PX + k * OLED_ICONE_PASSO_PX); }

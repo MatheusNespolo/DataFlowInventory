@@ -144,6 +144,7 @@ Este documento define os testes de integração da cadeia de comunicação do si
 #### Critérios de validação (OLED)
 - [ ] `lcd_end` = 60 (ou 61) e `i2c_n` ≥ 1 no `status`
 - [ ] Abertura, estoque, entrega e erro legíveis, sem caracteres cortados (16 colunas)
+- [ ] Faixa de ícones no rodapé: o ícone do estado atual aparece invertido e acompanha a FSM (aguardando → verificando → acionando → entregando → aguardando; erro ao forçar um timeout)
 - [ ] `lcd_quedas` estável durante pedidos com motor ligado
 
 #### Procedimento original — LCD 16x2 (registro, aprovado em 18/08/2026)

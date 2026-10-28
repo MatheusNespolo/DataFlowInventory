@@ -96,3 +96,10 @@ void textoTela(const Fsm& f, char* l1, char* l2) {
       break;
   }
 }
+
+// Um ícone por estado, na mesma ordem do enum Estado. Estado fora da faixa
+// (nunca deveria acontecer) mostra o de erro.
+uint8_t iconeTela(const Fsm& f) {
+  const uint8_t e = (uint8_t)f.estado;
+  return e < TELA_N_ICONES ? e : (uint8_t)(TELA_N_ICONES - 1);
+}
