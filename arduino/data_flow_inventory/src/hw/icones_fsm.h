@@ -1,0 +1,129 @@
+// ============================================================
+// DATA FLOW INVENTORY — Ícones dos estados da FSM no display OLED
+// ------------------------------------------------------------
+// Uma "fonte" de largura fixa no formato da SSD1306Ascii, com 5 caracteres
+// ('0' a '4'), um por estado da FSM, na ordem de Estado (src/logica/fsm.h).
+// Cada glifo tem 20 x 16 px: o desenho de 16 x 16 com 2 px de margem de cada
+// lado, para o ícone invertido (estado atual) virar um bloco aceso com o
+// desenho recortado. Fica na flash (PROGMEM): 6 + 5 x 40 = 206 bytes.
+//
+// Gerado a partir das artes abaixo (█ = pixel aceso). Cada página de 8 px
+// vira 20 bytes, uma coluna por byte, bit 0 em cima.
+// ============================================================
+#pragma once
+#include <SSD1306Ascii.h>
+
+static const uint8_t ICONE_PRIMEIRO = '0';
+
+GLCDFONTDECL(IconesFsm) = {
+  0x00, 0x00,  // tamanho 0 = fonte de largura fixa
+  20,          // largura
+  16,          // altura
+  '0',         // primeiro caractere
+  5,           // quantidade
+  // 0: AGUARDANDO — ampulheta
+  //   ████████████████
+  //   ████████████████
+  //    █            █
+  //    █            █
+  //     █          █
+  //      █  ████  █
+  //       █  ██  █
+  //        █    █
+  //        █    █
+  //       █      █
+  //      █   ██   █
+  //     █   ████   █
+  //    █   ██████   █
+  //    █  ████████  █
+  //   ████████████████
+  //   ████████████████
+  0x00, 0x00, 0x03, 0x0F, 0x13, 0x23, 0x43, 0x83, 0x23, 0x63,
+  0x63, 0x23, 0x83, 0x43, 0x23, 0x13, 0x0F, 0x03, 0x00, 0x00,
+  0x00, 0x00, 0xC0, 0xF0, 0xC8, 0xC4, 0xE2, 0xF1, 0xF8, 0xFC,
+  0xFC, 0xF8, 0xF1, 0xE2, 0xC4, 0xC8, 0xF0, 0xC0, 0x00, 0x00,
+  // 1: VERIFICANDO — lupa
+  //   
+  //       ██████
+  //      █      █
+  //     █        █
+  //    █          █
+  //    █          █
+  //    █          █
+  //    █          █
+  //    █          █
+  //     █        █
+  //      █      ███
+  //       ██████ ███
+  //              ███
+  //               ███
+  //                ███
+  //                 ██
+  0x00, 0x00, 0x00, 0xF0, 0x08, 0x04, 0x02, 0x02, 0x02, 0x02,
+  0x02, 0x02, 0x04, 0x08, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x01, 0x02, 0x04, 0x08, 0x08, 0x08, 0x08,
+  0x08, 0x08, 0x04, 0x1E, 0x3D, 0x78, 0xE0, 0xC0, 0x00, 0x00,
+  // 2: ACIONANDO — raio
+  //            ████
+  //           ████
+  //          ████
+  //         ████
+  //        ████
+  //       ████
+  //      ██████████
+  //     ██████████
+  //         ████
+  //        ████
+  //       ████
+  //      ████
+  //     ████
+  //    ███
+  //   ██
+  //   █
+  0x00, 0x00, 0x00, 0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC,
+  0xDE, 0xCF, 0xC7, 0xC3, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0xC0, 0x60, 0x30, 0x38, 0x1C, 0x1E, 0x0F, 0x07,
+  0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  // 3: ENTREGANDO — caixa sobre a esteira
+  //   
+  //       ████████
+  //       █      █
+  //       █ ████ █
+  //       █      █
+  //       ████████
+  //   
+  //   ████████   █
+  //   ████████████
+  //   ████████   █
+  //   
+  //   ████████████████
+  //   █              █
+  //   █ ██  ██  ██  ██
+  //   █              █
+  //   ████████████████
+  0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 0xBE, 0xA2, 0xAA, 0xAA,
+  0x2A, 0x2A, 0x22, 0xBE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0xFB, 0x8B, 0xAB, 0xAB, 0x8B, 0x8B, 0xAB, 0xAB,
+  0x89, 0x89, 0xA9, 0xAB, 0x88, 0x88, 0xA8, 0xF8, 0x00, 0x00,
+  // 4: ERRO — triângulo de alerta
+  //          ██
+  //          ██
+  //         ████
+  //         █  █
+  //        █ ██ █
+  //        █ ██ █
+  //       █  ██  █
+  //       █  ██  █
+  //      █   ██   █
+  //      █   ██   █
+  //     █          █
+  //     █    ██    █
+  //    █     ██     █
+  //    █            █
+  //   ████████████████
+  //   ████████████████
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x30, 0x0C, 0xF7,
+  0xF7, 0x0C, 0x30, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0xC0, 0xF0, 0xCC, 0xC3, 0xC0, 0xC0, 0xC0, 0xDB,
+  0xDB, 0xC0, 0xC0, 0xC0, 0xC3, 0xCC, 0xF0, 0xC0, 0x00, 0x00,
+};

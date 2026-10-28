@@ -9,6 +9,7 @@
 #include "../../config.h"
 #include "../logica/lcd_logica.h"
 #include "../logica/telas.h"
+#include "icones_fsm.h"
 
 namespace {
 // SSD1306Ascii escreve direto na memória do display, sem imagem da tela na RAM
@@ -20,6 +21,7 @@ uint8_t dispositivos = 0;
 uint16_t quedas = 0;
 char linha1[LCD_COLUNAS + 1] = "";
 char linha2[LCD_COLUNAS + 1] = "";
+uint8_t iconeAceso = OLED_ICONE_NENHUM;  // ícone invertido na tela agora
 
 // Um timeout de I²C (barramento preso) liga a flag do Wire: lê e limpa.
 bool houveTimeout() {
@@ -70,6 +72,23 @@ bool escreverLinha(uint8_t pagina, const char* texto) {
   return true;
 }
 
+// Fonte e espaçamento do texto (as 2 linhas). Chamada depois de desenhar ícones.
+void fonteTexto() {
+  oled.setInvertMode(false);
+  oled.setFont(X11fixed7x14);
+  oled.setLetterSpacing(OLED_ESPACO_LETRA_PX);  // depois do setFont, que o redefine
+}
+
+// Desenha o ícone k da faixa, normal ou invertido. Mesma regra do texto: false
+// se o I2C estourou o timeout.
+bool escreverIcone(uint8_t k, bool aceso) {
+  oled.setInvertMode(aceso);
+  oled.setCursor(oledIconeX(k), OLED_PAGINA_ICONES);
+  if (houveTimeout()) return false;
+  oled.write((uint8_t)(ICONE_PRIMEIRO + k));
+  return !houveTimeout();
+}
+
 // I2C preso em operação: desiste do display para não travar o loop. Quem chama
 // lcdIniciar() de novo (política em lcd_logica.h) pode religá-lo.
 void desistir() {
@@ -98,8 +117,7 @@ bool lcdIniciar() {
 #else
   oled.begin(&Adafruit128x64, endereco);  // inicializa e apaga a tela (~0,1 s)
 #endif
-  oled.setFont(X11fixed7x14);
-  oled.setLetterSpacing(OLED_ESPACO_LETRA_PX);  // depois do setFont, que o redefine
+  fonteTexto();
   // Barramento preso já na inicialização: segue sem display, como se não existisse.
   if (houveTimeout()) {
     endereco = 0;
@@ -108,6 +126,7 @@ bool lcdIniciar() {
   ativo = true;
   linha1[0] = 0;
   linha2[0] = 0;
+  iconeAceso = OLED_ICONE_NENHUM;  // tela apagada no begin: a faixa é redesenhada inteira
   return true;
 }
 
@@ -129,6 +148,24 @@ void lcdAtualizar(const char* l1, const char* l2) {
     strncpy(linha2, l2, LCD_COLUNAS);
     linha2[LCD_COLUNAS] = 0;
   }
+}
+
+void lcdIcones(uint8_t atual) {
+  if (!ativo || atual >= TELA_N_ICONES || atual == iconeAceso) return;
+  oled.setFont(IconesFsm);
+  oled.setLetterSpacing(0);  // o glifo já traz a margem
+  bool ok = true;
+  if (iconeAceso == OLED_ICONE_NENHUM) {
+    for (uint8_t k = 0; ok && k < TELA_N_ICONES; k++) ok = escreverIcone(k, k == atual);
+  } else {
+    ok = escreverIcone(iconeAceso, false) && escreverIcone(atual, true);
+  }
+  fonteTexto();
+  if (!ok) {
+    desistir();
+    return;
+  }
+  iconeAceso = atual;
 }
 
 bool lcdAtivo() { return ativo; }

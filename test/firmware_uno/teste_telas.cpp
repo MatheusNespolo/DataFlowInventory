@@ -55,3 +55,16 @@ TESTE(telas_cabem_em_16_colunas) {
     VERIFICA(strlen(l1) <= 16 && strlen(l2) <= 16);
   }
 }
+
+// ---- Ícones da FSM ---------------------------------------------------------------
+
+TESTE(telas_um_icone_por_estado_na_ordem_do_enum) {
+  Fsm f = fsmNova();
+  const Estado estados[] = {AGUARDANDO_PEDIDO, VERIFICANDO_ESTOQUE, ACIONANDO_ESTEIRA, ENTREGANDO_PECA, ERRO};
+  for (uint8_t i = 0; i < TELA_N_ICONES; i++) {
+    f.estado = estados[i];
+    VERIFICA(iconeTela(f) == i);
+  }
+  f.estado = (Estado)7;  // corrompido: nunca acontece, mas não pode apontar fora da faixa
+  VERIFICA(iconeTela(f) == TELA_N_ICONES - 1);
+}
