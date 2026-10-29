@@ -283,7 +283,7 @@ MQTT_PORT=1883
 |---------|----------------|---------|
 | `[WiFi] Falha ao conectar` | SSID/senha errados ou rede 5GHz | ESP32 só suporta 2,4GHz; conferir credenciais |
 | `[MQTT] Falha na conexao. rc=-2` (USE_TLS false / local) | Broker local inacessível | Conferir IP (`ipconfig`), Mosquitto rodando, firewall liberado na porta 1883 |
-| `[MQTT] Falha na conexao. rc=-2` (USE_TLS true / HiveMQ 8883) | Firewall corporativo bloqueando 8883 · cluster hibernado | Testar via hotspot 4G · `Test-NetConnection -Port 8883` · Ver `docs/testes/validações/troubleshooting_bancada_22-23_09.md` |
+| `[MQTT] Falha na conexao. rc=-2` (USE_TLS true / HiveMQ 8883) | Firewall corporativo bloqueando 8883 · cluster hibernado | Testar via hotspot 4G · `Test-NetConnection -Port 8883` · Ver `docs/testes/validacoes/troubleshooting_bancada_22-23_09.md` |
 | `rc=5` | Não autorizado | `allow_anonymous true` no `mosquitto.conf` ou configurar user/pass |
 | ESP32 conecta mas nada chega no broker | `MQTT_SERVER` = `localhost` no ESP32 | Usar o **IP do PC**, nunca `localhost` no ESP32 |
 | Servidor não recebe | `.env` errado ou tópicos diferentes | Conferir `MQTT_BROKER_URL` e nomes dos tópicos (devem ser iguais no `.ino` e no `.env`) |

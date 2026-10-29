@@ -13,13 +13,13 @@ Para qualquer membro da equipe inicializar o ambiente do zero:
 powershell -ExecutionPolicy Bypass -File .\scripts\setup.ps1
 
 # 2. Executar pré-voo de validação de configuração
-powershell -ExecutionPolicy Bypass -File .\docs\testes\validações\validar_infra.ps1
+powershell -ExecutionPolicy Bypass -File .\docs\testes\validacoes\validar_infra.ps1
 
 # 3. Subir todos os serviços (Mosquitto + MQTT Probe + Server Dashboard)
 .\start_services.bat
 
 # 4. Confirmar saúde pós-subida (comunicação E2E)
-powershell -ExecutionPolicy Bypass -File .\docs\testes\validações\validar_infra.ps1 -PosSubida
+powershell -ExecutionPolicy Bypass -File .\docs\testes\validacoes\validar_infra.ps1 -PosSubida
 ```
 
 ---
@@ -50,11 +50,11 @@ powershell -ExecutionPolicy Bypass -File .\docs\testes\validações\validar_infr
 1. **Checklist manual** — Abrir `checklist_pre_teste_rede_infra.md` e marcar ✅ nas seções 1–5 (broker local) antes de ligar qualquer hardware.
 2. **Automação** *(opcional, mas recomendado)* — Abrir PowerShell como Administrador e rodar:
    ```powershell
-   .\docs\testes\validações\validar_infra.ps1
+   .\docs\testes\validacoes\validar_infra.ps1
    ```
    Todos os itens devem retornar **PASS** antes de prosseguir.
 3. **Subir serviços** — `start_services.bat` na raiz do repositório (Mosquitto + `mqtt_probe` + server Node).
-4. **Validar subida** — Rodar `.\docs\testes\validações\validar_infra.ps1 -PosSubida`.
+4. **Validar subida** — Rodar `.\docs\testes\validacoes\validar_infra.ps1 -PosSubida`.
 5. **Executar bancada** — Seguir o roteiro do dia (ex.: `semana_01_18-20_agosto.md`) somente após validação completa da infraestrutura.
 
 ---

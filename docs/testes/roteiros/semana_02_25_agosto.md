@@ -60,7 +60,7 @@ netstat -an | findstr 1883
 **Scripts de validação:**
 - `node test/mqtt_probe/probe.js`
 - `node test/mqtt_probe/probe.js -PosSubida`
-- `docs/testes/validações/checklist_pre_teste_rede_infra.md`
+- `docs/testes/validacoes/checklist_pre_teste_rede_infra.md`
 
 ---
 

@@ -48,7 +48,7 @@ USE_TLS=false                         # broker local
 - [x] `start_services.bat` → Mosquitto + probe + server
 - [x] `mqtt_probe` mostra `online` retained em `dataflow/status`
 - [x] Esteira A operando no broker local
-- [x] Checklist: [`checklist_pre_teste_rede_infra.md`](../validações/checklist_pre_teste_rede_infra.md)
+- [x] Checklist: [`checklist_pre_teste_rede_infra.md`](../validacoes/checklist_pre_teste_rede_infra.md)
 
 ### 0.c — Hardware novo (esteiras B e C)
 

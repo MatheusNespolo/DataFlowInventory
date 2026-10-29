@@ -16,7 +16,7 @@ Criar documento (`docs/DEPLOYMENT.md`) com passo a passo completo para implantar
 - **Setup atual disperso em:** `README.md` §"Como Rodar", `server/README.md`, `simulator/README.md`
 - **Broker local:** `docs/broker_local_mosquitto.md`
 - **Broker remoto:** `docs/INTEGRATION_GUIDE.md` (HiveMQ Cloud)
-- **Checklist de rede:** `docs/testes/validações/checklist_pre_teste_rede_infra.md`
+- **Checklist de rede:** `docs/testes/validacoes/checklist_pre_teste_rede_infra.md`
 - **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
 
 ## ✅ Critério de Aceite

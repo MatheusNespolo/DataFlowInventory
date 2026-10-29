@@ -200,7 +200,7 @@ Camada **complementar** ao historiador do CX9240: o SQLite guarda dado de **neg�
 
 - [ ] Beckhoff: contrato validado, subscriber implementado, DB persistindo
 - [ ] Separador: código ativo, testes T7.1–T7.6 passando
-- [ ] Documentação: plano_de_testes.md + CHANGELOG.md + cards Done
+- [ ] Documentação: resultados.md (resultados de bancada) + CHANGELOG.md + cards Done
 - [ ] Observabilidade: smoke test com Docker e painéis do Grafana conferidos
 - [ ] Referência: ver `docs/testes/roteiros/semana_05_15-19_setembro.md` para execução
 

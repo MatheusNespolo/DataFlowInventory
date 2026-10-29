@@ -56,7 +56,7 @@
 
 > **Objetivo:** confirmar se o `rc=-2` é causado por firewall corporativo bloqueando a porta 8883. Método: isolar a variável de rede usando hotspot 4G (rede sem restrições corporativas).
 >
-> **Referência:** `docs/testes/validações/troubleshooting_bancada_22-23_09.md` §Problema 1
+> **Referência:** `docs/testes/validacoes/troubleshooting_bancada_22-23_09.md` §Problema 1
 
 ### 3.1 — Procedimento
 
@@ -245,7 +245,7 @@ mosquitto_sub -h localhost -t "dataflow/#" -v
 
 | Artefato | Localização | Status |
 |----------|-------------|--------|
-| Resultado do hotspot 4G | `docs/testes/validações/troubleshooting_bancada_22-23_09.md` | ⬜ |
+| Resultado do hotspot 4G | `docs/testes/validacoes/troubleshooting_bancada_22-23_09.md` | ⬜ |
 | Resultados IRF520 e burn-in | Seção 10 deste roteiro | ⬜ |
 | CHANGELOG da Semana 7 | `docs/CHANGELOG.md` | ⬜ |
 | Comentários dos Cards #21–#25 | GitHub Projects | ⬜ |
@@ -304,8 +304,8 @@ O simulador permite validar os cenários de FSM e a integração Dashboard/API s
 
 - [`semana_06_22-26_setembro.md`](semana_06_22-26_setembro.md)
 - [`plano_de_testes.md`](../plano_de_testes.md)
-- [`troubleshooting_bancada_22-23_09.md`](../validações/troubleshooting_bancada_22-23_09.md)
-- [`checklist_pre_teste_rede_infra.md`](../validações/checklist_pre_teste_rede_infra.md)
+- [`troubleshooting_bancada_22-23_09.md`](../validacoes/troubleshooting_bancada_22-23_09.md)
+- [`checklist_pre_teste_rede_infra.md`](../validacoes/checklist_pre_teste_rede_infra.md)
 - [`esp32/test_mqtt_cloud/README.md`](../../../esp32/test_mqtt_cloud/README.md)
 - [`CHANGELOG.md`](../../CHANGELOG.md)
 

@@ -233,7 +233,7 @@ Observar simultaneamente:
 
 ### 6.5 — Incidentes de Bancada 22–23/09 e Diagnóstico Pendente
 
-> Dois problemas independentes foram identificados durante o teste funcional com as novas placas de passagem soldadas e a tentativa de conexão ao HiveMQ Cloud. Diagnóstico técnico e mitigação documentados em `docs/testes/validações/troubleshooting_bancada_22-23_09.md`.
+> Dois problemas independentes foram identificados durante o teste funcional com as novas placas de passagem soldadas e a tentativa de conexão ao HiveMQ Cloud. Diagnóstico técnico e mitigação documentados em `docs/testes/validacoes/troubleshooting_bancada_22-23_09.md`.
 
 **Problema 1 — MQTT Cloud `rc=-2`:**
 - WiFi conectado, mas TCP/TLS na porta 8883 falha antes de negociar MQTT

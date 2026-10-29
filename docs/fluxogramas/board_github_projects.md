@@ -379,7 +379,7 @@ Até então o repositório só possuía o card genérico **#5 “Configurar brok
 PRÉ-BANCADA
  ├─ Criar/abrir o roteiro do dia em docs/testes/roteiros/
  ├─ Definir "Data Validação" nos cards-alvo
- ├─ Rodar .\docs\testes\validações\validar_infra.ps1 (PowerShell Admin) → todos PASS
+ ├─ Rodar .\docs\testes\validacoes\validar_infra.ps1 (PowerShell Admin) → todos PASS
  └─ Subir serviços com .\start_services.bat
 
 DURANTE

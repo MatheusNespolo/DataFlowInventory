@@ -96,7 +96,7 @@ Lembre de **desconectar o ESP32 dos pinos 0/1** durante o upload no Uno.
 
 **Bancada / integração:** siga o roteiro do dia em
 [`docs/testes/roteiros/`](docs/testes/roteiros/) e o
-[checklist de infra](docs/testes/validações/checklist_pre_teste_rede_infra.md).
+[checklist de infra](docs/testes/validacoes/checklist_pre_teste_rede_infra.md).
 
 **Pipelines de CI/CD:** o repositório conta com GitHub Actions automatizado (`.github/workflows/lint-and-security.yaml`). Consulte [`docs/CI-CD.md`](docs/CI-CD.md) para detalhes.
 

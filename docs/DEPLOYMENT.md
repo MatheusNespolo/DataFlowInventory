@@ -77,7 +77,7 @@ Para isolar problemas de rede/TLS, use o sketch `esp32/test_mqtt_cloud/` (ver o 
 
 > **Atenção (Windows):** se o serviço automático do Mosquitto estiver ativo, ele ocupa a porta 1883 e um segundo broker cria uma rede MQTT particionada (servidor num broker, ESP32 no outro; o dashboard fica em "ESP32 Offline"). O `start_services.bat` detecta isso e orienta: `net stop mosquitto; sc.exe config mosquitto start= demand` (PowerShell como Administrador).
 
-**Cenário B — HiveMQ Cloud:** crie o cluster em <https://cloud.hivemq.com>, crie um par usuário/senha em *Access Management*, anote o endpoint e use `mqtts://` na porta 8883 no `server/.env`. Se o ESP32 não conectar, veja `docs/testes/validações/troubleshooting_bancada_22-23_09.md` (SSID correto e "Maximizar compatibilidade" ativada no hotspot foram causas reais).
+**Cenário B — HiveMQ Cloud:** crie o cluster em <https://cloud.hivemq.com>, crie um par usuário/senha em *Access Management*, anote o endpoint e use `mqtts://` na porta 8883 no `server/.env`. Se o ESP32 não conectar, veja `docs/testes/validacoes/troubleshooting_bancada_22-23_09.md` (SSID correto e "Maximizar compatibilidade" ativada no hotspot foram causas reais).
 
 ## 6. Setup do servidor
 
@@ -154,7 +154,7 @@ Execute na ordem; cada linha depende da anterior.
 | Probe | `cd test/mqtt_probe && node probe.js` | mensagens dos tópicos `dataflow/*` |
 | Comando | `mosquitto_pub -h 127.0.0.1 -t dataflow/comandos/sub -m '{"acao":"solicitar_peca","peca":"A"}'` | esteira da peça A aciona; confirmação em `dataflow/comandos/pub`. O campo `acao` é obrigatório e `peca` é `A`, `B` ou `C` |
 | Dashboard | abrir <http://localhost:3000> | badges de conexão verdes, estoque visível; ao pedir uma peça pelo botão, esteira e evento aparecem |
-| Infra de rede | `docs/testes/validações/validar_infra.ps1` (parâmetro `-PosSubida` com os serviços no ar) | checagens de broker e firewall OK |
+| Infra de rede | `docs/testes/validacoes/validar_infra.ps1` (parâmetro `-PosSubida` com os serviços no ar) | checagens de broker e firewall OK |
 
 No PowerShell, o `mosquitto_pub` pode exigir outro escape de aspas no JSON; o `start_services.bat` mostra um exemplo que funciona (`& "C:\Program Files\mosquitto\mosquitto_pub.exe" ...`). No cenário C, só se aplicam servidor, dashboard e `/api/status`.
 

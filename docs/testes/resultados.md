@@ -52,7 +52,7 @@ Em ordem cronológica (o mais recente no fim).
 
 ### 26/08
 
-- Introduzida automação de validação de infraestrutura (`docs/testes/validações/validar_infra.ps1`) e checklist de rede/infra correspondente
+- Introduzida automação de validação de infraestrutura (`docs/testes/validacoes/validar_infra.ps1`) e checklist de rede/infra correspondente
 - Sistema ainda opera com **broker local (Mosquitto)**; conexão com **broker remoto (HiveMQ Cloud)** planejada para rodada futura (Teste 6), condicionada à consolidação da esteira A
 
 ### 27–28/08

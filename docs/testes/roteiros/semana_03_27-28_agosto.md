@@ -53,7 +53,7 @@ USE_TLS false                         # broker local
 - [ ] Fiação UART reconferida (divisor + GND comum)
 - [ ] `start_services.bat` (Mosquitto + probe + server)
 - [ ] Broker: `netstat -an | findstr 1883` → `0.0.0.0:1883`
-- [ ] Checklist: [`checklist_pre_teste_rede_infra.md`](../validações/checklist_pre_teste_rede_infra.md)
+- [ ] Checklist: [`checklist_pre_teste_rede_infra.md`](../validacoes/checklist_pre_teste_rede_infra.md)
 
 ### 0.c — Reupload obrigatório
 

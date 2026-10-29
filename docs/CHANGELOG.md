@@ -200,7 +200,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 - **Consolidação da documentação em `docs/ARCHITECTURE.md` (02/10/2026)**
   - `docs/arquitetura_mqtt.md` e `docs/fluxogramas/fluxograma_funcionamento.md` foram removidos depois de migrar seu conteúdo exclusivo para o `ARCHITECTURE.md`: tópicos completos, fluxos de dados e comando, formatos de mensagem (Serial, MQTT e Socket.IO), ligação serial Uno ↔ ESP32, configuração de broker e segurança, bibliotecas, contrato do simulador com o CX9240 e diagramas da FSM. O histórico continua no git
   - `docs/CI-CD-FIXES-2026-09-17.md` removido: duplicava a entrada "Hardening CI/CD" deste changelog e as seções 2.2 e 2.3 do `docs/CI-CD.md`
-  - `docs/testes/validações/test_write.txt` removido (arquivo de teste sem uso)
+  - `docs/testes/validacoes/test_write.txt` removido (arquivo de teste sem uso)
   - Links em `README.md`, `CONTRIBUTING.md`, `simulator/`, `docs/FRONTEND.md`, `docs/testes/plano_de_testes.md` e `docs/fluxogramas/board_github_projects.md` apontam para o `ARCHITECTURE.md`; árvore de diretórios do `README.md` atualizada (observabilidade, scripts, CI, testes). Menções antigas nas entradas abaixo e nos roteiros semanais são históricas e foram mantidas
 
 ---
@@ -286,7 +286,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
   - **Resultado da validação em 28/09:** conexão HiveMQ Cloud bem-sucedida via `Beckhoff_Guest` e via hotspot 4G
   - **Causa da falha inicial do hotspot:** SSID incorreto e opção “Maximizar compatibilidade” desativada
   - **Conclusão:** ESP32, sketch e HiveMQ Cloud estão operacionais; não atribuir a falha inicial exclusivamente ao firewall do SENAI. Se o `rc=-2` voltar a ocorrer, investigar a rede específica e suas regras para a porta 8883
-  - **Referência técnica:** `docs/testes/validações/troubleshooting_bancada_22-23_09.md` §Problema 1
+  - **Referência técnica:** `docs/testes/validacoes/troubleshooting_bancada_22-23_09.md` §Problema 1
 
 - **Perda de Potência em Esteiras B/C Após Soldagem de Placas de Passagem (22–23/09/2026)**
   - **Sintoma:** Motores B/C apresentam velocidade/força reduzidas após montagem das novas placas IRF520 soldadas
@@ -295,7 +295,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
   - **Diagnóstico:** Roteiro de 4 fases com multímetro documentado (teste com jumper curto + medição de tensão sob carga + teste de resistência de solda + teste de MOSFET)
   - **Mitigação em curso:** Aquisição de 2 expansores 110/220V→5V para alimentação dedicada de cada placa de passagem — **configuração já prevista no diagrama elétrico** (sem alteração de documentação necessária)
   - **Cronograma diagnóstico:** 25–27/09/2026 (paralelo ao burn-in test)
-  - **Referência técnica:** `docs/testes/validações/troubleshooting_bancada_22-23_09.md` §Problema 2
+  - **Referência técnica:** `docs/testes/validacoes/troubleshooting_bancada_22-23_09.md` §Problema 2
 
 ---
 
@@ -384,7 +384,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 - **Documentação — Reorganização dos roteiros de teste (03/09/2026)**
   - Consolidação de 8 arquivos diários em 4 arquivos semanais (`semana_01` a `semana_04`).
   - Atualização de todas as referências internas em `README.md`, `arquitetura_mqtt.md`,
-    `board_github_projects.md`, `checklist_pre_teste_rede_infra.md` e `validações/README.md`.
+    `board_github_projects.md`, `checklist_pre_teste_rede_infra.md` e `validacoes/README.md`.
   - READMEs adicionados em `simulator/`, `server/` e `frontend/` para melhor navegação.
 
 - **Frontend — Redesign do Painel Anunciador Industrial (02/09/2026)**
@@ -530,7 +530,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
   `35fe3d5`. Os textos ainda mandavam editar SSID/senha dentro do `.ino`:
   - `README.md` — passo "Configurar o ESP32"
   - `docs/arquitetura_mqtt.md` — "Como Rodar", seção HiveMQ Cloud e árvore de diretórios
-  - `docs/testes/validações/checklist_pre_teste_rede_infra.md` — seções 2, 4 e 7
+  - `docs/testes/validacoes/checklist_pre_teste_rede_infra.md` — seções 2, 4 e 7
   - `docs/testes/roteiros/semana_03_27-28_agosto.md` — novo Bloco 0.a (setup do `secrets.h`)
 
 - `docs/arquitetura_mqtt.md`: tabela de tópicos agora identifica quais são **retained**

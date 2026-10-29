@@ -49,9 +49,9 @@ Engenharia de Controle e Automação
 | 📡 **IoT e MQTT** | Mosquitto local ou HiveMQ Cloud, tópicos `dataflow/*`, mensagens retained e LWT | [Tópicos MQTT](#tópicos-mqtt) |
 | ⏱️ **Tempo real** | Servidor Node.js com Socket.IO, dashboard responsivo e vista 3D da bancada | [Destaques Técnicos](#destaques-técnicos) |
 | 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
-| ✅ **Qualidade** | Testes da lógica do firmware em g++ (97 testes), testes unitários do frontend, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
+| ✅ **Qualidade** | Testes da lógica do firmware em g++, testes unitários do frontend, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
 
-> **Status de validação (29/10/2026):** firmware Uno v3.0 validado em bancada; as três esteiras (A, B e C) foram calibradas e rodaram juntas em 21/10, com PWM e kick registrados em `config.h` (`e3c8833`, `ddf526a`, `d4ecc2f`). Na Semana 11, a última bancada, a esteira A foi montada na base e fez 10 entregas sem falha (4650–5000 ms, igual à calibração); B e C na base, o separador em modo automático, as peças impressas em 3D, o display OLED e a integração total seguem pendentes. Consulte o [roteiro da Semana 10](docs/testes/roteiros/semana_10_19-23_outubro.md), o [roteiro da Semana 11](docs/testes/roteiros/semana_11_26-30_outubro.md) e o [plano de testes](docs/testes/plano_de_testes.md).
+> **Estado da bancada:** o que já foi validado e o que falta fica em um só lugar, os [resultados de bancada](docs/testes/resultados.md) (estado atual, registro por teste e diário). O planejamento da semana está nos [roteiros](docs/testes/roteiros/), e o andamento de cada frente no [GitHub Project](https://github.com/users/MatheusNespolo/projects/3).
 
 ## Sumário
 
@@ -238,9 +238,10 @@ DataFlowInventory/
 │   │   └── Projeto de pesquisa - Final.docx   # Documentação acadêmica
 │   ├── fluxogramas/                       # Diagramas (FSM, ciclo do pedido, elétrico)
 │   └── testes/
-│       ├── plano_de_testes.md             # Plano de testes de integração (Serial → E2E)
+│       ├── plano_de_testes.md             # Como testar: tabela de testes e procedimentos (Serial → E2E)
+│       ├── resultados.md                  # Estado da bancada, registro de resultados e diário (fonte única)
 │       ├── roteiros/                      # Roteiros semanais de execução dos testes
-│       └── validações/                    # Checklists e automação de validação de infra
+│       └── validacoes/                    # Checklists e automação de validação de infra
 │           ├── README.md                  # Guia dos artefatos de validação
 │           ├── checklist_pre_teste_rede_infra.md
 │           └── validar_infra.ps1          # Script PowerShell de validação (broker/firewall/portas)
@@ -260,13 +261,13 @@ O Arduino opera com **5 estados**:
 |---|--------|-----------|
 | 1 | **AGUARDANDO_PEDIDO** | Sistema em repouso, aguarda comandos remotos (botões físicos desabilitados) |
 | 2 | **VERIFICANDO_ESTOQUE** | Checagem prévia sem ligar o motor: estoque, peça no topo e junção livre |
-| 3 | **ACIONANDO_ESTEIRA** | Liga o motor da esteira escolhida: kick-start em PWM 255 por **kickMs** (A=180 ms, B=180 ms, C=180 ms) e depois PWM de regime da própria esteira (A=245, B=200, C=230), calibrados em bancada (`e3c8833`, `ddf526a`, `d4ecc2f`). O separador parte para o compartimento da peça neste momento |
+| 3 | **ACIONANDO_ESTEIRA** | Liga o motor da esteira escolhida: kick-start em PWM 255 por **kickMs** e depois o PWM de regime da própria esteira, calibrados em bancada (valores atuais em `PARAM_ESTEIRA_A/B/C`, no `config.h`). O separador parte para o compartimento da peça neste momento |
 | 4 | **ENTREGANDO_PECA** | Supervisão por marcos: topo livre em 3 s, junção em 12,5 s (débito na confirmação) e 3 s de saída |
 | 5 | **ERRO** | Motores desligados; display e dashboard mostram onde falhou (ver `docs/ARCHITECTURE.md` §3); aguarda reset |
 
 > 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#3-máquina-de-estados-arduino).
 >
-> 🧪 Testes de integração da cadeia de comunicação (Serial → Broker → Dashboard) em [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md).
+> 🧪 Testes de integração da cadeia de comunicação (Serial → Broker → Dashboard) em [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md); resultados em [`docs/testes/resultados.md`](docs/testes/resultados.md).
 
 ### Tópicos MQTT
 
@@ -436,23 +437,12 @@ Abrir [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## Próximos Passos
 
-### Próximas validações (23/10/2026)
-
-- **Semana 11 (26–30/10) — última bancada de teste:** montagem final das esteiras na base, com teste de uma esteira por vez para garantir que a estrutura não altera o funcionamento calibrado; validação das peças impressas em 3D (roda separadora no motor de passo e peça que percorre as esteiras) e do separador em modo automático; integração total em 30/10. Ver [roteiro](docs/testes/roteiros/semana_11_26-30_outubro.md).
-- **Display:** o LCD 16x2 não respondia no I²C (`i2c_n 0`, falha elétrica) e foi substituído por um **display OLED 0,96" I²C (SSD1306)**, com a mesma tela de 2 linhas × 16 colunas (PR #68). O firmware está pronto e testado; falta a validação na bancada (`lcd_end` = 60 no `status` e a tela legível). O sistema opera sem o display.
-- **Itens concluídos:** CI/CD, telemetria Prometheus/Grafana, broker HiveMQ Cloud E2E e historiador CX9240 possuem documentação de implementação/validação em [`docs/CI-CD.md`](docs/CI-CD.md), [`observability/README.md`](observability/README.md), [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md) e [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md).
+- **Estado e pendências da bancada:** [resultados de bancada](docs/testes/resultados.md) (fonte única) e o [roteiro da semana](docs/testes/roteiros/).
 - **Planejamento:** o andamento de cada frente está no [GitHub Project](https://github.com/users/MatheusNespolo/projects/3), com os commits e PRs de evidência em cada card.
-- 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Telemetria concluída em 01/10/2026: código, testes automatizados e validação do stack (smoke test e conferência dos painéis). Ver [`observability/README.md`](observability/README.md).
+- **Histórico de mudanças:** [`docs/CHANGELOG.md`](docs/CHANGELOG.md), organizado por marcos.
+- **Itens concluídos:** CI/CD, telemetria Prometheus/Grafana, broker HiveMQ Cloud E2E e historiador CX9240 possuem documentação de implementação/validação em [`docs/CI-CD.md`](docs/CI-CD.md), [`observability/README.md`](observability/README.md), [`docs/testes/resultados.md`](docs/testes/resultados.md) e [`docs/INTEGRATION_GUIDE.md`](docs/INTEGRATION_GUIDE.md).
+- 📈 **Telemetria histórica (Prometheus + Grafana):** `GET /metrics` no servidor e três dashboards (Visão Geral, Performance e Confiabilidade) em `docs/grafana/`, com stack Docker opcional em `docker-compose.yml`. Ver [`observability/README.md`](observability/README.md).
 - 📘 **Guia de implantação:** passo a passo para subir o sistema do zero em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md); ainda não validado em máquina limpa.
-
-## Próximos Passos e Roteiros Disponíveis Atualizados
-
-Para etapas detalhadas sobre cada fase: [Semana 10 (calibração das esteiras)](docs/testes/roteiros/semana_10_19-23_outubro.md) vs [Semana 11 (montagem final e integração total)](docs/testes/roteiros/semana_11_26-30_outubro.md).
-
-- 🔧 **Diagnóstico IRF520 (esteiras B/C) — resolvido em 03/10:** a falha era elétrica (módulo IRF520 e motor da C, trocados; o firmware anterior estava correto). A C usa provisoriamente o módulo da A. Ver [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) (seção 4.2.1).
-- 🧪 **Semana 8 (fechamento em 13/10):** firmware Uno v3.0 validado em bancada (itens 1.1–1.11 e Bloco 2; B/C funcionando). Resultados em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md).
-- 🎡 **Separador (18/10):** roda giratória integrada ao firmware sem bloqueio, comandos `CMD:SEP:A|B|C` validados em bancada e preparo automático conforme a peça pedida. Ver o [guia de bancada do separador](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/separador_bancada.md) (removido do repositório em 27/10; link para a última versão).
-- ⚙️ **Semana 10 (21/10):** as três esteiras calibradas e rodando juntas. A esteira B não partia ou avançava pouco com o kick de 130 ms; com 180 ms (`d4ecc2f`) passou a partir normalmente, e a revisão do firmware confirmou que o acionamento é idêntico nas três esteiras. Resultados em [`docs/testes/roteiros/semana_10_19-23_outubro.md`](docs/testes/roteiros/semana_10_19-23_outubro.md).
 
 ## Equipe
 
