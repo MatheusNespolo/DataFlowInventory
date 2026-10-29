@@ -37,6 +37,15 @@ jobs:
           cd server && npx eslint . || echo "ESLint não configurado — pulando"
           cd ../simulator && npx eslint . || echo "ESLint não configurado — pulando"
 
+  docs-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Verificar links e âncoras da documentação
+        run: python3 scripts/verificar-links.py
+
   secret-detection:
     runs-on: ubuntu-latest
     steps:

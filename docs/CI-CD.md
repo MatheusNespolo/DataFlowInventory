@@ -39,7 +39,12 @@ Este documento descreve as pipelines de CI/CD implementadas para garantir qualid
   - AWS keys, API tokens, etc.
 - **Ação:** Bloqueia push se detectado
 
-#### 3. NPM Audit
+#### 3. Links da documentação (`docs-links`)
+- **O quê:** `scripts/verificar-links.py` confere todos os `.md` versionados: falha se um link relativo aponta para um arquivo inexistente ou para uma âncora (`#secao`) que não existe no destino, com o mesmo cálculo de âncora do GitHub. Links externos (http/https) não são verificados, porque dependem da rede
+- **Por quê:** apagar ou renomear um documento quebrava links sem ninguém perceber (8 links quebrados pela remoção de dois guias em 27/10/2026)
+- **Rodar localmente:** `python3 scripts/verificar-links.py` na raiz do repositório
+
+#### 3.1 NPM Audit
 - **Dirs:** `server/`, `simulator/`, `test/mqtt_probe/`
 - **Threshold:** `--audit-level=critical` (vulnerabilidades críticas e altas bloqueiam)
 - **Estratégia:** Ignorar low/moderate, focar em fixes via `npm audit fix`

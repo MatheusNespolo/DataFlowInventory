@@ -2,7 +2,7 @@
 REM ============================================================
 REM DATA FLOW INVENTORY - Inicializacao dos servicos locais
 REM Abre 3 janelas dedicadas: Mosquitto (broker), mqtt_probe e
-REM Server Node.js. Ver docs/testes/validações/README.md
+REM Server Node.js. Ver docs/testes/validacoes/README.md
 REM ============================================================
 setlocal
 

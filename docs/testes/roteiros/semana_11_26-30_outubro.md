@@ -147,4 +147,4 @@ Também registrar:
 - **Separador automático:** o resultado deve ser explicitado como validado, pendente ou não executado.
 - **Estrutura do projeto:** confirmar se as modificações mecânicas da base preservaram o comportamento original.
 
-Atualizar [`../plano_de_testes.md`](../plano_de_testes.md), [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md), [`../../INTEGRATION_GUIDE.md`](../../INTEGRATION_GUIDE.md) e [`../../CHANGELOG.md`](../../CHANGELOG.md) com os resultados reais, sem transformar plano em aprovação sem evidência.
+Registrar os resultados em [`../resultados.md`](../resultados.md) (estado atual, registro e diário; fonte única) e atualizar [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md), [`../../INTEGRATION_GUIDE.md`](../../INTEGRATION_GUIDE.md) e [`../../CHANGELOG.md`](../../CHANGELOG.md) com os resultados reais, sem transformar plano em aprovação sem evidência.

@@ -38,4 +38,4 @@ Este diretório contém um sketch isolado para testar a conectividade de rede (W
 | **`-4`** | Timeout de Conexão (`MQTT_CONNECTION_TIMEOUT`) | Servidor inacessível, DNS falhou ou rede muito lenta. |
 
 Consulte também o documento completo de suporte:  
-`docs/testes/validações/troubleshooting_bancada_22-23_09.md`
+`docs/testes/validacoes/troubleshooting_bancada_22-23_09.md`

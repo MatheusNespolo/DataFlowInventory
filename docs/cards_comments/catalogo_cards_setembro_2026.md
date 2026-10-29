@@ -1,0 +1,242 @@
+# Catálogo de cards — agosto e setembro de 2026 (arquivo histórico)
+
+> **Arquivo histórico.** Catálogo de cards e rascunhos de abertura que ficavam no guia do board (`docs/fluxogramas/board_github_projects.md`, seções 2 a 5) até 29/10/2026. Os números de card citados são da numeração planejada na época e **não** correspondem às issues atuais (por exemplo, o "Card #21 BOM" é a issue #23). A fonte do andamento é o [GitHub Project](https://github.com/users/MatheusNespolo/projects/3); não atualize este arquivo.
+
+## 2. Catálogo consolidado de cards
+
+### 🟢 Coluna `Done`
+
+| Card | Título | Área | Bloco | Validação |
+|---|---|---|---|---|
+| #3 | Implementar máquina de estados no Arduino | `Firmware-Uno` | `B1-B3` | 18/08/2026 |
+| #4 | Desenvolver gateway ESP32 (Serial ↔ MQTT) | `Firmware-ESP32` | `T1`, `T2` | 25/08/2026 |
+| #6 | Criar servidor Node.js (Express + WebSocket + MQTT) | `Backend` | `T2`, `T4` | 25/08/2026 |
+| #7 | Criar dashboard web (Frontend) | `Frontend` | `T4` | 25/08/2026 |
+| #9 | Teste 5 — Três esteiras (A + B + C) | `Hardware`/`Firmware-Uno` | `T5` | 12/09/2026 |
+| #10 | Simulador | `Backend`/`Frontend` | `N/A` | 25/08/2026 |
+| **#11** | **Sincronismo de estoque LCD ↔ Dashboard** | `Firmware-Uno`/`ESP32`/`Frontend` | `B3`, `T4` | **28/08/2026** |
+| **#12** | **Calibração do timeout de entrega (9 s) + recuperação via `CMD:RESET`** | `Firmware-Uno` | `B1`, `T4` | **28/08/2026** |
+| #13 | Infraestrutura de teste local (Mosquitto + scripts de validação) | `Infra/Rede` | `Infra` | 26/08/2026 |
+| #15 | Teste 6.1 — Provisionar cluster e credenciais HiveMQ Cloud | `Infra/Rede` | `T6-HiveMQ` | 02/09/2026 |
+| #16 | Teste 6.2 — Firmware ESP32 com suporte TLS/8883 | `Firmware-ESP32` | `T6-HiveMQ` | 02/09/2026 |
+| **#18** | **CI/CD: GitHub Actions + Scripts de Automação Multiplataforma** | `Infra/Rede` | `Infra` | **15/09/2026** |
+| **#20** | **Integração CX9240 (Beckhoff): Persistência MQTT → SQLite** | `Backend`/`Beckhoff` | `T6-DB` | **15/09/2026** |
+
+### 🟡 Coluna `In Progress`
+
+| Card | Título | Área | Observação |
+|---|---|---|---|
+| #1 | Montagem mecânica das esteiras e soldagem drivers | `Hardware` | Desbaste das esteiras A/B/C concluído (29/09). Esteiras B/C voltaram a acionar (03/10): módulo IRF520 e motor da C estavam defeituosos e foram trocados; **provisório:** a C usa o módulo da A (roteiro Semana 7, seção 4.2.1) |
+| #22 | Deployment Guide — Guia de Implantação | `Docs`/`Infra` | `docs/DEPLOYMENT.md` inicial redigido (30/09); falta validar em máquina limpa |
+| #25 | Telemetria Histórica — Prometheus/Grafana | `Infra` | ✅ Concluído (01/10/2026): implementação (PR #29) validada; capturas dos dashboards anexadas ao card |
+| #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
+| #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
+| #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
+| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Implementado sem bloqueio em `src/hw/separador.*` (pinos 5 a 8); giro isolado por comando relatado como funcionando; a roda se prepara de acordo com a peça pedida (`SEPARADOR_AUTOMATICO`), **modo automático ainda não validado em bancada**. Ver o [guia de bancada do separador](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/separador_bancada.md) (última versão, removido em 27/10) |
+
+### 🔴 Coluna `Blocked`
+
+*(Nenhum card bloqueado no momento — dependências de hardware para B/C foram superadas).*
+
+### ☁️ Coluna `Backlog`
+
+| Card | Título | Área | Bloco |
+|---|---|---|---|
+| #5 | Teste 6 — Migração para broker remoto (HiveMQ Cloud - Geral) | `Infra/Rede` | `T6-HiveMQ` |
+
+---
+
+## 3. Cards validados em 28/08/2026 (criar já em `Done`)
+
+### 🔹 Card #11 — Sincronismo de estoque LCD ↔ Dashboard
+
+- **Coluna:** `Done`
+- **Área:** `Firmware-Uno` / `Firmware-ESP32` / `Frontend`
+- **Bloco de Teste:** `B3`, `T4` · **Prioridade:** `P0-Crítico`
+- **Data Validação:** **28/08/2026**
+- **Labels:** `area:firmware-uno`, `area:frontend`, `tipo:bug`, `tipo:teste`
+- **Evidência:** commits `b2ec47d`, `b5727ad` · `docs/testes/plano_de_testes.md` (Observações 27–28/08) · `docs/CHANGELOG.md`
+
+**Descrição:** eliminar a divergência entre a contagem de estoque exibida no display LCD 16x2 I2C (0x27) e a exibida no Dashboard web após reinicializações, `F5` do navegador ou reconexões do gateway.
+
+**Solução aplicada:**
+1. Invocação de `publicarEstoque()` no `setup()` do Arduino Uno — o estado inicial é emitido logo após a energização.
+2. Invocação de `publicarEstoque()` também no tratamento de `CMD:RESET`, republicando o estoque após limpar o estado de erro da FSM.
+3. Publicação com flag **retained** no tópico `dataflow/estoque` pelo gateway ESP32.
+4. Servidor Node.js e Dashboard consomem o retained no `connect`, sincronizando a UI no carregamento inicial.
+
+**Critérios de aceite — todos ✅ em 28/08/2026:**
+- [x] Ao energizar o Uno, LCD e Dashboard exibem a mesma contagem inicial.
+- [x] Após `F5` no navegador, o Dashboard reconstrói o estoque a partir do retained (sem esperar novo evento).
+- [x] Após `CMD:RESET`, LCD e Dashboard voltam sincronizados ao estado inicial.
+- [x] Reconexão do gateway não gera divergência de contagem.
+- [x] Resultado transferido para o Registro de Resultados do `plano_de_testes.md`.
+
+---
+
+### 🔹 Card #12 — Calibração do timeout de entrega (9 s) e recuperação de falhas
+
+- **Coluna:** `Done`
+- **Área:** `Firmware-Uno`
+- **Bloco de Teste:** `B1`, `T4` · **Prioridade:** `P0-Crítico`
+- **Data Validação:** **28/08/2026**
+- **Labels:** `area:firmware-uno`, `tipo:hardening`, `tipo:teste`
+- **Evidência:** commits `b5727ad`, `ac02d13` · `docs/testes/roteiros/semana_04_08-12_setembro.md` (seção 1) · `docs/testes/plano_de_testes.md`
+
+**Descrição:** o valor original de `TIMEOUT_ENTREGA` (8 s, depois elevado provisoriamente para 12 s em 25/08) não refletia a dinâmica real da esteira A, gerando timeouts falsos ou mascarando travamentos reais.
+
+**Solução aplicada:**
+1. `TIMEOUT_ENTREGA` recalibrado para **9000 ms**.
+2. Introdução de `TEMPO_SAIDA_ESTEIRA_MS = 3000` — fase explícita de escoamento após o sensor de junção.
+3. Valores replicados nos sketches de teste `test/esteira_peca_b/arduino_esteiras_ab/`.
+
+**Medições de bancada (esteira A física):**
+
+| Fase | Tempo medido |
+|---|---|
+| Partida → sensor de junção J1 | ~5 s |
+| Escoamento para a esteira principal | 3 s |
+| **Total do ciclo** | **~8 s** |
+| **Timeout configurado** | **9 s** (margem de 1 s) |
+
+**Critérios de aceite — todos ✅ em 28/08/2026:**
+- [x] Ciclo normal de entrega da peça A conclui sem disparar timeout falso.
+- [x] Peça retida artificialmente → FSM transiciona para `ERRO` aos 9000 ms e desliga os motores.
+- [x] Estado de erro sinalizado no LCD e propagado ao Dashboard.
+- [x] `CMD:RESET` restaura a FSM para `IDLE` sem reinicialização física da placa.
+- [x] Resultado transferido para o Registro de Resultados do `plano_de_testes.md`.
+
+---
+
+## 4. Novos cards — Teste 6: validação MQTT via HiveMQ Cloud
+
+Até então o repositório só possuía o card genérico **#5 “Configurar broker MQTT (HiveMQ Cloud)”**, sem critérios de aceite nem decomposição. Os três cards abaixo detalham o **Teste 6** do [`plano_de_testes.md`](../testes/plano_de_testes.md) e a seção “Opção 2: HiveMQ Cloud” do [`ARCHITECTURE.md`](../ARCHITECTURE.md).
+
+> **Pré-requisito comum:** esteira A consolidada e Teste 4 (end-to-end local) aprovado — condição já atendida em 25–28/08/2026. A migração valida a **independência da camada de transporte** em relação à lógica da FSM: nenhuma linha de máquina de estados deve mudar.
+
+### 🔹 Card #15 — Teste 6.1: provisionar cluster e credenciais HiveMQ Cloud
+
+- **Coluna:** `Backlog` · **Área:** `Infra/Rede` · **Bloco:** `T6-HiveMQ` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:infra`, `tipo:teste`, `stretch:hivemq-cloud`
+
+**Objetivo:** provisionar o cluster Serverless em [cloud.hivemq.com](https://cloud.hivemq.com) e distribuir credenciais sem expô-las no versionamento.
+
+**Critérios de aceite:**
+- [ ] Cluster criado, com endpoint `<cluster>.s1.eu.hivemq.com` e porta **8883** (TLS).
+- [ ] Credencial de aplicação (usuário/senha) criada no *Access Management* do console.
+- [ ] `esp32/gateway_mqtt/secrets.h` preenchido com `SECRET_MQTT_SERVER_CLOUD`, `SECRET_MQTT_USER_CLOUD` e `SECRET_MQTT_PASS_CLOUD`.
+- [ ] `server/.env` com `MQTT_BROKER_URL=mqtts://<cluster>.s1.eu.hivemq.com` e `MQTT_PORT=8883` + usuário/senha.
+- [ ] Confirmado que `secrets.h` e `.env` **não** aparecem em `git status` (protegidos por `.gitignore`).
+- [ ] Conectividade preliminar validada pelo Web Client do próprio console HiveMQ.
+
+---
+
+### 🔹 Card #16 — Teste 6.2: firmware ESP32 com suporte TLS/8883
+
+- **Coluna:** `Backlog` · **Área:** `Firmware-ESP32` · **Bloco:** `T6-HiveMQ` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:firmware-esp32`, `tipo:teste`, `stretch:hivemq-cloud`
+- **Depende de:** #15
+
+**Objetivo:** validar o cliente MQTT sobre `WiFiClientSecure` no gateway com a flag `USE_TLS = true`, mantendo intacto o comportamento já aprovado no broker local.
+
+**Critérios de aceite:**
+- [ ] `esp32/gateway_mqtt/gateway_mqtt.ino` compila com `USE_TLS true` sem estouro de heap/flash.
+- [ ] Monitor serial exibe `[MQTT] Conectado!` após handshake TLS na porta 8883.
+- [ ] Publicações periódicas em `dataflow/status`, `dataflow/sensores` e `dataflow/esteiras` visíveis no Web Client do HiveMQ.
+- [ ] `dataflow/estoque` chega **retained** também no broker remoto.
+- [ ] Reconexão Wi-Fi não-bloqueante continua funcionando (não trava o loop da bridge serial).
+- [ ] Rejeições explícitas (`peca_invalida`, `ocupado`, `comando_desconhecido`) preservadas.
+- [ ] Reversão para `USE_TLS false` testada, garantindo retorno ao broker local sem regressão.
+
+---
+
+### 🔹 Card #17 — Teste 6.3: validação end-to-end remota via HiveMQ Cloud
+
+- **Coluna:** `Backlog` · **Área:** `Infra/Rede` / `Backend` / `Frontend` · **Bloco:** `T6-HiveMQ` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:infra`, `area:backend`, `tipo:teste`, `stretch:hivemq-cloud`
+- **Depende de:** #15, #16
+
+**Objetivo:** executar o ciclo completo Dashboard → Server → HiveMQ Cloud → ESP32 → Arduino Uno → esteira física, e o retorno da telemetria, integralmente sobre a internet com TLS.
+
+**Critérios de aceite:**
+- [ ] Servidor Node.js conecta via `mqtts://` na porta 8883 (log de conexão sem erro de certificado).
+- [ ] Pedido disparado no Dashboard aciona fisicamente a esteira A.
+- [ ] Ciclo pedido → entrega refletido na UI, equivalente ao Teste 4 local.
+- [ ] Estoque decrementa de forma consistente entre LCD e Dashboard (regressão do card #11 no ambiente remoto).
+- [ ] LWT `gateway offline` / `online` funciona igual ao broker local, com tópicos separados (`dataflow/status` × `dataflow/status/server`).
+- [ ] Sem perda de mensagens sob QoS 1 durante o ciclo.
+- [ ] Latência adicional medida e registrada (comparativo local × nuvem).
+- [ ] **Nenhuma alteração de lógica da FSM foi necessária** — apenas configuração de transporte.
+- [ ] Reversão para `USE_TLS=false` se a bancada continuar local no mesmo dia.
+- [ ] Resultado registrado no Registro de Resultados do `plano_de_testes.md` (linha do Teste 6).
+
+---
+
+## 5. Novos Cards — Sprint 5 (14–19/09/2026): CI/CD, Separador e Beckhoff
+
+> Artefatos completos prontos para uso em `docs/cards_comments/`
+
+### 🔹 Card #18 — CI/CD: GitHub Actions (Linting + Secret Detection) + Automação
+
+- **Coluna:** `Done` · **Área:** `Infra/Rede` · **Prioridade:** `P0-Crítico` · **Data Validação:** **15/09/2026**
+- **Labels:** `area:infra`, `tipo:hardening`, `p0-critico`
+- **Arquivo de Comentário:** `docs/cards_comments/card_cicd_lint_security.md`
+- **Objetivo:** Implementar pipeline no GitHub Actions para validação sintática (ESLint), compilação firmware (arduino-cli), detecção de segredos (truffleHog) e scripts locais multiplataforma (`setup`, `validate-env`, `precommit-checks` em `.sh` e `.ps1`).
+- **Status:** ✅ CONCLUÍDO e testado (15/09/2026).
+
+### 🔹 Card #19 — Integração Separador (Roda de Separação — 3 Compartimentos)
+
+- **Coluna:** `Todo` · **Área:** `Hardware` + `Firmware-Uno` · **Prioridade:** `P1-Alto`
+- **Labels:** `area:hardware`, `area:firmware-uno`, `tipo:feature`, `p1-alto`
+- **Arquivo de Comentário:** `docs/cards_comments/card_separador_integration.md`
+- **Objetivo:** Descomentarincludes motor 28BYJ-48 + ULN2003 na FSM do Arduino Uno, integrando a etapa de separação física em 3 compartimentos (A/B/C) ao fim da esteira principal.
+
+### 🔹 Card #20 — Integração CX9240 (Beckhoff): Persistência MQTT → SQLite Local
+
+- **Coluna:** `Done` · **Área:** `Backend` + `Beckhoff` · **Prioridade:** `P1-Alto` · **Data Validação:** **15/09/2026**
+- **Labels:** `area:backend`, `tipo:feature`, `stretch:beckhoff`, `p1-alto`
+- **Arquivo de Comentário:** `docs/cards_comments/card_beckhoff_cx9240_comment.md`
+- **Objetivo:** Comissionar nó historiador no CLP Beckhoff CX9240 (TwinCAT 3 em RT Linux ARM64) assinando tópicos MQTT (`dataflow/estoque` e `dataflow/eventos`) via TF6701 e persistindo em SQLite local (`/var/lib/dfi/historian.db`) via TF6420 em SQL Expert Mode.
+- **Status:** ✅ CONCLUÍDO e validado E2E com o simulador MQTT (15/09/2026).
+
+### 🔹 Card #21 — BOM (Bill of Materials) — Inventário de Componentes
+
+- **Coluna:** `Backlog` · **Área:** `Docs` + `Hardware` · **Prioridade:** `P1-Alto`
+- **Labels:** `area:docs`, `area:hardware`, `tipo:documentation`, `p1-alto`
+- **Arquivo de Comentário:** `docs/cards_comments/card_bom_bill_of_materials.md`
+- **Objetivo:** Publicar `docs/BILL_OF_MATERIALS.md` com todos os componentes eletrônicos e mecânicos do protótipo (SKUs, fornecedores, custos unitários/totais, datasheets) — permitindo reprodução completa por terceiros.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #22 — Deployment Guide — Guia de Implantação Completa
+
+- **Coluna:** `In Progress` (30/09/2026) · **Área:** `Docs` + `Infra` · **Prioridade:** `P2-Médio`
+- **Status:** versão inicial de `docs/DEPLOYMENT.md` redigida (seções 1–10, cenários A–D, inclui observabilidade). **Pendente:** executar o guia do zero em máquina limpa, cronometrar e corrigir atritos (Fase 3).
+- **Labels:** `area:docs`, `area:infra`, `tipo:documentation`, `p2-medio`
+- **Arquivo de Comentário:** `docs/cards_comments/card_deployment_guide.md`
+- **Objetivo:** Criar `docs/DEPLOYMENT.md` com passo a passo completo (pré-requisitos, hardware, firmware, broker, servidor, validação pós-deploy) para implantar o sistema do zero em um novo ambiente — cobrindo cenários local, nuvem e simulador.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #23 — Testes E2E Automatizados — Dashboard + API
+
+- **Coluna:** `Backlog` · **Área:** `QA` + `Infra/CI-CD` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:qa`, `area:infra`, `tipo:feature`, `p2-medio`
+- **Arquivo de Comentário:** `docs/cards_comments/card_testes_e2e_automatizados.md`
+- **Objetivo:** Implementar suíte E2E automatizada (Cypress) cobrindo fluxo crítico do Dashboard web e da API REST/WebSocket, rodando contra o simulador no CI — detectando regressões antes do merge e eliminando dependência de validação manual exclusiva.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #24 — Firmware Versioning — Tags Git e Versão em Sketches
+
+- **Coluna:** `Backlog` · **Área:** `Firmware` + `Processo` · **Prioridade:** `P2-Médio`
+- **Labels:** `area:firmware-uno`, `area:firmware-esp32`, `tipo:chore`, `p2-medio`
+- **Arquivo de Comentário:** `docs/cards_comments/card_firmware_versioning.md`
+- **Objetivo:** Introduzir cabeçalhos de versão semântica (`vX.Y.Z`) nos sketches Arduino/ESP32, criar tags Git retroativas para marcos já validados e documentar a convenção de versionamento em `CONTRIBUTING.md` — eliminando a ambiguidade de "qual versão está rodando na bancada".
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2
+
+### 🔹 Card #25 — Telemetria Histórica — Prometheus/Grafana (Métricas de Performance)
+
+- **Coluna:** `Done` (01/10/2026; em `In Progress` desde 30/09/2026) · **Área:** `Infra/Observabilidade` · **Prioridade:** `P3-Baixo`
+- **Status:** ✅ concluído em 01/10/2026. Implementação (PR #29): `GET /metrics`, stack Prometheus + Grafana e 3 dashboards, com testes sem Docker e job de CI. Validação do stack concluída; as capturas de tela dos dashboards estão anexadas ao card no GitHub Projects.
+- **Labels:** `area:infra`, `tipo:feature`, `p3-baixo`
+- **Arquivo de Comentário:** `docs/cards_comments/card_telemetria_historica_grafana.md`
+- **Objetivo:** Provisionar Prometheus + Grafana (Docker; InfluxDB descartado em favor do modelo *pull*) e instrumentar `server/server.js` com métricas de performance (latência p50/p95/p99, throughput de eventos, uptime) — complementando o historiador de negócio do CX9240 com observabilidade de infraestrutura. Setup em `observability/README.md`.
+- **Gap identificado em:** `docs/testes/roteiros/semana_06_22-26_setembro.md` §7.2

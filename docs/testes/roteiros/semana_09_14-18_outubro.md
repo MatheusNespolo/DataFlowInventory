@@ -47,7 +47,7 @@ As seguintes frentes são opcionais e independentes. Podem ocorrer em paralelo c
 
 ### Frente B — Data Flow System (opcional)
 
-- [ ] Fazer pré-voo de infraestrutura conforme [`validações/README.md`](../validações/README.md); registrar versão do firmware, broker e montagem.
+- [ ] Fazer pré-voo de infraestrutura conforme [`validacoes/README.md`](../validacoes/README.md); registrar versão do firmware, broker e montagem.
 - [ ] Exercitar o fluxo disponível de pedido/telemetria e verificar dashboard, estoque, eventos e recuperação sem interferir na frente do separador.
 - [ ] Anotar falhas, logs e critérios aprovados. Não marcar A+B+C calibrado sem medir os tempos/PWM de cada esteira.
 

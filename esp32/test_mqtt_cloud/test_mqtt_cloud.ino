@@ -9,7 +9,7 @@
 //   2. Abrir Serial Monitor (115200 baud)
 //   3. Observar as mensagens de diagnóstico
 //   4. Se falha: seguir o roteiro em
-//      docs/testes/validações/troubleshooting_bancada_22-23_09.md
+//      docs/testes/validacoes/troubleshooting_bancada_22-23_09.md
 //
 // CONFIGURAÇÕES em secrets.h (mesmo arquivo do gateway principal):
 //   - USE_TLS: false = Mosquitto local (1883)

@@ -1,6 +1,8 @@
 ## O que muda
 
-<!-- Resumo curto da mudança e do motivo. Referencie o card do GitHub Projects, se houver. -->
+<!-- Resumo curto da mudança e do motivo. -->
+
+Closes #<!-- número da issue/card que este PR resolve; no merge o card vai sozinho para Done. Se só avança o card (não o conclui), use "Refs #N". -->
 
 ## Como validar
 

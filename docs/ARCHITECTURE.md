@@ -108,7 +108,7 @@ Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor ser
 **5 estados** (firmware v3.0 — código em `arduino/data_flow_inventory/src/logica/fsm.cpp`):
 1. **AGUARDANDO_PEDIDO** → recebe comando
 2. **VERIFICANDO_ESTOQUE** → checagem prévia, sem ligar o motor: contador > 0, peça no sensor do topo, junção livre
-3. **ACIONANDO_ESTEIRA** → liga o motor da esteira escolhida (kick-start em **PWM 255** por **kickMs**; por esteira: **A=180 ms, B=180 ms, C=180 ms**) e depois aplica o **PWM de regime** da própria esteira (**A=245, B=200, C=230**), parâmetros calibrados em bancada (`e3c8833`, `ddf526a`, `d4ecc2f`; valores atuais em `config.h`).
+3. **ACIONANDO_ESTEIRA** → liga o motor da esteira escolhida (kick-start em **PWM 255** por **kickMs**) e depois aplica o **PWM de regime** da própria esteira, parâmetros calibrados em bancada (valores atuais em `PARAM_ESTEIRA_A/B/C`, no `config.h`; histórico da calibração nos [resultados de bancada](testes/resultados.md)).
 4. **ENTREGANDO_PECA** → supervisão por marcos (abaixo); o estoque é debitado na confirmação da junção
 5. **ERRO** → motores desligados a cada ciclo; só sai com `CMD:RESET`
 
@@ -321,7 +321,8 @@ Também são expostas as métricas padrão do `prom-client` (`process_*` e `node
 - `README.md` — Visão geral + quick start
 - `docs/fluxogramas/Diagrama elétrico.png` — **[NOVO]** Esquema unifilar completo do protótipo *(23/09/2026)*
 - `docs/broker_local_mosquitto.md` — Setup Mosquitto + firewall
-- `docs/testes/plano_de_testes.md` — Testes B0–6 completos
+- `docs/testes/plano_de_testes.md` — Testes B0–6: como testar
+- `docs/testes/resultados.md` — Estado da bancada, registro de resultados e diário (fonte única)
 - `docs/CI-CD.md` — **[NOVO]** GitHub Actions, validações, pipelines
 - `docs/INTEGRATION_GUIDE.md` — **[NOVO]** Integração Beckhoff + Separador
 - `CONTRIBUTING.md` — Fluxo de trabalho, PRs, validações
