@@ -40,10 +40,14 @@ test('ARCHITECTURE.md: a seção Observabilidade lista TODAS as métricas dfi_* 
   assert.ok(arq.includes('observability/README.md'), 'a lista de documentação correlata aponta para o README do stack');
 });
 
-test('CHANGELOG registra a telemetria histórica em "Não publicado"', () => {
-  const log = ler('docs/CHANGELOG.md');
-  const naoPublicado = log.split(/^## \[Não publicado\]\s*$/m)[1].split(/^## \[/m)[0];
-  assert.match(naoPublicado, /Telemetria Histórica de Performance/);
-  assert.match(naoPublicado, /GET \/metrics/);
-  assert.match(naoPublicado, /observability\/README\.md/);
+test('CHANGELOG registra a telemetria histórica num marco', () => {
+  // O CHANGELOG é organizado por marcos ("## [Marco N] — ..."): a entrada fica no marco em
+  // que foi entregue, não necessariamente em [Não publicado].
+  const log = ler('docs/CHANGELOG.md').replace(/\r\n/g, '\n');
+  const marco = log.split(/^## \[/m).find((s) => /^- \*\*Telemetria Histórica de Performance/m.test(s));
+  assert.ok(marco, 'algum marco tem a entrada da telemetria histórica');
+  assert.match(marco, /^(Não publicado|Marco \d+)\]/, 'a entrada está num marco, não numa seção de commit antiga');
+  const entrada = marco.split(/^- \*\*Telemetria Histórica de Performance/m)[1].split(/^(?:- |###? )/m)[0];
+  assert.match(entrada, /GET \/metrics/);
+  assert.match(entrada, /observability\/README\.md/);
 });
