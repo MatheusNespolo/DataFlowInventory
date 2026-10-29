@@ -75,7 +75,7 @@ A falha de 29/09 travava todo o sistema na partida do motor. Na primeira partida
 ## 4. Bloco 1 — Esteira A isolada com a v3.0 (05/10)
 
 > **Pré-requisito:** portão do Bloco 0 aprovado. Use apenas a esteira A; mantenha B e C com o motor desligado ou desconectado.
-> Base: [`firmware_uno_v3_validacao.md`](firmware_uno_v3_validacao.md) (passos 1 a 8), restrita à A.
+> Base: [`firmware_uno_v3_validacao.md`](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/firmware_uno_v3_validacao.md) (passos 1 a 8; removido do repositório em 27/10, link para a última versão), restrita à A.
 
 | Passo | Ação | Resultado esperado | Status |
 |-------|------|--------------------|--------|
@@ -294,7 +294,7 @@ O simulador valida o dashboard e a API sem hardware, mas **não** substitui a va
 ## 11. Referências
 
 - [`semana_07_28_setembro-3_outubro.md`](semana_07_28_setembro-3_outubro.md)
-- [`firmware_uno_v3_validacao.md`](firmware_uno_v3_validacao.md)
+- [`firmware_uno_v3_validacao.md`](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/firmware_uno_v3_validacao.md) (removido do repositório em 27/10; última versão)
 - [`plano_de_testes.md`](../plano_de_testes.md)
 - [`ARCHITECTURE.md`](../../ARCHITECTURE.md)
 - [`CHANGELOG.md`](../../CHANGELOG.md)
