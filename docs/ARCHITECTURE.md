@@ -108,7 +108,7 @@ Linhas que não são JSON (logs de debug do Arduino) só aparecem no monitor ser
 **5 estados** (firmware v3.0 — código em `arduino/data_flow_inventory/src/logica/fsm.cpp`):
 1. **AGUARDANDO_PEDIDO** → recebe comando
 2. **VERIFICANDO_ESTOQUE** → checagem prévia, sem ligar o motor: contador > 0, peça no sensor do topo, junção livre
-3. **ACIONANDO_ESTEIRA** → liga o motor da esteira escolhida (kick-start em **PWM 255** por **kickMs**; por esteira: **A=180 ms, B=130 ms, C=180 ms**) e depois aplica o **PWM de regime** da própria esteira (**A=225, B=200, C=230**), parâmetros calibrados em bancada no commit `e3c8833`.
+3. **ACIONANDO_ESTEIRA** → liga o motor da esteira escolhida (kick-start em **PWM 255** por **kickMs**; por esteira: **A=180 ms, B=180 ms, C=180 ms**) e depois aplica o **PWM de regime** da própria esteira (**A=245, B=200, C=230**), parâmetros calibrados em bancada (`e3c8833`, `ddf526a`, `d4ecc2f`; valores atuais em `config.h`).
 4. **ENTREGANDO_PECA** → supervisão por marcos (abaixo); o estoque é debitado na confirmação da junção
 5. **ERRO** → motores desligados a cada ciclo; só sai com `CMD:RESET`
 
@@ -170,7 +170,7 @@ flowchart LR
 - Um kick-start extra pode ocorrer depois de uma trava do loop de 2 s ou mais.
 - Pulsos acima de 100 kHz não são pegos pelo limitador de rajada.
 - Falta um teste automatizado de "12499 ms sem passagem" (o de 12500 ms e os de pulso de 19/20 ms existem).
-- **Nada disso foi validado em bancada:** sensores, motores e alimentação dependem do roteiro `docs/testes/roteiros/firmware_uno_v3_validacao.md`. Comece pelo passo 2 (sensores), que ajusta o potenciômetro dos módulos TCRT5000 e resolve a causa provável da "entrega da B sem débito".
+- **Validação em bancada:** sensores, motores e alimentação do firmware v3.0 foram validados em 13/10 (itens 1.1–1.11 e Bloco 2, ver o [roteiro da Semana 8](testes/roteiros/semana_08_05-09_outubro.md)); as limitações acima continuam valendo. O roteiro usado ([`firmware_uno_v3_validacao.md`](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/firmware_uno_v3_validacao.md)) foi removido do repositório em 27/10; o link aponta para a última versão.
 
 **Diagramas:**
 
@@ -252,7 +252,7 @@ As imagens abaixo são anteriores à v3.0 e não mostram os marcos; vale o diagr
 - **Posições:** `SEPARADOR_GRAUS_A/B/C/NEUTRO` em `config.h` (padrão A 120°, B 240°, C e neutro 0°); a roda real define os valores. `SEPARADOR_PASSOS_POR_VOLTA` é 2038 (engrenagem 63,68:1 do 28BYJ-48), e não 2048, para os compartimentos não desalinharem.
 - **Em aberto:** sem sensor de referência (a roda é suposta no neutro ao ligar e a posição se perde em qualquer reinício do Uno); o sentido de giro e o tempo da peça até o fim da esteira principal precisam ser medidos; a rotação em ciclos seguidos muito próximos pode mover a roda antes de a peça anterior chegar.
 
-Procedimento: [`separador_bancada.md`](testes/roteiros/separador_bancada.md).
+Procedimento: [guia de bancada do separador](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/separador_bancada.md) (removido do repositório em 27/10; link para a última versão). Validação com a roda impressa: Bloco 4 do [roteiro da Semana 11](testes/roteiros/semana_11_26-30_outubro.md).
 
 **Hardware:** Motor 28BYJ-48 + ULN2003 (pinos 5-8)  
 **Integração:** a roda se prepara quando a checagem prévia aprova o pedido (fora da FSM e sem bloqueio) e fica no compartimento depois da entrega; `SEPARADOR_AUTOMATICO` em `config.h`

@@ -49,9 +49,9 @@ Engenharia de Controle e Automação
 | 📡 **IoT e MQTT** | Mosquitto local ou HiveMQ Cloud, tópicos `dataflow/*`, mensagens retained e LWT | [Tópicos MQTT](#tópicos-mqtt) |
 | ⏱️ **Tempo real** | Servidor Node.js com Socket.IO, dashboard responsivo e vista 3D da bancada | [Destaques Técnicos](#destaques-técnicos) |
 | 📈 **Observabilidade** | Prometheus + Grafana com 17 métricas `dfi_*` e três dashboards | [`observability/README.md`](observability/README.md) |
-| ✅ **Qualidade** | Testes da lógica do firmware em g++ (84 testes), testes unitários do frontend, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
+| ✅ **Qualidade** | Testes da lógica do firmware em g++ (97 testes), testes unitários do frontend, testes E2E com Playwright e CI que compila os sketches | [Estrutura do Repositório](#estrutura-do-repositório) |
 
-> **Status de validação (23/10/2026):** firmware Uno v3.0 validado em bancada; as três esteiras (A, B e C) foram calibradas e rodaram juntas em 21/10, com PWM e kick registrados em `config.h` (`e3c8833`, `ddf526a`, `d4ecc2f`). O separador (roda giratória) está integrado ao firmware e respondeu aos comandos de bancada; o modo automático e as peças impressas em 3D serão validados na Semana 11, a última bancada, junto com a montagem final na base e a integração total. Consulte o [roteiro da Semana 10](docs/testes/roteiros/semana_10_19-23_outubro.md), o [roteiro da Semana 11](docs/testes/roteiros/semana_11_26-30_outubro.md) e o [plano de testes](docs/testes/plano_de_testes.md).
+> **Status de validação (29/10/2026):** firmware Uno v3.0 validado em bancada; as três esteiras (A, B e C) foram calibradas e rodaram juntas em 21/10, com PWM e kick registrados em `config.h` (`e3c8833`, `ddf526a`, `d4ecc2f`). Na Semana 11, a última bancada, a esteira A foi montada na base e fez 10 entregas sem falha (4650–5000 ms, igual à calibração); B e C na base, o separador em modo automático, as peças impressas em 3D, o display OLED e a integração total seguem pendentes. Consulte o [roteiro da Semana 10](docs/testes/roteiros/semana_10_19-23_outubro.md), o [roteiro da Semana 11](docs/testes/roteiros/semana_11_26-30_outubro.md) e o [plano de testes](docs/testes/plano_de_testes.md).
 
 ## Sumário
 
@@ -115,7 +115,7 @@ O sistema é composto por:
 | ⚙️ **Servidor Node.js** | Ponte entre MQTT e WebSocket |
 | ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (TLS/8883, E2E remoto validado em 19/09/2026) |
 
-> A roda giratória está integrada ao firmware v3.0 (pinos 5 a 8, sem bloquear o `loop()`): ela se prepara sozinha no compartimento da peça pedida assim que a checagem prévia aprova o pedido e fica nele até o pedido seguinte. Também aceita o comando de bancada `CMD:SEP:A|B|C|0` pela USB. A roda impressa em 3D e o modo automático com o hardware serão validados na Semana 11 (ver [`separador_bancada.md`](docs/testes/roteiros/separador_bancada.md)).
+> A roda giratória está integrada ao firmware v3.0 (pinos 5 a 8, sem bloquear o `loop()`): ela se prepara sozinha no compartimento da peça pedida assim que a checagem prévia aprova o pedido e fica nele até o pedido seguinte. Também aceita o comando de bancada `CMD:SEP:A|B|C|0` pela USB. A roda impressa em 3D e o modo automático com o hardware serão validados na Semana 11 (ver o Bloco 4 do [roteiro da Semana 11](docs/testes/roteiros/semana_11_26-30_outubro.md)).
 
 ## Destaques Técnicos
 
@@ -451,7 +451,7 @@ Para etapas detalhadas sobre cada fase: [Semana 10 (calibração das esteiras)](
 
 - 🔧 **Diagnóstico IRF520 (esteiras B/C) — resolvido em 03/10:** a falha era elétrica (módulo IRF520 e motor da C, trocados; o firmware anterior estava correto). A C usa provisoriamente o módulo da A. Ver [`docs/testes/roteiros/semana_07_28_setembro-3_outubro.md`](docs/testes/roteiros/semana_07_28_setembro-3_outubro.md) (seção 4.2.1).
 - 🧪 **Semana 8 (fechamento em 13/10):** firmware Uno v3.0 validado em bancada (itens 1.1–1.11 e Bloco 2; B/C funcionando). Resultados em [`docs/testes/roteiros/semana_08_05-09_outubro.md`](docs/testes/roteiros/semana_08_05-09_outubro.md).
-- 🎡 **Separador (18/10):** roda giratória integrada ao firmware sem bloqueio, comandos `CMD:SEP:A|B|C` validados em bancada e preparo automático conforme a peça pedida. Ver [`separador_bancada.md`](docs/testes/roteiros/separador_bancada.md).
+- 🎡 **Separador (18/10):** roda giratória integrada ao firmware sem bloqueio, comandos `CMD:SEP:A|B|C` validados em bancada e preparo automático conforme a peça pedida. Ver o [guia de bancada do separador](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/separador_bancada.md) (removido do repositório em 27/10; link para a última versão).
 - ⚙️ **Semana 10 (21/10):** as três esteiras calibradas e rodando juntas. A esteira B não partia ou avançava pouco com o kick de 130 ms; com 180 ms (`d4ecc2f`) passou a partir normalmente, e a revisão do firmware confirmou que o acionamento é idêntico nas três esteiras. Resultados em [`docs/testes/roteiros/semana_10_19-23_outubro.md`](docs/testes/roteiros/semana_10_19-23_outubro.md).
 
 ## Equipe

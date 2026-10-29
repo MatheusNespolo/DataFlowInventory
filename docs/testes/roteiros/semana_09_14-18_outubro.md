@@ -20,7 +20,7 @@
 2. Preparar a conclusão do **Bloco 3 — A+B+C e calibração**, replanejado para 19–23/10. B e C já foram confirmadas funcionando com firmware v3.0, mas ainda falta teste conjunto e calibração com medições registradas.
 3. Tarefas opcionais de fim de semana: Data Flow System e integração/historiador Beckhoff CX9240, em frentes independentes.
 
-Referências: [fechamento da Semana 8](semana_08_05-09_outubro.md), [validação do firmware v3](firmware_uno_v3_validacao.md), [guia de integração](../../INTEGRATION_GUIDE.md) e [plano de testes](../plano_de_testes.md).
+Referências: [fechamento da Semana 8](semana_08_05-09_outubro.md), [validação do firmware v3](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/firmware_uno_v3_validacao.md) (removido em 27/10; última versão), [guia de integração](../../INTEGRATION_GUIDE.md) e [plano de testes](../plano_de_testes.md).
 
 ## Dias úteis — quarta a sexta (14–16/10)
 

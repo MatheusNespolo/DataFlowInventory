@@ -64,7 +64,7 @@ Pré-requisitos: firmware v3.0 já validado; verificar alimentação, GND comum,
 
 ## Separador
 
-> **Situação do código (18/10/2026):** o separador foi implementado sem bloqueio em `src/hw/separador.*`. A equipe relatou que o giro isolado pelos comandos `CMD:SEP:A|B|C` funcionou (sem medições registradas). A roda agora se prepara sozinha de acordo com a peça pedida (`SEPARADOR_AUTOMATICO 1`, padrão), com testes de lógica no PC, mas esse **modo automático não foi testado em hardware**. Procedimento, ligação e critérios de parada: [`separador_bancada.md`](separador_bancada.md).
+> **Situação do código (18/10/2026):** o separador foi implementado sem bloqueio em `src/hw/separador.*`. A equipe relatou que o giro isolado pelos comandos `CMD:SEP:A|B|C` funcionou (sem medições registradas). A roda agora se prepara sozinha de acordo com a peça pedida (`SEPARADOR_AUTOMATICO 1`, padrão), com testes de lógica no PC, mas esse **modo automático não foi testado em hardware**. Procedimento, ligação e critérios de parada: [`separador_bancada.md`](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/separador_bancada.md).
 
 Executar apenas se a frente isolada do roteiro da Semana 9 foi aprovada. Não ativar diretamente o exemplo legado de `docs/INTEGRATION_GUIDE.md`; validar a solução atual, incremental e compatível com watchdog. Se integração de firmware não tiver sido implementada/revisada e testada em PC, limitar a sessão a ensaios isolados já aprovados.
 

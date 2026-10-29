@@ -82,7 +82,7 @@ status:blocked-hw      status:aguarda-bancada  stretch:hivemq-cloud
 | #2 | Diagrama elétrico e ligações | `Hardware` | Pinagem A/B/C consolidada; refinamento final do esquemático |
 | #8 | Escrever documentação e artigo | `Docs/Artigo` | Atualizações constantes com os resultados das bancadas |
 | #17 | Teste 6.3 — Validação end-to-end remota via HiveMQ Cloud | `Infra/Rede`/`Backend`/`Frontend` | Subtarefa em execução paralela (requer rede 4G sem bloqueio de porta) |
-| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Implementado sem bloqueio em `src/hw/separador.*` (pinos 5 a 8); giro isolado por comando relatado como funcionando; a roda se prepara de acordo com a peça pedida (`SEPARADOR_AUTOMATICO`), **modo automático ainda não validado em bancada**. Ver [`separador_bancada.md`](../testes/roteiros/separador_bancada.md) |
+| #19 | Integração Separador (Roda de Separação — 3 Compartimentos) | `Hardware`/`Firmware-Uno` | Implementado sem bloqueio em `src/hw/separador.*` (pinos 5 a 8); giro isolado por comando relatado como funcionando; a roda se prepara de acordo com a peça pedida (`SEPARADOR_AUTOMATICO`), **modo automático ainda não validado em bancada**. Ver o [guia de bancada do separador](https://github.com/MatheusNespolo/DataFlowInventory/blob/4c8ae6c/docs/testes/roteiros/separador_bancada.md) (última versão, removido em 27/10) |
 
 ### 🔴 Coluna `Blocked`
 
