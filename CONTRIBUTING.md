@@ -34,7 +34,7 @@ Este guia padroniza como propor mudanças de forma segura e rastreável.
 2. Faça mudanças pequenas e coesas.
 3. Rode as validações da seção 5.
 4. Atualize a documentação impactada e o `docs/CHANGELOG.md` (seção `[Não publicado]`).
-5. Abra o PR referenciando o card do [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3).
+5. Abra o PR com **`Closes #N`** na descrição quando ele conclui o card (no merge a issue fecha e o card vai sozinho para `Done` no [GitHub Projects](https://github.com/users/MatheusNespolo/projects/3)); use `Refs #N` quando só avança o card.
 
 ## 4. Convenções de commit
 
@@ -108,8 +108,10 @@ retained em `dataflow/status` — isso reintroduz a regressão do "ESP32 Offline
 ## 6. Documentação
 
 Toda mudança de comportamento observável deve atualizar:
-- `docs/CHANGELOG.md` (obrigatório)
+- `docs/CHANGELOG.md` (obrigatório): uma entrada curta em `[Não publicado]`, com data e PR
 - O documento afetado (`README.md`, `docs/ARCHITECTURE.md`, checklists, roteiros)
+
+Onde registrar cada tipo de informação (e o que **não** copiar entre documentos): [`docs/README.md`](docs/README.md). Antes de um PR que mexe na documentação, rode `python3 scripts/verificar-links.py`.
 
 ## 7. Comunidade e políticas
 

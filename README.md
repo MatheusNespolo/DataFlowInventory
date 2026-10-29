@@ -225,6 +225,7 @@ DataFlowInventory/
 │   └── frontend_smoke/                    # Testes E2E com Playwright (portas 3100–3102)
 │
 ├── docs/
+│   ├── README.md                          # Mapa: onde registrar o quê (e o que não copiar)
 │   ├── ARCHITECTURE.md                    # Referência técnica única (arquitetura, tópicos, mensagens, observabilidade)
 │   ├── DEPLOYMENT.md                      # Implantação do zero
 │   ├── CI-CD.md, CHANGELOG.md             # Pipelines e histórico de mudanças
