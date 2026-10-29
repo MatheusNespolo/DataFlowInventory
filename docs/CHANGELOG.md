@@ -6,11 +6,13 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.
 e o projeto adota versionamento por marcos de bancada (ainda sem releases semânticas
 publicadas — o protótipo está em desenvolvimento ativo).
 
-Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `Removido`.
+Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Removido`, `Segurança`, `Problemas Conhecidos` — cada uma aparece **uma vez** por marco.
+
+**Como registrar:** toda mudança entra em `[Não publicado]` (o marco em andamento, normalmente a semana de bancada), em **uma entrada curta** com a data e o PR ou commit. O detalhe fica no PR e nos documentos; o resultado de bancada fica em [`testes/resultados.md`](testes/resultados.md). Ao fechar o marco, `[Não publicado]` vira `[Marco N] — título (datas)` e uma nova `[Não publicado]` começa vazia.
 
 ---
 
-## [Não publicado]
+## [Não publicado] — Semana 11: display OLED e montagem final na base (26–30/10/2026, em andamento)
 
 ### Alterado
 
@@ -33,17 +35,9 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - **Pendente:** validação na bancada (reteste do item B3 na Semana 11)
   - **Documentação:** README, ARCHITECTURE, CI-CD, DEPLOYMENT, plano de testes (B3), roteiro da Semana 11, guia do separador, card do BOM e projeto de pesquisa atualizados. O diagrama elétrico não desenha o display (nem o LCD antigo), então não mudou
 
-- **Status de validação/documentação (13/10/2026):** registrado o sucesso da validação em bancada do firmware Uno v3.0 (itens 1.1–1.11 e Bloco 2; B/C funcionando), sem presumir medições não fornecidas nem concluir o teste integrado A+B+C/calibração. README, arquitetura, guia de integração e plano de testes atualizados para separar resultados concluídos de pendências.
-- **Planejamento:** criados os roteiros da Semana 9 (14–18/10; separador prioritário e tarefas opcionais de fim de semana para Data Flow System/CX9240) e Semana 10 (19–23/10; A+B+C, calibração e fechamento condicional do separador).
-- **Separador:** guia deixa explícito que a ativação documentada é legado v2.x, não aplicável diretamente à v3.0; validação física e integração seguem pendentes.
-- **Diagrama 3D do mímico:** objeto do separador no fim da esteira principal reorientado de cilindro horizontal (roda-gigante) para vertical (tipo balde), com a base assentada na bancada; comentário do `diagrama3d.js` e rótulo do SVG de fallback no `index.html` atualizados de "Roda de Estoque" para "Separador", alinhando a terminologia do dashboard à usada no firmware e na documentação.
-- **Bancada final — avanço de fase (23/10/2026):** todas as esteiras foram rodadas na quarta-feira, e o ajuste do PWM/kick foi registrado nos últimos commits (`ddf526a`, `1e8fbf1`, `d4ecc2f`). O restante do roteiro agora é a montagem final na base e na estrutura do projeto, com testes um a um para confirmar que a montagem não altera o comportamento padrão. As impressões 3D do separador e da peça que percorre as esteiras ficaram prontas e serão validadas na Semana 11, com integração total ao fim da semana.
-- **Calibração de esteiras (bancada) — commit `e3c8833` (18/10/2026):** registro dos parâmetros por esteira no firmware Uno v3.0:
-  - **A:** `pwmRegime=225` e `kickMs=180 ms`
-  - **B:** `pwmRegime=200` e `kickMs=130 ms`
-  - **C:** `pwmRegime=230` e `kickMs=180 ms`
-  - Marcos M1/M2/M3 e pulso mínimo não foram alterados por este commit (apenas ajuste de `pwmRegime`/`kickMs`).
+---
 
+## [Marco 5] — Separador, LCD e calibração das esteiras (13–23/10/2026)
 
 ### Adicionado
 
@@ -73,13 +67,6 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - **Não validado em hardware:** o motor nunca girou com este código. Procedimento, ligação, calibração e critérios de parada em `docs/testes/roteiros/separador_bancada.md`. Em aberto: sem sensor de referência (a posição se perde em reinício), sentido e ângulos a medir, e o tempo da peça até o fim da esteira principal
   - **Documentação corrigida de passagem:** o Uno não usa `ArduinoJson` desde a v3.0 (a v3.0 monta o JSON à mão); `ARCHITECTURE.md` e `DEPLOYMENT.md` ainda o listavam. Substitui as entradas de 13/10 que descrevem o separador como "registro comentado"
 
-- **Página de apresentação:** visão geral visual do projeto em https://matheusnespolo.github.io/dataflow-inventory-site/ (repositório separado [`dataflow-inventory-site`](https://github.com/MatheusNespolo/dataflow-inventory-site): Next.js, React Three Fiber, GSAP e Framer Motion, publicado no GitHub Pages). O README passa a apontar para ela no topo e em "Escolha seu caminho".
-- **Cobertura E2E do dashboard (card #27):** Playwright agora valida feedback de comandos ocupados/inválidos/limitados, estoque esgotado e recuperação por reset, reconexão WebSocket sincronizando estado, e `/api/status` nos modos servidor sem broker e simulador. O simulador aceita `ESTOQUE_INICIAL` (padrão 15) para testes isolados; execução documentada em `docs/CI-CD.md` e `CONTRIBUTING.md`.
-  - 8 testes novos: 3 em `comandos-recusados` (sistema ocupado, peça inválida, rate limit), 1 em `sem-estoque`, 1 de reconexão em `resiliencia` e 3 em `api-status` (503 do servidor sem broker, recusa com broker offline, 404 do simulador). Suíte serial (`workers: 1`), portas 3100–3102; em CI, 1 retentativa e `maxFailures: 3`
-  - **Validação parcial:** uma execução registrou 31 testes passando e 2 falhas; os testes novos e o cenário de rate limit passaram isoladamente. A suíte completa **ainda não foi reexecutada** após a última correção, portanto não há confirmação de execução totalmente verde
-
-### Adicionado
-
 - **LCD: busca de endereço, recuperação em operação e diagnóstico (18/10/2026)**
   - **Motivo:** na bancada o display mostra só quadrados pretos na primeira linha e o `inicio` traz `lcd: false`, ou seja, o controlador do display tem energia, mas o Uno não recebeu resposta do módulo I²C em 0x27 nem em 0x3F. Revisão do código: a sondagem era uma tentativa só e só em dois endereços, e **um único timeout de I²C desligava o LCD para sempre** (ele só voltava reiniciando o Uno, e o `inicio` continuava dizendo `lcd: true`)
   - **Busca de endereço:** o firmware varre o barramento (0x08–0x77) e usa o módulo que responder em qualquer endereço de expansor (0x20–0x27 ou 0x38–0x3F; 0x27 e 0x3F primeiro). Com o barramento preso, a varredura desiste no primeiro timeout (25 ms)
@@ -96,6 +83,36 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - **Lógica testada no PC:** novo `src/logica/plano_separador.*` com 10 testes em `test/firmware_uno/teste_separador.cpp` (caminho mais curto, 1 passo por chamada, intervalo mínimo entre passos, mudança de alvo no meio do giro, estouro do `micros()`, atraso do loop e bobinas): a suíte do firmware passa de 43 para 53 testes. O módulo ainda não é usado pelo firmware, então o Uno segue com os mesmos 14510 bytes de flash e 951 de RAM; com tudo descomentado (verificado só como compilação), compila sem avisos em 16348 bytes (50%) e 1002 de RAM (48%)
   - **Ainda em aberto, registrado em `src/hw/separador.h`:** sem sensor de referência (a posição se perde em reinício), motor de passo com 5 V próprios (~240 mA) e o momento do giro em relação à chegada da peça; o giro **nunca foi testado em hardware**
   - Corrige a documentação que dizia que o rascunho existia só no histórico do git (`ARCHITECTURE.md`, `INTEGRATION_GUIDE.md`, board e roteiro da Semana 8)
+
+### Alterado
+
+- **Bancada final — avanço de fase (23/10/2026):** todas as esteiras foram rodadas na quarta-feira, e o ajuste do PWM/kick foi registrado nos últimos commits (`ddf526a`, `1e8fbf1`, `d4ecc2f`). O restante do roteiro agora é a montagem final na base e na estrutura do projeto, com testes um a um para confirmar que a montagem não altera o comportamento padrão. As impressões 3D do separador e da peça que percorre as esteiras ficaram prontas e serão validadas na Semana 11, com integração total ao fim da semana.
+
+- **Calibração de esteiras (bancada) — commit `e3c8833` (18/10/2026):** registro dos parâmetros por esteira no firmware Uno v3.0:
+  - **A:** `pwmRegime=225` e `kickMs=180 ms`
+  - **B:** `pwmRegime=200` e `kickMs=130 ms`
+  - **C:** `pwmRegime=230` e `kickMs=180 ms`
+  - Marcos M1/M2/M3 e pulso mínimo não foram alterados por este commit (apenas ajuste de `pwmRegime`/`kickMs`).
+
+- **Diagrama 3D do mímico:** objeto do separador no fim da esteira principal reorientado de cilindro horizontal (roda-gigante) para vertical (tipo balde), com a base assentada na bancada; comentário do `diagrama3d.js` e rótulo do SVG de fallback no `index.html` atualizados de "Roda de Estoque" para "Separador", alinhando a terminologia do dashboard à usada no firmware e na documentação.
+
+- **Planejamento:** criados os roteiros da Semana 9 (14–18/10; separador prioritário e tarefas opcionais de fim de semana para Data Flow System/CX9240) e Semana 10 (19–23/10; A+B+C, calibração e fechamento condicional do separador).
+
+- **Status de validação/documentação (13/10/2026):** registrado o sucesso da validação em bancada do firmware Uno v3.0 (itens 1.1–1.11 e Bloco 2; B/C funcionando), sem presumir medições não fornecidas nem concluir o teste integrado A+B+C/calibração. README, arquitetura, guia de integração e plano de testes atualizados para separar resultados concluídos de pendências.
+
+- **Separador:** guia deixa explícito que a ativação documentada é legado v2.x, não aplicável diretamente à v3.0; validação física e integração seguem pendentes.
+
+---
+
+## [Marco 4] — Firmware Uno v3.0 e documentação consolidada (02–12/10/2026)
+
+### Adicionado
+
+- **Página de apresentação:** visão geral visual do projeto em https://matheusnespolo.github.io/dataflow-inventory-site/ (repositório separado [`dataflow-inventory-site`](https://github.com/MatheusNespolo/dataflow-inventory-site): Next.js, React Three Fiber, GSAP e Framer Motion, publicado no GitHub Pages). O README passa a apontar para ela no topo e em "Escolha seu caminho".
+
+- **Cobertura E2E do dashboard (card #27):** Playwright agora valida feedback de comandos ocupados/inválidos/limitados, estoque esgotado e recuperação por reset, reconexão WebSocket sincronizando estado, e `/api/status` nos modos servidor sem broker e simulador. O simulador aceita `ESTOQUE_INICIAL` (padrão 15) para testes isolados; execução documentada em `docs/CI-CD.md` e `CONTRIBUTING.md`.
+  - 8 testes novos: 3 em `comandos-recusados` (sistema ocupado, peça inválida, rate limit), 1 em `sem-estoque`, 1 de reconexão em `resiliencia` e 3 em `api-status` (503 do servidor sem broker, recusa com broker offline, 404 do simulador). Suíte serial (`workers: 1`), portas 3100–3102; em CI, 1 retentativa e `maxFailures: 3`
+  - **Validação parcial:** uma execução registrou 31 testes passando e 2 falhas; os testes novos e o cenário de rate limit passaram isoladamente. A suíte completa **ainda não foi reexecutada** após a última correção, portanto não há confirmação de execução totalmente verde
 
 ### Alterado
 
@@ -129,6 +146,11 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - **Entrega por marcos:** checagem prévia sem ligar o motor; M1 topo livre em 3 s (motor travado para na hora); M2 junção em 12,5 s; débito na confirmação; M3 junção livre após 3 s de saída. Junções capturadas por interrupção, com pulso mínimo de 20 ms; a confirmação ignora uma ocupação que começou antes da partida do motor (junção ocupada no próprio ciclo da partida vai para `juncao_obstruida` sem ligar o motor, e a largura de um pulso que já estava em curso na partida é descartada)
   - **Robustez:** kick-start dos motores, watchdog de 2 s (quando avisa que o loop travou, desliga os motores na hora, antes do reset), causa do reset no `inicio`, LCD procurado em 0x27/0x3F e opcional (se o I²C travar durante a operação, o LCD é desligado e o sistema segue sem ele), rajada de interrupções de um sensor de junção oscilando no limiar é limitada (a interrupção dele é suspensa por até 5 ms e o nível é ressincronizado), energização com PORF e BORF juntos sai como `energia`, textos na flash (RAM global de 55% para 46%), sem ArduinoJson no Uno
   - **Rollback:** firmware v2.x no commit `fddde08`. **Validação em bancada pendente:** `docs/testes/roteiros/firmware_uno_v3_validacao.md`
+
+- **Firmware Uno v3.0 — supervisão por marcos e diagnóstico mais claro (03/10/2026)**
+  - Melhoria de processo, não correção de defeito no firmware anterior: marcos separados para partida (M1), trânsito (M2) e saída (M3), com fase e tempo nos erros
+  - A v3.0 ainda aguarda validação em bancada na Semana 8; os resultados de 03/10 foram obtidos com o firmware anterior, que estava correto
+
 - **Firmware Uno — revisão do código e reaplicação das atualizações de 02/10/2026**
   - **Reaplicado:** `TIMEOUT_ENTREGA` de 9 s para **12,5 s** (vigia só o trajeto topo → junção; estourou, as três esteiras são desligadas e o sistema vai para `ERRO` sem debitar estoque), confirmação por **passagem** no sensor de junção (o sensor precisa ser visto livre depois que a esteira liga) e estoque inicial de **15** peças por tipo. O PWM por esteira (`VELOCIDADE_ESTEIRA_A/B/C`) foi mantido, mas o valor da C passou de 140 para **200** (igual a A e B): o plano de testes registra ~150 como o PWM mínimo que move a esteira com peça, então 140 não movia a peça; calibre a C em bancada se o motor novo for mais rápido
   - **Corrigido:** o LCD era redesenhado (`lcd.clear()` e criação de `String`) a cada volta do loop enquanto o sistema estava em `ERRO` por timeout, o que fazia o display piscar e fragmentava o heap do Uno (2 KB de RAM); a mensagem agora é desenhada uma única vez, na transição para `ERRO`
@@ -138,6 +160,31 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - **Corrigido no gateway ESP32:** `Serial2.setRxBufferSize(2048)`, porque durante a reconexão MQTT/TLS o buffer padrão (256 B) transbordava e linhas do Uno chegavam truncadas ou se perdiam
   - **Documentação:** `docs/ARCHITECTURE.md` (estados, erros que levam a ERRO e rejeições), tabela de estados do `README.md` e o roteiro de timeout do `docs/testes/plano_de_testes.md`
   - **Validado:** o sketch compila para o Arduino Uno (`arduino-cli`, 54% da flash e 55% da RAM); o gateway ESP32 também compila (76% da flash). **Não validado em bancada**: o LCD apagado e a esteira C fraca (possível causa elétrica: fiação, diodo antiparalelo, driver IRF520 ou fonte) seguem em investigação e este firmware não os corrige por si só
+
+- **Divulgação e organização do README (02/10/2026)**
+  - `README.md` reorganizado sem reescrever as seções: abertura enxuta (frase de posicionamento, badges de 17 para 8), tabela **Escolha seu caminho**, seção **Por que este projeto é interessante**, diagrama de arquitetura movido para a seção Arquitetura e pedido de estrela no fim
+  - `LICENSE` normalizado (aviso de copyright em uma única linha) para o GitHub reconhecer a licença MIT; **o reconhecimento só se confirma depois do merge**
+  - Novos arquivos de comunidade: formulários de issue (bug e ideia), modelo de pull request, `CODE_OF_CONDUCT.md` e `SECURITY.md`; `CONTRIBUTING.md` ganhou a seção 7 com os links
+  - Novo `docs/DIVULGACAO.md`: plano de divulgação orgânica com textos-base, rascunhos por canal, rascunhos de issues iniciais, checklist e métricas. **Nada foi publicado e nenhuma issue foi criada**; a publicação e a checagem dos canais são da equipe
+
+- **Dashboard Grafana "Visão Geral" (02/10/2026):** o painel "Estoque atual" passa a ter escala máxima 15 (antes 5), alinhada ao estoque inicial de 15 peças por tipo. Limiares de cor inalterados (iguais aos do frontend)
+
+- **Firmware Uno — confirmação de entrega pelo sensor de junção (02/10/2026)**
+  - `TIMEOUT_ENTREGA` de **9000 ms → 12500 ms**: vigia só o trajeto topo → junção; sem confirmação da junção em 12,5 s a esteira (qualquer uma das três) é desligada e o sistema vai para `ERRO` (`timeout`) sem debitar o estoque
+  - A confirmação passou a exigir uma **passagem** (o sensor precisa ser visto livre após ligar a esteira): sensor já em LOW na partida não debita estoque sozinho
+  - Mantidos e documentados: o estoque só é debitado após a confirmação, e o motor segue ligado `TEMPO_SAIDA_ESTEIRA_MS` (3 s) depois dela, fora do timeout
+  - **Não validado em bancada** (sem hardware nesta sessão): validar com o cenário de timeout do `docs/testes/plano_de_testes.md`
+
+- **Firmware Uno — velocidade por esteira secundária (02/10/2026)**
+  - Novas constantes `VELOCIDADE_ESTEIRA_A/B/C`; A e B seguem em `VELOCIDADE_SECUNDARIA` (200) e a esteira C usa PWM menor (`VELOCIDADE_ESTEIRA_C`, inicial 140) porque o novo motor é mais forte e entregava rápido demais
+  - **Compilação local (02/10/2026):** os 4 sketches do job `arduino-compile` compilaram com `arduino-cli` 1.5.1 (Uno principal com a esteira C em PWM 140: 17432 bytes de flash, 54%). Só compilação, sem hardware; procedimento em `docs/CI-CD.md`
+  - **Valor da C não calibrado:** ajustar em bancada após a troca do motor (tempo topo → junção parecido com A e B, partida com peça, folga em relação ao `TIMEOUT_ENTREGA`; avaliar `TEMPO_SAIDA_ESTEIRA_MS` por esteira se a saída da C divergir)
+
+- **Estoque inicial de 15 peças por tipo (02/10/2026)**
+  - Firmware Uno (`ESTOQUE_INICIAL`) e simulador agora começam com **15** peças de A, B e C (antes 5), para permitir mais rodadas de teste; o valor "5" do `index.html` era só o texto exibido antes da primeira mensagem e foi alinhado
+  - O servidor real não guarda estoque inicial (espelha o que o Arduino publica); o estoque do Arduino continua voltando ao inicial a cada reinício
+  - O painel de estoque do Grafana (`max: 5`) **não foi alterado**: com mais de 5 peças a barra fica cheia, mas o valor numérico continua correto
+  - Estoque de software acima do número de peças físicas não protege nada: se faltar peça no topo, o sensor gera `sem_estoque`
 
 ### Revertido
 
@@ -156,14 +203,9 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - `docs/testes/validações/test_write.txt` removido (arquivo de teste sem uso)
   - Links em `README.md`, `CONTRIBUTING.md`, `simulator/`, `docs/FRONTEND.md`, `docs/testes/plano_de_testes.md` e `docs/fluxogramas/board_github_projects.md` apontam para o `ARCHITECTURE.md`; árvore de diretórios do `README.md` atualizada (observabilidade, scripts, CI, testes). Menções antigas nas entradas abaixo e nos roteiros semanais são históricas e foram mantidas
 
-### Alterado
+---
 
-- **Divulgação e organização do README (02/10/2026)**
-  - `README.md` reorganizado sem reescrever as seções: abertura enxuta (frase de posicionamento, badges de 17 para 8), tabela **Escolha seu caminho**, seção **Por que este projeto é interessante**, diagrama de arquitetura movido para a seção Arquitetura e pedido de estrela no fim
-  - `LICENSE` normalizado (aviso de copyright em uma única linha) para o GitHub reconhecer a licença MIT; **o reconhecimento só se confirma depois do merge**
-  - Novos arquivos de comunidade: formulários de issue (bug e ideia), modelo de pull request, `CODE_OF_CONDUCT.md` e `SECURITY.md`; `CONTRIBUTING.md` ganhou a seção 7 com os links
-  - Novo `docs/DIVULGACAO.md`: plano de divulgação orgânica com textos-base, rascunhos por canal, rascunhos de issues iniciais, checklist e métricas. **Nada foi publicado e nenhuma issue foi criada**; a publicação e a checagem dos canais são da equipe
-- **Dashboard Grafana "Visão Geral" (02/10/2026):** o painel "Estoque atual" passa a ter escala máxima 15 (antes 5), alinhada ao estoque inicial de 15 peças por tipo. Limiares de cor inalterados (iguais aos do frontend)
+## [Marco 3] — Bancada B/C, diagrama elétrico, observabilidade e deployment (18–30/09/2026)
 
 ### Adicionado
 
@@ -171,12 +213,6 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Novo `docs/DEPLOYMENT.md` (versão inicial): cenários A–D, pré-requisitos, hardware, firmware, broker, servidor, dashboard, observabilidade, validação pós-deploy e rollback. **Não foi executado em máquina limpa ainda** (Fase 3 do card #22)
   - `README.md`, `docs/INTEGRATION_GUIDE.md` (nova seção 3, Observabilidade; checklist passou a seção 4), `docs/testes/plano_de_testes.md`, `docs/fluxogramas/board_github_projects.md` e os cards #22 e #25 atualizados; `observability/README.md` passa a referenciar o `DEPLOYMENT.md`
   - Card #25 renomeado para Prometheus/Grafana (InfluxDB descartado) e movido para `In Progress`; Card #22 movido para `In Progress`
-
-- **Desbaste mecânico das esteiras e falha de acionamento B/C (29/09/2026; atualização 03/10)**
-  - Desbaste da costura das esteiras A, B e C concluído, com ciclo manual suave
-  - B e C voltaram a acionar; entrega ótima e timeout até `ERRO` funcionam com o firmware anterior à v3.0, que estava correto
-  - A falha era elétrica: o módulo IRF520 e o motor da C estavam defeituosos; a partida travava o sistema. Módulo e motor foram trocados; **provisoriamente, C usa o módulo da A**
-  - O rascunho de diagnóstico em 6 fases foi superado pelo diagnóstico conclusivo; ver Semana 7, seção 4.2.1
 
 - **Telemetria Histórica de Performance — Prometheus + Grafana (30/09/2026)**
   - `GET /metrics` no `server/server.js` (mesma porta 3000 e mesmo padrão aberto do `/api/status`) com 17 métricas `dfi_*` mais as métricas padrão do processo: publish → ack do broker, tempo de confirmação do gateway por comando, tempo de resposta da API por rota, throughput de mensagens e eventos, reconexões MQTT, erros, quedas do gateway (LWT), comandos por resultado, sem resposta e órfãos, estoque e esteiras
@@ -188,6 +224,12 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Testes sem Docker em `test/server_metrics/` (unitários, integração com broker MQTT em processo e verificações estáticas do stack) e job `server-metrics-tests` no CI
   - **Validação concluída em 01/10/2026:** a execução do stack e a conferência dos painéis (cobertas por `scripts/observability-smoke.sh` / `.ps1`) foram feitas, e as capturas dos dashboards foram anexadas ao card #25. Esta linha substitui o aviso de "não validado" de 30/09/2026
   - Complementa (não substitui) o historiador SQLite do CX9240, que guarda os dados de negócio
+
+- **Desbaste mecânico das esteiras e falha de acionamento B/C (29/09/2026; atualização 03/10)**
+  - Desbaste da costura das esteiras A, B e C concluído, com ciclo manual suave
+  - B e C voltaram a acionar; entrega ótima e timeout até `ERRO` funcionam com o firmware anterior à v3.0, que estava correto
+  - A falha era elétrica: o módulo IRF520 e o motor da C estavam defeituosos; a partida travava o sistema. Módulo e motor foram trocados; **provisoriamente, C usa o módulo da A**
+  - O rascunho de diagnóstico em 6 fases foi superado pelo diagnóstico conclusivo; ver Semana 7, seção 4.2.1
 
 - **Roteiro de Testes — Semana 7 (28/09–02/10/2026)**
   - Documento completo em `docs/testes/roteiros/semana_07_28_setembro-3_outubro.md` com 5 blocos de trabalho:
@@ -237,32 +279,6 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Identificados **7 gaps prioritários** com classificação de impacto (Alta/Média/Baixa): BOM ausente, diagrama elétrico não publicado, deployment guide ausente, firmware sem versioning, testes E2E manuais, documentação inline mínima, performance telemetria ausente
   - Sugestão de 5 cards para próxima sprint: BOM, Deployment Guide, Testes E2E Automatizados, Firmware Versioning, Telemetria Histórica (Grafana/InfluxDB)
 
-### Alterado
-
-- **Firmware Uno v3.0 — supervisão por marcos e diagnóstico mais claro (03/10/2026)**
-  - Melhoria de processo, não correção de defeito no firmware anterior: marcos separados para partida (M1), trânsito (M2) e saída (M3), com fase e tempo nos erros
-  - A v3.0 ainda aguarda validação em bancada na Semana 8; os resultados de 03/10 foram obtidos com o firmware anterior, que estava correto
-- **Firmware Uno — confirmação de entrega pelo sensor de junção (02/10/2026)**
-  - `TIMEOUT_ENTREGA` de **9000 ms → 12500 ms**: vigia só o trajeto topo → junção; sem confirmação da junção em 12,5 s a esteira (qualquer uma das três) é desligada e o sistema vai para `ERRO` (`timeout`) sem debitar o estoque
-  - A confirmação passou a exigir uma **passagem** (o sensor precisa ser visto livre após ligar a esteira): sensor já em LOW na partida não debita estoque sozinho
-  - Mantidos e documentados: o estoque só é debitado após a confirmação, e o motor segue ligado `TEMPO_SAIDA_ESTEIRA_MS` (3 s) depois dela, fora do timeout
-  - **Não validado em bancada** (sem hardware nesta sessão): validar com o cenário de timeout do `docs/testes/plano_de_testes.md`
-
-### Alterado
-
-- **Firmware Uno — velocidade por esteira secundária (02/10/2026)**
-  - Novas constantes `VELOCIDADE_ESTEIRA_A/B/C`; A e B seguem em `VELOCIDADE_SECUNDARIA` (200) e a esteira C usa PWM menor (`VELOCIDADE_ESTEIRA_C`, inicial 140) porque o novo motor é mais forte e entregava rápido demais
-  - **Compilação local (02/10/2026):** os 4 sketches do job `arduino-compile` compilaram com `arduino-cli` 1.5.1 (Uno principal com a esteira C em PWM 140: 17432 bytes de flash, 54%). Só compilação, sem hardware; procedimento em `docs/CI-CD.md`
-  - **Valor da C não calibrado:** ajustar em bancada após a troca do motor (tempo topo → junção parecido com A e B, partida com peça, folga em relação ao `TIMEOUT_ENTREGA`; avaliar `TEMPO_SAIDA_ESTEIRA_MS` por esteira se a saída da C divergir)
-
-### Alterado
-
-- **Estoque inicial de 15 peças por tipo (02/10/2026)**
-  - Firmware Uno (`ESTOQUE_INICIAL`) e simulador agora começam com **15** peças de A, B e C (antes 5), para permitir mais rodadas de teste; o valor "5" do `index.html` era só o texto exibido antes da primeira mensagem e foi alinhado
-  - O servidor real não guarda estoque inicial (espelha o que o Arduino publica); o estoque do Arduino continua voltando ao inicial a cada reinício
-  - O painel de estoque do Grafana (`max: 5`) **não foi alterado**: com mais de 5 peças a barra fica cheia, mas o valor numérico continua correto
-  - Estoque de software acima do número de peças físicas não protege nada: se faltar peça no topo, o sensor gera `sem_estoque`
-
 ### Problemas Conhecidos
 
 - **Falha de conexão MQTT Cloud com `rc=-2` — investigação por rede (22–28/09/2026)**
@@ -280,6 +296,10 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - **Mitigação em curso:** Aquisição de 2 expansores 110/220V→5V para alimentação dedicada de cada placa de passagem — **configuração já prevista no diagrama elétrico** (sem alteração de documentação necessária)
   - **Cronograma diagnóstico:** 25–27/09/2026 (paralelo ao burn-in test)
   - **Referência técnica:** `docs/testes/validações/troubleshooting_bancada_22-23_09.md` §Problema 2
+
+---
+
+## [Marco 2] — CI/CD, frontend e Beckhoff CX9240 (02–17/09/2026)
 
 ### Adicionado
 
@@ -303,6 +323,23 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
   - Realizados avanços estruturais na fixação, suporte e alinhamento mecânico das esteiras B e C na bancada de testes.
   - Testes elétricos e soldagem final dos módulos IRF520 (B/C) reprogramados para a rodada seguinte devido à restrição de tempo no dia 15/09.
 
+- **Simulador — Publicação MQTT opcional para integração Beckhoff CX9240 (15/09/2026)**
+  - `simulator/server.js`: novo modo opcional (`MQTT_PUBLISH=true`, desativado por padrão) que
+    publica o estoque no broker MQTT via cliente `mqtt` (nova dependência `^5.10.0`).
+  - Tópico `dataflow/estoque`, payload `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}`,
+    QoS 1 e **retained** — publica a cada mudança de estoque e imediatamente ao conectar,
+    reproduzindo o mesmo contrato usado pelo gateway ESP32 real.
+  - Validado localmente contra broker Mosquitto: mensagem confirmada como retained via
+    `mosquitto_sub`. Publicação é não-bloqueante (falhas de conexão MQTT não afetam o
+    funcionamento offline padrão via Socket.IO).
+  - Variáveis de ambiente: `MQTT_PUBLISH`, `MQTT_BROKER_URL`, `MQTT_PORT`, `MQTT_USER`,
+    `MQTT_PASS`, `MQTT_TOPIC_ESTOQUE`. Script `npm run start:mqtt` adicionado.
+  - Documentação: nova seção "Integração Beckhoff CX9240" em `docs/arquitetura_mqtt.md`;
+    `simulator/README.md` atualizado; critério de aceite do card de melhoria (lado simulador)
+    marcado como concluído em `docs/testes/plano_de_testes.md`.
+  - Persistência em banco (MySQL/MariaDB/PostgreSQL) e o programa do lado Beckhoff CX9240
+    continuam fora do escopo — a cargo de outro agente, a validar em bancada própria.
+
 - **CI/CD + Automação Multiplataforma — Sprint 5 (14–15/09/2026)**
   - **GitHub Actions** `.github/workflows/lint-and-security.yaml` criado com 4 jobs:
     - `lint-javascript`: ESLint em `server/` e `simulator/`
@@ -322,29 +359,6 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
     - `simulator/.env.example` — **novo arquivo** (similar ao `server/.env.example`; documenta variáveis MQTT para modo Beckhoff)
     - `docs/cards_comments/` — **nova pasta** com comentários prontos para aplicar nos cards do GitHub Projects (CI/CD, Separador, Beckhoff)
   - **Validação dos scripts concluída (15/09/2026):** todos os itens S1 a S6 do Bloco 5 validados com sucesso em ambientes Linux e Windows.
-
-- **Simulador — Publicação MQTT opcional para integração Beckhoff CX9240 (15/09/2026)**
-  - `simulator/server.js`: novo modo opcional (`MQTT_PUBLISH=true`, desativado por padrão) que
-    publica o estoque no broker MQTT via cliente `mqtt` (nova dependência `^5.10.0`).
-  - Tópico `dataflow/estoque`, payload `{"type":"estoque","pecaA":N,"pecaB":N,"pecaC":N}`,
-    QoS 1 e **retained** — publica a cada mudança de estoque e imediatamente ao conectar,
-    reproduzindo o mesmo contrato usado pelo gateway ESP32 real.
-  - Validado localmente contra broker Mosquitto: mensagem confirmada como retained via
-    `mosquitto_sub`. Publicação é não-bloqueante (falhas de conexão MQTT não afetam o
-    funcionamento offline padrão via Socket.IO).
-  - Variáveis de ambiente: `MQTT_PUBLISH`, `MQTT_BROKER_URL`, `MQTT_PORT`, `MQTT_USER`,
-    `MQTT_PASS`, `MQTT_TOPIC_ESTOQUE`. Script `npm run start:mqtt` adicionado.
-  - Documentação: nova seção "Integração Beckhoff CX9240" em `docs/arquitetura_mqtt.md`;
-    `simulator/README.md` atualizado; critério de aceite do card de melhoria (lado simulador)
-    marcado como concluído em `docs/testes/plano_de_testes.md`.
-  - Persistência em banco (MySQL/MariaDB/PostgreSQL) e o programa do lado Beckhoff CX9240
-    continuam fora do escopo — a cargo de outro agente, a validar em bancada própria.
-
-- **Documentação — Reorganização dos roteiros de teste (03/09/2026)**
-  - Consolidação de 8 arquivos diários em 4 arquivos semanais (`semana_01` a `semana_04`).
-  - Atualização de todas as referências internas em `README.md`, `arquitetura_mqtt.md`,
-    `board_github_projects.md`, `checklist_pre_teste_rede_infra.md` e `validações/README.md`.
-  - READMEs adicionados em `simulator/`, `server/` e `frontend/` para melhor navegação.
 
 - **Documentação — Reorganização do roteiro da Semana 4 (08/09/2026)**
   - Roteiro `semana_04_01-03_setembro.md` renomeado para `semana_04_08-12_setembro.md`,
@@ -366,6 +380,12 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
     a implementação completa fica para sprints/agentes futuros.
   - Sugerida a criação de card de melhoria (Template A / backlog) para rastreabilidade no
     GitHub Projects.
+
+- **Documentação — Reorganização dos roteiros de teste (03/09/2026)**
+  - Consolidação de 8 arquivos diários em 4 arquivos semanais (`semana_01` a `semana_04`).
+  - Atualização de todas as referências internas em `README.md`, `arquitetura_mqtt.md`,
+    `board_github_projects.md`, `checklist_pre_teste_rede_infra.md` e `validações/README.md`.
+  - READMEs adicionados em `simulator/`, `server/` e `frontend/` para melhor navegação.
 
 - **Frontend — Redesign do Painel Anunciador Industrial (02/09/2026)**
   - Painel anunciador com indicadores visuais IEC-60073 (LED status: verde/amarelo/vermelho).
@@ -419,8 +439,6 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
     borda vermelha, NÃO "Comando enviado".
   - Servidor rejeita peça inválida no Socket.IO → `comando_erro` sem chegar ao MQTT.
   - `simulator/server.js`: o evento `pedido` passou a ser registrado somente apos a validacao de estoque (antes era emitido antes, seguido de `erro` quando a peca estava sem estoque) - alinhando o simulador ao fix aplicado no servidor real.
-
-
 
 - **Dashboard travado em "ESP32 Offline" mesmo com o gateway online** — *regressão
   introduzida em `9a7ce25`*.
@@ -499,18 +517,25 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Segurança`, `R
     silenciosamente.
   - `checklist_pre_teste_rede_infra.md`: passo "garantir um único listener na 1883".
 
+---
+
+## [Marco 1] — Integração inicial: status separado e credenciais (até 01/09/2026)
+
 ### Alterado
 
 - `server/.env.example`: documentada a nova variável `MQTT_TOPIC_STATUS_SERVER`
   (padrão `dataflow/status/server`).
+
 - **Documentação de credenciais atualizada** para o fluxo `secrets.h` introduzido em
   `35fe3d5`. Os textos ainda mandavam editar SSID/senha dentro do `.ino`:
   - `README.md` — passo "Configurar o ESP32"
   - `docs/arquitetura_mqtt.md` — "Como Rodar", seção HiveMQ Cloud e árvore de diretórios
   - `docs/testes/validações/checklist_pre_teste_rede_infra.md` — seções 2, 4 e 7
   - `docs/testes/roteiros/semana_03_27-28_agosto.md` — novo Bloco 0.a (setup do `secrets.h`)
+
 - `docs/arquitetura_mqtt.md`: tabela de tópicos agora identifica quais são **retained**
   e qual componente é o **dono** de cada tópico de status.
+
 - `docs/testes/roteiros/semana_03_27-28_agosto.md`: título corrigido (estava
   "26/08/2026" em um arquivo de 27/08) e roteiro reescrito para cobrir as mudanças
   de `35fe3d5` e `9a7ce25` — novos blocos **3.A** (rejeições explícitas de comando),
