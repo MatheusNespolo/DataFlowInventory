@@ -8,7 +8,6 @@ Dashboard web em tempo real para monitoramento e controle do protótipo IoT. Int
 - [Funcionalidades](#funcionalidades)
 - [Como Visualizar](#como-visualizar)
 - [Estrutura do Repositório](#estrutura-do-repositório)
-- [Credenciais de Teste](#credenciais-de-teste)
 - [Arquitetura da Interface](#arquitetura-da-interface)
 
 ---
@@ -67,6 +66,8 @@ O frontend é um **dashboard web responsivo** que conecta ao servidor Node.js vi
 | **Acessibilidade** | ARIA labels, role="status", aria-live="polite" |
 | **Segurança** | Helmet + CSP, CORS restrito, rate limit por socket |
 | **Aprimoramento Progressivo** | 3D (WebGL) → SVG 2D fallback → texto |
+
+## Como Visualizar
 
 ### Rápido (Simulador — recomendado para teste)
 
