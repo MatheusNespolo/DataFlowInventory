@@ -14,7 +14,14 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ## [Não publicado] — Semana 11: display OLED e montagem final na base (26–30/10/2026, em andamento)
 
+### Adicionado
+
+- **CI: verificação de links e âncoras da documentação (29/10/2026):** job `docs-links` (`scripts/verificar-links.py`); fecha a issue #39
+
 ### Alterado
+
+- **Documentação reorganizada para manter (29/10/2026):** resultados de bancada em um só lugar ([`testes/resultados.md`](testes/resultados.md), separado do plano de testes, com o diário em ordem cronológica); README e ARCHITECTURE sem status nem números copiados (apontam para `resultados.md` e `config.h`); CHANGELOG em marcos; guia do board só com regras, alinhado ao board real (sem "In Review", Área preenchida em todos os cards, Done pelo `Closes #N`); `docs/cards_comments/` vira arquivo; mapa [`docs/README.md`](README.md) de onde registrar o quê; pasta `validações/` → `validacoes/`
+- **Semana 11 — esteira A na base (28/10/2026, PR #71):** 10 entregas sem falha, 4650–5000 ms, sem mudança de código; peça improvisada. Ver [`testes/resultados.md`](testes/resultados.md)
 
 - **Display OLED: faixa de ícones dos estados da FSM (28/10/2026)**
   - **O que mudou:** os 16 px de baixo do OLED, que estavam vazios, ganharam uma faixa com um ícone por estado da FSM (ampulheta = aguardando, lupa = verificando, raio = acionando, caixa sobre a esteira = entregando, triângulo = erro), com o do estado atual **invertido** (bloco aceso com o desenho recortado). A linha 2 do texto subiu 8 px (páginas 3–4); as duas linhas continuam com 16 colunas e os mesmos textos
