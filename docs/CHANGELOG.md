@@ -17,6 +17,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 ### Alterado
 
 - **Semana 11 encerrada e roteiro da Semana 12 (03/11/2026):** esteira B montada na base e testada; 10 entregas de cada esteira (A e B), 5000–6000 ms. Display OLED recebido em 03/11. Esteira C, integração total, peças 3D, separador automático e teste do display transferidos para o [roteiro da Semana 12](testes/roteiros/semana_12_03-06_novembro.md). Ver [`testes/resultados.md`](testes/resultados.md)
+- **Esteira C na base (03/11/2026):** integrada com sucesso (entregas e tempos a registrar); separador gira menos que o esperado, com roteiro de diagnóstico no Bloco 4 da Semana 12. Ver [`testes/resultados.md`](testes/resultados.md)
 
 ---
 
