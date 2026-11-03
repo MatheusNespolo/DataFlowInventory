@@ -8,9 +8,9 @@
 
 ## Estado atual
 
-**Situação de validação atualizada (bancada, 29/10/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 a montagem final começou em 28/10: a **esteira A foi montada na base** e fez **10 entregas com sucesso, entre 4650 e 5000 ms** (igual à calibração de 21/10, sem mudança de código; peça improvisada). Seguem pendentes a montagem e o teste de B e C na base, a integração total, as peças 3D do separador e da peça transportada, e o reteste do display (B3, agora OLED).
+**Situação de validação atualizada (bancada, 03/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas com A e B**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada.
 
-**Pendências/retestes:** (1) montagem de B e C na base e garantia de que a estrutura não altera a operação original (A já montada), (2) teste individual e sequencial de B e C fixadas na base, com tempos e ciclos registrados (A aprovada: 10 entregas, 4650–5000 ms), (3) validação das peças 3D do separador e da peça que percorre as esteiras (a A foi testada com uma peça improvisada), (4) integração total, prevista para 30/10 e sujeita a replanejamento, (5) reteste B3 com o display OLED, que deve chegar em 29–30/10. O separador automático segue como item de validação em hardware, condicionado a evidência de bancada. Consulte os roteiros da [Semana 8 (resultados)](roteiros/semana_08_05-09_outubro.md), [Semana 9 (14–18/10)](roteiros/semana_09_14-18_outubro.md), [Semana 10 (19–23/10)](roteiros/semana_10_19-23_outubro.md) e [Semana 11 (26–30/10)](roteiros/semana_11_26-30_outubro.md).
+**Pendências/retestes (Semana 12, [roteiro](roteiros/semana_12_03-06_novembro.md)):** (1) montagem e teste da esteira C na base, (2) integração total A+B+C na base, (3) peças 3D (roda separadora e peça transportada) e separador em modo automático no hardware, (4) reteste B3 com o display OLED, (5) tempos por esteira na base, para comparar com a calibração de 21/10 (o intervalo de 5000–6000 ms das entregas com A e B está acima dos 4650–5000 ms da A isolada).
 
 ---
 
@@ -35,7 +35,7 @@
 | 7.D | Diagnóstico IRF520 B/C (Semana 7) | 03/10/2026 | ✅ Aprovado | B e C movem; entrega ótima e timeout até o `ERRO` OK (firmware anterior à v3.0). Módulo IRF520 e motor da C trocados; C usa provisoriamente o módulo da A |
 | BK | Beckhoff — Historiador SQLite (CX9240) | 15/09/2026 | ✅ Aprovado | Persistência no SQLite local (`/var/lib/dfi/historian.db`) via TF6701 + TF6420 validada com simulador MQTT |
 | M1 | Montagem mecânica das esteiras | 15/09/2026 | ✅ Aprovado | Alinhamento e fixação das esteiras na estrutura mecânica concluídos |
-| M2 | Montagem final na base — esteira A (Semana 11) | 28/10/2026 | ⚠️ Parcial | Esteira A: ✅ 10 entregas, 4650–5000 ms, sem falha (igual à calibração; sem mudança de código; peça improvisada). B e C ainda não montadas |
+| M2 | Montagem final na base — esteiras A e B (Semana 11) | 28–30/10/2026 | ⚠️ Parcial | A: ✅ 10 entregas, 4650–5000 ms, sem falha (28/10). B: ✅ montada e testada; 10 entregas com A e B, 5000–6000 ms (29–30/10). Sem mudança de código; peça improvisada. C pendente (Semana 12) |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
 ---
@@ -136,3 +136,10 @@ Em ordem cronológica (o mais recente no fim).
 - **Peça usada:** improvisada. A peça impressa em 3D ainda não foi verificada (Bloco 4 do roteiro).
 - **Display:** o OLED ainda não chegou (previsto para 29–30/10); reteste B3 pendente.
 - **Sem avanço em 26–27/10:** as atividades previstas para segunda e terça (revisão da bancada e montagem do conjunto) não foram executadas; B e C na base, integração total e peças 3D ficaram concentradas em 29–30/10. Ver [roteiro da Semana 11](roteiros/semana_11_26-30_outubro.md).
+
+### 29–30/10 (Semana 11 — esteira B na base)
+
+- **Esteira B na base:** montada na estrutura final e testada.
+- **Entregas com A e B:** 10 entregas, com tempo de entrega considerado aceitável pela equipe, entre **5000 e 6000 ms**. É mais que os 4650–5000 ms da esteira A isolada em 28/10; o tempo de cada esteira separada não foi registrado e entra na Semana 12.
+- **Sem mudança** de firmware ou de parâmetros; peça improvisada.
+- **Não executado na Semana 11** (transferido para a [Semana 12](roteiros/semana_12_03-06_novembro.md)): esteira C na base, integração total A+B+C, peças 3D, separador automático no hardware e reteste do display OLED.
