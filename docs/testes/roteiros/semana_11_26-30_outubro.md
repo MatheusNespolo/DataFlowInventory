@@ -4,7 +4,7 @@
 
 > **Atualização de estado (29/10/2026):** os avanços da semana só começaram na quarta-feira (28/10): até então não houve atividade de bancada, e as tarefas de 26 e 27/10 ficaram sem execução. Em 28/10 a **esteira A foi montada na base** e fez **10 entregas com sucesso**, com tempo de entrega entre **4650 e 5000 ms** — dentro do medido na calibração de 21/10 (~4950 ms), sem nenhuma mudança de firmware ou de parâmetros (só a mecânica da base mudou). Foi usada uma **peça improvisada**: a peça impressa em 3D ainda não foi verificada. As esteiras B e C na base, a integração e a validação das peças 3D seguem pendentes, agora concentradas em 29 e 30/10.
 
-> **Encerramento (03/11/2026):** em 29–30/10 a **esteira B foi montada na base e testada**, e foram feitas **10 entregas com as esteiras A e B**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. A esteira C na base, a integração total A+B+C, as peças 3D, o separador em modo automático e o reteste do display **não foram executados** e foram transferidos para o [roteiro da Semana 12](semana_12_03-06_novembro.md). Resultados consolidados em [`resultados.md`](../resultados.md).
+> **Encerramento (03/11/2026):** em 29–30/10 a **esteira B foi montada na base e testada**, e foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. As peças impressas em 3D ainda não foram usadas; o display OLED chegou em 03/11. A esteira C na base, a integração total A+B+C, as peças 3D, o separador em modo automático e o reteste do display **não foram executados** e foram transferidos para o [roteiro da Semana 12](semana_12_03-06_novembro.md). Resultados consolidados em [`resultados.md`](../resultados.md).
 
 | Item | Status final (03/11/2026) | Evidência |
 |---|---|---|
@@ -13,11 +13,11 @@
 | Esteira A montada na base | ✅ Concluído | relato da equipe, 28/10 |
 | Entregas da esteira A na base | ✅ Aprovado | 10 entregas em 28/10, 4650–5000 ms, sem falha; peça improvisada |
 | Esteira B montada na base | ✅ Concluído | relato da equipe, 29–30/10 |
-| Entregas com A e B na base | ✅ Aprovado | 10 entregas, 5000–6000 ms (tempo aceitável) |
+| Entregas de A e B na base | ✅ Aprovado | 10 entregas de cada esteira, 5000–6000 ms (tempo aceitável) |
 | Esteira C montada e testada na base | ➡️ Transferido | Semana 12 |
 | Integração A/B/C na base | ➡️ Transferido | Semana 12 |
 | Peças 3D (roda separadora e peça) | ➡️ Transferido | Semana 12 |
-| Display OLED (reteste B3) | ➡️ Transferido | Semana 12; firmware pronto (PRs #68 e #70) |
+| Display OLED (reteste B3) | ➡️ Transferido | display recebido em 03/11; teste na Semana 12 (firmware pronto, PRs #68 e #70) |
 
 > ⚠️ **Risco de prazo:** com as atividades de segunda a quarta comprimidas em um dia, os blocos 2 a 4 (B e C na base, integração total e peças 3D) cabem com dificuldade em 29–30/10. O que não for concluído deve ser registrado como **pendente**, sem presumir aprovação, e replanejado na semana seguinte.
 
@@ -35,7 +35,7 @@
 | **26/10 (seg.)** | Revisão da bancada e checklist final de montagem. | Base/estrutura, fixação das esteiras, alinhamento, GND e alimentação conferidos. | ⬜ Não executado |
 | **27/10 (ter.)** | Inspeção mecânica e montagem final do conjunto. | Esteiras fixadas e sem obstruções, deslocamento e alinhamento registrados. | ⬜ Não executado |
 | **28/10 (qua.)** | Teste individual por esteira na base. | Resultado por esteira com falhas/ajustes documentados. | ✅ Parcial: esteira A montada na base, 10 entregas com sucesso (4650–5000 ms); B e C não montadas |
-| **29/10 (qui.)** | Integração parcial e ciclo de pedido A/B/C. | Sequência operacional estável; registro de falhas e reset. | ✅ Parcial (29–30/10): esteira B montada na base; 10 entregas com A e B, 5000–6000 ms; C não montada |
+| **29/10 (qui.)** | Integração parcial e ciclo de pedido A/B/C. | Sequência operacional estável; registro de falhas e reset. | ✅ Parcial (29–30/10): esteira B montada na base; 10 entregas de cada esteira (A e B), 5000–6000 ms; C não montada |
 | **30/10 (sex.)** | Validação das peças 3D + integração total final. | Evidência final de funcionamento e fechamento da bancada. | ➡️ Transferido para a Semana 12 |
 
 ---
@@ -76,7 +76,7 @@
 | Esteira | Resultado | Tempo de entrega | Ciclos | Falhas | Observações |
 |---|---|---:|---:|---|---|
 | A | ✅ Aprovado (28/10) | 4650–5000 ms | 10 | nenhuma | Primeira esteira montada na base; tempo igual ao da calibração de 21/10 (~4950 ms), sem mudança de código. Peça improvisada (a impressa em 3D ainda não foi verificada) |
-| B | ✅ Aprovado (29–30/10) | 5000–6000 ms (entregas com A e B) | 10 (A e B) | nenhuma relatada | Montada na base e testada; tempo considerado aceitável pela equipe. Tempo de B isolada não registrado |
+| B | ✅ Aprovado (29–30/10) | 5000–6000 ms | 10 | nenhuma relatada | Montada na base e testada; tempo considerado aceitável pela equipe (intervalo registrado em conjunto para A e B). Peça improvisada |
 | C | ➡️ Transferido |  |  |  | Não montada na base; ver Semana 12 |
 
 ### Critério de saída

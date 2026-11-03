@@ -16,7 +16,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ### Alterado
 
-- **Semana 11 encerrada e roteiro da Semana 12 (03/11/2026):** esteira B montada na base e testada; 10 entregas com A e B, 5000–6000 ms. Esteira C, integração total, peças 3D, separador automático e display transferidos para o [roteiro da Semana 12](testes/roteiros/semana_12_03-06_novembro.md). Ver [`testes/resultados.md`](testes/resultados.md)
+- **Semana 11 encerrada e roteiro da Semana 12 (03/11/2026):** esteira B montada na base e testada; 10 entregas de cada esteira (A e B), 5000–6000 ms. Display OLED recebido em 03/11. Esteira C, integração total, peças 3D, separador automático e teste do display transferidos para o [roteiro da Semana 12](testes/roteiros/semana_12_03-06_novembro.md). Ver [`testes/resultados.md`](testes/resultados.md)
 
 ---
 
@@ -29,7 +29,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 ### Alterado
 
 - **Documentação reorganizada para manter (29/10/2026):** resultados de bancada em um só lugar ([`testes/resultados.md`](testes/resultados.md), separado do plano de testes, com o diário em ordem cronológica); README e ARCHITECTURE sem status nem números copiados (apontam para `resultados.md` e `config.h`); CHANGELOG em marcos; guia do board só com regras, alinhado ao board real (sem "In Review", Área preenchida em todos os cards, Done pelo `Closes #N`); `docs/cards_comments/` vira arquivo; mapa [`docs/README.md`](README.md) de onde registrar o quê; pasta `validações/` → `validacoes/`
-- **Semana 11 — esteira B na base (29–30/10/2026):** montada e testada; 10 entregas com A e B, 5000–6000 ms (aceitável); sem mudança de código. Ver [`testes/resultados.md`](testes/resultados.md)
+- **Semana 11 — esteira B na base (29–30/10/2026):** montada e testada; 10 entregas de cada esteira (A e B), 5000–6000 ms (aceitável); sem mudança de código. Ver [`testes/resultados.md`](testes/resultados.md)
 - **Semana 11 — esteira A na base (28/10/2026, PR #71):** 10 entregas sem falha, 4650–5000 ms, sem mudança de código; peça improvisada. Ver [`testes/resultados.md`](testes/resultados.md)
 
 - **Display OLED: faixa de ícones dos estados da FSM (28/10/2026)**

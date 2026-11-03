@@ -1,6 +1,6 @@
 # Roteiro de Testes — Semana 12 (03–06/11/2026)
 
-> **Estado da bancada (03/11/2026):** as esteiras **A e B estão montadas na base** e aprovadas (A: 10 entregas, 4650–5000 ms; com A e B: 10 entregas, 5000–6000 ms). Esta semana recebe tudo o que não foi executado na [Semana 11](semana_11_26-30_outubro.md): esteira C na base, integração total, peças 3D, separador automático no hardware e o reteste do display. Segunda-feira (02/11) foi feriado (Finados). Estado completo e histórico em [`resultados.md`](../resultados.md).
+> **Estado da bancada (03/11/2026):** as esteiras **A e B estão montadas na base** e aprovadas (A: 10 entregas em 28/10, 4650–5000 ms; em 29–30/10, 10 entregas de cada esteira, A e B, entre 5000 e 6000 ms). O **display OLED chegou** em 03/11 e as **peças impressas em 3D** serão usadas pela primeira vez nesta semana. Esta semana recebe tudo o que não foi executado na [Semana 11](semana_11_26-30_outubro.md): esteira C na base, integração total, peças 3D, separador automático no hardware e o reteste do display. Segunda-feira (02/11) foi feriado (Finados). Estado completo e histórico em [`resultados.md`](../resultados.md).
 
 | Item | Status (03/11/2026) | Origem |
 |---|---|---|
@@ -8,9 +8,9 @@
 | Esteira B na base | ✅ Aprovado | Semana 11, 29–30/10 |
 | Esteira C na base | ⬜ Pendente | transferido da Semana 11 |
 | Integração A+B+C na base | ⬜ Pendente | transferido da Semana 11 |
-| Peças 3D (roda separadora e peça) | ⬜ Pendente | transferido da Semana 11 |
+| Integração com as peças impressas em 3D (roda separadora e peça) | ⬜ Pendente | transferido da Semana 11; ainda não usadas |
 | Separador em modo automático no hardware | ⬜ Pendente | transferido da Semana 11 |
-| Display OLED (reteste B3) | ⬜ Pendente | transferido da Semana 11; firmware pronto (PRs #68 e #70) |
+| Display OLED (reteste B3) | ⬜ Pendente | display recebido em 03/11; firmware pronto (PRs #68 e #70) |
 
 ## Objetivos
 
@@ -48,12 +48,12 @@ Mesmo procedimento usado para A e B na Semana 11 (Bloco 2 do [roteiro anterior](
 
 ## Bloco 2 — tempos por esteira na base
 
-As entregas com A e B na Semana 11 levaram 5000–6000 ms, acima dos 4650–5000 ms da A isolada. Medir cada esteira **separada**, na base, com a mesma peça:
+Na Semana 11, as entregas de A e B em 29–30/10 ficaram entre 5000 e 6000 ms (intervalo registrado em conjunto), acima dos 4650–5000 ms da A em 28/10. Medir cada esteira **separada**, na base, com a mesma peça:
 
 | Esteira | Calibração (21/10) | Na base (Semana 11) | Na base (Semana 12) | Ciclos | Observações |
 |---|---:|---:|---:|---:|---|
-| A | ~4950 ms | 4650–5000 ms |  |  |  |
-| B | — | 5000–6000 ms (com A) |  |  |  |
+| A | ~4950 ms | 4650–5000 ms (28/10); 5000–6000 ms (29–30/10, com B) |  |  |  |
+| B | — | 5000–6000 ms (com A, em conjunto) |  |  |  |
 | C | ~4530 ms | — |  |  |  |
 
 **Critério de saída:** [ ] tempo de cada esteira registrado · [ ] diferença em relação à calibração explicada (atrito da montagem, peça, alimentação) ou aceita como nova referência.

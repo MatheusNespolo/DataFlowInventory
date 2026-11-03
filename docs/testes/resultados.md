@@ -8,9 +8,9 @@
 
 ## Estado atual
 
-**Situação de validação atualizada (bancada, 03/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas com A e B**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada.
+**Situação de validação atualizada (bancada, 03/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas). O **display OLED chegou** em 03/11 e será testado na Semana 12.
 
-**Pendências/retestes (Semana 12, [roteiro](roteiros/semana_12_03-06_novembro.md)):** (1) montagem e teste da esteira C na base, (2) integração total A+B+C na base, (3) peças 3D (roda separadora e peça transportada) e separador em modo automático no hardware, (4) reteste B3 com o display OLED, (5) tempos por esteira na base, para comparar com a calibração de 21/10 (o intervalo de 5000–6000 ms das entregas com A e B está acima dos 4650–5000 ms da A isolada).
+**Pendências/retestes (Semana 12, [roteiro](roteiros/semana_12_03-06_novembro.md)):** (1) montagem e teste da esteira C na base, (2) integração total A+B+C na base, (3) integração com as peças impressas em 3D (roda separadora e peça transportada) e separador em modo automático no hardware, (4) reteste B3 com o display OLED (já recebido), (5) tempos por esteira na base, para comparar com a calibração de 21/10 (o intervalo de 5000–6000 ms das entregas de A e B em 29–30/10 está acima dos 4650–5000 ms da A em 28/10).
 
 ---
 
@@ -35,7 +35,7 @@
 | 7.D | Diagnóstico IRF520 B/C (Semana 7) | 03/10/2026 | ✅ Aprovado | B e C movem; entrega ótima e timeout até o `ERRO` OK (firmware anterior à v3.0). Módulo IRF520 e motor da C trocados; C usa provisoriamente o módulo da A |
 | BK | Beckhoff — Historiador SQLite (CX9240) | 15/09/2026 | ✅ Aprovado | Persistência no SQLite local (`/var/lib/dfi/historian.db`) via TF6701 + TF6420 validada com simulador MQTT |
 | M1 | Montagem mecânica das esteiras | 15/09/2026 | ✅ Aprovado | Alinhamento e fixação das esteiras na estrutura mecânica concluídos |
-| M2 | Montagem final na base — esteiras A e B (Semana 11) | 28–30/10/2026 | ⚠️ Parcial | A: ✅ 10 entregas, 4650–5000 ms, sem falha (28/10). B: ✅ montada e testada; 10 entregas com A e B, 5000–6000 ms (29–30/10). Sem mudança de código; peça improvisada. C pendente (Semana 12) |
+| M2 | Montagem final na base — esteiras A e B (Semana 11) | 28–30/10/2026 | ⚠️ Parcial | A: ✅ 10 entregas, 4650–5000 ms, sem falha (28/10). B: ✅ montada e testada; 10 entregas de cada esteira (A e B), 5000–6000 ms (29–30/10). Sem mudança de código; peça improvisada. C pendente (Semana 12) |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
 ---
@@ -140,6 +140,7 @@ Em ordem cronológica (o mais recente no fim).
 ### 29–30/10 (Semana 11 — esteira B na base)
 
 - **Esteira B na base:** montada na estrutura final e testada.
-- **Entregas com A e B:** 10 entregas, com tempo de entrega considerado aceitável pela equipe, entre **5000 e 6000 ms**. É mais que os 4650–5000 ms da esteira A isolada em 28/10; o tempo de cada esteira separada não foi registrado e entra na Semana 12.
-- **Sem mudança** de firmware ou de parâmetros; peça improvisada.
+- **Entregas de A e B:** 10 entregas de cada esteira, com tempo de entrega considerado aceitável pela equipe, entre **5000 e 6000 ms**. É mais que os 4650–5000 ms da esteira A em 28/10; o intervalo de cada esteira separada não foi registrado e entra na Semana 12.
+- **Sem mudança** de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas).
+- **Display OLED:** recebido em 03/11; teste na Semana 12 (reteste B3).
 - **Não executado na Semana 11** (transferido para a [Semana 12](roteiros/semana_12_03-06_novembro.md)): esteira C na base, integração total A+B+C, peças 3D, separador automático no hardware e reteste do display OLED.
