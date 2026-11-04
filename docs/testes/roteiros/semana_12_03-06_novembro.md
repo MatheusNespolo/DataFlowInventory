@@ -6,11 +6,11 @@
 |---|---|---|
 | Esteira A na base | ✅ Aprovado | Semana 11, 28/10 |
 | Esteira B na base | ✅ Aprovado | Semana 11, 29–30/10 |
-| Esteira C na base | ✅ Integrada (03/11) | número de entregas e tempos a registrar |
+| Esteira C na base | ✅ Aprovado (03/11) | 10 entregas, 4103–5069 ms |
 | Integração A+B+C na base | ⬜ Pendente | transferido da Semana 11 |
 | Integração com as peças impressas em 3D (roda separadora e peça) | ⬜ Pendente | transferido da Semana 11; ainda não usadas |
-| Separador em modo automático no hardware | ⚠️ Em diagnóstico (03/11) | a roda se move, mas aparenta girar menos que o esperado; ver Bloco 4 |
-| Display OLED (reteste B3) | ⬜ Pendente | display recebido em 03/11; firmware pronto (PRs #68 e #70) |
+| Separador em modo automático no hardware | ⚠️ Em diagnóstico | a roda gira cerca de **metade** do esperado, também com `SEPARADOR_RPM` 5 (`c54776c`) e após mudanças na elétrica; ver Bloco 4 |
+| Display OLED (reteste B3) | ✅ Aprovado (03/11) | testado com sucesso na bancada |
 
 ## Objetivos
 
@@ -25,7 +25,7 @@
 | Data | Atividade | Saída esperada | Status |
 |---|---|---|---|
 | **02/11 (seg.)** | Feriado (Finados). | — | — |
-| **03/11 (ter.)** | Montagem da esteira C na base e teste individual. | C com ≥ 5 entregas sem falha e tempos registrados. | ✅ C integrada com sucesso; entregas e tempos a registrar. Separador: gira menos que o esperado (em diagnóstico) |
+| **03/11 (ter.)** | Montagem da esteira C na base e teste individual. | C com ≥ 5 entregas sem falha e tempos registrados. | ✅ C integrada: 10 entregas, 4103–5069 ms. Display OLED testado com sucesso. Separador: gira menos que o esperado (em diagnóstico) |
 | **04/11 (qua.)** | Tempos por esteira e integração A+B+C na base. | Tabela de tempos por esteira; sequência alternada estável. | ⬜ |
 | **05/11 (qui.)** | Peças 3D e separador em modo automático. | Roda encaixada e alinhada; peça passando pelos sensores; roda no compartimento certo. | ⬜ |
 | **06/11 (sex.)** | Display OLED (B3), integração total final e fechamento. | Evidência final registrada em `resultados.md`. | ⬜ |
@@ -40,7 +40,7 @@ Mesmo procedimento usado para A e B na Semana 11 (Bloco 2 do [roteiro anterior](
 
 | Esteira | Resultado | Tempo de entrega | Ciclos | Falhas | Observações |
 |---|---|---:|---:|---|---|
-| C | ✅ Integrada (03/11) | a registrar | a registrar |  | Montada na base e integrada com sucesso; número de entregas e tempos serão informados pela equipe |
+| C | ✅ Aprovado (03/11) | 4103–5069 ms | 10 | nenhuma relatada | Montada na base e integrada com sucesso. Amostras: 4652, 4230, 4103, 4365 e 5069 ms; dentro da calibração de 21/10 (~4530 ms) |
 
 **Critério de saída:** [ ] C fixada na base sem tensão mecânica · [ ] ≥ 5 entregas sem falha · [ ] tempo registrado e comparado com a calibração de 21/10 (C: ~4530 ms).
 
@@ -54,7 +54,7 @@ Na Semana 11, as entregas de A e B em 29–30/10 ficaram entre 5000 e 6000 ms (i
 |---|---:|---:|---:|---:|---|
 | A | ~4950 ms | 4650–5000 ms (28/10); 5000–6000 ms (29–30/10, com B) |  |  |  |
 | B | — | 5000–6000 ms (com A, em conjunto) |  |  |  |
-| C | ~4530 ms | — |  |  |  |
+| C | ~4530 ms | — | 4103–5069 ms (03/11) | 10 |  |
 
 **Critério de saída:** [ ] tempo de cada esteira registrado · [ ] diferença em relação à calibração explicada (atrito da montagem, peça, alimentação) ou aceita como nova referência.
 
@@ -95,7 +95,21 @@ Itens do Bloco 4 da Semana 11 e do card [#65](https://github.com/MatheusNespolo/
 | Gira menos que 120° mesmo **sem** a roda, mas **sempre volta exatamente à marca** | Passos por volta errados (outra redução) | Corrigir `SEPARADOR_PASSOS_POR_VOLTA` na proporção: 2038 × 120 ÷ ângulo medido |
 | Gira 120° e volta à marca, com e sem a roda | Firmware e motor corretos | Ajustar `SEPARADOR_GRAUS_A/B/C` à posição real dos compartimentos da roda impressa |
 
-Registrar: ângulo medido em cada situação, se a marca se desloca, e a fonte de 5 V usada.
+Registrar: ângulo medido em cada situação, se a marca se desloca, e a fonte usada.
+
+> **Atualização (04/11):** o motor de passo tem **fonte de 12 V dedicada**. Com mudanças na elétrica e no firmware, inclusive `SEPARADOR_RPM` 10 → 5 (`c54776c`), a roda continua girando cerca de **metade** do esperado. Um fator fixo de 2 que não muda com a velocidade **não é perda de passos** (ela piora com a velocidade e não é constante): é uma relação fixa entre os passos e o ângulo da roda. O próximo teste separa onde ela está.
+
+#### Teste do eixo × roda (decisivo para o fator 2)
+
+1. Prenda uma fita em bandeira no **eixo do motor** e faça uma marca na **roda**; as duas alinhadas com uma marca na base, com a roda no neutro e o Uno ligado assim.
+2. Pelo Serial Monitor: `CMD:SEP:A`, depois `CMD:SEP:B`, depois `CMD:SEP:0`. Cada um avança 120° no mesmo sentido: juntos, **uma volta completa**.
+3. Observe a fita do **eixo** e a marca da **roda** separadamente.
+
+| Eixo do motor | Roda | Causa | Ajuste |
+|---|---|---|---|
+| Dá **meia volta** | Acompanha o eixo | O motor precisa do **dobro de passos por volta** (4076 em vez de 2038): outra versão do 28BYJ-48 ou acionamento equivalente a meio passo | Em `config.h`: `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096 (os dois juntos; a biblioteca precisa ser ≥ e múltipla de 4) |
+| Dá **uma volta completa** | Dá meia volta | Transmissão entre o eixo e a roda: engrenagens/polias 2:1 na peça impressa, ou o eixo **patinando** no furo da roda | Se houver redução, multiplicar `SEPARADOR_PASSOS_POR_VOLTA` pela relação; se patina, corrigir o encaixe (furo em D do eixo) |
+| Treme, zumbe ou anda e volta | — | Sequência das fases fora de ordem (fiação IN1–IN4 ≠ pinos 5–8 em ordem direta) | Fiação direta IN1→5, IN2→6, IN3→7, IN4→8 (o firmware já troca a ordem internamente) |
 
 **Critério de saída:** [ ] peça e roda operam sem interferência · [ ] ajustes de impressão, tolerância ou ângulo registrados.
 
