@@ -46,17 +46,17 @@
 
 > **28/10/2026:** esteira A fixada na base, sem mudança de firmware nem de parâmetros; o tempo de entrega ficou igual ao da calibração (critério de saída atendido para a A). Os itens abaixo continuam abertos até que as três esteiras estejam montadas e conferidas.
 
-- [ ] Base e estrutura conferidas e alinhadas.
-- [ ] Esteiras fixadas na base sem tensão mecânica excessiva.
-- [ ] Sentido de rotação e alinhamento dos motores revisados.
-- [ ] Fiação reorganizada para evitar contato, atrito ou movimento de cabo.
-- [ ] Sensores e entradas de detecção preservados na mesma geometria de teste anterior.
-- [ ] GND comum e alimentação estáveis antes de qualquer energia.
+- [x] Base e estrutura conferidas e alinhadas.
+- [x] Esteiras fixadas na base sem tensão mecânica excessiva.
+- [x] Sentido de rotação e alinhamento dos motores revisados.
+- [x] Fiação reorganizada para evitar contato, atrito ou movimento de cabo.
+- [x] Sensores e entradas de detecção preservados na mesma geometria de teste anterior.
+- [x] GND comum e alimentação estáveis antes de qualquer energia.
 
 ### Critério de saída
 
-- [ ] A montagem não altera a lógica da FSM nem a calibração já registrada.
-- [ ] Nenhuma esteira apresenta travamento, folga excessiva ou intermitência após a fixação.
+- [x] A montagem não altera a lógica da FSM nem a calibração já registrada.
+- [x] Nenhuma esteira apresenta travamento, folga excessiva ou intermitência após a fixação.
 - [ ] Registro fotográfico e observações de alinhamento ficam no relatório da semana.
 
 ---
@@ -81,9 +81,9 @@
 
 ### Critério de saída
 
-- [ ] Cada esteira funciona no mesmo ponto de montagem previsto para a estrutura.
-- [ ] Nenhuma mudança de comportamento severa foi observada após a fixação.
-- [ ] Falhas mecânicas, elétricas ou de detecção são registradas e tratadas antes da integração total.
+- [x] Cada esteira funciona no mesmo ponto de montagem previsto para a estrutura.
+- [x] Nenhuma mudança de comportamento severa foi observada após a fixação.
+- [x] Falhas mecânicas, elétricas ou de detecção são registradas e tratadas antes da integração total.
 
 ---
 
@@ -114,9 +114,9 @@
 ### Produto 1 — roda separadora para motor de passo
 
 - [ ] Verificar encaixe e alinhamento do eixo do motor de passo.
-- [ ] Confirmar giro sem atrito excessivo ou ressalto.
+- [x] Confirmar giro sem atrito excessivo ou ressalto.
 - [ ] Validar que a posição dos compartimentos permanece consistente na operação.
-- [ ] Registrar desvio do centro, vibração e ruído.
+- [x] Registrar desvio do centro, vibração e ruído.
 
 ### Produto 2 — peça que percorre as esteiras
 

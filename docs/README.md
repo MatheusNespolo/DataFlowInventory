@@ -19,6 +19,7 @@ Cada informação tem **um** lugar. Os outros documentos apontam para ele com um
 
 | Documento | Para quê |
 |---|---|
+| [`GLOSSARIO.md`](GLOSSARIO.md) | Termos do projeto em linguagem simples |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Referência técnica: arquitetura, tópicos MQTT, mensagens, FSM, hardware |
 | [`DEPLOYMENT.md`](DEPLOYMENT.md) | Subir o sistema do zero |
 | [`INTEGRATION_GUIDE.md`](INTEGRATION_GUIDE.md) | Integração com o Beckhoff CX9240 e o separador |
