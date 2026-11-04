@@ -226,6 +226,7 @@ DataFlowInventory/
 │
 ├── docs/
 │   ├── README.md                          # Mapa: onde registrar o quê (e o que não copiar)
+│   ├── GLOSSARIO.md                       # Termos do projeto (FSM, LWT, retained, QoS, PWM…)
 │   ├── ARCHITECTURE.md                    # Referência técnica única (arquitetura, tópicos, mensagens, observabilidade)
 │   ├── DEPLOYMENT.md                      # Implantação do zero
 │   ├── CI-CD.md, CHANGELOG.md             # Pipelines e histórico de mudanças
@@ -267,6 +268,8 @@ O Arduino opera com **5 estados**:
 | 5 | **ERRO** | Motores desligados; display e dashboard mostram onde falhou (ver `docs/ARCHITECTURE.md` §3); aguarda reset |
 
 > 📊 Diagramas completos (máquina de estados, fluxo operacional e sequência de comunicação) em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#3-máquina-de-estados-arduino).
+>
+> 📖 Não conhece algum termo (FSM, LWT, retained, QoS, PWM…)? Veja o [glossário](docs/GLOSSARIO.md).
 >
 > 🧪 Testes de integração da cadeia de comunicação (Serial → Broker → Dashboard) em [`docs/testes/plano_de_testes.md`](docs/testes/plano_de_testes.md); resultados em [`docs/testes/resultados.md`](docs/testes/resultados.md).
 

@@ -25,6 +25,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ### Adicionado
 
+- **Glossário de termos do projeto (04/11/2026):** [`GLOSSARIO.md`](GLOSSARIO.md) explica FSM, LWT, retained, QoS, broker, gateway, IRF520, PWM e TCRT5000, ligado a partir do README; fecha a issue #37
 - **CI: verificação de links e âncoras da documentação (29/10/2026):** job `docs-links` (`scripts/verificar-links.py`); fecha a issue #39
 
 ### Alterado
