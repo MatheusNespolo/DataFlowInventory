@@ -8,9 +8,9 @@
 
 ## Estado atual
 
-**Situação de validação atualizada (bancada, 03/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas). O **display OLED chegou** em 03/11 e será testado na Semana 12.
+**Situação de validação atualizada (bancada, 03/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas). O **display OLED chegou** em 03/11 e será testado na Semana 12. Na Semana 12, em 03/11, a **esteira C foi integrada com sucesso** à base (número de entregas e tempos a registrar), e o **separador** se moveu, mas aparentou girar menos que o esperado (em diagnóstico).
 
-**Pendências/retestes (Semana 12, [roteiro](roteiros/semana_12_03-06_novembro.md)):** (1) montagem e teste da esteira C na base, (2) integração total A+B+C na base, (3) integração com as peças impressas em 3D (roda separadora e peça transportada) e separador em modo automático no hardware, (4) reteste B3 com o display OLED (já recebido), (5) tempos por esteira na base, para comparar com a calibração de 21/10 (o intervalo de 5000–6000 ms das entregas de A e B em 29–30/10 está acima dos 4650–5000 ms da A em 28/10).
+**Pendências/retestes (Semana 12, [roteiro](roteiros/semana_12_03-06_novembro.md)):** (1) entregas e tempos da esteira C na base (integrada em 03/11), (2) integração total A+B+C na base, (3) integração com as peças impressas em 3D (roda separadora e peça transportada) e separador em modo automático no hardware — diagnóstico do giro curto no Bloco 4 do roteiro, (4) reteste B3 com o display OLED (já recebido), (5) tempos por esteira na base, para comparar com a calibração de 21/10 (o intervalo de 5000–6000 ms das entregas de A e B em 29–30/10 está acima dos 4650–5000 ms da A em 28/10).
 
 ---
 
@@ -144,3 +144,8 @@ Em ordem cronológica (o mais recente no fim).
 - **Sem mudança** de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas).
 - **Display OLED:** recebido em 03/11; teste na Semana 12 (reteste B3).
 - **Não executado na Semana 11** (transferido para a [Semana 12](roteiros/semana_12_03-06_novembro.md)): esteira C na base, integração total A+B+C, peças 3D, separador automático no hardware e reteste do display OLED.
+
+### 03/11 (Semana 12 — esteira C na base)
+
+- **Esteira C na base:** integrada com sucesso. Número de entregas e tempos serão informados pela equipe.
+- **Separador:** a roda se move, mas aparenta girar **menos que o esperado**. Diagnóstico (passos perdidos sob carga, passos por volta ou posição dos compartimentos) no Bloco 4 do [roteiro da Semana 12](roteiros/semana_12_03-06_novembro.md).
