@@ -156,6 +156,9 @@ TESTE(separador_graus_para_passos_arredonda_e_normaliza) {
   VERIFICA(separadorGrausParaPassos(360, 2038) == 0);      // volta cheia = mesma posição
   VERIFICA(separadorGrausParaPassos(-120, 2038) == 1359);  // = 240°
   VERIFICA(separadorGrausParaPassos(480, 2038) == 679);    // = 120°
+  // O valor medido na bancada (config.h) e a tabela do INTEGRATION_GUIDE.
+  VERIFICA(separadorGrausParaPassos(120, 4076) == 1359);   // 1358,67
+  VERIFICA(separadorGrausParaPassos(240, 4076) == 2717);   // 2717,33
   VERIFICA(separadorGrausParaPassos(120, 2048) == 683);    // 682,67
   VERIFICA(separadorGrausParaPassos(90, 0) == 0);          // passos inválidos
 }

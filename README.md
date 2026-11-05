@@ -115,7 +115,7 @@ O sistema é composto por:
 | ⚙️ **Servidor Node.js** | Ponte entre MQTT e WebSocket |
 | ☁️ **Broker MQTT** | Mosquitto local (validado em bancada) / HiveMQ Cloud (TLS/8883, E2E remoto validado em 19/09/2026) |
 
-> A roda giratória está integrada ao firmware v3.0 (pinos 5 a 8, sem bloquear o `loop()`): ela se prepara sozinha no compartimento da peça pedida assim que a checagem prévia aprova o pedido e fica nele até o pedido seguinte. Também aceita o comando de bancada `CMD:SEP:A|B|C|0` pela USB. A roda impressa em 3D e o modo automático com o hardware serão validados na Semana 11 (ver o Bloco 4 do [roteiro da Semana 11](docs/testes/roteiros/semana_11_26-30_outubro.md)).
+> A roda giratória está integrada ao firmware v3.0 (pinos 5 a 8, sem bloquear o `loop()`): ela se prepara sozinha no compartimento da peça pedida assim que a checagem prévia aprova o pedido e fica nele até o pedido seguinte. Também aceita o comando de bancada `CMD:SEP:A|B|C|0` pela USB. O estado da validação fica nos [resultados de bancada](docs/testes/resultados.md).
 
 ## Destaques Técnicos
 
@@ -307,7 +307,8 @@ O Arduino opera com **5 estados**:
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
 | Display OLED 0,96" I2C | 1 | 128x64, controlador SSD1306 (endereço detectado automaticamente: 0x3C ou 0x3D). Substituiu o LCD 16x2 em 27/10/2026 |
 | Motor de passo 28BYJ-48 + driver ULN2003 | 1 | Roda separadora (alimentação 5 V própria, GND comum) |
-| Peças impressas em 3D | — | Roda separadora (3 compartimentos) e peça transportada |
+| Roda separadora impressa em 3D | 1 | 3 compartimentos, no eixo do motor de passo |
+| Produtos transportados | 3 tipos (A, B, C) | Feitos à mão |
 | Botões | 4 | 3 solicitação + 1 reset (opcionais) |
 | Fonte 12V DC | 1 | Alimentação geral |
 

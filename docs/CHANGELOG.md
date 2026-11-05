@@ -12,12 +12,16 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ---
 
-## [Não publicado] — Semana 12: esteira C, integração total, peças 3D e display (03–06/11/2026, em andamento)
+## [Não publicado] — Semana 12: esteira C, integração total, separador e display (03–06/11/2026, em andamento)
 
 ### Alterado
 
 - **Semana 11 encerrada e roteiro da Semana 12 (03/11/2026):** esteira B montada na base e testada; 10 entregas de cada esteira (A e B), 5000–6000 ms. Display OLED recebido em 03/11. Esteira C, integração total, peças 3D, separador automático e teste do display transferidos para o [roteiro da Semana 12](testes/roteiros/semana_12_03-06_novembro.md). Ver [`testes/resultados.md`](testes/resultados.md)
-- **Esteira C na base (03/11/2026):** integrada com sucesso (entregas e tempos a registrar); separador gira menos que o esperado, com roteiro de diagnóstico no Bloco 4 da Semana 12. Ver [`testes/resultados.md`](testes/resultados.md)
+- **Esteira C na base e display OLED (03/11/2026):** C integrada com 10 entregas, 4103–5069 ms; as três esteiras estão montadas na base. Display OLED testado com sucesso (B3). Ver [`testes/resultados.md`](testes/resultados.md)
+- **Separador: giro corrigido (04/11/2026, `99786b7`):** a roda girava cerca de metade do esperado; com `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096, a volta fecha na marca e a roda chega a tempo de receber as peças. Comentários, ARCHITECTURE e INTEGRATION_GUIDE atualizados
+- **Tempos por esteira na base (04/11/2026):** A 5513 ms, B 4437 ms, C 4086 ms. Ver [`testes/resultados.md`](testes/resultados.md)
+- **Integração A+B+C na base (até 05/11/2026):** entregas consistentes, sem perda de conexão nem reinício do Uno ou do ESP32
+- **Produtos feitos à mão (05/11/2026):** decisão da equipe: o transporte não usará peças impressas em 3D; a roda separadora impressa continua. README, roteiro e card #65 atualizados
 
 ---
 

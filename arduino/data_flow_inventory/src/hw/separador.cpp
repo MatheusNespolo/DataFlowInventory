@@ -6,8 +6,8 @@
 #include "../../config.h"
 #include "../logica/plano_separador.h"
 
-// O ritmo vem dos passos reais da roda (2038), que são MENOS que os 2048 da
-// biblioteca: o intervalo entre passos do plano é, portanto, sempre >= ao da
+// O ritmo vem dos passos reais da roda, que são MENOS que os da biblioteca
+// (SEPARADOR_PASSOS_POR_VOLTA e SEPARADOR_PASSOS_BIBLIOTECA): o intervalo entre passos do plano é, portanto, sempre >= ao da
 // biblioteca, e step(±1) nunca espera.
 static_assert(SEPARADOR_PASSOS_POR_VOLTA <= SEPARADOR_PASSOS_BIBLIOTECA,
               "o plano nao pode ser mais rapido que a biblioteca Stepper");

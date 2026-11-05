@@ -139,10 +139,10 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 
 ### 2.2 Posições
 
-| Peça | Ângulo (padrão do firmware) | Passos (2038 por volta) |
+| Peça | Ângulo (padrão do firmware) | Passos (4076 por volta) |
 |------|--------|--------|
-| **A** | 120° | 679 |
-| **B** | 240° | 1359 |
+| **A** | 120° | 1359 |
+| **B** | 240° | 2717 |
 | **C** e neutro | 0° | 0 |
 
 > Valores padrão de `SEPARADOR_GRAUS_*` em `config.h`, herdados do código da v2.x (a tabela antiga deste guia, A=0°, B=120°, C=240°, **não** era a usada pelo código). A roda real define os ângulos: ajuste as constantes. A roda deve estar no neutro quando o Uno liga (não há sensor de referência).
