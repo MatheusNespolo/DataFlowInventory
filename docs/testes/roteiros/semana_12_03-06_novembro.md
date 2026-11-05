@@ -2,14 +2,20 @@
 
 > **Estado da bancada (03/11/2026):** as esteiras **A e B estão montadas na base** e aprovadas (A: 10 entregas em 28/10, 4650–5000 ms; em 29–30/10, 10 entregas de cada esteira, A e B, entre 5000 e 6000 ms). O **display OLED chegou** em 03/11 e as **peças impressas em 3D** serão usadas pela primeira vez nesta semana. Esta semana recebe tudo o que não foi executado na [Semana 11](semana_11_26-30_outubro.md): esteira C na base, integração total, peças 3D, separador automático no hardware e o reteste do display. Segunda-feira (02/11) foi feriado (Finados). Estado completo e histórico em [`resultados.md`](../resultados.md).
 
-| Item | Status (03/11/2026) | Origem |
+> **Atualização de estado (05/11/2026):** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 (`99786b7`), **a volta do separador fecha na marca** e a roda se prepara **a tempo de receber as peças**. Os tempos de cada esteira foram medidos em 04/11 (Bloco 2). Hoje: acabamento da elétrica e fixação da roda separadora no motor de passo. Para finalizar, falta o acabamento da base e dos cabos.
+
+| Item | Status (05/11/2026) | Origem |
 |---|---|---|
 | Esteira A na base | ✅ Aprovado | Semana 11, 28/10 |
 | Esteira B na base | ✅ Aprovado | Semana 11, 29–30/10 |
 | Esteira C na base | ✅ Aprovado (03/11) | 10 entregas, 4103–5069 ms |
 | Integração A+B+C na base | ⬜ Pendente | transferido da Semana 11 |
-| Integração com as peças impressas em 3D (roda separadora e peça) | ⬜ Pendente | transferido da Semana 11; ainda não usadas |
-| Separador em modo automático no hardware | ⚠️ Em diagnóstico | a roda gira cerca de **metade** do esperado, também com `SEPARADOR_RPM` 5 (`c54776c`) e após mudanças na elétrica; ver Bloco 4 |
+| Fixação da roda separadora no motor de passo | 🔄 Em andamento (05/11) | transferido da Semana 11 |
+| Peça impressa em 3D percorrendo as esteiras | ⬜ Pendente | transferido da Semana 11 |
+| Separador em modo automático no hardware | ✅ Aprovado (04/11) | giro corrigido com 4076 passos por volta (`99786b7`): a volta fecha e a roda chega a tempo; ver Bloco 4 |
+| Tempos por esteira na base | ✅ Medido (04/11) | A 5513 ms, B 4437 ms, C 4086 ms; ver Bloco 2 |
+| Acabamento da elétrica | 🔄 Em andamento (05/11) | — |
+| Acabamento da base e dos cabos | ⬜ Pendente | etapa final |
 | Display OLED (reteste B3) | ✅ Aprovado (03/11) | testado com sucesso na bancada |
 
 ## Objetivos
@@ -26,8 +32,8 @@
 |---|---|---|---|
 | **02/11 (seg.)** | Feriado (Finados). | — | — |
 | **03/11 (ter.)** | Montagem da esteira C na base e teste individual. | C com ≥ 5 entregas sem falha e tempos registrados. | ✅ C integrada: 10 entregas, 4103–5069 ms. Display OLED testado com sucesso. Separador: gira menos que o esperado (em diagnóstico) |
-| **04/11 (qua.)** | Tempos por esteira e integração A+B+C na base. | Tabela de tempos por esteira; sequência alternada estável. | ⬜ |
-| **05/11 (qui.)** | Peças 3D e separador em modo automático. | Roda encaixada e alinhada; peça passando pelos sensores; roda no compartimento certo. | ⬜ |
+| **04/11 (qua.)** | Tempos por esteira e integração A+B+C na base. | Tabela de tempos por esteira; sequência alternada estável. | ✅ Tempos medidos (A 5513, B 4437, C 4086 ms); separador corrigido. Integração A+B+C: resultado a registrar |
+| **05/11 (qui.)** | Peças 3D e separador em modo automático. | Roda encaixada e alinhada; peça passando pelos sensores; roda no compartimento certo. | 🔄 Acabamento da elétrica e fixação da roda no motor de passo |
 | **06/11 (sex.)** | Display OLED (B3), integração total final e fechamento. | Evidência final registrada em `resultados.md`. | ⬜ |
 
 > ⚠️ A ordem pode mudar conforme a disponibilidade da bancada e das peças. O que não for executado fica como **pendente**, sem presumir aprovação.
@@ -52,11 +58,11 @@ Na Semana 11, as entregas de A e B em 29–30/10 ficaram entre 5000 e 6000 ms (i
 
 | Esteira | Calibração (21/10) | Na base (Semana 11) | Na base (Semana 12) | Ciclos | Observações |
 |---|---:|---:|---:|---:|---|
-| A | ~4950 ms | 4650–5000 ms (28/10); 5000–6000 ms (29–30/10, com B) |  |  |  |
-| B | — | 5000–6000 ms (com A, em conjunto) |  |  |  |
-| C | ~4530 ms | — | 4103–5069 ms (03/11) | 10 |  |
+| A | ~4950 ms | 4650–5000 ms (28/10); 5000–6000 ms (29–30/10, com B) | 5513 ms (04/11) | não informados | A mais lenta das três; cerca de 560 ms acima da calibração |
+| B | — | 5000–6000 ms (com A, em conjunto) | 4437 ms (04/11) | não informados | Primeiro tempo da B isolada |
+| C | ~4530 ms | — | 4103–5069 ms (03/11); 4086 ms (04/11) | 10 (03/11) | Dentro do esperado |
 
-**Critério de saída:** [ ] tempo de cada esteira registrado · [ ] diferença em relação à calibração explicada (atrito da montagem, peça, alimentação) ou aceita como nova referência.
+**Critério de saída:** [x] tempo de cada esteira registrado · [ ] diferença em relação à calibração explicada (atrito da montagem, peça, alimentação) ou aceita como nova referência.
 
 ---
 
@@ -77,7 +83,7 @@ Itens do Bloco 4 da Semana 11 e do card [#65](https://github.com/MatheusNespolo/
 
 - [ ] Roda encaixada no eixo do 28BYJ-48, sem folga nem deslizamento.
 - [ ] `CMD:SEP:A|B|C|0` leva cada compartimento à posição de recebimento.
-- [ ] Modo automático: em pedidos reais, a roda chega ao compartimento antes da peça.
+- [x] Modo automático: em pedidos reais, a roda chega ao compartimento antes da peça (04/11).
 - [ ] A peça impressa percorre topo → junção → esteira principal sem enroscar e aciona os sensores.
 - [ ] Medir o tempo da peça entre a junção e o fim da esteira principal (define `SEPARADOR_ESPERA_APOS_ENTREGA_MS`).
 
@@ -110,6 +116,8 @@ Registrar: ângulo medido em cada situação, se a marca se desloca, e a fonte u
 | Dá **meia volta** | Acompanha o eixo | O motor precisa do **dobro de passos por volta** (4076 em vez de 2038): outra versão do 28BYJ-48 ou acionamento equivalente a meio passo | Em `config.h`: `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096 (os dois juntos; a biblioteca precisa ser ≥ e múltipla de 4) |
 | Dá **uma volta completa** | Dá meia volta | Transmissão entre o eixo e a roda: engrenagens/polias 2:1 na peça impressa, ou o eixo **patinando** no furo da roda | Se houver redução, multiplicar `SEPARADOR_PASSOS_POR_VOLTA` pela relação; se patina, corrigir o encaixe (furo em D do eixo) |
 | Treme, zumbe ou anda e volta | — | Sequência das fases fora de ordem (fiação IN1–IN4 ≠ pinos 5–8 em ordem direta) | Fiação direta IN1→5, IN2→6, IN3→7, IN4→8 (o firmware já troca a ordem internamente) |
+
+> ✅ **Resolvido (04/11):** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096 (`99786b7`), a volta completa fecha na marca e a roda se prepara a tempo de receber as peças. O valor é o medido em bancada; a origem física do fator 2 (versão do motor ou transmissão) não foi identificada.
 
 **Critério de saída:** [ ] peça e roda operam sem interferência · [ ] ajustes de impressão, tolerância ou ângulo registrados.
 

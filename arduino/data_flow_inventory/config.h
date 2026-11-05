@@ -48,11 +48,14 @@
 #define STEPPER_IN2        6
 #define STEPPER_IN3        7
 #define STEPPER_IN4        8
-// Passos por volta DA RODA (passo completo). O 28BYJ-48 tem engrenagem 63,68:1, ou
-// seja ~2038 passos por volta, e não 2048: com 2048 o erro acumularia ~1,8° a cada
-// volta e os compartimentos desalinhariam em poucos ciclos. Calibre em bancada.
+// Passos por volta DA RODA, medidos em bancada (04/11/2026): com os ~2038 do 28BYJ-48
+// padrão (engrenagem 63,68:1) a roda dava só meia volta; com 4076 a volta fecha na marca.
+// Não arredonde para 4096: o erro acumularia ~1,8° a cada volta e os compartimentos
+// desalinhariam em poucos ciclos. Ao trocar o motor ou a roda, confira a volta completa
+// com CMD:SEP:A, CMD:SEP:B e CMD:SEP:0 (a marca tem de voltar ao lugar).
 #define SEPARADOR_PASSOS_POR_VOLTA   4076
-// A biblioteca Stepper só precisa de um múltiplo de 4 (fases das bobinas) e do ritmo.
+// A biblioteca Stepper só precisa do ritmo: um múltiplo de 4 (fases das bobinas) que
+// não seja menor que os passos por volta acima.
 #define SEPARADOR_PASSOS_BIBLIOTECA  4096
 #define SEPARADOR_RPM      10     // se a roda perder passos ou travar, diminua (ex.: 8)
 // 1 = inverte o sentido do giro: use se a roda girar ao contrário do esperado (A e B trocam de lugar).
