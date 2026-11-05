@@ -8,9 +8,9 @@
 
 ## Estado atual
 
-**Situação de validação atualizada (bancada, 05/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas). O **display OLED chegou** em 03/11 e será testado na Semana 12. Na Semana 12, em 03/11, a **esteira C foi integrada** à base e fez **10 entregas entre 4103 e 5069 ms**, e o **display OLED foi testado com sucesso** (reteste B3). Com isso, **as três esteiras estão montadas na base e aprovadas**. O giro do **separador**, que era cerca de metade do esperado, foi corrigido em 04/11 com 4076 passos por volta (`99786b7`): **a volta fecha e a roda se prepara a tempo de receber as peças**. Tempos medidos em 04/11: **A 5513 ms, B 4437 ms, C 4086 ms**. Em 05/11: acabamento da elétrica e fixação da roda no motor de passo.
+**Situação de validação atualizada (bancada, 05/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas). O **display OLED chegou** em 03/11 e será testado na Semana 12. Na Semana 12, em 03/11, a **esteira C foi integrada** à base e fez **10 entregas entre 4103 e 5069 ms**, e o **display OLED foi testado com sucesso** (reteste B3). Com isso, **as três esteiras estão montadas na base e aprovadas**. O giro do **separador**, que era cerca de metade do esperado, foi corrigido em 04/11 com 4076 passos por volta (`99786b7`): **a volta fecha e a roda se prepara a tempo de receber as peças**. Tempos medidos em 04/11: **A 5513 ms, B 4437 ms, C 4086 ms**. A **integração A+B+C** foi feita: entregas consistentes, sem perda de conexão e sem reinício do Uno ou do ESP32. Em 05/11: acabamento da elétrica e fixação da roda no motor de passo. **Decisão da equipe:** o transporte não usará peças impressas em 3D; os produtos serão feitos à mão.
 
-**Pendências/retestes (Semana 12, [roteiro](roteiros/semana_12_03-06_novembro.md)):** (1) integração total A+B+C na base, (2) fixação da roda separadora no motor de passo (em andamento) e peça impressa em 3D percorrendo as esteiras, (3) acabamento da elétrica (em andamento), da base e dos cabos.
+**Pendências/retestes (Semana 12, [roteiro](roteiros/semana_12_03-06_novembro.md)):** (1) fixação da roda separadora no motor de passo (em andamento), (2) produtos feitos à mão percorrendo as esteiras e caindo na roda, (3) acabamento da elétrica (em andamento), da base e dos cabos.
 
 ---
 
@@ -36,8 +36,9 @@
 | BK | Beckhoff — Historiador SQLite (CX9240) | 15/09/2026 | ✅ Aprovado | Persistência no SQLite local (`/var/lib/dfi/historian.db`) via TF6701 + TF6420 validada com simulador MQTT |
 | M1 | Montagem mecânica das esteiras | 15/09/2026 | ✅ Aprovado | Alinhamento e fixação das esteiras na estrutura mecânica concluídos |
 | S1 | Separador — volta completa e modo automático | 04/11/2026 | ✅ Aprovado | Com 4076 passos por volta (`99786b7`), a volta fecha na marca e a roda chega a tempo de receber as peças. Roda ainda sendo fixada ao motor (05/11) |
+| I1 | Integração total A+B+C na base | até 05/11/2026 | ✅ Aprovado | Entregas consistentes; sem perda de conexão nem reinício do Uno ou do ESP32. Quantidade de entregas não informada |
 | T1 | Tempo de entrega por esteira, na base | 04/11/2026 | ✅ Medido | A 5513 ms, B 4437 ms, C 4086 ms |
-| M2 | Montagem final na base — esteiras A, B e C | 28/10–03/11/2026 | ✅ Aprovado | A: 10 entregas, 4650–5000 ms (28/10). B: 10 entregas de cada esteira (A e B), 5000–6000 ms (29–30/10). C: 10 entregas, 4103–5069 ms (03/11). Sem mudança de código; peça improvisada. Integração total A+B+C pendente |
+| M2 | Montagem final na base — esteiras A, B e C | 28/10–03/11/2026 | ✅ Aprovado | A: 10 entregas, 4650–5000 ms (28/10). B: 10 entregas de cada esteira (A e B), 5000–6000 ms (29–30/10). C: 10 entregas, 4103–5069 ms (03/11). Sem mudança de código; peça improvisada |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
 ---
@@ -155,9 +156,11 @@ Em ordem cronológica (o mais recente no fim).
 
 ### 04/11 (Semana 12 — separador e tempos por esteira)
 
-- **Separador:** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096 (`99786b7`), **a volta completa fecha na marca** e a roda se prepara **a tempo de receber as peças**. O valor é o medido em bancada; a origem física do fator 2 não foi identificada.
+- **Separador:** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096 (`99786b7`) e `SEPARADOR_RPM` 10, **a volta completa fecha na marca** e a roda se prepara **a tempo de receber as peças**. O valor é o medido em bancada; a origem física do fator 2 não foi identificada.
 - **Tempos de entrega por esteira:** A **5513 ms**, B **4437 ms**, C **4086 ms**. A é a mais lenta, cerca de 560 ms acima da calibração de 21/10 (~4950 ms); todas bem abaixo do prazo de 12,5 s.
 
 ### 05/11 (Semana 12 — acabamento)
 
+- **Integração A+B+C:** feita; entregas consistentes, sem perda de conexão e sem reinício do Uno ou do ESP32.
+- **Decisão da equipe:** o transporte não usará peças impressas em 3D; os produtos serão feitos à mão.
 - **Em andamento:** acabamento da elétrica e fixação da roda separadora no motor de passo. Para finalizar, falta o acabamento da base e dos cabos.

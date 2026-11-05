@@ -2,16 +2,16 @@
 
 > **Estado da bancada (03/11/2026):** as esteiras **A e B estão montadas na base** e aprovadas (A: 10 entregas em 28/10, 4650–5000 ms; em 29–30/10, 10 entregas de cada esteira, A e B, entre 5000 e 6000 ms). O **display OLED chegou** em 03/11 e as **peças impressas em 3D** serão usadas pela primeira vez nesta semana. Esta semana recebe tudo o que não foi executado na [Semana 11](semana_11_26-30_outubro.md): esteira C na base, integração total, peças 3D, separador automático no hardware e o reteste do display. Segunda-feira (02/11) foi feriado (Finados). Estado completo e histórico em [`resultados.md`](../resultados.md).
 
-> **Atualização de estado (05/11/2026):** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 (`99786b7`), **a volta do separador fecha na marca** e a roda se prepara **a tempo de receber as peças**. Os tempos de cada esteira foram medidos em 04/11 (Bloco 2). Hoje: acabamento da elétrica e fixação da roda separadora no motor de passo. Para finalizar, falta o acabamento da base e dos cabos.
+> **Atualização de estado (05/11/2026):** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 (`99786b7`), **a volta do separador fecha na marca** e a roda se prepara **a tempo de receber as peças**. Os tempos de cada esteira foram medidos em 04/11 (Bloco 2). Hoje: acabamento da elétrica e fixação da roda separadora no motor de passo. Para finalizar, falta o acabamento da base e dos cabos. A **integração A+B+C foi feita**: entregas consistentes, sem perda de conexão e sem reinício do Uno ou do ESP32. **Decisão da equipe:** o transporte não usará peças impressas em 3D; os **produtos serão feitos à mão**.
 
 | Item | Status (05/11/2026) | Origem |
 |---|---|---|
 | Esteira A na base | ✅ Aprovado | Semana 11, 28/10 |
 | Esteira B na base | ✅ Aprovado | Semana 11, 29–30/10 |
 | Esteira C na base | ✅ Aprovado (03/11) | 10 entregas, 4103–5069 ms |
-| Integração A+B+C na base | ⬜ Pendente | transferido da Semana 11 |
+| Integração A+B+C na base | ✅ Aprovado | entregas consistentes; sem perda de conexão nem reinício do Uno ou do ESP32 |
 | Fixação da roda separadora no motor de passo | 🔄 Em andamento (05/11) | transferido da Semana 11 |
-| Peça impressa em 3D percorrendo as esteiras | ⬜ Pendente | transferido da Semana 11 |
+| Produtos feitos à mão percorrendo as esteiras e caindo na roda | ⬜ Pendente | substitui a peça impressa em 3D (decisão da equipe) |
 | Separador em modo automático no hardware | ✅ Aprovado (04/11) | giro corrigido com 4076 passos por volta (`99786b7`): a volta fecha e a roda chega a tempo; ver Bloco 4 |
 | Tempos por esteira na base | ✅ Medido (04/11) | A 5513 ms, B 4437 ms, C 4086 ms; ver Bloco 2 |
 | Acabamento da elétrica | 🔄 Em andamento (05/11) | — |
@@ -23,7 +23,7 @@
 1. Montar a esteira C na base e aprová-la como A e B, sem mudar o comportamento calibrado.
 2. Medir o tempo de entrega de cada esteira na base, separadamente, para comparar com a calibração de 21/10.
 3. Fazer a integração total A+B+C na base, com pedidos alternados e em sequência, sem reinício do Uno.
-4. Validar as peças impressas em 3D e o separador em modo automático no hardware.
+4. Validar a roda separadora impressa, o separador em modo automático no hardware e os produtos feitos à mão (a peça impressa em 3D foi descartada).
 5. Retestar o display com o OLED (item B3 do [plano de testes](../plano_de_testes.md)).
 
 ## Cronograma
@@ -32,8 +32,8 @@
 |---|---|---|---|
 | **02/11 (seg.)** | Feriado (Finados). | — | — |
 | **03/11 (ter.)** | Montagem da esteira C na base e teste individual. | C com ≥ 5 entregas sem falha e tempos registrados. | ✅ C integrada: 10 entregas, 4103–5069 ms. Display OLED testado com sucesso. Separador: gira menos que o esperado (em diagnóstico) |
-| **04/11 (qua.)** | Tempos por esteira e integração A+B+C na base. | Tabela de tempos por esteira; sequência alternada estável. | ✅ Tempos medidos (A 5513, B 4437, C 4086 ms); separador corrigido. Integração A+B+C: resultado a registrar |
-| **05/11 (qui.)** | Peças 3D e separador em modo automático. | Roda encaixada e alinhada; peça passando pelos sensores; roda no compartimento certo. | 🔄 Acabamento da elétrica e fixação da roda no motor de passo |
+| **04/11 (qua.)** | Tempos por esteira e integração A+B+C na base. | Tabela de tempos por esteira; sequência alternada estável. | ✅ Tempos medidos (A 5513, B 4437, C 4086 ms); separador corrigido; integração A+B+C aprovada |
+| **05/11 (qui.)** | Roda separadora, produtos e separador em modo automático. | Roda encaixada e alinhada; peça passando pelos sensores; roda no compartimento certo. | 🔄 Acabamento da elétrica e fixação da roda no motor de passo |
 | **06/11 (sex.)** | Display OLED (B3), integração total final e fechamento. | Evidência final registrada em `resultados.md`. | ⬜ |
 
 > ⚠️ A ordem pode mudar conforme a disponibilidade da bancada e das peças. O que não for executado fica como **pendente**, sem presumir aprovação.
@@ -68,7 +68,7 @@ Na Semana 11, as entregas de A e B em 29–30/10 ficaram entre 5000 e 6000 ms (i
 
 ## Bloco 3 — integração total A+B+C na base
 
-- [ ] Sequência alternada A → B → C repetida, sem reinício inesperado do Uno (sem `inicio` no meio).
+- [x] Sequência alternada A → B → C repetida, sem reinício inesperado do Uno (sem `inicio` no meio): entregas consistentes, sem perda de conexão nem reinício do Uno ou do ESP32.
 - [ ] Pedidos em sequência rápida: o segundo pedido é recusado como `ocupado` enquanto o primeiro não termina.
 - [ ] Estoque correto no dashboard depois do ciclo.
 - [ ] Um erro forçado (retirar a peça antes da junção) gera `timeout` e o reset recupera.
@@ -77,14 +77,14 @@ Na Semana 11, as entregas de A e B em 29–30/10 ficaram entre 5000 e 6000 ms (i
 
 ---
 
-## Bloco 4 — peças 3D e separador automático
+## Bloco 4 — roda separadora, produtos e separador automático
 
 Itens do Bloco 4 da Semana 11 e do card [#65](https://github.com/MatheusNespolo/DataFlowInventory/issues/65):
 
 - [ ] Roda encaixada no eixo do 28BYJ-48, sem folga nem deslizamento.
 - [ ] `CMD:SEP:A|B|C|0` leva cada compartimento à posição de recebimento.
 - [x] Modo automático: em pedidos reais, a roda chega ao compartimento antes da peça (04/11).
-- [ ] A peça impressa percorre topo → junção → esteira principal sem enroscar e aciona os sensores.
+- [ ] Os produtos feitos à mão percorrem topo → junção → esteira principal sem enroscar, acionam os sensores e caem no compartimento certo (a peça impressa em 3D foi descartada).
 - [ ] Medir o tempo da peça entre a junção e o fim da esteira principal (define `SEPARADOR_ESPERA_APOS_ENTREGA_MS`).
 
 > **Observação (03/11):** a roda se move, mas aparenta **girar menos que o esperado**. O firmware conta cada passo que emite (um `loop()` atrasado só deixa a roda mais lenta, sem reduzir o ângulo), então a causa está entre: (1) **passos perdidos** sob carga (roda impressa, atrito, velocidade de 10 RPM, alimentação de 5 V fraca ou compartilhada com os motores DC); (2) **passos por volta diferentes** dos 2038 configurados (outra redução do motor); (3) **expectativa ou geometria**: a roda sempre vai pelo caminho mais curto, no máximo 120° por pedido, e os compartimentos impressos podem não estar a 120°. Diagnóstico abaixo.
@@ -117,7 +117,7 @@ Registrar: ângulo medido em cada situação, se a marca se desloca, e a fonte u
 | Dá **uma volta completa** | Dá meia volta | Transmissão entre o eixo e a roda: engrenagens/polias 2:1 na peça impressa, ou o eixo **patinando** no furo da roda | Se houver redução, multiplicar `SEPARADOR_PASSOS_POR_VOLTA` pela relação; se patina, corrigir o encaixe (furo em D do eixo) |
 | Treme, zumbe ou anda e volta | — | Sequência das fases fora de ordem (fiação IN1–IN4 ≠ pinos 5–8 em ordem direta) | Fiação direta IN1→5, IN2→6, IN3→7, IN4→8 (o firmware já troca a ordem internamente) |
 
-> ✅ **Resolvido (04/11):** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096 (`99786b7`), a volta completa fecha na marca e a roda se prepara a tempo de receber as peças. O valor é o medido em bancada; a origem física do fator 2 (versão do motor ou transmissão) não foi identificada.
+> ✅ **Resolvido (04/11):** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 e `SEPARADOR_PASSOS_BIBLIOTECA` 4096 (`99786b7`) e `SEPARADOR_RPM` 10, a volta completa fecha na marca e a roda se prepara a tempo de receber as peças. O valor é o medido em bancada; a origem física do fator 2 (versão do motor ou transmissão) não foi identificada.
 
 **Critério de saída:** [ ] peça e roda operam sem interferência · [ ] ajustes de impressão, tolerância ou ângulo registrados.
 
@@ -135,6 +135,6 @@ Registrar ao fim de cada dia, conforme o [mapa da documentação](../../README.m
 
 - resultados em [`resultados.md`](../resultados.md) (estado atual, registro e diário);
 - uma entrada curta no [`CHANGELOG.md`](../../CHANGELOG.md), em `[Não publicado]`;
-- comentário nos cards [#1](https://github.com/MatheusNespolo/DataFlowInventory/issues/1) (montagem), [#65](https://github.com/MatheusNespolo/DataFlowInventory/issues/65) (peças 3D) e [#66](https://github.com/MatheusNespolo/DataFlowInventory/issues/66) (integração total).
+- comentário nos cards [#1](https://github.com/MatheusNespolo/DataFlowInventory/issues/1) (montagem), [#65](https://github.com/MatheusNespolo/DataFlowInventory/issues/65) (roda separadora e produtos) e [#66](https://github.com/MatheusNespolo/DataFlowInventory/issues/66) (integração total).
 
 Marcar cada item como **aprovado**, **falhou**, **bloqueado** ou **não executado**.
