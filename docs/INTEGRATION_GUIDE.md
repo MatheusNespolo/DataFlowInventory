@@ -134,8 +134,8 @@ CREATE TABLE IF NOT EXISTS eventos_log (
 
 | Componente | Especificação | Pinos Arduino | Alimentação |
 |-----------|---------------|---------------|-------------|
-| **Motor de Passo** | 28BYJ-48 | — | 5V |
-| **Driver** | ULN2003 | 5, 6, 7, 8 | 5V + 5-12V motor |
+| **Motor de Passo** | 28BYJ-48 (versão de 12 V) | — | 12V (fonte dedicada) |
+| **Driver** | ULN2003 | 5, 6, 7, 8 | 12V (mesma fonte do motor; GND comum com o Uno) |
 
 ### 2.2 Posições
 
