@@ -12,7 +12,19 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ---
 
-## [Não publicado] — Semana 12: esteira C, integração total, separador e display (03–06/11/2026, em andamento)
+## [Não publicado] — Semana 13: produtos, acabamento e integração total (09–13/11/2026, em andamento)
+
+### Alterado
+
+- **Semana 12 encerrada e roteiro da Semana 13 (09/11/2026):** roda separadora fixada no motor, com giro e posições testados. Produtos feitos à mão, acabamento e integração total transferidos para o [roteiro da Semana 13](testes/roteiros/semana_13_09-13_novembro.md). Integração das esteiras separada da integração total do projeto; motor de passo documentado como versão de 12 V. Ver [`testes/resultados.md`](testes/resultados.md)
+
+---
+
+## [Marco 7] — Semana 12: esteira C, integração das esteiras, separador e display (03–06/11/2026)
+
+### Adicionado
+
+- **Glossário de termos do projeto (04/11/2026):** [`GLOSSARIO.md`](GLOSSARIO.md) explica FSM, LWT, retained, QoS, broker, gateway, IRF520, PWM e TCRT5000, ligado a partir do README; fecha a issue #37
 
 ### Alterado
 
@@ -29,7 +41,6 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ### Adicionado
 
-- **Glossário de termos do projeto (04/11/2026):** [`GLOSSARIO.md`](GLOSSARIO.md) explica FSM, LWT, retained, QoS, broker, gateway, IRF520, PWM e TCRT5000, ligado a partir do README; fecha a issue #37
 - **CI: verificação de links e âncoras da documentação (29/10/2026):** job `docs-links` (`scripts/verificar-links.py`); fecha a issue #39
 
 ### Alterado

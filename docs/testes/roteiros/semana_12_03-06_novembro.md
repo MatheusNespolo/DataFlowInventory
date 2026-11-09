@@ -4,25 +4,28 @@
 
 > **Atualização de estado (05/11/2026):** com `SEPARADOR_PASSOS_POR_VOLTA` 4076 (`99786b7`), **a volta do separador fecha na marca** e a roda se prepara **a tempo de receber as peças**. Os tempos de cada esteira foram medidos em 04/11 (Bloco 2). Hoje: acabamento da elétrica e fixação da roda separadora no motor de passo. Para finalizar, falta o acabamento da base e dos cabos. A **integração A+B+C foi feita**: entregas consistentes, sem perda de conexão e sem reinício do Uno ou do ESP32. **Decisão da equipe:** o transporte não usará peças impressas em 3D; os **produtos serão feitos à mão**.
 
-| Item | Status (05/11/2026) | Origem |
+> **Encerramento (09/11/2026):** a roda separadora foi **fixada no motor de passo**, e o **giro e as posições** foram testados com ela acoplada. O acabamento da elétrica, o acabamento da base e dos cabos, o teste dos produtos feitos à mão e a **integração total do projeto** não foram concluídos e foram transferidos para o [roteiro da Semana 13](semana_13_09-13_novembro.md). A integração aprovada nesta semana é a das **três esteiras**. Resultados consolidados em [`resultados.md`](../resultados.md).
+
+| Item | Status final (09/11/2026) | Origem |
 |---|---|---|
 | Esteira A na base | ✅ Aprovado | Semana 11, 28/10 |
 | Esteira B na base | ✅ Aprovado | Semana 11, 29–30/10 |
 | Esteira C na base | ✅ Aprovado (03/11) | 10 entregas, 4103–5069 ms |
-| Integração A+B+C na base | ✅ Aprovado | entregas consistentes; sem perda de conexão nem reinício do Uno ou do ESP32 |
-| Fixação da roda separadora no motor de passo | 🔄 Em andamento (05/11) | transferido da Semana 11 |
-| Produtos feitos à mão percorrendo as esteiras e caindo na roda | ⬜ Pendente | substitui a peça impressa em 3D (decisão da equipe) |
+| Integração das esteiras A+B+C na base | ✅ Aprovado | entregas consistentes; sem perda de conexão nem reinício do Uno ou do ESP32 |
+| Fixação da roda separadora no motor de passo | ✅ Concluído | giro e posições testados com a roda acoplada |
+| Integração total do projeto | ➡️ Transferido | Semana 13 |
+| Produtos feitos à mão percorrendo as esteiras e caindo na roda | ➡️ Transferido | Semana 13; substitui a peça impressa em 3D (decisão da equipe) |
 | Separador em modo automático no hardware | ✅ Aprovado (04/11) | giro corrigido com 4076 passos por volta (`99786b7`): a volta fecha e a roda chega a tempo; ver Bloco 4 |
-| Tempos por esteira na base | ✅ Medido (04/11) | A 5513 ms, B 4437 ms, C 4086 ms; ver Bloco 2 |
-| Acabamento da elétrica | 🔄 Em andamento (05/11) | — |
-| Acabamento da base e dos cabos | ⬜ Pendente | etapa final |
+| Tempos por esteira na base | ✅ Medido (04/11) | A 5513 ms (aceito como referência), B 4437 ms, C 4086 ms; ver Bloco 2 |
+| Acabamento da elétrica | ➡️ Transferido | Semana 13 |
+| Acabamento da base e dos cabos | ➡️ Transferido | Semana 13 |
 | Display OLED (reteste B3) | ✅ Aprovado (03/11) | testado com sucesso na bancada |
 
 ## Objetivos
 
 1. Montar a esteira C na base e aprová-la como A e B, sem mudar o comportamento calibrado.
 2. Medir o tempo de entrega de cada esteira na base, separadamente, para comparar com a calibração de 21/10.
-3. Fazer a integração total A+B+C na base, com pedidos alternados e em sequência, sem reinício do Uno.
+3. Fazer a integração das esteiras A+B+C na base, com pedidos alternados e em sequência, sem reinício do Uno.
 4. Validar a roda separadora impressa, o separador em modo automático no hardware e os produtos feitos à mão (a peça impressa em 3D foi descartada).
 5. Retestar o display com o OLED (item B3 do [plano de testes](../plano_de_testes.md)).
 
@@ -33,8 +36,8 @@
 | **02/11 (seg.)** | Feriado (Finados). | — | — |
 | **03/11 (ter.)** | Montagem da esteira C na base e teste individual. | C com ≥ 5 entregas sem falha e tempos registrados. | ✅ C integrada: 10 entregas, 4103–5069 ms. Display OLED testado com sucesso. Separador: gira menos que o esperado (em diagnóstico) |
 | **04/11 (qua.)** | Tempos por esteira e integração A+B+C na base. | Tabela de tempos por esteira; sequência alternada estável. | ✅ Tempos medidos (A 5513, B 4437, C 4086 ms); separador corrigido; integração A+B+C aprovada |
-| **05/11 (qui.)** | Roda separadora, produtos e separador em modo automático. | Roda encaixada e alinhada; peça passando pelos sensores; roda no compartimento certo. | 🔄 Acabamento da elétrica e fixação da roda no motor de passo |
-| **06/11 (sex.)** | Display OLED (B3), integração total final e fechamento. | Evidência final registrada em `resultados.md`. | ⬜ |
+| **05/11 (qui.)** | Roda separadora, produtos e separador em modo automático. | Roda encaixada e alinhada; peça passando pelos sensores; roda no compartimento certo. | ✅ Parcial (05–06/11): roda fixada no motor; giro e posições testados com a roda acoplada. Produtos e acabamento da elétrica transferidos |
+| **06/11 (sex.)** | Display OLED (B3), integração total final e fechamento. | Evidência final registrada em `resultados.md`. | ➡️ Display aprovado em 03/11; integração total e fechamento transferidos para a Semana 13 |
 
 > ⚠️ A ordem pode mudar conforme a disponibilidade da bancada e das peças. O que não for executado fica como **pendente**, sem presumir aprovação.
 
@@ -48,7 +51,7 @@ Mesmo procedimento usado para A e B na Semana 11 (Bloco 2 do [roteiro anterior](
 |---|---|---:|---:|---|---|
 | C | ✅ Aprovado (03/11) | 4103–5069 ms | 10 | nenhuma relatada | Montada na base e integrada com sucesso. Amostras: 4652, 4230, 4103, 4365 e 5069 ms; dentro da calibração de 21/10 (~4530 ms) |
 
-**Critério de saída:** [ ] C fixada na base sem tensão mecânica · [ ] ≥ 5 entregas sem falha · [ ] tempo registrado e comparado com a calibração de 21/10 (C: ~4530 ms).
+**Critério de saída:** [x] C fixada na base sem tensão mecânica · [x] ≥ 5 entregas sem falha · [x] tempo registrado e comparado com a calibração de 21/10 (C: ~4530 ms).
 
 ---
 
@@ -58,22 +61,24 @@ Na Semana 11, as entregas de A e B em 29–30/10 ficaram entre 5000 e 6000 ms (i
 
 | Esteira | Calibração (21/10) | Na base (Semana 11) | Na base (Semana 12) | Ciclos | Observações |
 |---|---:|---:|---:|---:|---|
-| A | ~4950 ms | 4650–5000 ms (28/10); 5000–6000 ms (29–30/10, com B) | 5513 ms (04/11) | não informados | A mais lenta das três; cerca de 560 ms acima da calibração |
+| A | ~4950 ms | 4650–5000 ms (28/10); 5000–6000 ms (29–30/10, com B) | 5513 ms (04/11) | não informados | A mais lenta das três; cerca de 560 ms acima da calibração; aceito como referência |
 | B | — | 5000–6000 ms (com A, em conjunto) | 4437 ms (04/11) | não informados | Primeiro tempo da B isolada |
 | C | ~4530 ms | — | 4103–5069 ms (03/11); 4086 ms (04/11) | 10 (03/11) | Dentro do esperado |
 
-**Critério de saída:** [x] tempo de cada esteira registrado · [ ] diferença em relação à calibração explicada (atrito da montagem, peça, alimentação) ou aceita como nova referência.
+**Critério de saída:** [x] tempo de cada esteira registrado · [x] diferença em relação à calibração explicada (atrito da montagem, peça, alimentação) ou aceita como nova referência: **5513 ms aceito como referência da esteira A na base** (decisão da equipe; prazo de 12,5 s).
 
 ---
 
-## Bloco 3 — integração total A+B+C na base
+## Bloco 3 — integração das esteiras A+B+C na base
+
+> Os itens abertos abaixo foram transferidos para a integração total do projeto, no Bloco 4 da [Semana 13](semana_13_09-13_novembro.md).
 
 - [x] Sequência alternada A → B → C repetida, sem reinício inesperado do Uno (sem `inicio` no meio): entregas consistentes, sem perda de conexão nem reinício do Uno ou do ESP32.
 - [ ] Pedidos em sequência rápida: o segundo pedido é recusado como `ocupado` enquanto o primeiro não termina.
 - [ ] Estoque correto no dashboard depois do ciclo.
 - [ ] Um erro forçado (retirar a peça antes da junção) gera `timeout` e o reset recupera.
 
-**Critério de saída:** [ ] integração total concluída com logs e sequência de eventos registrados · [ ] falhas classificadas como pendência ou ajuste de bancada.
+**Critério de saída:** [ ] integração concluída com logs e sequência de eventos registrados (transferido para a Semana 13) · [ ] falhas classificadas como pendência ou ajuste de bancada.
 
 ---
 
@@ -81,11 +86,11 @@ Na Semana 11, as entregas de A e B em 29–30/10 ficaram entre 5000 e 6000 ms (i
 
 Itens do Bloco 4 da Semana 11 e do card [#65](https://github.com/MatheusNespolo/DataFlowInventory/issues/65):
 
-- [ ] Roda encaixada no eixo do 28BYJ-48, sem folga nem deslizamento.
-- [ ] `CMD:SEP:A|B|C|0` leva cada compartimento à posição de recebimento.
+- [x] Roda encaixada no eixo do 28BYJ-48, sem folga nem deslizamento (05–06/11).
+- [x] `CMD:SEP:A|B|C|0` leva cada compartimento à posição de recebimento: giro e posições testados com a roda acoplada (05–06/11).
 - [x] Modo automático: em pedidos reais, a roda chega ao compartimento antes da peça (04/11).
-- [ ] Os produtos feitos à mão percorrem topo → junção → esteira principal sem enroscar, acionam os sensores e caem no compartimento certo (a peça impressa em 3D foi descartada).
-- [ ] Medir o tempo da peça entre a junção e o fim da esteira principal (define `SEPARADOR_ESPERA_APOS_ENTREGA_MS`).
+- [ ] ➡️ Semana 13: os produtos feitos à mão percorrem topo → junção → esteira principal sem enroscar, acionam os sensores e caem no compartimento certo (a peça impressa em 3D foi descartada).
+- [ ] ➡️ Semana 13: medir o tempo da peça entre a junção e o fim da esteira principal (define `SEPARADOR_ESPERA_APOS_ENTREGA_MS`).
 
 > **Observação (03/11):** a roda se move, mas aparenta **girar menos que o esperado**. O firmware conta cada passo que emite (um `loop()` atrasado só deixa a roda mais lenta, sem reduzir o ângulo), então a causa está entre: (1) **passos perdidos** sob carga (roda impressa, atrito, velocidade de 10 RPM, alimentação de 5 V fraca ou compartilhada com os motores DC); (2) **passos por volta diferentes** dos 2038 configurados (outra redução do motor); (3) **expectativa ou geometria**: a roda sempre vai pelo caminho mais curto, no máximo 120° por pedido, e os compartimentos impressos podem não estar a 120°. Diagnóstico abaixo.
 

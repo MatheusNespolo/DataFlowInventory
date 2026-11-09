@@ -306,7 +306,7 @@ O Arduino opera com **5 estados**:
 | Driver IRF520 | 3 | Controle de 1 motor cada |
 | Sensor IR TCRT5000 | 6 | Detecção de peças |
 | Display OLED 0,96" I2C | 1 | 128x64, controlador SSD1306 (endereço detectado automaticamente: 0x3C ou 0x3D). Substituiu o LCD 16x2 em 27/10/2026 |
-| Motor de passo 28BYJ-48 + driver ULN2003 | 1 | Roda separadora (alimentação 5 V própria, GND comum) |
+| Motor de passo 28BYJ-48 + driver ULN2003 | 1 | Roda separadora (versão de 12 V, fonte de 12 V dedicada, GND comum) |
 | Roda separadora impressa em 3D | 1 | 3 compartimentos, no eixo do motor de passo |
 | Produtos transportados | 3 tipos (A, B, C) | Feitos à mão |
 | Botões | 4 | 3 solicitação + 1 reset (opcionais) |
