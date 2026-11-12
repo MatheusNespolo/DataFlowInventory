@@ -117,6 +117,15 @@ O sistema é composto por:
 
 > A roda giratória está integrada ao firmware v3.0 (pinos 5 a 8, sem bloquear o `loop()`): ela se prepara sozinha no compartimento da peça pedida assim que a checagem prévia aprova o pedido e fica nele até o pedido seguinte. Também aceita o comando de bancada `CMD:SEP:A|B|C|0` pela USB. O estado da validação fica nos [resultados de bancada](docs/testes/resultados.md).
 
+### Protótipo montado
+
+<div align="center">
+<img src="img/prototipo/prototipo-montado-frente.jpg" width="49%" alt="Protótipo montado na base: três esteiras secundárias, esteira principal e roda separadora, com a fiação sob o tampo">
+<img src="img/prototipo/prototipo-montado-superior.jpg" width="49%" alt="Protótipo visto de cima: esteiras A, B e C, esteira principal e roda separadora de três compartimentos">
+</div>
+
+As três esteiras secundárias (A, B e C) alimentam a esteira principal, que leva o produto até a roda separadora de três compartimentos. Fotos de 10/11/2026; vídeo de um teste de bancada com o dashboard na [release de mídia](https://github.com/MatheusNespolo/DataFlowInventory/releases/tag/midia-conic-2026).
+
 ## Destaques Técnicos
 
 | Capacidade | Detalhe |
@@ -308,7 +317,7 @@ O Arduino opera com **5 estados**:
 | Display OLED 0,96" I2C | 1 | 128x64, controlador SSD1306 (endereço detectado automaticamente: 0x3C ou 0x3D). Substituiu o LCD 16x2 em 27/10/2026 |
 | Motor de passo 28BYJ-48 + driver ULN2003 | 1 | Roda separadora (versão de 12 V, fonte de 12 V dedicada, GND comum) |
 | Roda separadora impressa em 3D | 1 | 3 compartimentos, no eixo do motor de passo |
-| Produtos transportados | 3 tipos (A, B, C) | Feitos à mão |
+| Produtos transportados | 3 tipos (A, B, C) | Comprados prontos |
 | Botões | 4 | 3 solicitação + 1 reset (opcionais) |
 | Fonte 12V DC | 1 | Alimentação geral |
 

@@ -17,6 +17,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 ### Alterado
 
 - **Semana 12 encerrada e roteiro da Semana 13 (09/11/2026):** roda separadora fixada no motor, com giro e posições testados. Produtos feitos à mão, acabamento e integração total transferidos para o [roteiro da Semana 13](testes/roteiros/semana_13_09-13_novembro.md). Integração das esteiras separada da integração total do projeto; motor de passo documentado como versão de 12 V. Ver [`testes/resultados.md`](testes/resultados.md)
+- **Roda separadora na base, produtos comprados e CONIC (12/11/2026):** roda montada na base; os produtos, que seriam feitos à mão, foram comprados prontos (falta testá-los em operação); integração total prevista para 13/11. Trabalho apresentado no CONIC com sucesso. Fotos do protótipo em `img/prototipo/` (README e DIVULGACAO) e vídeo de teste de bancada na [release de mídia](https://github.com/MatheusNespolo/DataFlowInventory/releases/tag/midia-conic-2026)
 
 ---
 
