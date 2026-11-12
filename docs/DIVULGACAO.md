@@ -7,6 +7,16 @@ equipe revisar e publicar**: nenhum texto foi postado e nenhuma issue foi criada
 > **Antes de qualquer post:** confira o status atual no [README](../README.md) (esteiras B e C, validação do
 > HiveMQ Cloud) e **não prometa o que ainda não foi validado em bancada**.
 
+## 0. Apresentações
+
+### CONIC — Congresso UniSENAI (novembro de 2026)
+
+O trabalho foi apresentado no CONIC com sucesso. Material do protótipo para reaproveitar nos posts:
+
+- **Fotos do protótipo montado (10/11/2026):** [`img/prototipo/prototipo-montado-frente.jpg`](../img/prototipo/prototipo-montado-frente.jpg) e [`img/prototipo/prototipo-montado-superior.jpg`](../img/prototipo/prototipo-montado-superior.jpg)
+- **Vídeo** (fora do histórico do Git, como anexo da [release de mídia](https://github.com/MatheusNespolo/DataFlowInventory/releases/tag/midia-conic-2026)):
+  - teste de bancada com o dashboard em operação (sem áudio).
+
 ## 1. Texto-base (reaproveite e adapte)
 
 **Uma linha:**

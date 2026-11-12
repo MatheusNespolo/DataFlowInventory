@@ -8,9 +8,9 @@
 
 ## Estado atual
 
-**Situação de validação atualizada (bancada, 09/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas). O **display OLED chegou** em 03/11 e será testado na Semana 12. Na Semana 12, em 03/11, a **esteira C foi integrada** à base e fez **10 entregas entre 4103 e 5069 ms**, e o **display OLED foi testado com sucesso** (reteste B3). Com isso, **as três esteiras estão montadas na base e aprovadas**. O giro do **separador**, que era cerca de metade do esperado, foi corrigido em 04/11 com 4076 passos por volta (`99786b7`): **a volta fecha e a roda se prepara a tempo de receber as peças**. Tempos medidos em 04/11: **A 5513 ms (aceito como referência), B 4437 ms, C 4086 ms**. A **integração das esteiras A+B+C** foi feita: entregas consistentes, sem perda de conexão e sem reinício do Uno ou do ESP32. Em 05–06/11, a **roda separadora foi fixada no motor de passo**, e o giro e as posições foram testados com ela acoplada. **Decisão da equipe:** o transporte não usará peças impressas em 3D; os produtos serão feitos à mão.
+**Situação de validação atualizada (bancada, 12/11/2026):** as três esteiras rodaram em bancada em 21/10, com PWM e kick registrados (`ddf526a`, `1e8fbf1`, `d4ecc2f`). Na Semana 11 (montagem final na base), a **esteira A** foi montada e fez 10 entregas sem falha em 28/10 (4650–5000 ms, igual à calibração), e a **esteira B** foi montada e testada em 29–30/10; foram feitas **10 entregas de cada esteira (A e B)**, com tempo de entrega considerado aceitável, entre **5000 e 6000 ms**. Nenhuma mudança de firmware ou de parâmetros; peça improvisada (as peças impressas em 3D ainda não foram usadas). O **display OLED chegou** em 03/11 e será testado na Semana 12. Na Semana 12, em 03/11, a **esteira C foi integrada** à base e fez **10 entregas entre 4103 e 5069 ms**, e o **display OLED foi testado com sucesso** (reteste B3). Com isso, **as três esteiras estão montadas na base e aprovadas**. O giro do **separador**, que era cerca de metade do esperado, foi corrigido em 04/11 com 4076 passos por volta (`99786b7`): **a volta fecha e a roda se prepara a tempo de receber as peças**. Tempos medidos em 04/11: **A 5513 ms (aceito como referência), B 4437 ms, C 4086 ms**. A **integração das esteiras A+B+C** foi feita: entregas consistentes, sem perda de conexão e sem reinício do Uno ou do ESP32. Em 05–06/11, a **roda separadora foi fixada no motor de passo**, e o giro e as posições foram testados com ela acoplada. **Decisão da equipe:** o transporte não usará peças impressas em 3D; os produtos, que seriam feitos à mão, foram **comprados** prontos (12/11). Na Semana 13, a **roda separadora foi montada na base** (fotos de 10/11 em [`img/prototipo/`](../../img/prototipo/)), e o trabalho foi apresentado no **CONIC** com sucesso.
 
-**Pendências/retestes (Semana 13, [roteiro](roteiros/semana_13_09-13_novembro.md)):** (1) produtos feitos à mão percorrendo as esteiras e caindo na roda, (2) acabamento da elétrica, da base e dos cabos, com reteste das esteiras, (3) integração total do projeto, (4) registro fotográfico da montagem final.
+**Pendências/retestes (Semana 13, [roteiro](roteiros/semana_13_09-13_novembro.md)):** (1) produtos comprados percorrendo as esteiras e caindo na roda (13/11), (2) acabamento da elétrica, da base e dos cabos, com reteste das esteiras, (3) integração total do projeto (prevista para 13/11).
 
 ---
 
@@ -38,7 +38,7 @@
 | S1 | Separador — volta completa e modo automático | 04/11/2026 | ✅ Aprovado | Com 4076 passos por volta (`99786b7`), a volta fecha na marca e a roda chega a tempo de receber as peças. Roda fixada no motor em 05–06/11, com giro e posições testados com ela acoplada |
 | I1 | Integração das esteiras A+B+C na base | até 05/11/2026 | ✅ Aprovado | Entregas consistentes; sem perda de conexão nem reinício do Uno ou do ESP32. Quantidade de entregas não informada |
 | T1 | Tempo de entrega por esteira, na base | 04/11/2026 | ✅ Medido | A 5513 ms (aceito como referência), B 4437 ms, C 4086 ms |
-| I2 | Integração total do projeto | Semana 13 | ⬜ Pendente | Esteiras, separador com a roda fixada, produtos feitos à mão, display e dashboard |
+| I2 | Integração total do projeto | 13/11/2026 (prevista) | ⬜ Pendente | Esteiras, separador com a roda montada na base, produtos comprados, display e dashboard |
 | M2 | Montagem final na base — esteiras A, B e C | 28/10–03/11/2026 | ✅ Aprovado | A: 10 entregas, 4650–5000 ms (28/10). B: 10 entregas de cada esteira (A e B), 5000–6000 ms (29–30/10). C: 10 entregas, 4103–5069 ms (03/11). Sem mudança de código; peça improvisada |
 | — | Plano B (Simulador) | 25/08/2026 | ✅ Aprovado | Frontend + Simulador validados sem hardware físico |
 
@@ -172,3 +172,10 @@ Em ordem cronológica (o mais recente no fim).
 - **Motor de passo:** versão de 12 V, em fonte de 12 V dedicada.
 - **Esteira A:** o tempo de 5513 ms (04/11) foi aceito pela equipe como referência na base.
 - **Não concluído na Semana 12** (transferido para a [Semana 13](roteiros/semana_13_09-13_novembro.md)): produtos feitos à mão, acabamento da elétrica, da base e dos cabos, e integração total do projeto.
+
+### 10–12/11 (Semana 13 — roda na base e CONIC)
+
+- **Roda separadora:** montada na base, junto do fim da esteira principal. Fotos do protótipo montado (10/11) em [`img/prototipo/`](../../img/prototipo/).
+- **Produtos:** comprados prontos, no lugar dos feitos à mão (decisão da equipe). Falta testá-los em operação.
+- **CONIC:** o trabalho foi apresentado com sucesso. Fotos do protótipo em `img/prototipo/` e vídeo de teste de bancada com o dashboard na [release de mídia](https://github.com/MatheusNespolo/DataFlowInventory/releases/tag/midia-conic-2026).
+- **Próximo passo:** teste dos produtos em operação e integração total do projeto, previstos para 13/11. Acabamento da elétrica, da base e dos cabos sem registro de conclusão.
