@@ -174,6 +174,8 @@ Este documento define os testes de integração da cadeia de comunicação do si
 
 ### B4 — Falta de energia dos periféricos (`sem_energia`)
 
+> Melhoria contínua identificada na bancada da Semana 13 (13/11/2026); implementação e critérios no card [#80](https://github.com/MatheusNespolo/DataFlowInventory/issues/80).
+
 O Uno e o ESP32 ficam ligados pela USB do notebook; os sensores e os motores, pelas fontes do sistema. Com as fontes desligadas, os seis sensores passam a ler "ocupado", e o firmware vai para ERRO com o erro `sem_energia` em ~0,5 s.
 
 1. Com o sistema em `AGUARDANDO_PEDIDO`, desligue a fonte do sistema (USB do notebook ligada)
