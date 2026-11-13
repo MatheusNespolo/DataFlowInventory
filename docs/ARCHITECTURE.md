@@ -143,6 +143,7 @@ flowchart LR
 - `motor_sem_avanco` — M1: o topo não liberou no prazo (motor travado, fraco ou peça presa no início)
 - `timeout` — M2: a peça saiu do topo e não chegou à junção no prazo
 - `peca_presa_saida` — M3: a junção continuou ocupada no fim da saída
+- `sem_energia` — os 6 sensores ficaram ocupados juntos por 500 ms, em qualquer estado: a fonte dos periféricos foi desligada (o Uno e o ESP32 seguem ligados pela USB, e os sensores sem alimentação leem "ocupado"). Os 3 topos ocupados são normais (estoque), mas as 3 junções ocupadas juntas não acontecem em operação. Durante uma entrega, uma junção de **outra** esteira ocupada adia a confirmação da passagem por até 1 s, para a queda não debitar o estoque; o limite evita que uma junção obstruída trave a entrega. É uma heurística: não percebe a queda só da fonte de 12 V dos motores (nesse caso sai `motor_sem_avanco`). Display: "ERRO: Energia / Verifique fonte"; dashboard: faixa de alerta
 
 **Rejeições (não mudam o estado):**
 - `peca_invalida` — formato diferente de `CMD:PECA:` + A, B ou C

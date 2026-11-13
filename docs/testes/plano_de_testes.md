@@ -172,6 +172,21 @@ Este documento define os testes de integração da cadeia de comunicação do si
 - [ ] Estoque e status exibidos corretamente, sem caracteres corrompidos
 - [ ] Comandos via serial refletem no display
 
+### B4 — Falta de energia dos periféricos (`sem_energia`)
+
+O Uno e o ESP32 ficam ligados pela USB do notebook; os sensores e os motores, pelas fontes do sistema. Com as fontes desligadas, os seis sensores passam a ler "ocupado", e o firmware vai para ERRO com o erro `sem_energia` em ~0,5 s.
+
+1. Com o sistema em `AGUARDANDO_PEDIDO`, desligue a fonte do sistema (USB do notebook ligada)
+2. Conferir: estado `ERRO`; display "ERRO: Energia / Verifique fonte"; no dashboard, a faixa "Falta de energia nos periféricos" e o histórico "Erro: sem_energia"
+3. Ainda sem a fonte, use **Reiniciar**: o sistema volta a `AGUARDANDO_PEDIDO` e, em ~0,5 s, detecta de novo
+4. Religue a fonte e use **Reiniciar**: a faixa some e um pedido entrega normalmente
+5. Repita desligando a fonte **durante uma entrega**: ERRO `sem_energia` (e não `timeout` ou `peca_presa_saida`), motores parados e **sem débito** do estoque
+
+#### Critérios de validação
+- [ ] Os seis sensores leem "ocupado" com a fonte desligada (mensagem `sensores`: 1 em topo e junção)
+- [ ] ERRO `sem_energia` em ~0,5 s, em repouso e durante a entrega, sem débito
+- [ ] Display e dashboard mostram a causa; a faixa some depois do reset com a fonte religada
+
 #### Troubleshooting (B1–B3)
 | Sintoma | Causa provável | Solução |
 |---------|----------------|---------|

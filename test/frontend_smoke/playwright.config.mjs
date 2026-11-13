@@ -42,7 +42,8 @@ export default defineConfig({
     {
       command: 'node ../../simulator/server.js',
       url: 'http://localhost:3100',
-      env: { PORT: '3100' },
+      // SIMULAR_FALHAS: libera a queda de energia simulada (energia.spec.mjs).
+      env: { PORT: '3100', SIMULAR_FALHAS: 'true' },
       reuseExistingServer: false,
       timeout: 30_000,
     },
