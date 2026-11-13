@@ -41,6 +41,13 @@ const ESTOQUE_INICIAL = Number.isInteger(parseInt(process.env.ESTOQUE_INICIAL, 1
 // Mesmo comportamento do servidor real (../server/server.js).
 const COMANDO_INTERVALO_MS = parseInt(process.env.COMANDO_INTERVALO_MS, 10) || 500;
 
+// Queda de energia dos periféricos (mesma regra do firmware, ENERGIA_FALHA_MS): os 6
+// sensores passam a ler "ocupado" e, depois deste tempo, o sistema vai para ERRO
+// (sem_energia). Só para testes: com SIMULAR_FALHAS=true o dashboard pode disparar a queda
+// pelos eventos simular_falta_energia e simular_energia_volta (os testes E2E usam isso).
+const ENERGIA_FALHA_MS = 500;
+const SIMULAR_FALHAS = process.env.SIMULAR_FALHAS === 'true';
+
 // ============================================================
 // ESTADO SIMULADO (espelha a FSM do Arduino)
 // Os nomes de estado são idênticos aos publicados via MQTT
@@ -55,6 +62,9 @@ let sim = {
   sensores:        { topo: { A: 1, B: 1, C: 1 }, juncao: { J1: 0, J2: 0, J3: 0 } },
   eventos:         [],
   timerEntrega:    null,
+  semEnergia:      false,
+  timerEnergia:    null,
+  entregaSuspensa: null,   // peça cuja entrega foi suspensa pela queda de energia
 };
 
 const PECAS = ['A', 'B', 'C'];
@@ -272,6 +282,57 @@ function confirmarEntrega(peca) {
   console.log(`[SIM] Estoque: A=${sim.estoque.pecaA} B=${sim.estoque.pecaB} C=${sim.estoque.pecaC}`);
 }
 
+// Fonte dos periféricos desligada: os 6 sensores ocupados; ERRO depois de ENERGIA_FALHA_MS.
+function faltaDeEnergia() {
+  if (sim.semEnergia) return;
+  console.log('[SIM] Queda de energia dos periféricos (6 sensores ocupados)');
+  sim.semEnergia = true;
+  // Como no firmware: a confirmação da entrega em curso fica suspensa na hora, para a
+  // queda não debitar o estoque antes de virar ERRO (SUSPEITA_ENERGIA_MS).
+  if (sim.timerEntrega) {
+    clearTimeout(sim.timerEntrega);
+    sim.timerEntrega = null;
+    sim.entregaSuspensa = PECAS[sim.pecaSolicitada - 1];
+  }
+  for (const p of PECAS) sim.sensores.topo[p] = 1;
+  for (const j of ['J1', 'J2', 'J3']) sim.sensores.juncao[j] = 1;
+  emitirSensores();
+  agendarErroSemEnergia();
+}
+
+function agendarErroSemEnergia() {
+  clearTimeout(sim.timerEnergia);
+  sim.timerEnergia = setTimeout(() => {
+    sim.timerEnergia = null;
+    if (!sim.semEnergia || sim.estado === 'ERRO') return;
+    sim.entregaSuspensa = null;             // a entrega suspensa não é concluída
+    const peca = PECAS[sim.pecaSolicitada - 1];
+    sim.esteiras.secA = sim.esteiras.secB = sim.esteiras.secC = false;
+    sim.estado = 'ERRO';
+    emitirEvento('erro', peca, { tipo: 'sem_energia' });
+    emitirStatus();
+    emitirEsteiras();
+  }, ENERGIA_FALHA_MS);
+}
+
+// Fonte religada: junções livres; topo ocupado onde ainda há estoque.
+function energiaVolta() {
+  if (!sim.semEnergia) return;
+  console.log('[SIM] Energia dos periféricos restabelecida');
+  sim.semEnergia = false;
+  clearTimeout(sim.timerEnergia);
+  sim.timerEnergia = null;
+  for (const p of PECAS) sim.sensores.topo[p] = sim.estoque['peca' + p] > 0 ? 1 : 0;
+  for (const j of ['J1', 'J2', 'J3']) sim.sensores.juncao[j] = 0;
+  emitirSensores();
+  // Energia de volta antes do ERRO: a entrega suspensa segue.
+  if (sim.entregaSuspensa && sim.estado === 'ENTREGANDO_PECA') {
+    const peca = sim.entregaSuspensa;
+    sim.timerEntrega = setTimeout(() => confirmarEntrega(peca), DELAY_ENTREGA);
+  }
+  sim.entregaSuspensa = null;
+}
+
 function resetSistema() {
   console.log('[SIM] Sistema resetado');
 
@@ -288,6 +349,8 @@ function resetSistema() {
 
   emitirStatus();
   emitirEsteiras();
+  // Energia ainda fora: detecta de novo, como o firmware.
+  if (sim.semEnergia) agendarErroSemEnergia();
   console.log('[SIM] Aguardando pedido...');
 }
 
@@ -342,6 +405,11 @@ io.on('connection', (socket) => {
     io.emit('comando', { acao: 'reset' });
     resetSistema();
   });
+
+  if (SIMULAR_FALHAS) {
+    socket.on('simular_falta_energia', faltaDeEnergia);
+    socket.on('simular_energia_volta', energiaVolta);
+  }
 
   socket.on('disconnect', () => {
     console.log(`[SIM] Cliente desconectado: ${socket.id}`);

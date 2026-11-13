@@ -59,6 +59,9 @@ void telaErro(const Fsm& f, char* l1, char* l2) {
     case ERR_PECA_PRESA_SAIDA:
       anexaTxt(l1, TXT("ERRO: Saida ")); anexaLetra(l1, p); anexaTxt(l2, TXT("Peca presa"));
       break;
+    case ERR_SEM_ENERGIA:
+      anexaTxt(l1, TXT("ERRO: Energia")); anexaTxt(l2, TXT("Verifique fonte"));
+      break;
     default:
       anexaTxt(l1, TXT("ERRO"));
       anexaTxt(l2, nomeErro(f.erroAtual));

@@ -141,6 +141,7 @@ Prevista para 13/11, depois dos ajustes dos Blocos 1 e 1b, **já com o Beckhoff 
 - [ ] Giro da roda no diagrama do dashboard acompanha a roda real.
 - [ ] Display mostra as telas e a faixa de ícones acompanhando a FSM durante a operação.
 - [ ] CX9240 recebe e grava os eventos e o estoque (historiador SQLite), conferido depois do ciclo.
+- [ ] Falta de energia dos periféricos: com a fonte desligada, ERRO `sem_energia` e alerta no dashboard (item B4 do [plano de testes](../plano_de_testes.md); card [#80](https://github.com/MatheusNespolo/DataFlowInventory/issues/80), melhoria contínua), inclusive durante uma entrega, sem débito.
 
 **Critério de saída:** [ ] integração total concluída com logs e sequência de eventos registrados · [ ] sistema estável em operação em série · [ ] falhas classificadas como pendência ou ajuste de bancada.
 

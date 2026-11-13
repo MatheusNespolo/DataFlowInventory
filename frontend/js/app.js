@@ -31,6 +31,7 @@ const els = {
 
   // Estado
   estadoAtual: document.getElementById('estado-atual'),
+  alertaEnergia: document.getElementById('alerta-energia'),
   pecaSolicitada: document.getElementById('peca-solicitada'),
   uptime: document.getElementById('uptime'),
 
@@ -214,6 +215,12 @@ socket.on('estado_inicial', (data) => {
   if (data.esteiras) {
     atualizarEsteiras(data.esteiras);
   }
+  // Página aberta com o sistema em ERRO por falta de energia: o erro mais recente
+  // do histórico (o servidor guarda do mais novo para o mais antigo) diz a causa.
+  if (data.status && data.status.estado === 'ERRO' && Array.isArray(data.eventos)) {
+    const ultimoErro = data.eventos.find((evt) => evt && evt.evento === 'erro');
+    definirAlertaEnergia(Boolean(ultimoErro && ultimoErro.tipo === 'sem_energia'));
+  }
   // Replay do histórico apenas na primeira vez — reconexões não repetem.
   if (!historicoSemeado && data.eventos && data.eventos.length > 0) {
     data.eventos.forEach(evt => {
@@ -264,6 +271,7 @@ socket.on('evento', (data) => {
     flashCard('card-estoque', 'var(--accent-green)');
   } else if (data.evento === 'erro') {
     flashCard('card-estado', 'var(--accent-red)');
+    if (data.tipo === 'sem_energia') definirAlertaEnergia(true);
   } else if (data.evento === 'inicio') {
     // Arduino v2.1 envia versao e driver no evento de início
     atualizarDriver(data.versao, data.driver);
@@ -367,7 +375,14 @@ function marcarSemDados() {
   });
 }
 
+// Faixa de falta de energia dos periféricos: aparece no erro sem_energia do firmware
+// (os seis sensores ocupados juntos) e some quando o sistema sai de ERRO.
+function definirAlertaEnergia(ativo) {
+  if (els.alertaEnergia) els.alertaEnergia.hidden = !ativo;
+}
+
 function atualizarEstado(data) {
+  if (data && data.estado && data.estado !== 'ERRO') definirAlertaEnergia(false);
   const estado = data.estado || 'DESCONHECIDO';
   els.estadoAtual.textContent = estado;
   // Códigos de estado bem longos (ex.: VERIFICANDO_ESTOQUE) usam fonte
@@ -582,7 +597,9 @@ function adicionarHistorico(evento, peca, tipo, scroll = true) {
       classe = 'evento-entrega';
       break;
     case 'erro':
-      msg = `Erro: ${tipo || 'desconhecido'}${peca ? ' — Peça ' + peca : ''}`;
+      msg = tipo === 'sem_energia'
+        ? 'Erro: sem_energia — falta de energia nos periféricos (verifique a fonte)'
+        : `Erro: ${tipo || 'desconhecido'}${peca ? ' — Peça ' + peca : ''}`;
       classe = 'evento-erro';
       break;
     case 'inicio':

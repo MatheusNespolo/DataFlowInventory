@@ -41,6 +41,8 @@ O frontend é um **dashboard web responsivo** que conecta ao servidor Node.js vi
 
 **Roda do separador no diagrama (`js/separador.js`).** O firmware não publica a posição da roda, então o diagrama aplica a **mesma regra do firmware** (`separador_auto`) sobre o `status` que já recebe: do estado `ACIONANDO_ESTEIRA` (checagem prévia aprovada) até o fim da entrega (`ENTREGANDO_PECA`) a roda busca o compartimento da peça pedida (A 120°, B 240°, C e neutro 0°, iguais a `SEPARADOR_GRAUS_*` de `config.h`); depois da entrega ela **fica** onde está até o pedido seguinte. Pedido recusado não a move, e o evento `inicio` (Uno reiniciado) a devolve ao neutro, porque o firmware volta a supor a roda ali. Funciona igual com o simulador. **Limites:** é uma estimativa; a posição real pode diferir (o comando de bancada `CMD:SEP` move a roda sem aparecer no `status`, e qualquer reinício a desalinha). Com `prefers-reduced-motion` a roda vai direto ao destino. O estado fica em `window.EstadoDiagrama.separador` (`destino`, `alvo`, `graus`, `movendo`).
 
+**Falta de energia dos periféricos.** Quando o firmware publica o erro `sem_energia` (os seis sensores ocupados juntos: a fonte do sistema desligada, com o Uno e o ESP32 ligados pela USB), o painel mostra uma faixa de alerta (`#alerta-energia`, `role="alert"`) junto dos controles, e o histórico registra "Erro: sem_energia — falta de energia nos periféricos (verifique a fonte)". Quem abre a página depois do erro também vê a faixa, porque ela é semeada pelo último erro do histórico no `estado_inicial`. A faixa some quando o sistema sai de ERRO.
+
 ### Histórico e Equipamentos (`#/status`)
 
 - **Tabela de eventos** com timestamp, tipo, peça (se aplicável) e descrição

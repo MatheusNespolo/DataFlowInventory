@@ -1429,6 +1429,20 @@ html {
   display: block;
 }
 
+/* Falta de energia dos periféricos (erro sem_energia do firmware). */
+.alerta-energia {
+  margin-top: 0.7rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--accent-red);
+  border-left-width: 4px;
+  border-radius: 6px;
+  font-size: var(--step--1);
+  color: var(--accent-red);
+}
+.alerta-energia[hidden] {
+  display: none;
+}
+
 .btn-a { --btn: var(--peca-a); }
 .btn-b { --btn: var(--peca-b); }
 .btn-c { --btn: var(--peca-c); }

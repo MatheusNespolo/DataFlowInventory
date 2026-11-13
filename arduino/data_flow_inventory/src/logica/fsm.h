@@ -33,7 +33,8 @@ enum TipoErro : uint8_t {
   ERR_PECA_PRESA_SAIDA,       // M3                          → ERRO
   ERR_OCUPADO,                // rejeição (não muda o estado)
   ERR_PECA_INVALIDA,          // rejeição
-  ERR_COMANDO_DESCONHECIDO    // rejeição
+  ERR_COMANDO_DESCONHECIDO,   // rejeição
+  ERR_SEM_ENERGIA             // 6 sensores ocupados juntos → ERRO (fonte dos periféricos desligada)
 };
 
 enum FaseErro : uint8_t { FERR_NENHUMA = 0, FERR_VERIFICACAO, FERR_PARTIDA, FERR_TRANSITO, FERR_SAIDA };
@@ -81,9 +82,27 @@ struct Fsm {
   uint32_t pausaDesde;
   TelaLcd tela;
   TipoErro erroAtual;        // último erro que levou a ERRO (para o LCD)
+  bool todosOcupados;        // os 6 sensores estão ocupados desde todosOcupadosDesde
+  uint32_t todosOcupadosDesde;
+  bool outraJuncao;          // na entrega: junção de outra esteira ocupada desde outraJuncaoDesde
+  uint32_t outraJuncaoDesde;
 };
 
 static const uint16_t PAUSA_POS_ENTREGA_MS = 1500;
+
+// Falta de energia dos periféricos: o Uno e o ESP32 seguem ligados pela USB, mas os
+// sensores sem alimentação passam todos a ler "ocupado". Os 3 sensores de topo
+// ocupados são normais (estoque), mas as 3 junções ocupadas juntas não acontecem em
+// operação: uma peça é entregue por vez e a junção só fica ocupada por instantes.
+// Os 6 ocupados por este tempo, em qualquer estado, levam a ERRO (sem_energia).
+static const uint16_t ENERGIA_FALHA_MS = 500;
+
+// Na entrega, as junções das OUTRAS esteiras ficam livres; na queda de energia as três
+// ocupam no mesmo instante, e a da esteira ativa confirmaria uma passagem falsa (e
+// debitaria) antes de ENERGIA_FALHA_MS. Por isso, com uma junção de outra esteira
+// ocupada, a confirmação espera até este tempo: ou a falta de energia é detectada, ou a
+// leitura some. O limite impede que uma junção obstruída de outra esteira trave a entrega.
+static const uint16_t SUSPEITA_ENERGIA_MS = 2 * ENERGIA_FALHA_MS;
 
 void fsmIniciar(Fsm& f, const ParamEsteira params[3], int estoqueInicial);
 void fsmPasso(Fsm& f, const EntradasFsm& in, SaidasFsm& out);

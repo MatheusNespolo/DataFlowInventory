@@ -28,6 +28,7 @@ Abra [http://localhost:3000](http://localhost:3000).
 | Rejeição por FSM ocupada (`ocupado`) | ✅ |
 | Rate limit por socket (`COMANDO_INTERVALO_MS`) | ✅ |
 | Timeout de entrega | ❌ (apenas no firmware real) |
+| Falta de energia dos periféricos (`sem_energia`) | ✅ só para testes: com `SIMULAR_FALHAS=true`, os eventos Socket.IO `simular_falta_energia` e `simular_energia_volta` simulam a queda e a volta da fonte (os 6 sensores ocupados; ERRO depois de 500 ms, como no firmware) |
 
 ## Modo Beckhoff CX9240 (publicação MQTT opcional)
 

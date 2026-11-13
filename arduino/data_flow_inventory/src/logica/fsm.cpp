@@ -23,6 +23,7 @@ const char* nomeErro(TipoErro e) {
     case ERR_OCUPADO:              return TXT("ocupado");
     case ERR_PECA_INVALIDA:        return TXT("peca_invalida");
     case ERR_COMANDO_DESCONHECIDO: return TXT("comando_desconhecido");
+    case ERR_SEM_ENERGIA:          return TXT("sem_energia");
     default:                       return TXT("desconhecido");
   }
 }
@@ -80,6 +81,10 @@ void fsmIniciar(Fsm& f, const ParamEsteira params[3], int estoqueInicial) {
   f.pausaDesde = 0;
   f.tela = TELA_ESTOQUE;
   f.erroAtual = ERR_NENHUM;
+  f.todosOcupados = false;
+  f.todosOcupadosDesde = 0;
+  f.outraJuncao = false;
+  f.outraJuncaoDesde = 0;
 }
 
 bool fsmMotorLigado(const Fsm& f, uint8_t idx) {
@@ -114,6 +119,7 @@ static void tratarComando(Fsm& f, const EntradasFsm& in, SaidasFsm& out) {
         f.sup.fase = FASE_FIM;
         f.tela = TELA_ESTOQUE;
         f.erroAtual = ERR_NENHUM;
+        f.todosOcupados = false;  // energia ainda fora: detecta de novo depois de ENERGIA_FALHA_MS
         emitir(out, EV_ESTADO);
         emitir(out, EV_ESTOQUE);
       }
@@ -124,11 +130,49 @@ static void tratarComando(Fsm& f, const EntradasFsm& in, SaidasFsm& out) {
   }
 }
 
+// true enquanto a confirmação da entrega deve esperar: há uma junção de outra esteira
+// ocupada há menos de SUSPEITA_ENERGIA_MS (ver fsm.h).
+static bool suspeitaDeEnergia(Fsm& f, const EntradasFsm& in, uint8_t idx) {
+  bool outra = false;
+  for (uint8_t i = 0; i < 3; i++) outra = outra || (i != idx && in.juncao[i].ocupada);
+  if (!outra) {
+    f.outraJuncao = false;
+    return false;
+  }
+  if (!f.outraJuncao) {
+    f.outraJuncao = true;
+    f.outraJuncaoDesde = in.agora;
+  }
+  return (uint32_t)(in.agora - f.outraJuncaoDesde) < SUSPEITA_ENERGIA_MS;
+}
+
+// true quando os 6 sensores estão ocupados há ENERGIA_FALHA_MS (ver fsm.h).
+static bool semEnergia(Fsm& f, const EntradasFsm& in) {
+  bool todos = true;
+  for (uint8_t i = 0; i < 3; i++) todos = todos && in.topo[i] && in.juncao[i].ocupada;
+  if (!todos) {
+    f.todosOcupados = false;
+    return false;
+  }
+  if (!f.todosOcupados) {
+    f.todosOcupados = true;
+    f.todosOcupadosDesde = in.agora;
+  }
+  return (uint32_t)(in.agora - f.todosOcupadosDesde) >= ENERGIA_FALHA_MS;
+}
+
 void fsmPasso(Fsm& f, const EntradasFsm& in, SaidasFsm& out) {
   out.nEventos = 0;
   out.zerarJuncao = -1;
 
   tratarComando(f, in, out);
+
+  // Antes das checagens: sem energia, a causa certa é sem_energia (e não junção
+  // obstruída ou motor sem avanço). Em ERRO não conta: o reset recomeça a contagem.
+  if (f.estado != ERRO && semEnergia(f, in)) {
+    falhar(f, out, ERR_SEM_ENERGIA, FERR_NENHUMA, -1, -1);
+    return;
+  }
   const uint8_t idx = (f.peca >= 1 && f.peca <= 3) ? (uint8_t)(f.peca - 1) : 0;
 
   switch (f.estado) {
@@ -156,6 +200,7 @@ void fsmPasso(Fsm& f, const EntradasFsm& in, SaidasFsm& out) {
         break;
       }
       out.zerarJuncao = (int8_t)idx;
+      f.outraJuncao = false;
       supervisorIniciar(f.sup, f.params[idx], in.agora);
       f.estado = ENTREGANDO_PECA;
       emitir(out, EV_ESTEIRAS);
@@ -173,6 +218,9 @@ void fsmPasso(Fsm& f, const EntradasFsm& in, SaidasFsm& out) {
         }
         break;
       }
+      // Possível queda de energia: o motor segue, mas a passagem não é confirmada
+      // (nem as falhas avaliadas) até ela ser descartada ou virar sem_energia.
+      if (suspeitaDeEnergia(f, in, idx)) break;
       const LeituraJuncao& j = in.juncao[idx];
       const long tMs = (long)(uint32_t)(in.agora - f.sup.inicioMs);
       switch (supervisorAtualizar(f.sup, in.agora, in.topo[idx], j)) {

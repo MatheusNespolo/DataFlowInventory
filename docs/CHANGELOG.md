@@ -14,6 +14,10 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ## [Não publicado] — Semana 13: produtos, acabamento e integração total (09–13/11/2026, em andamento)
 
+### Adicionado
+
+- **Detecção da falta de energia dos periféricos (13/11/2026, card [#80](https://github.com/MatheusNespolo/DataFlowInventory/issues/80), melhoria contínua):** com a fonte do sistema desligada, o Uno e o ESP32 seguem ligados pela USB e os seis sensores leem "ocupado"; o dashboard mostrava tudo OK. Agora os 6 ocupados por 500 ms levam a ERRO `sem_energia` (display "ERRO: Energia / Verifique fonte", faixa de alerta no dashboard), e na entrega uma junção de outra esteira ocupada adia a confirmação por até 1 s, para a queda não debitar o estoque. Simulador com a queda para testes (`SIMULAR_FALHAS=true`); 6 testes do firmware e 3 E2E novos. ESP32 e servidor sem mudança. Procedimento de bancada: item B4 do plano de testes
+
 ### Alterado
 
 - **Semana 12 encerrada e roteiro da Semana 13 (09/11/2026):** roda separadora fixada no motor, com giro e posições testados. Produtos feitos à mão, acabamento e integração total transferidos para o [roteiro da Semana 13](testes/roteiros/semana_13_09-13_novembro.md). Integração das esteiras separada da integração total do projeto; motor de passo documentado como versão de 12 V. Ver [`testes/resultados.md`](testes/resultados.md)
