@@ -64,6 +64,7 @@ let sim = {
   timerEntrega:    null,
   semEnergia:      false,
   timerEnergia:    null,
+  entregaSuspensa: null,   // peça cuja entrega foi suspensa pela queda de energia
 };
 
 const PECAS = ['A', 'B', 'C'];
@@ -286,6 +287,13 @@ function faltaDeEnergia() {
   if (sim.semEnergia) return;
   console.log('[SIM] Queda de energia dos periféricos (6 sensores ocupados)');
   sim.semEnergia = true;
+  // Como no firmware: a confirmação da entrega em curso fica suspensa na hora, para a
+  // queda não debitar o estoque antes de virar ERRO (SUSPEITA_ENERGIA_MS).
+  if (sim.timerEntrega) {
+    clearTimeout(sim.timerEntrega);
+    sim.timerEntrega = null;
+    sim.entregaSuspensa = PECAS[sim.pecaSolicitada - 1];
+  }
   for (const p of PECAS) sim.sensores.topo[p] = 1;
   for (const j of ['J1', 'J2', 'J3']) sim.sensores.juncao[j] = 1;
   emitirSensores();
@@ -297,10 +305,7 @@ function agendarErroSemEnergia() {
   sim.timerEnergia = setTimeout(() => {
     sim.timerEnergia = null;
     if (!sim.semEnergia || sim.estado === 'ERRO') return;
-    if (sim.timerEntrega) {                 // entrega em curso: para sem debitar
-      clearTimeout(sim.timerEntrega);
-      sim.timerEntrega = null;
-    }
+    sim.entregaSuspensa = null;             // a entrega suspensa não é concluída
     const peca = PECAS[sim.pecaSolicitada - 1];
     sim.esteiras.secA = sim.esteiras.secB = sim.esteiras.secC = false;
     sim.estado = 'ERRO';
@@ -320,6 +325,12 @@ function energiaVolta() {
   for (const p of PECAS) sim.sensores.topo[p] = sim.estoque['peca' + p] > 0 ? 1 : 0;
   for (const j of ['J1', 'J2', 'J3']) sim.sensores.juncao[j] = 0;
   emitirSensores();
+  // Energia de volta antes do ERRO: a entrega suspensa segue.
+  if (sim.entregaSuspensa && sim.estado === 'ENTREGANDO_PECA') {
+    const peca = sim.entregaSuspensa;
+    sim.timerEntrega = setTimeout(() => confirmarEntrega(peca), DELAY_ENTREGA);
+  }
+  sim.entregaSuspensa = null;
 }
 
 function resetSistema() {
