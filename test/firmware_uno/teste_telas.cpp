@@ -41,13 +41,14 @@ TESTE(telas_cabem_em_16_colunas) {
   VERIFICA_TEXTO(l2, "Entregue! B:14");
 
   const TipoErro erros[] = {ERR_MOTOR_SEM_AVANCO, ERR_TIMEOUT, ERR_JUNCAO_OBSTRUIDA, ERR_SEM_PECA_TOPO,
-                            ERR_SEM_ESTOQUE, ERR_PECA_PRESA_SAIDA, ERR_COMANDO_DESCONHECIDO};
+                            ERR_SEM_ESTOQUE, ERR_PECA_PRESA_SAIDA, ERR_COMANDO_DESCONHECIDO,
+                            ERR_SEM_ENERGIA};
   const char* esperado1[] = {"ERRO: Motor B", "ERRO: Timeout B", "ERRO: Juncao J2", "ERRO: Topo B",
-                             "ERRO: Estoque B", "ERRO: Saida B", "ERRO"};
+                             "ERRO: Estoque B", "ERRO: Saida B", "ERRO", "ERRO: Energia"};
   const char* esperado2[] = {"Sem avanco", "Retire a peca", "Obstruida", "Sem peca",
-                             "Zerado", "Peca presa", "comando_desconhe"};
+                             "Zerado", "Peca presa", "comando_desconhe", "Verifique fonte"};
   f.tela = TELA_ERRO;
-  for (int i = 0; i < 7; i++) {
+  for (int i = 0; i < 8; i++) {
     f.erroAtual = erros[i];
     textoTela(f, l1, l2);
     VERIFICA_TEXTO(l1, esperado1[i]);

@@ -77,6 +77,20 @@ struct Bancada {
     for (uint32_t t = t0; t <= t1; t += 5) passo(t);
   }
 
+  // Fonte dos periféricos desligada: os 6 sensores passam a ler "ocupado".
+  void semEnergia(uint32_t t) {
+    for (int i = 0; i < 3; i++) {
+      in.topo[i] = true;
+      in.juncao[i].ocupada = true;
+      in.juncao[i].ocupouEm = t;
+    }
+  }
+
+  // Fonte religada: topos com peça, junções livres.
+  void energiaVolta() {
+    for (int i = 0; i < 3; i++) in.juncao[i].ocupada = false;
+  }
+
   bool contem(const char* trecho) const { return strstr(log, trecho) != nullptr; }
   bool algumMotor() const { return fsmMotorLigado(f, 0) || fsmMotorLigado(f, 1) || fsmMotorLigado(f, 2); }
 };
@@ -362,3 +376,105 @@ TESTE(separador_nao_gira_se_o_pedido_for_recusado) {
   VERIFICA(separadorAutoDestino(a, b.f.estado, b.f.peca, 0) == 0);  // a roda não se mexe à toa
 }
 
+// ---- Falta de energia dos periféricos -----------------------------------------------
+
+TESTE(sem_energia_em_repouso_vai_para_erro_depois_de_500_ms) {
+  Bancada b;
+  b.ate(0, 100);
+  b.semEnergia(105);
+  b.ate(105, 600);                        // 495 ms com os 6 ocupados: ainda não
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  b.ate(605, 610);                        // 500 ms
+  VERIFICA(b.f.estado == ERRO);
+  VERIFICA(b.f.erroAtual == ERR_SEM_ENERGIA);
+  VERIFICA(b.contem("erro sem_energia - -\nestado ERRO"));
+  VERIFICA(!b.algumMotor());
+}
+
+TESTE(sem_energia_no_meio_da_entrega_para_o_motor_sem_debitar) {
+  Bancada b;
+  b.passo(0, CMD_PECA, 'B');
+  b.passo(5);
+  VERIFICA(fsmMotorLigado(b.f, 1));
+  b.in.topo[1] = false;                   // a peça saiu do topo
+  b.ate(10, 1000);
+  b.semEnergia(1005);                     // corte: os 6 sensores leem ocupado
+  b.ate(1005, 1600);
+  VERIFICA(b.f.estado == ERRO);
+  VERIFICA(b.f.erroAtual == ERR_SEM_ENERGIA);  // e não peca_presa_saida nem timeout
+  VERIFICA(b.contem("erro sem_energia B -"));
+  VERIFICA(!b.algumMotor());
+  VERIFICA(b.debitos == 0);               // a "passagem" falsa na junção não debitou
+}
+
+TESTE(pedido_logo_depois_do_corte_da_sem_energia_e_nao_juncao_obstruida) {
+  Bancada b;
+  b.semEnergia(0);
+  b.ate(0, 600);                          // já detectou em repouso
+  VERIFICA(b.f.erroAtual == ERR_SEM_ENERGIA);
+  b.passo(605, CMD_PECA, 'A');            // pedido em ERRO: recusado como ocupado
+  VERIFICA(b.f.estado == ERRO);
+  VERIFICA(!b.contem("juncao_obstruida"));
+  VERIFICA(!b.algumMotor());
+}
+
+TESTE(sem_energia_nao_dispara_em_operacao_normal) {
+  // Estoque normal: os 3 topos ocupados o tempo todo.
+  Bancada b;
+  b.ate(0, 5000);
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  // Duas junções ocupadas juntas (ruído) por mais de 500 ms: falta uma.
+  b.in.juncao[0].ocupada = b.in.juncao[2].ocupada = true;
+  b.ate(5005, 7000);
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  // As 3 junções juntas, mas um topo vazio: também não.
+  b.in.juncao[1].ocupada = true;
+  b.in.topo[1] = false;
+  b.ate(7005, 9000);
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  // Os 6 ocupados por menos de 500 ms (rajada): não.
+  b.in.topo[1] = true;
+  b.ate(9005, 9400);
+  b.in.juncao[1].ocupada = false;
+  b.ate(9405, 11000);
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  VERIFICA(!b.contem("sem_energia"));
+}
+
+TESTE(reset_com_energia_ainda_fora_detecta_de_novo_e_com_energia_volta_a_aguardar) {
+  Bancada b;
+  b.semEnergia(0);
+  b.ate(0, 600);
+  VERIFICA(b.f.erroAtual == ERR_SEM_ENERGIA);
+  b.passo(605, CMD_RESET);                // reset sem religar a fonte
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  b.ate(610, 1100);                       // recomeça a contar do reset: ainda não
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  b.ate(1105, 1110);
+  VERIFICA(b.f.estado == ERRO);           // detectou de novo
+  b.energiaVolta();
+  b.passo(1200, CMD_RESET);
+  b.ate(1205, 5000);
+  VERIFICA(b.f.estado == AGUARDANDO_PEDIDO);
+  b.passo(5005, CMD_PECA, 'C');           // e o sistema volta a entregar
+  VERIFICA(b.f.estado == ACIONANDO_ESTEIRA);
+}
+
+TESTE(juncao_de_outra_esteira_ocupada_na_entrega_so_adia_a_confirmacao) {
+  Bancada b;
+  b.passo(0, CMD_PECA, 'A');
+  b.passo(5);
+  b.in.topo[0] = false;
+  b.ate(10, 2000);
+  b.in.juncao[2].ocupada = true;          // junção da C obstruída (não é queda de energia)
+  b.in.juncao[2].ocupouEm = 2005;
+  b.in.juncao[0].ocupada = true;          // a peça A chega à junção dela
+  b.in.juncao[0].ocupouEm = 2005;
+  b.ate(2005, 2900);                      // dentro de SUSPEITA_ENERGIA_MS: espera
+  VERIFICA(b.f.estoque[0] == 15);
+  VERIFICA(fsmMotorLigado(b.f, 0));
+  b.ate(2905, 3100);                      // passou 1 s: segue e confirma a passagem real
+  VERIFICA(b.f.estoque[0] == 14);
+  VERIFICA(b.f.estado == ENTREGANDO_PECA);
+  VERIFICA(!b.contem("sem_energia"));
+}
