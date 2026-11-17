@@ -6,6 +6,8 @@
 
 > **Atualização de estado (13/11/2026):** os produtos comprados foram testados em 12/11. Dois problemas: (1) os produtos **A e C nem sempre passam da esteira secundária para a principal**, o que pede ajuste mecânico; (2) a **roda separadora gira menos que deveria**, e o produto nem sempre cai no compartimento certo, o que pede ajuste fino das configurações com testes empíricos (Bloco 1b). Em 13/11: os dois ajustes e, depois, a integração total **já com o CX9240**.
 
+> **Encerramento (17/11/2026):** não há registro de bancada de 13/11. O ajuste de A e C, o ajuste fino da roda, o acabamento e a integração total foram transferidos para o [roteiro da Semana 14](semana_14_16-20_novembro.md). Em 16/11 a equipe testou a detecção da falta de energia (card #80) e começou a calibrar a roda (7 e 6 RPM); resultados em [`resultados.md`](../resultados.md).
+
 | Item | Status (13/11/2026) | Origem |
 |---|---|---|
 | Roda separadora montada na base | ✅ Concluído | fotos de 10/11 |
@@ -35,7 +37,7 @@
 | **10/11 (ter.)** | Acabamento da elétrica. | Fiação organizada e conferida; alimentação e GND comum revisados. | ⬜ Não registrado |
 | **11/11 (qua.)** | Acabamento da base e dos cabos; reteste das esteiras. | Acabamento concluído; tempos dentro das referências. | ⬜ Não registrado |
 | **12/11 (qui.)** | Integração total do projeto (na prática: teste dos produtos). | Sequência completa estável, com ocupado, estoque e erro forçado verificados. | ⚠️ Produtos testados: A e C nem sempre passam para a principal; roda gira menos e erra o compartimento. Integração total adiada para 13/11 |
-| **13/11 (sex.)** | Ajuste mecânico de A e C, ajuste fino da roda e integração total com o CX9240. | Produtos passando e caindo no compartimento certo; evidência final em `resultados.md`. | ⬜ |
+| **13/11 (sex.)** | Ajuste mecânico de A e C, ajuste fino da roda e integração total com o CX9240. | Produtos passando e caindo no compartimento certo; evidência final em `resultados.md`. | ➡️ Sem registro; transferido para a [Semana 14](semana_14_16-20_novembro.md) |
 
 > ⚠️ A ordem pode mudar conforme a disponibilidade da bancada, mas os produtos devem ser testados **antes** de fechar os cabos: ajustar a altura ou a posição de um sensor é mais fácil com tudo acessível. O que não for executado fica como **pendente**, sem presumir aprovação.
 

@@ -12,7 +12,16 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 ---
 
-## [Não publicado] — Semana 13: produtos, acabamento e integração total (09–13/11/2026, em andamento)
+## [Não publicado] — Semana 14: calibração da roda, acabamento e integração total (16–20/11/2026, em andamento)
+
+### Alterado
+
+- **Semana 13 encerrada e roteiro da Semana 14 (17/11/2026):** sem registro de bancada em 13/11; ajuste de A e C, ajuste fino da roda, acabamento e integração total transferidos para o [roteiro da Semana 14](testes/roteiros/semana_14_16-20_novembro.md). Ver [`testes/resultados.md`](testes/resultados.md)
+- **Falta de energia testada e calibração da roda (16–17/11/2026, `2a1f775`):** detecção da falta de energia (B4, card #80) testada na bancada. Roda separadora: com 7 RPM a primeira volta acerta todos os compartimentos, mas a marca se afasta nas voltas seguintes; com 6 RPM fica muito fora. Configuração em teste: 4096 passos por volta e 7 RPM; o roteiro da Semana 14 traz o teste do sentido do desvio e a fórmula do ajuste fino. Ver [`testes/resultados.md`](testes/resultados.md)
+
+---
+
+## [Marco 8] — Semana 13: roda na base, produtos comprados, CONIC e falta de energia (09–13/11/2026)
 
 ### Adicionado
 
