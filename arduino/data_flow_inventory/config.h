@@ -53,11 +53,11 @@
 // Não arredonde para 4096: o erro acumularia ~1,8° a cada volta e os compartimentos
 // desalinhariam em poucos ciclos. Ao trocar o motor ou a roda, confira a volta completa
 // com CMD:SEP:A, CMD:SEP:B e CMD:SEP:0 (a marca tem de voltar ao lugar).
-#define SEPARADOR_PASSOS_POR_VOLTA   4076
+#define SEPARADOR_PASSOS_POR_VOLTA   4096
 // A biblioteca Stepper só precisa do ritmo: um múltiplo de 4 (fases das bobinas) que
 // não seja menor que os passos por volta acima.
 #define SEPARADOR_PASSOS_BIBLIOTECA  4096
-#define SEPARADOR_RPM      10     // se a roda perder passos ou travar, diminua (ex.: 8)
+#define SEPARADOR_RPM      7     // se a roda perder passos ou travar, diminua (ex.: 8)
 // 1 = inverte o sentido do giro: use se a roda girar ao contrário do esperado (A e B trocam de lugar).
 #define SEPARADOR_INVERTER_SENTIDO  0
 // 1 (padrão) = a roda se prepara sozinha de acordo com a peça pedida: parte assim que
