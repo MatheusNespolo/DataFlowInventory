@@ -45,6 +45,8 @@ const COMANDO_INTERVALO_MS = parseInt(process.env.COMANDO_INTERVALO_MS, 10) || 5
 // sensores passam a ler "ocupado" e, depois deste tempo, o sistema vai para ERRO
 // (sem_energia). Só para testes: com SIMULAR_FALHAS=true o dashboard pode disparar a queda
 // pelos eventos simular_falta_energia e simular_energia_volta (os testes E2E usam isso).
+// simular_falta_energia_na_entrega arma a queda para o instante em que a próxima entrega
+// começa, no próprio simulador: o teste não depende do tempo de resposta do navegador.
 const ENERGIA_FALHA_MS = 500;
 const SIMULAR_FALHAS = process.env.SIMULAR_FALHAS === 'true';
 
@@ -65,6 +67,7 @@ let sim = {
   semEnergia:      false,
   timerEnergia:    null,
   entregaSuspensa: null,   // peça cuja entrega foi suspensa pela queda de energia
+  quedaNaEntrega:  false,  // teste: derruba a energia quando a próxima entrega começar
 };
 
 const PECAS = ['A', 'B', 'C'];
@@ -247,6 +250,10 @@ function acionarEsteira(peca) {
   emitirEsteiras();
 
   sim.timerEntrega = setTimeout(() => confirmarEntrega(peca), DELAY_ENTREGA);
+  if (sim.quedaNaEntrega) {
+    sim.quedaNaEntrega = false;
+    faltaDeEnergia();
+  }
 }
 
 function confirmarEntrega(peca) {
@@ -317,6 +324,7 @@ function agendarErroSemEnergia() {
 
 // Fonte religada: junções livres; topo ocupado onde ainda há estoque.
 function energiaVolta() {
+  sim.quedaNaEntrega = false;               // desarma uma queda pendente (limpeza dos testes)
   if (!sim.semEnergia) return;
   console.log('[SIM] Energia dos periféricos restabelecida');
   sim.semEnergia = false;
@@ -409,6 +417,7 @@ io.on('connection', (socket) => {
   if (SIMULAR_FALHAS) {
     socket.on('simular_falta_energia', faltaDeEnergia);
     socket.on('simular_energia_volta', energiaVolta);
+    socket.on('simular_falta_energia_na_entrega', () => { sim.quedaNaEntrega = true; });
   }
 
   socket.on('disconnect', () => {

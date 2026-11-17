@@ -58,20 +58,11 @@ test('energia — queda no meio da entrega: para sem debitar o estoque', async (
   await expect(estado).toHaveText('AGUARDANDO_PEDIDO');
   try {
     const estoqueB = (await page.locator('#estoque-b').textContent()).trim();
-    // O corte acontece no exato status ENTREGANDO_PECA (a entrega simulada dura 1,5 s;
-    // esperar o texto na tela pode perder essa janela num runner lento).
-    const cortou = page.evaluate(() => new Promise((resolve) => {
-      const aoStatus = (d) => {
-        if (d && d.estado === 'ENTREGANDO_PECA') {
-          window.dfiSocket.off('status', aoStatus);
-          window.dfiSocket.emit('simular_falta_energia');
-          resolve();
-        }
-      };
-      window.dfiSocket.on('status', aoStatus);
-    }));
+    // A queda é armada no simulador e acontece no instante em que a entrega começa. Disparar
+    // pelo navegador ao ver ENTREGANDO_PECA falhava no CI: com o WebGL por software, a página
+    // podia reagir depois de a entrega simulada (1,5 s) já ter sido confirmada e debitada.
+    await emitir(page, 'simular_falta_energia_na_entrega');
     await page.locator('#btn-solicitar-b').click();
-    await cortou;
     await expect(estado).toHaveText('ERRO');
     await expect(page.locator('#alerta-energia')).toBeVisible();
     await expect(historicoContendo(page, 'Erro: sem_energia')).not.toHaveCount(0);
