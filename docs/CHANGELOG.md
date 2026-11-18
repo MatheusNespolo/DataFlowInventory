@@ -18,6 +18,7 @@ Convenção de seções: `Adicionado`, `Alterado`, `Corrigido`, `Revertido`, `Re
 
 - **Semana 13 encerrada e roteiro da Semana 14 (17/11/2026):** sem registro de bancada em 13/11; ajuste de A e C, ajuste fino da roda, acabamento e integração total transferidos para o [roteiro da Semana 14](testes/roteiros/semana_14_16-20_novembro.md). Ver [`testes/resultados.md`](testes/resultados.md)
 - **Falta de energia testada e calibração da roda (16–17/11/2026, `2a1f775`):** detecção da falta de energia (B4, card #80) testada na bancada. Roda separadora: com 7 RPM a primeira volta acerta todos os compartimentos, mas a marca se afasta nas voltas seguintes; com 6 RPM fica muito fora. Configuração em teste: 4096 passos por volta e 7 RPM; o roteiro da Semana 14 traz o teste do sentido do desvio e a fórmula do ajuste fino. Ver [`testes/resultados.md`](testes/resultados.md)
+- **Calibração da roda interrompida, acabamento e reteste (17–18/11/2026, `8ad2700`, `459184a`):** com 7 RPM e 4076 passos por volta, resultado razoável, mas a roda deve ser ajustada ao neutro a cada volta. Acabamento e ajuste da passagem de A e C concluídos; reteste com 15 ciclos por esteira (falhas: A 5, B 3, C 4, produto fora do compartimento certo). Sem bancada em 18/11; integração geral prevista para 19/11. Ver [`testes/resultados.md`](testes/resultados.md)
 
 ---
 

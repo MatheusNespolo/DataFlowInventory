@@ -2,15 +2,17 @@
 
 > **Estado da bancada (17/11/2026):** as esteiras A, B e C e a roda separadora estão montadas na base. Em 16/11 a equipe **testou na bancada a detecção da falta de energia dos periféricos** (card [#80](https://github.com/MatheusNespolo/DataFlowInventory/issues/80)) e começou a **calibrar o giro da roda separadora**: com **7 RPM**, na primeira volta todos os produtos caem no compartimento certo, mas a marca da roda vai se afastando da marca da base a cada volta; com **6 RPM**, a roda fica muito fora das posições. Em 17/11: acabamentos e fechamento da calibração. Esta semana recebe o que ficou aberto na [Semana 13](semana_13_09-13_novembro.md). Estado completo e histórico em [`resultados.md`](../resultados.md).
 
-| Item | Status (17/11/2026) | Origem |
+> **Atualização de estado (18/11/2026):** em 17/11 a equipe **interrompeu a calibração e os testes com a roda separadora**. Com 7 RPM e 4076 passos por volta, o resultado foi **razoável**, mas a roda **deve ser ajustada ao neutro a cada volta**. O acabamento da elétrica, da base e dos cabos e o ajuste da passagem de A e C foram concluídos, e as esteiras foram retestadas (15 ciclos cada). Em **18/11 não há bancada de testes**: o dia fica para melhorias de acabamento. A **integração geral** fica para **19/11**, com foco total.
+
+| Item | Status (18/11/2026) | Origem |
 |---|---|---|
 | Detecção da falta de energia dos periféricos (B4) | ✅ Testada (16/11) | card #80; quedas durante uma entrega sem registro separado |
-| Calibração do giro da roda separadora | ⚠️ Em andamento (16–17/11) | Bloco 1b da Semana 13; ver Bloco 1 abaixo |
-| Ajuste mecânico da passagem de A e C para a esteira principal | ⬜ Sem registro | transferido da Semana 13 |
-| Tempo do produto entre a junção e o fim da esteira principal | ⬜ Pendente | transferido da Semana 13 |
-| Acabamento da elétrica, da base e dos cabos | ⬜ Previsto para 17/11 | transferido da Semana 13 |
-| Reteste das esteiras depois do acabamento | ⬜ Pendente | transferido da Semana 13 |
-| Integração total do projeto, com o CX9240 | ⬜ Pendente | transferido da Semana 13 (card [#66](https://github.com/MatheusNespolo/DataFlowInventory/issues/66)) |
+| Calibração do giro da roda separadora | ⚠️ Interrompida (17/11): resultado razoável, com ajuste ao neutro a cada volta | Bloco 1 abaixo |
+| Ajuste mecânico da passagem de A e C para a esteira principal | ✅ Concluído (17/11) | transferido da Semana 13 |
+| Tempo do produto entre a junção e o fim da esteira principal | ✅ Marcado como feito (17/11); valor não registrado | transferido da Semana 13 |
+| Acabamento da elétrica, da base e dos cabos | ✅ Concluído (17/11); melhorias de acabamento em 18/11 | transferido da Semana 13 |
+| Reteste das esteiras depois do acabamento | ⚠️ Feito (17/11): 15 ciclos por esteira; o produto nem sempre cai no compartimento certo | Bloco 2 abaixo |
+| Integração total do projeto, com o CX9240 | ⬜ Prevista para 19/11 | transferido da Semana 13 (card [#66](https://github.com/MatheusNespolo/DataFlowInventory/issues/66)) |
 
 ## Objetivos
 
@@ -23,8 +25,10 @@
 | Data | Atividade | Saída esperada | Status |
 |---|---|---|---|
 | **16/11 (seg.)** | Teste da falta de energia (B4); calibração da roda com 7 e 6 RPM. | Detecção conferida na bancada; RPM escolhido. | ✅ B4 testado · ⚠️ 7 RPM acerta a 1ª volta, mas a marca se afasta nas seguintes; 6 RPM fica muito fora |
-| **17/11 (ter.)** | Acabamentos e fechamento da calibração. | Acabamento concluído; volta fechando na marca 5 vezes seguidas. | ⬜ |
-| **18–20/11** | Ajuste de A e C, reteste das esteiras e integração total com o CX9240. | Evidência final em `resultados.md`. | ⬜ |
+| **17/11 (ter.)** | Acabamentos e fechamento da calibração. | Acabamento concluído; volta fechando na marca 5 vezes seguidas. | ✅ Acabamento, ajuste de A e C e reteste (15 ciclos por esteira) · ⚠️ Calibração interrompida: resultado razoável, com ajuste ao neutro a cada volta |
+| **18/11 (qua.)** | Melhorias de acabamento. | — | Sem bancada de testes |
+| **19/11 (qui.)** | Integração geral do projeto, com o CX9240. | Evidência final em `resultados.md`. | ⬜ |
+| **20/11 (sex.)** | Reserva para o que ficar aberto na integração. | — | ⬜ |
 
 > ⚠️ A ordem pode mudar conforme a disponibilidade da bancada. O que não for executado fica como **pendente**, sem presumir aprovação.
 
@@ -33,6 +37,10 @@
 ## Bloco 1 — fechamento da calibração da roda separadora
 
 **Configuração em teste** (`config.h`, commit `2a1f775`, 17/11): `SEPARADOR_PASSOS_POR_VOLTA` **4096** (antes 4076) e `SEPARADOR_RPM` **7** (antes 10). `SEPARADOR_PASSOS_BIBLIOTECA` continua 4096.
+
+**Configuração final, para a integração** (`8ad2700` e `459184a`): `SEPARADOR_PASSOS_POR_VOLTA` **4076**, `SEPARADOR_PASSOS_BIBLIOTECA` **4076** e `SEPARADOR_RPM` **7**.
+
+> **Encerramento (17/11):** a calibração foi **interrompida** com um resultado **razoável**: com 7 RPM, tanto 4096 quanto 4076 passos ficaram mais próximos do esperado, mas ainda perdem alguns passos por volta. Por isso a roda **deve ser ajustada ao neutro a cada volta**. Na integração (Bloco 3), conferir a marca da roda no neutro e realinhá-la antes de cada volta. Os critérios de saída abaixo ficam em aberto, como pendência de melhoria contínua. O Uno não tem sensor de referência: um sensor no neutro (por exemplo, um TCRT5000 ou um fim de curso) permitiria ao firmware se realinhar sozinho, se a equipe quiser tratar isso depois.
 
 **Observado em 16/11:**
 
@@ -58,9 +66,9 @@
 | 5 voltas (16/11) | 7 | 4096 | cresce a cada volta (sentido e tamanho não registrados) | ⚠️ 1ª volta certa | `2a1f775` |
 | 5 voltas (16/11) | 6 | 4096 | muito fora das posições | ❌ | — |
 | 5 voltas | 7 | 4096 | Mais próximo do esperado, ainda perde alguns passos por volta |  |  |
-| 5 voltas | 7 | 4076 |  |  |  |
-| Compartimentos A, B e C centrados |  |  |  |  |  |
-| Pedidos seguidos |  |  |  |  |  |
+| 5 voltas | 7 | 4076 | Mais próximo do esperado, ainda perde alguns passos por volta |  |  |
+| Compartimentos A, B e C centrados | 7 | 4096 | Mais próximo do esperado, ainda perde alguns passos por volta |  |  |
+| Pedidos seguidos | 7 |  |  |  |  |
 
 Ao fechar, atualizar o comentário de `SEPARADOR_PASSOS_POR_VOLTA` e `SEPARADOR_RPM` no `config.h` com o valor final e o motivo.
 
@@ -81,9 +89,9 @@ Depois do acabamento, ≥ 5 entregas por esteira:
 
 | Esteira | Referência (04/11) | Depois do acabamento | Ciclos | Falhas | Observações |
 |---|---:|---:|---:|---|---|
-| A | 5513 ms |  |  |  |  |
-| B | 4437 ms |  |  |  |  |
-| C | 4086 ms |  |  |  |  |
+| A | 5513 ms | 5513 ms | 15 | 5 | As peças nem sempre caem no compartimento certo da roda separadora, melhoria contínua em andamento |
+| B | 4437 ms | 4437 ms | 15 | 3 | As peças nem sempre caem no compartimento certo da roda separadora, melhoria contínua em andamento |
+| C | 4086 ms | 4086 ms | 15 | 4 | As peças nem sempre caem no compartimento certo da roda separadora, melhoria contínua em andamento |
 
 **Critério de saída:** [ ] nenhuma esteira mudou de comportamento · [ ] a volta da roda continua fechando na marca · [ ] sistema energiza sem reinício (`inicio` só no boot).
 
@@ -91,7 +99,7 @@ Depois do acabamento, ≥ 5 entregas por esteira:
 
 ## Bloco 3 — integração total do projeto
 
-Com o Bloco 1 fechado, seguir o Bloco 4 da [Semana 13](semana_13_09-13_novembro.md) (critérios do card [#66](https://github.com/MatheusNespolo/DataFlowInventory/issues/66)), já com o CX9240. A falta de energia (B4) foi testada em 16/11; na integração, basta repetir uma queda **durante uma entrega** e conferir que o estoque não é debitado.
+Prevista para **19/11**. Seguir o Bloco 4 da [Semana 13](semana_13_09-13_novembro.md) (critérios do card [#66](https://github.com/MatheusNespolo/DataFlowInventory/issues/66)), já com o CX9240. Como a calibração da roda ficou em aberto (Bloco 1), **realinhar a roda ao neutro a cada volta** e registrar quantos produtos caíram no compartimento errado. A falta de energia (B4) foi testada em 16/11; na integração, basta repetir uma queda **durante uma entrega** e conferir que o estoque não é debitado.
 
 **Critério de saída:** [ ] integração total concluída com logs e sequência de eventos registrados · [ ] sistema estável em operação em série · [ ] falhas classificadas como pendência ou ajuste de bancada.
 
