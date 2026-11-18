@@ -57,7 +57,7 @@
 |---|---:|---:|---|---|---|
 | 5 voltas (16/11) | 7 | 4096 | cresce a cada volta (sentido e tamanho não registrados) | ⚠️ 1ª volta certa | `2a1f775` |
 | 5 voltas (16/11) | 6 | 4096 | muito fora das posições | ❌ | — |
-| 5 voltas | 7 | 4096 |  |  |  |
+| 5 voltas | 7 | 4096 | Mais próximo do esperado, ainda perde alguns passos por volta |  |  |
 | 5 voltas | 7 | 4076 |  |  |  |
 | Compartimentos A, B e C centrados |  |  |  |  |  |
 | Pedidos seguidos |  |  |  |  |  |
@@ -72,10 +72,10 @@ Ao fechar, atualizar o comentário de `SEPARADOR_PASSOS_POR_VOLTA` e `SEPARADOR_
 
 Itens dos Blocos 2 e 3 da [Semana 13](semana_13_09-13_novembro.md):
 
-- [ ] Fiação organizada, sem contato com partes móveis; motor de passo em fonte de 12 V dedicada, com **GND comum** ao Uno; cabos do I²C e da serial afastados dos cabos dos motores.
-- [ ] Acabamento da base e dos cabos, sem interferir nas esteiras, nos sensores nem na roda.
-- [ ] Ajuste mecânico da passagem de A e C para a esteira principal, com ≥ 5 entregas de cada.
-- [ ] Tempo do produto entre a junção e o fim da esteira principal (para `SEPARADOR_ESPERA_APOS_ENTREGA_MS`).
+- [x] Fiação organizada, sem contato com partes móveis; motor de passo em fonte de 12 V dedicada, com **GND comum** ao Uno; cabos do I²C e da serial afastados dos cabos dos motores.
+- [x] Acabamento da base e dos cabos, sem interferir nas esteiras, nos sensores nem na roda.
+- [x] Ajuste mecânico da passagem de A e C para a esteira principal, com ≥ 5 entregas de cada.
+- [x] Tempo do produto entre a junção e o fim da esteira principal (para `SEPARADOR_ESPERA_APOS_ENTREGA_MS`).
 
 Depois do acabamento, ≥ 5 entregas por esteira:
 
